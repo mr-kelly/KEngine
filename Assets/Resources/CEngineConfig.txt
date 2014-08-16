@@ -4,5 +4,6 @@ AssetBundleExt	.box	base
 ResourceDirName	AssetBundles	base
 ResourceRemoteUrl	http://10.236.51.41/AssetBundles	base
 ResourceMD5BundleName	ResourcesMD5	base
+IsLoadAssetBundle	1	base
 AllWin32ResourceOnEditor	0	no
 IsMobileMD5Resource	0	no

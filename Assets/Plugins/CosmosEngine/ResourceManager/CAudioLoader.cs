@@ -36,7 +36,7 @@ public class CAudioLoader
 	public CAudioLoader(string url)
 	{
         Url = url;
-        if (CResourceManager.IsLoadResourceFolder)
+        if (CCosmosEngine.GetConfig("IsLoadAssetBundle").ToInt32() == 0)
             CResourceManager.Instance.StartCoroutine(LoadFromResourcesFolder(url));
         else
             CResourceManager.Instance.StartCoroutine(Load(url));

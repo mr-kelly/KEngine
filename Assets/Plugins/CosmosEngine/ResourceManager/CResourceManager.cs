@@ -25,8 +25,6 @@ public class CResourceManager : MonoBehaviour, ICModule
 		ShowTime,
 		ShowDetail,
 	}
-    public static bool IsLoadResourceFolder = false; // 是否讀取Resources資源文件夾內的
-
     public static bool CacheWWW = false;
     public static int CacheVersion = -1;  // Load from bundleVersion
 

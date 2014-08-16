@@ -38,7 +38,7 @@ public class CAssetFileBridge
         AssetFileLoadedCallback = assetFileLoadedCallback;
         AssetInBundleName = assetName;
 
-        if (CResourceManager.IsLoadResourceFolder)
+        if (CCosmosEngine.GetConfig("IsLoadAssetBundle").ToInt32() == 0)
         {
             CResourceManager.Instance.StartCoroutine(LoadInResourceFolder(path));
         }
