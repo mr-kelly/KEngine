@@ -1,0 +1,268 @@
+﻿//-------------------------------------------------------------------------
+//
+//      CosmosEngine - The Lightweight Unity3D Game Develop Framework
+//
+//                     Copyright © 2011-2014
+//                   MrKelly <23110388@qq.com>
+//              https://github.com/mr-kelly/CosmosEngine
+//
+//-------------------------------------------------------------------------
+using UnityEngine;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Reflection;
+
+
+public class CGameSettings : ICModule
+{
+    class _InstanceClass { public static CGameSettings _Instance = new CGameSettings();}
+    public static CGameSettings Instance { get { return _InstanceClass._Instance; } }
+
+	public Dictionary<Type, Dictionary<string, CBaseInfo>> SettingInfos = new Dictionary<Type, Dictionary<string, CBaseInfo>>();
+
+    public Action InitAction; // Init時調用的委託、函數指針
+
+	public void LoadTab<T>(string tabPath) where T : CBaseInfo, new()
+	{
+        CTabFile tabFile;
+#if GAME_CLIENT
+        tabFile = CTabFile.LoadFromString(CSettingManager.Instance.LoadSetting(tabPath));
+#else 
+        tabFile = new CTabFile();
+        tabFile.LoadByIO(XArtScriptDefine.AppPath + tabPath);
+		
+#endif
+
+        int rowStart = 2;
+		Dictionary<string, CBaseInfo> dict = new Dictionary<string, CBaseInfo>();
+		for (int i = rowStart; i <= tabFile.GetHeight(); i++)
+		{
+            // 先读取ID， 获取是否之前已经读取过配置，
+            // 如果已经读取过，那么获取原配置对象，并重新赋值 (因为游戏中其它地方已经存在它的引用了，直接替换内存泄露)
+            string id = tabFile.GetString(i, "Id");  // 获取ID是否存在, 如果已经存在，那么替换其属性，不new一个
+            CBaseInfo existOne;
+            if (dict.TryGetValue(id, out existOne))
+            {
+                CBaseInfo existT = existOne;
+                CBaseInfo.LoadFromTab(typeof(T), ref existT, tabFile, i);  // 修改原对象，不new
+                (existT as CBaseInfo).Parse();
+            }
+            else
+            {
+                T pInfo = CBaseInfo.LoadFromTab(typeof(T), tabFile, i) as T;
+                pInfo.Parse();
+                dict[pInfo.Id] = pInfo;  // 不存在，直接new
+            }
+		}
+
+		SettingInfos[typeof(T)] = dict;
+	}
+
+	public List<T> GetInfos<T>() where T : CBaseInfo
+	{
+		Dictionary<string, CBaseInfo> dict;
+		if (SettingInfos.TryGetValue(typeof(T), out dict))
+		{
+			//CBase.Log(dict.Count+"");
+			List<T> list = new List<T>();
+			foreach (CBaseInfo item in dict.Values)
+			{
+				list.Add((T)item);
+			}
+			return list;
+		}
+		else
+			CBase.LogError("找不到类型配置{0}, 总类型数{1}", typeof(T).Name, SettingInfos.Count);
+
+		return null;
+	}
+	public T GetInfo<T>(string id) where T : CBaseInfo
+	{
+		Dictionary<string, CBaseInfo> dict;
+		if (SettingInfos.TryGetValue(typeof(T), out dict))
+		{
+			CBaseInfo tabInfo;
+			if (dict.TryGetValue(id, out tabInfo))
+			{
+				return (T)tabInfo;
+			}
+			else
+				CBase.LogError("找不到类型{0} Id为{1}的配置对象, 类型表里共有对象{2}", typeof(T).Name, id, dict.Count);
+		}
+		else
+			CBase.LogError("找不到类型配置{0}, 总类型数{1}", typeof(T).Name, SettingInfos.Count);
+
+		return null;
+	}
+	// 数字ID是索引
+	public T GetInfo<T>(int id) where T : CBaseInfo
+	{
+		return GetInfo<T>(id.ToString());
+	}
+
+	public IEnumerator Init()
+	{
+        if (this.InitAction == null)
+            CBase.LogError("GameSettings沒有定義初始化行為！！！");
+        else
+            this.InitAction();
+		yield break;
+	}
+
+	public IEnumerator UnInit()
+	{
+		yield break;
+	}
+}
+
+public class CBaseInfo
+{
+	public string Id;
+	public virtual void Parse()
+	{
+
+	}
+
+    public static void LoadFromTab(Type type, ref CBaseInfo newT, CTabFile tabFile, int row)
+    {
+        CBase.Assert(typeof(CBaseInfo).IsAssignableFrom(type));
+
+		FieldInfo[] fields = type.GetFields();
+		foreach (FieldInfo field in fields)
+		{
+			if (!tabFile.HasColumn(field.Name))
+			{
+                CBase.LogError("表{0} 找不到表头{1}", type.Name, field.Name);
+				continue;
+			}
+			object value;
+			if (field.FieldType == typeof(int))
+			{
+				value = tabFile.GetInteger(row, field.Name);
+			}
+            else if (field.FieldType == typeof(long))
+            {
+                value = (long)tabFile.GetInteger(row, field.Name);
+            }
+            else if (field.FieldType == typeof(string))
+            {
+                value = tabFile.GetString(row, field.Name);
+            }
+            else if (field.FieldType == typeof(float))
+            {
+                value = tabFile.GetFloat(row, field.Name);
+            }
+            else if (field.FieldType == typeof(bool))
+            {
+                value = tabFile.GetBool(row, field.Name);
+            }
+            else if (field.FieldType == typeof(double))
+            {
+                value = tabFile.GetDouble(row, field.Name);
+            }
+            else if (field.FieldType == typeof(uint))
+            {
+                value = tabFile.GetUInteger(row, field.Name);
+            }
+            else if (field.FieldType == typeof(List<string>))
+            {
+                string sz = tabFile.GetString(row, field.Name);
+                value = CBaseTool.Split<string>(sz, '|');
+            }
+            else if (field.FieldType == typeof(List<int>))
+            {
+                List<int> retInt = new List<int>();
+                string szArr = tabFile.GetString(row, field.Name);
+                if (!string.IsNullOrEmpty(szArr))
+                {
+                    string[] szIntArr = szArr.Split('|');
+                    foreach (string szInt in szIntArr)
+                    {
+                        float parseFloat;
+                        float.TryParse(szInt, out parseFloat);
+                        int parseInt_ = (int)parseFloat;
+                        retInt.Add(parseInt_);
+                    }
+                    value = retInt;
+                }
+                else
+                    value = new List<int>();
+            }
+            else if (field.FieldType == typeof (List<List<string>>))
+            {
+                string sz = tabFile.GetString(row, field.Name);
+                if (!string.IsNullOrEmpty(sz))
+                {
+                    var szOneList = new List<List<string>>();
+                    string[] szArr = sz.Split('|');
+                    foreach (string szOne in szArr)
+                    {
+                        string[] szOneArr = szOne.Split('-');
+                        szOneList.Add(new List<string>(szOneArr));
+                    }
+                    value = szOneList;
+                }
+                else
+                    value = new List<List<string>>();
+            }
+            else if (field.FieldType == typeof(List<List<int>>))
+            {
+                string sz = tabFile.GetString(row, field.Name);
+                if (!string.IsNullOrEmpty(sz))
+                {
+                    var zsOneIntList = new List<List<int>>();
+                    string[] szArr = sz.Split('|');
+                    foreach (string szOne in szArr)
+                    {
+                        List<int> retInts = new List<int>();
+                        string[] szOneArr = szOne.Split('-');
+                        foreach (string szOneInt in szOneArr)
+                        {
+                            float parseFloat;
+                            float.TryParse(szOneInt, out parseFloat);
+                            int parseInt_ = (int)parseFloat;
+                            retInts.Add(parseInt_);
+                        }
+                        zsOneIntList.Add(retInts);
+                    }
+                    value = zsOneIntList;
+                }
+                else
+                    value = new List<List<int>>();
+            }
+            else
+            {
+                CBase.LogWarning("未知类型: {0}", field.Name);
+                value = null;
+            }
+
+		    if (field.Name == "Id")  // 如果是Id主键，确保数字成整数！不是浮点数  因为excel转tab可能转成浮点
+			{
+				float fValue;
+				if (float.TryParse((string)value, out fValue))
+				{
+					try
+					{
+						value = ((int)fValue).ToString();
+					}
+					catch
+					{
+						CBase.LogError("转型错误...{0}", value.ToString());
+					}
+
+				}
+			}
+
+			field.SetValue(newT, value);
+		}
+
+    }
+
+	public static CBaseInfo LoadFromTab(Type type, CTabFile tabFile, int row)
+	{
+        CBaseInfo newT = Activator.CreateInstance(type) as CBaseInfo;
+		LoadFromTab(type, ref newT, tabFile, row);
+        return newT;
+	}
+}
