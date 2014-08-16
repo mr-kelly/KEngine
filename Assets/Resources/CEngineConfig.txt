@@ -1,7 +1,7 @@
 Key	Value	Comment
-ProductDirName	cb-product	base
+ProductRelPath	../../cb-product	
+AssetBundleRelPath	../../cb-product/AssetBundles	
 AssetBundleExt	.box	base
-ResourceDirName	AssetBundles	base
 ResourceRemoteUrl	http://10.236.51.41/AssetBundles	base
 ResourceMD5BundleName	ResourcesMD5	base
 IsLoadAssetBundle	1	base

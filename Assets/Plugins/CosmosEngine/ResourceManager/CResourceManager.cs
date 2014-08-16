@@ -258,8 +258,10 @@ public class CResourceManager : MonoBehaviour, ICModule
     }
 	public static IEnumerator InitResourcePath()
     {
-        string productDirName = CCosmosEngine.GetConfig("ProductDirName");
-        string resourceDirName = CCosmosEngine.GetConfig("ResourceDirName");
+        string productPath = Path.Combine(Application.dataPath, CCosmosEngine.GetConfig("ProductRelPath"));
+        string assetBundlePath = Path.Combine(Application.dataPath, CCosmosEngine.GetConfig("AssetBundleRelPath"));
+        string productDirName = Path.GetFileName(CCosmosEngine.GetConfig("ProductRelPath"));
+        string resourceDirName = Path.GetFileName(CCosmosEngine.GetConfig("AssetBundleRelPath"));
 
         BuildPlatformName = GetBuildPlatformName();
 
@@ -273,11 +275,9 @@ public class CResourceManager : MonoBehaviour, ICModule
 			case RuntimePlatform.WindowsEditor:
 			case RuntimePlatform.OSXEditor:
 				{
-                    string path = Application.dataPath + "/../../";
-
-                    ApplicationPath = string.Format("{0}{1}{2}/", fileProtocol, path, productDirName + "/");
-                    ResourcesPath = fileProtocol + path + productDirName + "/" + resourceDirName + "/" + BuildPlatformName + "/";
-                    ResourcesPathWithOutFileProtocol = path + productDirName + "/" + resourceDirName + "/" + BuildPlatformName + "/";
+                    ApplicationPath = string.Format("{0}{1}/", fileProtocol, productPath);
+                    ResourcesPath = fileProtocol + assetBundlePath + "/" + BuildPlatformName + "/";
+                    ResourcesPathWithOutFileProtocol = assetBundlePath + "/" + BuildPlatformName + "/";
 
 				}
 				break;

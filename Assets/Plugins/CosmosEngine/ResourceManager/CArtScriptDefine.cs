@@ -17,7 +17,8 @@ public class XArtScriptDefine
 	{
 		get
 		{
-            string productDirName = CCosmosEngine.GetConfig("ProductDirName");
+            string productRelPath = System.IO.Path.Combine(Application.dataPath, CCosmosEngine.GetConfig("ProductRelPath"));
+            string productDirName = System.IO.Path.GetFileName(productRelPath);
             string productDir = productDirName + "/";
 			string appPath = "";
 
@@ -26,22 +27,14 @@ public class XArtScriptDefine
 				case RuntimePlatform.WindowsEditor:
 				case RuntimePlatform.OSXEditor:
 					{
-                        //string path = Application.dataPath.Substring(0, Application.dataPath.Length - "/Assets".Length);
-                        //if (path.Contains("/Client"))
-                        //{
-                        //    path = path.Substring(0, path.Length - "/Client".Length);
-                        //}
-                        //string[] Splits = path.Split('/');
-                        //path = path.Substring(0, path.Length - Splits[Splits.Length - 1].Length);
-                        //appPath = path + productDir;
-                        appPath = "../" + productDir;
+                        appPath = productRelPath + "/";
 					}
 					break;
 				case RuntimePlatform.WindowsPlayer:
 				case RuntimePlatform.OSXPlayer:
 					{
-						string path = Application.dataPath.Substring(0, Application.dataPath.Length - "ClientX86D_Data".Length);
-						appPath = path + "/";
+                        string path = Application.dataPath + "/../";
+                        appPath = path;
 					}
 					break;
 				case RuntimePlatform.Android:
