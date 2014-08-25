@@ -25,6 +25,11 @@ Design Patterns
 * __Depend on third party plugins__ - You can use your favourite Plugins like NGUI, 2DToolkit or something else
 * __Modularized__ - Yes, she's clean. But you can dress the framework via add Modules
 
+Structure
+------------------------------
+
+![Cosmos Engine Structure](https://raw.githubusercontent.com/mr-kelly/CosmosEngine/master/CosmosEngineStructure.png)
+
 Quick Start
 -----------------------------------------------
 
