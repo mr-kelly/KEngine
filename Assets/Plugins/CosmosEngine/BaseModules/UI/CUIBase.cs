@@ -105,12 +105,7 @@ public class CUIBase : MonoBehaviour
     /// <param name="go"></param>
     public void DestroyGameObjectChildren(GameObject go)
     {
-        foreach (Transform trans in go.GetComponentsInChildren<Transform>(true))
-        {
-            if (trans == go.transform) continue;  // 不干自己
-            trans.parent = null; // 清空父, 因为.Destroy非同步的
-            GameObject.Destroy(trans.gameObject);
-        }
+        CTool.DestroyGameObjectChildren(go);
     }
 
     // 抄 NGUISelectionTool的同名方法，将位置旋转缩放清零

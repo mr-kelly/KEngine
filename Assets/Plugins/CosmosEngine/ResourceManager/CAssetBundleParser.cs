@@ -22,12 +22,15 @@ public class CAssetBundleParser
     public bool IsFinished { get { return CreateRequest.isDone; } }
     public AssetBundle Bundle {get {return CreateRequest.assetBundle;}}
 
+    public static Func<string, byte[], AssetBundleCreateRequest> ParseFunc = null; // 可以放置資源加密函數
+
     public CAssetBundleParser(string relativePath, byte[] bytes, Action<AssetBundle> callback = null)
     {
         RelativeUrl = relativePath;
         Callback = callback;
 
-        CreateRequest = ParseAb(RelativeUrl, bytes);  // 不重複創建...
+        var func = ParseFunc ?? DefaultParseAb;
+        CreateRequest = func(RelativeUrl, bytes);  // 不重複創建...
 
         CResourceManager.Instance.StartCoroutine(WaitCreateAssetBundle(CreateRequest));
     }
@@ -45,33 +48,8 @@ public class CAssetBundleParser
     }
 
 
-    static AssetBundleCreateRequest ParseAb(string relativePath, byte[] bytes)
+    static AssetBundleCreateRequest DefaultParseAb(string relativePath, byte[] bytes)
     {
-        CBase.Assert(bytes.Length > 2);
-
-        // first step
-        if (bytes[1] == 255)
-            bytes[0] = 0;
-        else
-            bytes[1]++;
-
-        // second step
-        byte[] endMd5 = new byte[16];
-
-        for (int i = 0; i < endMd5.Length; i++)
-        {
-            int copyFromIndex = i + bytes.Length - 16;
-            endMd5[i] = bytes[copyFromIndex];
-        }
-
-        if (!CBaseTool.ArraysEqual<byte>(endMd5, CBaseTool.MD5_bytes(relativePath)))
-        {
-            CBase.LogError("Error when Decrypt AssetBundle: {0}", relativePath);
-            return null;
-        }
-
-        Array.Resize<byte>(ref bytes, bytes.Length - 16);  // cut end
-
         return AssetBundle.CreateFromMemory(bytes);
     }
 }

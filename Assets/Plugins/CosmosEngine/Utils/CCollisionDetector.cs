@@ -13,7 +13,6 @@ using System.Collections;
 using System.Collections.Generic;
 
 // 碰撞侦测器， 添加组件并绑定事件，用来外部回调一些碰撞检测， 只限2D
-
 public class CCollisionDetector : CBehaviour
 {
     public event Action<Collider2D, Vector2> OnCollisionEnterEvent;
@@ -23,8 +22,8 @@ public class CCollisionDetector : CBehaviour
     /// </summary>
     Collider2D[] Colliders;
 
-    int LayerMask_;
-
+    public int LayerMask_;
+    const bool IgnoreSelf = true;  // 不對自己碰撞哦
     /// <summary>
     /// 忽略的Transform
     /// </summary>
@@ -110,7 +109,7 @@ public class CCollisionDetector : CBehaviour
     /// <param name="hitCollider">碰到的对象</param>
     void OnHit(Collider2D selfCol, Collider2D hitCollider)
     {
-        if (selfCol == hitCollider)
+        if (IgnoreSelf && selfCol == hitCollider)
             return;
 
         _HitsCached.Add(hitCollider);
@@ -174,16 +173,4 @@ public class CCollisionDetector : CBehaviour
 
         return touchPos;
     }
-
-    //void OnCollisionEnter2D(Collision2D collision)
-    //{
-    //    if (OnCollisionEnterEvent != null)
-    //        OnCollisionEnterEvent(collision.collider);
-    //}
-
-    //void OnTriggerEnter2D(Collider2D collider)
-    //{
-    //    if (OnTriggerEnterEvent != null)
-    //        OnTriggerEnterEvent(collider);
-    //}
 }

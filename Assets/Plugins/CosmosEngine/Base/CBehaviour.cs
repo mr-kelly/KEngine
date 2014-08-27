@@ -10,6 +10,9 @@
 using UnityEngine;
 using System.Collections;
 
+/// <summary>
+/// TODO:只有Actor停止，Hero不停止
+/// </summary>
 public class CBehaviour : MonoBehaviour
 {
     public Transform _Transform;
@@ -18,7 +21,7 @@ public class CBehaviour : MonoBehaviour
 
     static bool IsApplicationQuited = false;  // 全局标记, 程序是否退出状态
     
-    public float TimeScale = 1f;
+    public float TimeScale = 1f;  // TODO: In Actor, Bullet,....
 
     public virtual void Awake()
     {
@@ -35,7 +38,7 @@ public class CBehaviour : MonoBehaviour
     // Update is called once per frame
     public virtual void Update()
     {
-
+		
     }
 
     /// <summary>

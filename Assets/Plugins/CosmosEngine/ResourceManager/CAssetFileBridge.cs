@@ -67,7 +67,14 @@ public class CAssetFileBridge
         if (AssetInBundleName == null)
         {
             // 经过AddWatch调试，.mainAsset这个getter第一次执行时特别久，要做序列化
-            asset = assetBundle.mainAsset;
+            try
+            {
+                asset = assetBundle.mainAsset;
+            }
+            catch
+            {
+                CBase.LogError("[OnAssetBundleLoaded:mainAsset]{0}", url);
+            }
         }
         else
         {

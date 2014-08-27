@@ -1,10 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class CMyGame : CCosmosEngine
+public class CMyGame : MonoBehaviour
 {
-    protected override IEnumerator InitGame()
+    void Awake()
     {
-        yield break;
+        CCosmosEngine.New(
+            gameObject,
+            new ICModule[] { },
+            null,
+            null);
+
     }
 }

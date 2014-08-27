@@ -22,7 +22,7 @@ using System.IO;
 /// <summary>
 /// Some tool function for time, bytes, MD5, or something...
 /// </summary>
-public class CBaseTool
+public class CTool
 {
     static float[] RecordTime = new float[10];
     static string[] RecordKey = new string[10];
@@ -35,6 +35,15 @@ public class CBaseTool
     {
         yield return new WaitForSeconds(time);
         callback();
+    }
+    public static void DestroyGameObjectChildren(GameObject go)
+    {
+        foreach (Transform trans in go.GetComponentsInChildren<Transform>(true))
+        {
+            if (trans == go.transform) continue;  // 不干自己
+            trans.parent = null; // 清空父, 因为.Destroy非同步的
+            GameObject.Destroy(trans.gameObject);
+        }
     }
 
     public static List<T> Split<T>(string str, params char[] args)
@@ -616,6 +625,53 @@ public class CBaseTool
         }
         return true;
     }
+
+	/// <summary>
+	/// 呈弧形，传入一个参考点根据角度和半径计算出其它位置的坐标
+	/// </summary>
+	/// <param name="nNum">需要的数量</param>
+	/// <param name="pAnchorPos">锚定点/参考点</param>
+	/// <param name="nAngle">角度</param>
+	/// <param name="nRadius">半径</param>
+	/// <returns></returns>
+	public static Vector3[] GetSmartNpcPoints(int nNum, Vector3 pAnchorPos, int nAngle, float nRadius)
+	{
+		bool bPlural = nNum % 2 == 0 ? true : false; // 是否复数模式
+		Vector3 vDir = Vector3.down.normalized;
+		int nMidNum = bPlural ? nNum / 2 : nNum / 2 + 1; // 中间数, 循环过了中间数后，另一个方向起排布
+		Vector3 vRPos = vDir * nRadius; //// 计算直线在圆形上的顶点 半径是表现距离
+		Vector3[] targetPos = new Vector3[nNum];
+		for (int i = 1; i <= nNum; i++)
+		{
+			int nAddAngle = 0;
+
+			if (bPlural) // 复数模式
+			{
+				if (i > nMidNum)
+					nAddAngle = nAngle * ((i % nMidNum) + 1) - nAngle / 2;
+				else
+					nAddAngle = -nAngle * ((i % nMidNum) + 1) + nAngle / 2; // 除以2，是为了顶端NPC均匀排布 by KK
+			}
+			else // 单数模式
+			{
+				// 判断是否过了中间数
+				if (i > nMidNum)
+				{
+					nAddAngle = nAngle * ((i % nMidNum) + 1); // 添加NPC的角度
+				}
+				else if (i < nMidNum) // 非复数模式， 中间数NPC 放在正方向
+				{
+					nAddAngle = -nAngle * ((i % nMidNum) + 1); // 反方向角度
+				}
+				else
+					nAddAngle = 0; // 正方向
+			}
+
+			Vector3 vTargetPos = pAnchorPos + Quaternion.AngleAxis(nAddAngle, Vector3.forward) * vRPos;
+			targetPos[i - 1] = vTargetPos;
+		}
+		return targetPos;
+	}
 
 }
 

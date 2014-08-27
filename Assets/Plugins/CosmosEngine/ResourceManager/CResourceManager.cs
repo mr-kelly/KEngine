@@ -169,7 +169,7 @@ public class CResourceManager : MonoBehaviour, ICModule
             while (!inAppVersionFile.IsFinished)
                 yield return null;
             
-            if (CCosmosEngine.DetailDebugMode)
+            if (Debug.isDebugBuild)
                 CBase.Log("== InApp Resource Version: {0}", inAppVersionFile.Www.text);
             inAppResourceVersion = inAppVersionFile.Www.text.ToInt32();
         }
@@ -183,7 +183,7 @@ public class CResourceManager : MonoBehaviour, ICModule
             while (!docVersionFile.IsFinished)
                 yield return null;
 
-            if (CCosmosEngine.DetailDebugMode)
+            if (Debug.isDebugBuild)
                 CBase.Log("== Doc Resource Version: {0}", docVersionFile.Www.text);
             docResourceVersion = docVersionFile.Www.text.ToInt32();
         }
@@ -314,9 +314,9 @@ public class CResourceManager : MonoBehaviour, ICModule
 				break;
 		}
 
-        
 
-		if (CCosmosEngine.DetailDebugMode)
+
+        if (Debug.isDebugBuild)
 		{
 			CBase.Log("ResourceManager ApplicationPath: {0}", ApplicationPath);
             CBase.Log("ResourceManager ResourcesPath: {0}", ResourcesPath);

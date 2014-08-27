@@ -40,18 +40,18 @@ public class CNGUIBridge : ICUIBridge
         GameObject uiRootobj = new GameObject("UIRoot");
         UiRoot = uiRootobj.AddComponent<UIRoot>();
         CBase.Assert(UiRoot);
-        UiRoot.scalingStyle = UIRoot.Scaling.FixedSizeOnMobiles;
+        UiRoot.scalingStyle = UIRoot.Scaling.ConstrainedOnMobiles;
         UiRoot.manualHeight = 960;
 
         GameObject panelRootObj = new GameObject("PanelRoot");
-        CBaseTool.SetChild(panelRootObj.transform, uiRootobj.transform);
+        CTool.SetChild(panelRootObj.transform, uiRootobj.transform);
 
         Transform panelTrans = panelRootObj.transform;
         PanelRoot = panelRootObj.AddComponent<UIPanel>();
         CBase.Assert(PanelRoot);
 
         GameObject uiCamObj = new GameObject("UICamera");
-        CBaseTool.SetChild(uiCamObj.transform, UiRoot.transform);
+        CTool.SetChild(uiCamObj.transform, UiRoot.transform);
         UiCamera = uiCamObj.AddComponent<UICamera>();
         UiCamera.cachedCamera.cullingMask = 1 << (int)CLayerDef.UI;
         UiCamera.cachedCamera.clearFlags = CameraClearFlags.Depth;
@@ -64,12 +64,12 @@ public class CNGUIBridge : ICUIBridge
         foreach (UIAnchor.Side side in Enum.GetValues(typeof(UIAnchor.Side)))
         {
             GameObject anchorObj = new GameObject(side.ToString());
-            CBaseTool.SetChild(anchorObj.transform, panelTrans);
+            CTool.SetChild(anchorObj.transform, panelTrans);
             AnchorSide[side.ToString()] = anchorObj.transform;
         }
 
         GameObject nullAnchor = new GameObject("Null");
-        CBaseTool.SetChild(nullAnchor.transform, panelTrans);
+        CTool.SetChild(nullAnchor.transform, panelTrans);
         AnchorSide["Null"] = nullAnchor.transform;
 
         NGUITools.SetLayer(uiRootobj, (int)CLayerDef.UI);
