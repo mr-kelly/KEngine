@@ -66,13 +66,13 @@ CosmosEngine中的所有设计，都基于这个开始思考的。
 [回目录](#cn-title)
 
 
-<a name="#cn-structure"></a>整体结构图
+<a name="cn-structure"></a>整体结构图
 ----------------------------------------------
 ![Structure of CosmosEngine](https://raw.githubusercontent.com/mr-kelly/CosmosEngine/master/CosmosEngineStructure.png)
 
 [回目录](#cn-title)
 
-<a name="#cn-exp"></a>使用经验
+<a name="cn-exp"></a>使用经验
 ----------------------------------------------
 
 ### 异步编程，善用协程和回调
