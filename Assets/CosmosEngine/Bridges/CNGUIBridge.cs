@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿#if NGUI
+using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -77,3 +78,4 @@ public class CNGUIBridge : ICUIBridge
     }
 
 }
+#endif

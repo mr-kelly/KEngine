@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 public class CCosmosEngineWindow : EditorWindow
 {
@@ -10,6 +12,11 @@ public class CCosmosEngineWindow : EditorWindow
         CheckConfigFile();
     }
 
+    enum CUIBridgeType
+    {
+        UGUI,
+        NGUI,
+    }
     static string ConfFilePath = "Assets/Resources/CEngineConfig.txt";
 
     // 默認的配置文件內容
@@ -63,9 +70,93 @@ public class CCosmosEngineWindow : EditorWindow
 
         ConfFile = CTabFile.LoadFromFile(ConfFilePath);
     }
+
+    string GetConfValue(string key)
+    {
+        foreach (CTabFile.CTabRow row in ConfFile)
+        {
+            string key2 = row.GetString("Key");
+            if (key == key2)
+            {
+                string value = row.GetString("Value");
+                return value;
+            }
+        }
+
+        return null;
+    }
+
+    void SetConfValue(string key, string value)
+    {
+        foreach (CTabFile.CTabRow row in ConfFile)
+        {
+            string key2 = row.GetString("Key");
+            if (key == key2)
+            {
+                ConfFile.SetValue<string>(row.Row, "Value", value);
+            }
+        }
+        ConfFile.Save(ConfFilePath);
+        AssetDatabase.Refresh();
+    }
+
+    void OnGUI_SetUIBridge()
+    {
+        string uiBridgeType = GetConfValue("UIBridgeType");
+        CUIBridgeType curUiType = CUIBridgeType.UGUI;
+        if (uiBridgeType == "NGUI")
+        {
+            curUiType = CUIBridgeType.NGUI;
+        }
+
+
+        CUIBridgeType selUiType = (CUIBridgeType)EditorGUILayout.EnumPopup("Use UI Bridge", curUiType);
+        if (selUiType != curUiType)
+        {
+            string uiType = selUiType.ToString();
+            DoSetUIBridge(uiType);
+            SetConfValue("UIBridgeType", uiType);
+        }
+    }
+
+    void DoSetUIBridge(string uiType)
+    {
+        switch (uiType)
+        {
+            case "NGUI":
+                foreach(BuildTargetGroup target in System.Enum.GetValues(typeof(BuildTargetGroup)))
+                {
+                    string symbolStr = PlayerSettings.GetScriptingDefineSymbolsForGroup(target);
+                    List<string> symbols = new List<string>(symbolStr.Split(new char[] { ';' }, System.StringSplitOptions.RemoveEmptyEntries));
+                    if (!symbols.Contains("NGUI"))
+                        symbols.Add("NGUI");
+
+                    PlayerSettings.SetScriptingDefineSymbolsForGroup(target, string.Join(";", symbols.ToArray()));
+                }
+                
+                break;
+            default:
+                foreach (BuildTargetGroup target in System.Enum.GetValues(typeof(BuildTargetGroup)))
+                {
+                    string symbolStr = PlayerSettings.GetScriptingDefineSymbolsForGroup(target);
+                    List<string> symbols = new List<string>(symbolStr.Split(new char[] { ';' }, System.StringSplitOptions.RemoveEmptyEntries));
+                    if (symbols.Contains("NGUI"))
+                        symbols.Remove("NGUI");
+
+                    PlayerSettings.SetScriptingDefineSymbolsForGroup(target, string.Join(";", symbols.ToArray()));
+                }
+                break;
+        }
+    }
+
     void OnGUI()
     {
         EditorGUILayout.LabelField("== Configure the CosmosEngine ==");
+        OnGUI_SetUIBridge();
+
+        EditorGUILayout.Space();
+
+        EditorGUILayout.LabelField("== Advanced Setting ==");
         bool tabDirty = false;
         foreach (CTabFile.CTabRow row in ConfFile)
         {
@@ -83,6 +174,7 @@ public class CCosmosEngineWindow : EditorWindow
             ConfFile.Save(ConfFilePath);
             AssetDatabase.Refresh();
         }
+
 
     }
 }
