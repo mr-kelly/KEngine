@@ -72,7 +72,6 @@ public class CCosmosEngine : MonoBehaviour
             CBase.Log("Application.persistentDataPath = {0} , WritePermission: {1}", Application.persistentDataPath, CTool.HasWriteAccessToFolder(Application.persistentDataPath));
             CBase.Log("Application.temporaryCachePath = {0} , WritePermission: {1}", Application.temporaryCachePath, CTool.HasWriteAccessToFolder(Application.temporaryCachePath));
             CBase.Log("Application.unityVersion = {0}", Application.unityVersion);
-            CBase.Log("Remote Update WebServer Url = {0}", CCosmosEngine.GetConfig("ResourceRemoteUrl"));
             CBase.Log("SystemInfo.deviceModel = {0}", SystemInfo.deviceModel);
             CBase.Log("SystemInfo.deviceUniqueIdentifier = {0}", SystemInfo.deviceUniqueIdentifier);
             CBase.Log("====================================================================================");
