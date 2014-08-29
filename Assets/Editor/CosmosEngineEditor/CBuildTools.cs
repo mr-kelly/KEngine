@@ -23,16 +23,16 @@ public partial class CBuildTools
     {
         if (classType == null)
         {
-            CBase.LogWarning("Not Found HookFunc Unknown class,  func Name: {0}", funcName);
             return false;
         }
 
         MethodInfo methodInfo = classType.GetMethod(funcName, BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
         if (methodInfo == null)
         {
-            CBase.LogWarning("Not Found HookFunc FuncName {0} of Class {1}", funcName, classType.Name);
             return false;
         }
+
+        CBase.Log("HookFunc- {0}:{1}", classType.Name, funcName);
         methodInfo.Invoke(null, args);
 
         return true;
