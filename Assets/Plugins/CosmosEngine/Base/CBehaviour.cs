@@ -20,7 +20,8 @@ public class CBehaviour : MonoBehaviour
     protected bool IsDeleted = false;
 
     static bool IsApplicationQuited = false;  // 全局标记, 程序是否退出状态
-    
+    public static System.Action ApplicationQuitEvent;
+ 
     public float TimeScale = 1f;  // TODO: In Actor, Bullet,....
 
     public virtual void Awake()
@@ -64,6 +65,12 @@ public class CBehaviour : MonoBehaviour
 
     void OnApplicationQuit()
     {
+        if (!IsApplicationQuited)
+            CBase.Log("OnApplicationQuit!");
+
         IsApplicationQuited = true;
+
+        if (ApplicationQuitEvent != null)
+            ApplicationQuitEvent();
     }
 }

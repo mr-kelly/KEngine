@@ -113,7 +113,7 @@ public class CFiber : MonoBehaviour
     IEnumerator _HandleCustomRoutine(int coId, CCoroutineWrapper coWrapper, CCoroutineBase wait)
     {
         coWrapper.Suspend = true;
-        var co = _NewCoroutine(wait.DoRun());
+        _NewCoroutine(wait.DoRun()); // var co = 
         while (!wait.IsFinish)
             yield return null;
         coWrapper.Suspend = false;

@@ -375,7 +375,6 @@ public class CTool
     public static byte[] MD5_bytes(string str)
     {
         // MD5 文件名
-        var md5CSP = new System.Security.Cryptography.MD5CryptoServiceProvider();
         var md5 = new System.Security.Cryptography.MD5CryptoServiceProvider();
         return md5.ComputeHash(System.Text.Encoding.Unicode.GetBytes(str));
     }

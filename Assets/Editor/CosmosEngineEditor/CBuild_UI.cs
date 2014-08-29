@@ -12,9 +12,7 @@ public partial class CBuild_UI : AutoBuildBase
 	GameObject AnchorObject;
 	GameObject WindowObject;
 	GameObject TempPanelObject;
-	GameObject TempPrefabObj;
 	string UIScenePath;
-	List<Texture> TextureList = new List<Texture>();
 
 	public override string GetDirectory() { return "UI"; }
 	public override string GetExtention() { return "*.unity"; }
@@ -101,7 +99,6 @@ public partial class CBuild_UI : AutoBuildBase
 		AnchorObject = null;
 		WindowObject = null;
 		TempPanelObject = null;
-		TempPrefabObj = null;
 	}
 
 	public bool CheckUI(bool showMsg)

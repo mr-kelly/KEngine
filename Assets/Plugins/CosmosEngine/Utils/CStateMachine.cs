@@ -47,6 +47,8 @@ public class CStateMachine<OBJ, STATE>
 
         Array statesArray = Enum.GetValues(typeof(STATE));
         CBase.Assert(statesArray.Length == stateMap.Length);
+        
+        CBase.Assert(Object_);
 
         foreach (CState<STATE> state in stateMap)
         {

@@ -12,7 +12,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 // 钩子系统，类似EventManager事件驱动编程，本质也是Observer观察者模式的一种
-// 仿开源系统Wordpress, 叫钩子
+// 仿开源系统Wordpress, 叫钩子 
 public class CHook
 {
 	public delegate bool HookDelegate(object[] args);

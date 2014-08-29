@@ -15,7 +15,6 @@ using System.Collections;
 /// </summary>
 public class CAssetFileBridge
 {
-    string Path;
     System.Action<UnityEngine.Object, object[]> AssetFileLoadedCallback;
     object[] CallbackArgs;
     string AssetInBundleName;  // AssetBundle里的名字, Resources時不用
@@ -33,9 +32,8 @@ public class CAssetFileBridge
 
     void _Init(string path, string assetName, System.Action<UnityEngine.Object, object[]> assetFileLoadedCallback, object[] args)
     {
-
-        Path = path;
         AssetFileLoadedCallback = assetFileLoadedCallback;
+        CallbackArgs = args;
         AssetInBundleName = assetName;
 
         if (CCosmosEngine.GetConfig("IsLoadAssetBundle").ToInt32() == 0)

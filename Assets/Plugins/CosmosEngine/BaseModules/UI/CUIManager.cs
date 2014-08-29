@@ -375,10 +375,10 @@ public class CUIManager : ICModule
 
         if (!uiState.UIWindow.IsDynamicWindow)
         {
-            foreach (var item in uiState.TextureDict)
-            {
-                //CResourceManager.DestroyTexture(item.Value);
-            }
+            //foreach (var item in uiState.TextureDict)
+            //{
+            //    //CResourceManager.DestroyTexture(item.Value);
+            //}
         }
 
         UnityEngine.Object.Destroy(uiState.UIWindow.gameObject);

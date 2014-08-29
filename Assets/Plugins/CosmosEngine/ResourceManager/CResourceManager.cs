@@ -209,7 +209,7 @@ public class CResourceManager : MonoBehaviour, ICModule
     {
         string productPath = Path.Combine(Application.dataPath, CCosmosEngine.GetConfig("ProductRelPath"));
         string assetBundlePath = Path.Combine(Application.dataPath, CCosmosEngine.GetConfig("AssetBundleRelPath"));
-        string productDirName = Path.GetFileName(CCosmosEngine.GetConfig("ProductRelPath"));
+        //string productDirName = Path.GetFileName(CCosmosEngine.GetConfig("ProductRelPath"));
         string resourceDirName = Path.GetFileName(CCosmosEngine.GetConfig("AssetBundleRelPath"));
 
         BuildPlatformName = GetBuildPlatformName();
