@@ -2,3 +2,4 @@ Key	Value	Comment
 ProductRelPath	Build	
 AssetBundleRelPath	StreamingAssets	
 AssetBundleExt	.unity3d	base
+IsLoadAssetBundle	1

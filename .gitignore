@@ -7,5 +7,5 @@
 /UnityVS.CosmosEngineBootstrap.CSharp.Editor.csproj
 /UnityVS.CosmosEngineBootstrap.CSharp.Plugins.csproj
 /UnityVS.CosmosEngineBootstrap.sln
-/Assets/Plugins/CosmosEnginePlugins/NGUI
-/Assets/Plugins/CosmosEnginePlugins/NGUI.meta
+/Assets/Plugins/NGUI
+/PushToClient.bat

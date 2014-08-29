@@ -11,5 +11,6 @@ public class CMyGame : MonoBehaviour
             null,
             null);
 
+        CUIManager.Instance.OpenWindow<CUIHome>();
     }
 }

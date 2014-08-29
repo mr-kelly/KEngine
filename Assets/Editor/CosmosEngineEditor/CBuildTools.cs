@@ -19,15 +19,23 @@ public partial class CBuildTools
 	static int PushedAssetCount = 0;
 
     // 鉤子函數, 動態改變某些打包行為
-    static void HookFunc(string funcName, params object[] args)
+    public static bool HookFunc(System.Type classType, string funcName, params object[] args)
     {
-        MethodInfo methodInfo = typeof(CBuildTools).GetMethod(funcName, BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
+        if (classType == null)
+        {
+            CBase.LogWarning("Not Found HookFunc Unknown class,  func Name: {0}", funcName);
+            return false;
+        }
+
+        MethodInfo methodInfo = classType.GetMethod(funcName, BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
         if (methodInfo == null)
         {
-            CBase.LogWarning("Not Found HookFunc: {0}", funcName);
-            return;
+            CBase.LogWarning("Not Found HookFunc FuncName {0} of Class {1}", funcName, classType.Name);
+            return false;
         }
         methodInfo.Invoke(null, args);
+
+        return true;
     }
 
     #region 打包功能
@@ -144,7 +152,7 @@ public partial class CBuildTools
 		}
 
 
-        HookFunc("BeforeBuildAssetBundle", asset, path, relativePath);
+        HookFunc(typeof(CBuildTools), "BeforeBuildAssetBundle", asset, path, relativePath);
 
 		uint crc;
 		BuildPipeline.BuildAssetBundle(
@@ -164,7 +172,7 @@ public partial class CBuildTools
 		CBase.Log("生成文件： {0}", path);
 
 
-        HookFunc("AfterBuildAssetBundle", asset, path, relativePath);
+        HookFunc(typeof(CBuildTools), "AfterBuildAssetBundle", asset, path, relativePath);
 
 		return crc;
 	}
