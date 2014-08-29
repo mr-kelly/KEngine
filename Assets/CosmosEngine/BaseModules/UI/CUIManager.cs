@@ -68,8 +68,14 @@ public class CUIManager : ICModule
     public IEnumerator Init()
     {
         Type bridgeType = Type.GetType(string.Format("C{0}Bridge", CCosmosEngine.GetConfig("UIBridgeType")));
-        UiBridge = Activator.CreateInstance(bridgeType) as ICUIBridge;
-        UiBridge.InitBridge();
+        if (bridgeType != null)
+        {
+            UiBridge = Activator.CreateInstance(bridgeType) as ICUIBridge;
+            UiBridge.InitBridge();
+        }
+        else
+            CBase.Log("No UI Bridge in Use.");
+        
         yield break;
     }
 

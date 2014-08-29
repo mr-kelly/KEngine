@@ -14,7 +14,7 @@ public class CCosmosEngineWindow : EditorWindow
 
     enum CUIBridgeType
     {
-        UGUI,
+        NO_UI,
         NGUI,
     }
     static string ConfFilePath = "Assets/Resources/CEngineConfig.txt";
@@ -103,7 +103,7 @@ public class CCosmosEngineWindow : EditorWindow
     void OnGUI_SetUIBridge()
     {
         string uiBridgeType = GetConfValue("UIBridgeType");
-        CUIBridgeType curUiType = CUIBridgeType.UGUI;
+        CUIBridgeType curUiType = CUIBridgeType.NO_UI;
         if (uiBridgeType == "NGUI")
         {
             curUiType = CUIBridgeType.NGUI;
@@ -119,32 +119,44 @@ public class CCosmosEngineWindow : EditorWindow
         }
     }
 
+    void RemoveDefineSymbols(string symbol)
+    {
+        foreach (BuildTargetGroup target in System.Enum.GetValues(typeof(BuildTargetGroup)))
+        {
+            string symbolStr = PlayerSettings.GetScriptingDefineSymbolsForGroup(target);
+            List<string> symbols = new List<string>(symbolStr.Split(new char[] { ';' }, System.StringSplitOptions.RemoveEmptyEntries));
+            if (symbols.Contains(symbol))
+                symbols.Remove(symbol);
+            PlayerSettings.SetScriptingDefineSymbolsForGroup(target, string.Join(";", symbols.ToArray()));
+        }
+
+
+    }
+
+    void AddDefineSymbols(string symbol)
+    {
+        foreach (BuildTargetGroup target in System.Enum.GetValues(typeof(BuildTargetGroup)))
+        {
+            string symbolStr = PlayerSettings.GetScriptingDefineSymbolsForGroup(target);
+            List<string> symbols = new List<string>(symbolStr.Split(new char[] { ';' }, System.StringSplitOptions.RemoveEmptyEntries));
+            if (!symbols.Contains(symbol))
+            {
+                symbols.Add(symbol);
+                PlayerSettings.SetScriptingDefineSymbolsForGroup(target, string.Join(";", symbols.ToArray()));
+            }
+        }
+    }
+
     void DoSetUIBridge(string uiType)
     {
         switch (uiType)
         {
             case "NGUI":
-                foreach(BuildTargetGroup target in System.Enum.GetValues(typeof(BuildTargetGroup)))
-                {
-                    string symbolStr = PlayerSettings.GetScriptingDefineSymbolsForGroup(target);
-                    List<string> symbols = new List<string>(symbolStr.Split(new char[] { ';' }, System.StringSplitOptions.RemoveEmptyEntries));
-                    if (!symbols.Contains("NGUI"))
-                        symbols.Add("NGUI");
+                AddDefineSymbols("NGUI");
 
-                    PlayerSettings.SetScriptingDefineSymbolsForGroup(target, string.Join(";", symbols.ToArray()));
-                }
-                
                 break;
             default:
-                foreach (BuildTargetGroup target in System.Enum.GetValues(typeof(BuildTargetGroup)))
-                {
-                    string symbolStr = PlayerSettings.GetScriptingDefineSymbolsForGroup(target);
-                    List<string> symbols = new List<string>(symbolStr.Split(new char[] { ';' }, System.StringSplitOptions.RemoveEmptyEntries));
-                    if (symbols.Contains("NGUI"))
-                        symbols.Remove("NGUI");
-
-                    PlayerSettings.SetScriptingDefineSymbolsForGroup(target, string.Join(";", symbols.ToArray()));
-                }
+                RemoveDefineSymbols("NGUI");
                 break;
         }
     }
