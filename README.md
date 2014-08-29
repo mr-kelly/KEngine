@@ -1,11 +1,22 @@
-
-CosmosEngine
+<a name="cn-title"></a>CosmosEngine
 =====
 [https://github.com/mr-kelly/CosmosEngine](https://github.com/mr-kelly/CosmosEngine "CosmosEngine")
 
+
+* [简介](#cn-intro)
+* [特性](#cn-feature)
+* [约定](#cn-convention)
+* [整体架构图](#cn-structure)
+* [使用经验](#cn-exp)
+
+
+<a name="cn-intro"></a>简介
+------------------
 CosmosEngine - Unity3D /2D 轻量级模块化游戏开发框架，包含轻量级的代码和常用模块，提供一定的编程范式作约束，旨在减少开发人员的重复工作和做决定的次数。
 
-特性
+[回目录](#cn-title)
+
+<a name="cn-feature"></a>特性
 -----
 ### 非侵入式设计
 一切从CosmosEngine.Create()开始，你甚至可以在现有的项目基础上嵌入。
@@ -24,7 +35,9 @@ CosmosEngine讨厌厚重的代码类，它十分轻量，使得任何人都可�
 得益于轻量化、模块化的设计，框架是拥抱一切第三方插件。
 比如默认使用UI插件式NGUI，通过内部提供的NGUI桥接类实现与底层UIModule的衔接。
 
-约定
+[回目录](#cn-title)
+
+<a name="cn-convention"></a>约定
 -------------------------------------------------------
 作者早年从事Web开发，深深受到“约定优于配置”的影响，认为这是能够让开发人员、游戏策划人员走出无数配置文件陷阱的重要因素。
 CosmosEngine中的约定，除去框架内部代码外，是没有强迫性的，如果你不喜欢，是可以拒绝使用，使用你自己的编程范式。
@@ -50,12 +63,16 @@ CosmosEngine的事件定义，只针对地写在特定模块内。
 新项目的开发过程中，最浪费时间的莫过于从头构建底层框架了，既枯燥又重复。更令人恐惧的是不同项目有些功能是一样的，却因部分耦合的问题，导致要重写、维护两套代码，恶心之极。
 CosmosEngine中的所有设计，都基于这个开始思考的。
 
-整体结构
+[回目录](#cn-title)
+
+
+<a name="#cn-structure"></a>整体结构图
 ----------------------------------------------
 ![Structure of CosmosEngine](https://raw.githubusercontent.com/mr-kelly/CosmosEngine/master/CosmosEngineStructure.png)
 
+[回目录](#cn-title)
 
-使用经验
+<a name="#cn-exp"></a>使用经验
 ----------------------------------------------
 
 ### 异步编程，善用协程和回调
@@ -64,6 +81,8 @@ Unity的协程是一个非常好用的特性，它底层的很多异步都通过
 
 协程的本质是每一个游戏帧进行轮询，而回调的本质就是事件驱动编程。 CosmosEngine里的回调，基本是包裹着协程的。
 不使用多线程、多进程，否则在Unity引擎中会有一些不可预料情况。
+
+[回目录](#cn-title)
 
 [中文博客介绍](http://www.cnblogs.com/mrkelly/p/3944773.html)
 
@@ -109,4 +128,3 @@ CosmosEngine is weak now, no enough documentation support to it.
 CosmosEngine can embed different UI Plugin. Currently we use NGUI as the main UI plugins by default.
 
 *You should copy the NGUI source code to the Assets/Plugins/CosmosEnginePlugins/ directory to make the example project right*
-
