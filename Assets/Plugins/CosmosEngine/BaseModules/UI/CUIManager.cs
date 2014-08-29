@@ -80,7 +80,7 @@ public class CUIManager : ICModule
 
     public void OpenWindow(Type type, params object[] args)
     {
-        string uiName = type.Name.Remove(0, 3); // 去掉"XUI"
+        string uiName = type.Name.Remove(0, 3); // 去掉"CUI"
         OpenWindow(uiName, args);
     }
 
