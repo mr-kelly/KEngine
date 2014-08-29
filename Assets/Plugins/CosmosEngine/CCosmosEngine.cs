@@ -84,7 +84,6 @@ public class CCosmosEngine : MonoBehaviour
     {
         ICModule[] baseModules = new ICModule[] {  // 基础三件套
             CResourceManager.Instance, 
-            CSettingManager.Instance,
             CUIManager.Instance, 
         };
         foreach (ICModule mod in baseModules)

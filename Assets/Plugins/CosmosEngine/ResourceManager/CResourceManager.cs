@@ -16,6 +16,11 @@ using System.IO;
 using UnityEditor;
 #endif
 
+public enum CResourceManagerPathType
+{
+    StreamingAssetsPathPriority, // 忽略PersitentDataPath
+    PersistentDataPathPriority,  // 尝试在Persistent目錄尋找，找不到再去StreamingAssets
+}
 public class CResourceManager : MonoBehaviour, ICModule
 {
 	public delegate void ASyncLoadABAssetDelegate(Object asset, params object[] args);
@@ -52,9 +57,10 @@ public class CResourceManager : MonoBehaviour, ICModule
 	public static string ApplicationPath;
 	public static string DocumentResourcesPathWithOutFileStart;
 	private static string DocumentResourcesPath;
-    
-    public static bool IsDocumentResourcePriority = false; // 是否優先找下載的資源?還是app本身資源優先
-    public static int ResourceVersion = -1; // 可能是讀取Doc的，也可能是讀取App里的，有CheckResourceVersion函數決定
+
+    public static CResourceManagerPathType ResourcePathType = CResourceManagerPathType.StreamingAssetsPathPriority;  // 是否優先找下載的資源?還是app本身資源優先
+
+    public static System.Func<string, string> CustomGetResourcesPath; // 自定义资源路径。。。
 
 	public static string GetResourcesPath(string url) 
 	{
@@ -62,12 +68,12 @@ public class CResourceManager : MonoBehaviour, ICModule
             CBase.LogError("尝试获取一个空的资源路径！");
 
         string docUrl;
-        bool hasDocUrl = GetDocumentResourceUrl(url, out docUrl);
+        bool hasDocUrl = TryGetDocumentResourceUrl(url, out docUrl);
 
         string inAppUrl;
-        bool hasInAppUrl = GetInAppResourceUrl(url, out inAppUrl);
+        bool hasInAppUrl = TryGetInAppResourceUrl(url, out inAppUrl);
 
-        if (IsDocumentResourcePriority)  // 優先下載資源模式
+        if (ResourcePathType == CResourceManagerPathType.StreamingAssetsPathPriority)  // 優先下載資源模式
         {
             if (hasDocUrl)
             {
@@ -107,7 +113,7 @@ public class CResourceManager : MonoBehaviour, ICModule
         return Application.persistentDataPath;
     }
 
-    private static bool GetInAppResourceUrl(string url, out string newUrl)
+    public static bool TryGetInAppResourceUrl(string url, out string newUrl)
     {
         newUrl = ResourcesPath + url;
 
@@ -121,7 +127,7 @@ public class CResourceManager : MonoBehaviour, ICModule
         return true;
     }
 
-    private static bool GetDocumentResourceUrl(string url, out string newUrl)
+    public static bool TryGetDocumentResourceUrl(string url, out string newUrl)
     {
         newUrl = DocumentResourcesPath + url;
         if (File.Exists(DocumentResourcesPathWithOutFileStart + url))
@@ -145,69 +151,12 @@ public class CResourceManager : MonoBehaviour, ICModule
 	public IEnumerator Init()
 	{
         yield return StartCoroutine(InitResourcePath());
-        yield return StartCoroutine(CheckResourceVersion());
         yield break;
 	}
 
     public IEnumerator UnInit()
     {
         yield break;
-    }
-
-    // 檢查資源版本號，獲取Doc的版本文件盒StreamingAsset里的
-    IEnumerator CheckResourceVersion()
-    {
-        // 獲取InApp Version文件，獲取版本號
-        int inAppResourceVersion = -1;
-        int docResourceVersion = -1;
-
-        string inAppVersionFilePath;
-        bool hasInAppVersionFile = GetInAppResourceUrl("Version.txt", out inAppVersionFilePath);
-        if (hasInAppVersionFile)
-        {
-            CWWWLoader inAppVersionFile = new CWWWLoader(inAppVersionFilePath);
-            while (!inAppVersionFile.IsFinished)
-                yield return null;
-            
-            if (Debug.isDebugBuild)
-                CBase.Log("== InApp Resource Version: {0}", inAppVersionFile.Www.text);
-            inAppResourceVersion = inAppVersionFile.Www.text.ToInt32();
-        }
-        
-        // 獲取DocumentVersion文件
-        string docVersionFileUrl;
-        bool hasDocVersionFile = GetDocumentResourceUrl("Version.txt", out docVersionFileUrl);
-        if (hasDocVersionFile)
-        {
-            CWWWLoader docVersionFile = new CWWWLoader(docVersionFileUrl);
-            while (!docVersionFile.IsFinished)
-                yield return null;
-
-            if (Debug.isDebugBuild)
-                CBase.Log("== Doc Resource Version: {0}", docVersionFile.Www.text);
-            docResourceVersion = docVersionFile.Www.text.ToInt32();
-        }
-
-        CBase.Assert(hasInAppVersionFile); // 必須有一個Version文件！
-
-        if (hasDocVersionFile)
-        {
-            IsDocumentResourcePriority = docResourceVersion > inAppResourceVersion; // document的下載資源版本更高，設置成document資源優先！
-            ResourceVersion = System.Math.Max(docResourceVersion, inAppResourceVersion);
-        }
-        else
-        {
-            ResourceVersion = inAppResourceVersion;
-            IsDocumentResourcePriority = false; // app內資源優先使用
-        }
-
-        if (Debug.isDebugBuild)
-        {
-            if (IsDocumentResourcePriority)
-                CBase.Log("優先使用Document下載目錄的資源!");
-            else
-                CBase.Log("優先使用App內目錄的資源!");
-        }
     }
 
     public static string GetBuildPlatformName()

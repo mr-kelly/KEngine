@@ -13,7 +13,7 @@ using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 
-public class CUIBase : MonoBehaviour
+public abstract class CUIController : MonoBehaviour
 {
     public string UITemplateName = "";
     public string UIName = "";

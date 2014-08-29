@@ -1,7 +1,7 @@
 Key	Value	Comment
-ProductRelPath	../../cb-product	
-AssetBundleRelPath	../../cb-product/AssetBundles	
-AssetBundleExt	.box	base
+ProductRelPath	Build	
+AssetBundleRelPath	StreamingAssets	
+AssetBundleExt	.unity3d	base
 ResourceRemoteUrl	http://10.236.51.41/AssetBundles	base
 ResourceMD5BundleName	ResourcesMD5	base
 IsLoadAssetBundle	1	base

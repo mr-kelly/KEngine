@@ -22,7 +22,7 @@ public class CUIManager : ICModule
     {
         public string Name;
         public CUIConfig UISetting;
-        public CUIBase UIWindow;
+        public CUIController UIWindow;
         public string UIType;
         public bool IsLoading;
         public bool IsStaticUI; // 非复制出来的, 静态UI
@@ -35,7 +35,7 @@ public class CUIManager : ICModule
         public bool DestroyAfterClose;
         public bool NotDestroyAfterLeave = false;
 
-        public Queue<Action<CUIBase, object[]>> CallbacksWhenFinish;
+        public Queue<Action<CUIController, object[]>> CallbacksWhenFinish;
         public Queue<object[]> CallbacksArgsWhenFinish;
 
         public CUIState(string _UITypeName)
@@ -48,7 +48,7 @@ public class CUIManager : ICModule
             OpenWhenFinish = false;
             OpenArgs = null;
 
-            CallbacksWhenFinish = new Queue<Action<CUIBase, object[]>>();
+            CallbacksWhenFinish = new Queue<Action<CUIController, object[]>>();
             CallbacksArgsWhenFinish = new Queue<object[]>();
         }
     }
@@ -82,7 +82,7 @@ public class CUIManager : ICModule
         OpenWindow(uiName, args);
     }
 
-    public void OpenWindow<T>(params object[] args) where T : CUIBase
+    public void OpenWindow<T>(params object[] args) where T : CUIController
     {
         OpenWindow(typeof(T), args);
     }
@@ -157,7 +157,7 @@ public class CUIManager : ICModule
         });
     }
 
-    void OnDynamicWindowCallback(CUIBase _ui, object[] _args)
+    void OnDynamicWindowCallback(CUIController _ui, object[] _args)
     {
         string template = (string)_args[0];
         string name = (string)_args[1];
@@ -170,7 +170,7 @@ public class CUIManager : ICModule
 
         UiBridge.UIObjectFilter(uiConfig, uiObj);
 
-        CUIBase uiBase = uiObj.GetComponent<CUIBase>();
+        CUIController uiBase = uiObj.GetComponent<CUIController>();
         uiBase.UITemplateName = template;
         uiBase.UIName = name;
 
@@ -286,7 +286,7 @@ public class CUIManager : ICModule
         return null;
     }
 
-    CUIBase GetUIBase(string name)
+    CUIController GetUIBase(string name)
     {
         CUIState uiState;
         UIWindows.TryGetValue(name, out uiState);
@@ -298,7 +298,7 @@ public class CUIManager : ICModule
 
     public bool IsOpen(string name)
     {
-        CUIBase uiBase = GetUIBase(name);
+        CUIController uiBase = GetUIBase(name);
         return uiBase == null ? false : uiBase.gameObject.activeSelf;
     }
 
@@ -353,7 +353,7 @@ public class CUIManager : ICModule
 
         UiBridge.UIObjectFilter(uiConfig, uiObj);
         
-        CUIBase uiBase = (CUIBase)uiObj.AddComponent(openState.UIType);
+        CUIController uiBase = (CUIController)uiObj.AddComponent(openState.UIType);
 
         openState.UIWindow = uiBase;
 
@@ -395,7 +395,7 @@ public class CUIManager : ICModule
     /// <param name="uiName"></param>
     /// <param name="callback"></param>
     /// <param name="args"></param>
-    public void CallUI(string uiName, Action<CUIBase, object[]> callback, params object[] args)
+    public void CallUI(string uiName, Action<CUIController, object[]> callback, params object[] args)
     {
         CBase.Assert(callback);
 
@@ -416,17 +416,17 @@ public class CUIManager : ICModule
         callback(uiState.UIWindow, args);
     }
 
-    public void CallUI<T>(Action<T> callback) where T : CUIBase
+    public void CallUI<T>(Action<T> callback) where T : CUIController
     {
         CallUI<T>((_ui, _args) => callback(_ui));
     }
 
     // 使用泛型方式
-    public void CallUI<T>(Action<T, object[]> callback, params object[] args) where T : CUIBase
+    public void CallUI<T>(Action<T, object[]> callback, params object[] args) where T : CUIController
     {
         string uiName = typeof(T).Name.Remove(0, 3); // 去掉 "XUI"
 
-        CallUI(uiName, (CUIBase _uibase, object[] _args) =>
+        CallUI(uiName, (CUIController _uibase, object[] _args) =>
         {
             callback((T)_uibase, _args);
         }, args);
@@ -437,7 +437,7 @@ public class CUIManager : ICModule
     {
         CBase.LogError("[警告]CallUIMethod过时了~ 请尽快改成CallUI()");
 
-        CUIBase uiBase = GetUIBase(uiName);
+        CUIController uiBase = GetUIBase(uiName);
         if (uiBase == null)
         {
             CBase.LogWarning("CallUIMethod Failed, UI not load, UI={0}, Method={1}", uiName, methodName);
@@ -479,7 +479,7 @@ public class CUIManager : ICModule
         }
         MutexUI[mutexId] = uiState;
 
-        CUIBase uiBase = uiState.UIWindow;
+        CUIController uiBase = uiState.UIWindow;
         uiBase.OnPreOpen();
         if (uiBase.gameObject.activeSelf)
             uiBase.OnClose();
@@ -490,7 +490,7 @@ public class CUIManager : ICModule
     }
 
 
-    void InitWindow(CUIState uiState, CUIBase uiBase, bool open, params object[] args)
+    void InitWindow(CUIState uiState, CUIController uiBase, bool open, params object[] args)
     {
         uiBase.OnInit();
 
@@ -501,13 +501,13 @@ public class CUIManager : ICModule
         }
 
     }
-    void OnUIWindowLoaded(CUIState uiState, CUIBase uiBase)
+    void OnUIWindowLoaded(CUIState uiState, CUIController uiBase)
     {
         //if (openState.OpenWhenFinish)  // 加载完打开 模式下，打开时执行回调
         {
             while (uiState.CallbacksWhenFinish.Count > 0)
             {
-                Action<CUIBase, object[]> callback = uiState.CallbacksWhenFinish.Dequeue();
+                Action<CUIController, object[]> callback = uiState.CallbacksWhenFinish.Dequeue();
                 object[] _args = uiState.CallbacksArgsWhenFinish.Dequeue();
                 callback(uiBase, _args);
             }
