@@ -38,3 +38,7 @@ CosmosEngine is weak now, no enough documentation support to it.
 CosmosEngine can embed different UI Plugin. Currently we use NGUI as the main UI plugins by default.
 
 *You should copy the NGUI source code to the Assets/Plugins/CosmosEnginePlugins/ directory to make the example project right*
+
+
+
+[中文介绍](http://www.cnblogs.com/mrkelly/p/3944773.html)
