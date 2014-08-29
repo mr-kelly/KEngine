@@ -67,7 +67,8 @@ public class CUIManager : ICModule
 
     public IEnumerator Init()
     {
-        UiBridge = new CNGUIBridge();
+        Type bridgeType = Type.GetType(CCosmosEngine.GetConfig("UIBridgeType"));
+        UiBridge = Activator.CreateInstance(bridgeType) as ICUIBridge;
         UiBridge.InitBridge();
         yield break;
     }

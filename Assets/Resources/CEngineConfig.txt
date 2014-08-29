@@ -3,3 +3,4 @@ ProductRelPath	Build
 AssetBundleRelPath	StreamingAssets	
 AssetBundleExt	.unity3d	base
 IsLoadAssetBundle	1	
+UIBridgeType	CNGUIBridge
