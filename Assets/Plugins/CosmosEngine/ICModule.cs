@@ -16,3 +16,12 @@ public interface ICModule
     IEnumerator Init();
     IEnumerator UnInit();
 }
+
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
+public class CModuleDependency : Attribute
+{
+    public CModuleDependency(Type dependencyType)
+    {
+
+    }
+}

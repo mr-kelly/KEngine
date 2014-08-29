@@ -392,7 +392,7 @@ public class CTabFile : IEnumerable, IDisposable
     {
         internal CTabFile TabFile;
 
-        internal int Row { get; set; }
+        public int Row { get; internal set; }
 
         internal CTabRow(CTabFile tabFile)
         {

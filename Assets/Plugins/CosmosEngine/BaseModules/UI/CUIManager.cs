@@ -13,6 +13,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
+[CModuleDependency(typeof(CResourceManager))]
 public class CUIManager : ICModule
 {
     class _InstanceClass {public static CUIManager _Instance = new CUIManager();}

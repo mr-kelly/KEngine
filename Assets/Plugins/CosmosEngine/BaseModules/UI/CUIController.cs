@@ -17,16 +17,16 @@ public abstract class CUIController : MonoBehaviour
 {
     public string UITemplateName = "";
     public string UIName = "";
-	public string UITitle = "(未设置)"; // UI的标题
-	public bool HasBackBtn = true; // 是否有返回按钮
+    public string UITitle = "(未设置)"; // UI的标题
+    public bool HasBackBtn = true; // 是否有返回按钮
 
     public bool IsDynamicWindow { get { return UITemplateName != UIName; } }
 
     public virtual void OnPreOpen() { }
-	//ShowNavigationBar
+    //ShowNavigationBar
     public virtual void OnOpen(params object[] args)
-	{
-	}
+    {
+    }
 
     public virtual void OnClose() { }
     public virtual void OnInit() { }
@@ -121,57 +121,57 @@ public abstract class CUIController : MonoBehaviour
     /// 传入指定数量， 对List<GameObject>里指定数量项SetActive(true)/或创建, 其余的SetActive(false)
     /// 常用于UIGrid下的对象动态增长
     /// </summary>
-	//[System.Obsolete("用ResizeUIGridGameObjects代替，不用List了")]
-	//public void ResizeGameObjectList(ref List<GameObject> gameObjList, int resizeCount, GameObject templateForNew = null, Transform newTemplateParent = null)
-	//{
-	//	if (templateForNew == null)
-	//		templateForNew = default(GameObject);
+    //[System.Obsolete("用ResizeUIGridGameObjects代替，不用List了")]
+    //public void ResizeGameObjectList(ref List<GameObject> gameObjList, int resizeCount, GameObject templateForNew = null, Transform newTemplateParent = null)
+    //{
+    //	if (templateForNew == null)
+    //		templateForNew = default(GameObject);
 
-	//	for (int i = 0; i < resizeCount; i++)
-	//	{
-	//		if (i >= gameObjList.Count)
-	//		{
-	//			GameObject newTemplate = Instantiate(templateForNew) as GameObject;
-	//			newTemplate.transform.parent = newTemplateParent;
-	//			ClearLocalTransform(newTemplate.transform);
+    //	for (int i = 0; i < resizeCount; i++)
+    //	{
+    //		if (i >= gameObjList.Count)
+    //		{
+    //			GameObject newTemplate = Instantiate(templateForNew) as GameObject;
+    //			newTemplate.transform.parent = newTemplateParent;
+    //			ClearLocalTransform(newTemplate.transform);
 
-	//			gameObjList.Add(newTemplate);
-	//		}
-	//		gameObjList[i].SetActive(true);
-	//	}
+    //			gameObjList.Add(newTemplate);
+    //		}
+    //		gameObjList[i].SetActive(true);
+    //	}
 
-	//	for (int i = resizeCount; i < gameObjList.Count; ++i)
-	//	{
-	//		gameObjList[i].SetActive(false);
-	//	}
-	//}
+    //	for (int i = resizeCount; i < gameObjList.Count; ++i)
+    //	{
+    //		gameObjList[i].SetActive(false);
+    //	}
+    //}
 
     // 类似上面，直接传入UIGrid
-	//[System.Obsolete("用下面那个代替，不用List了")]
-	//public void ResizeUIGridGameObjects(UIGrid uiGrid, ref List<GameObject> gameObjList, int resizeCount, GameObject templateForNew = null)
-	//{
-	//	CBase.Assert(uiGrid);
-	//	ResizeGameObjectList(ref gameObjList, resizeCount, templateForNew, uiGrid.transform);
-	//	uiGrid.Reposition();
-	//}
+    //[System.Obsolete("用下面那个代替，不用List了")]
+    //public void ResizeUIGridGameObjects(UIGrid uiGrid, ref List<GameObject> gameObjList, int resizeCount, GameObject templateForNew = null)
+    //{
+    //	CBase.Assert(uiGrid);
+    //	ResizeGameObjectList(ref gameObjList, resizeCount, templateForNew, uiGrid.transform);
+    //	uiGrid.Reposition();
+    //}
 
     /// <summary>
     /// 传入指定数量， 对UIGrid里指定数量项SetActive(true)/或创建, 其余的SetActive(false)
     /// 常用于UIGrid下的对象动态增长
     /// </summary>
-	public void ResizeUIGridGameObjects(UIGrid uiGrid, int resizeCount, GameObject templateForNew)
-	{
-		_ResizeUIWidgetContainerGameObjects(uiGrid, resizeCount, templateForNew);
-		uiGrid.Reposition();
-	}
+    public void ResizeUIGridGameObjects(UIGrid uiGrid, int resizeCount, GameObject templateForNew)
+    {
+        _ResizeUIWidgetContainerGameObjects(uiGrid, resizeCount, templateForNew);
+        uiGrid.Reposition();
+    }
 
-	public void ResizeUITableGameObjects(UITable uiTable, int resizeCount, GameObject templateForNew)
-	{
-		_ResizeUIWidgetContainerGameObjects(uiTable, resizeCount, templateForNew);
-		uiTable.Reposition();
-	}
+    public void ResizeUITableGameObjects(UITable uiTable, int resizeCount, GameObject templateForNew)
+    {
+        _ResizeUIWidgetContainerGameObjects(uiTable, resizeCount, templateForNew);
+        uiTable.Reposition();
+    }
 
-	void _ResizeUIWidgetContainerGameObjects(UIWidgetContainer uiGrid, int resizeCount, GameObject templateForNew)
+    void _ResizeUIWidgetContainerGameObjects(UIWidgetContainer uiGrid, int resizeCount, GameObject templateForNew)
     {
         if (templateForNew == null)
             templateForNew = default(GameObject);
@@ -188,15 +188,15 @@ public abstract class CUIController : MonoBehaviour
                 //gameObjList.Add(newTemplate);
             }
             newTemplate = uiGrid.transform.GetChild(i).gameObject;
-			if (!newTemplate.activeSelf)
-				newTemplate.SetActive(true);
+            if (!newTemplate.activeSelf)
+                newTemplate.SetActive(true);
         }
 
         for (int i = resizeCount; i < uiGrid.transform.childCount; ++i)
         {
-			GameObject newTemplate= uiGrid.transform.GetChild(i).gameObject;
-			if(newTemplate.activeSelf)
-            newTemplate.SetActive(false);
+            GameObject newTemplate = uiGrid.transform.GetChild(i).gameObject;
+            if (newTemplate.activeSelf)
+                newTemplate.SetActive(false);
         }
 
     }
