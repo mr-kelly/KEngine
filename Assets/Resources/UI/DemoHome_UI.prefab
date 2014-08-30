@@ -43,7 +43,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 400004}
   m_Layer: 5
-  m_Name: Home_UI
+  m_Name: DemoHome_UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
