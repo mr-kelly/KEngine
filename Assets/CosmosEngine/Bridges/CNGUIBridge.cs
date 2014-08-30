@@ -20,11 +20,12 @@ public class CNGUIBridge : ICUIBridge
         CreateUIRoot();
     }
 
-    public void UIObjectFilter(CUIConfig uiConfig, GameObject uiObj)
+    public void UIObjectFilter(GameObject uiObj)
     {
-        string side = uiConfig.Side ?? "";
-        uiObj.transform.parent = AnchorSide[side];
-        uiObj.transform.localPosition = new Vector3(uiConfig.OffsetX, uiConfig.OffsetY, uiConfig.OffsetZ); // 根据表中偏移
+        //string side = uiConfig.Side ?? "";
+        uiObj.transform.parent = AnchorSide[UIAnchor.Side.Center.ToString()];
+        //uiObj.transform.localPosition = new Vector3(uiConfig.OffsetX, uiConfig.OffsetY, uiConfig.OffsetZ); // 根据表中偏移
+        uiObj.transform.localPosition = Vector3.zero;
         uiObj.transform.localScale = new Vector3(1, 1, 1);
     }
 

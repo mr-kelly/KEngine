@@ -22,7 +22,6 @@ public class CUIManager : ICModule
     public class CUIState
     {
         public string Name;
-        public CUIConfig UISetting;
         public CUIController UIWindow;
         public string UIType;
         public bool IsLoading;
@@ -30,11 +29,6 @@ public class CUIManager : ICModule
 
         public bool OpenWhenFinish;
         public object[] OpenArgs;
-
-        public Dictionary<string, Texture> TextureDict = new Dictionary<string, Texture>();
-
-        public bool DestroyAfterClose;
-        public bool NotDestroyAfterLeave = false;
 
         public Queue<Action<CUIController, object[]>> CallbacksWhenFinish;
         public Queue<object[]> CallbacksArgsWhenFinish;
@@ -57,7 +51,6 @@ public class CUIManager : ICModule
     public ICUIBridge UiBridge;
 
     public Dictionary<string, CUIState> UIWindows = new Dictionary<string, CUIState>();
-    Dictionary<int, CUIState> MutexUI = new Dictionary<int, CUIState>(); // 静态（非复制）UI界面的互斥状态
 
     public bool UIRootLoaded = false;
 
@@ -148,7 +141,6 @@ public class CUIManager : ICModule
             if (!UIWindows.TryGetValue(name, out uiInstanceState)) // 实例创建
             {
                 uiInstanceState = new CUIState(template);
-                uiInstanceState.UISetting = uiTemplateState.UISetting;
                 uiInstanceState.IsStaticUI = false;
                 uiInstanceState.IsLoading = true;
                 uiInstanceState.UIWindow = null;
@@ -171,12 +163,11 @@ public class CUIManager : ICModule
         string name = (string)_args[1];
 
         GameObject uiObj = (GameObject)UnityEngine.Object.Instantiate(_ui.gameObject);
-        CUIConfig uiConfig = uiObj.GetComponent<CUIConfig>();
 
         uiObj.name = name;
 
 
-        UiBridge.UIObjectFilter(uiConfig, uiObj);
+        UiBridge.UIObjectFilter(uiObj);
 
         CUIController uiBase = uiObj.GetComponent<CUIController>();
         uiBase.UITemplateName = template;
@@ -219,24 +210,10 @@ public class CUIManager : ICModule
             return;
         }
 
-        int mutexId = uiState.UISetting.MutexId;
-        if (mutexId > 0)
-        {
-            if (Debug.isDebugBuild)
-            {
-                CUIState mutexState;
-                if (MutexUI.TryGetValue(mutexId, out mutexState) && mutexState != null && mutexState != uiState)
-                {
-                    CBase.LogError("[CloseWindow]MutexUI互斥有问题，关闭时发现已经有另一个互斥Ui被打开了: {0}", mutexState.Name);
-                }
-            }
-            MutexUI[mutexId] = null;
-        }
-
         uiState.UIWindow.gameObject.SetActive(false);
         uiState.UIWindow.OnClose();
 
-        if (uiState.DestroyAfterClose)
+        if (!uiState.IsStaticUI)
             DestroyWindow(name);
     }
 
@@ -255,22 +232,6 @@ public class CUIManager : ICModule
         foreach (string item in LoadList)
             DestroyWindow(item);
 
-    }
-
-    public void DestroyWindowsAfterLeave()
-    {
-        List<string> LoadList = new List<string>();
-
-        foreach (KeyValuePair<string, CUIState> uiWindow in UIWindows)
-        {
-            if (IsLoad(uiWindow.Key) && (!uiWindow.Value.NotDestroyAfterLeave))
-            {
-                LoadList.Add(uiWindow.Key);
-            }
-        }
-
-        foreach (string item in LoadList)
-            DestroyWindow(item);
     }
 
     public void CloseAllWindows()
@@ -329,7 +290,6 @@ public class CUIManager : ICModule
         openState.IsStaticUI = true;
         openState.OpenArgs = args;
         openState.OpenWhenFinish = openWhenFinish;
-        openState.TextureDict.Clear();
         //openState.DestroyAfterClose = uiSetting.DestroyAfterClose;
         //openState.NotDestroyAfterLeave = uiSetting.NotDestroyAfterLeave;
         //openState.UISetting = uiSetting;
@@ -349,22 +309,12 @@ public class CUIManager : ICModule
 
         GameObject uiObj = (GameObject)assetLoader.Asset;
 
-        CUIConfig uiConfig = uiObj.GetComponent<CUIConfig>();
-        if (uiConfig == null)
-        {
-            uiConfig = uiObj.AddComponent<CUIConfig>();
-            uiConfig.UIName = name;
-        }
-            
-        openState.DestroyAfterClose = uiConfig.DestroyAfterClose;
-        openState.NotDestroyAfterLeave = uiConfig.NotDestroyAfterLeave;
-        openState.UISetting = uiConfig;
         openState.IsLoading = false;
 
         uiObj.SetActive(false);
         uiObj.name = openState.Name;
 
-        UiBridge.UIObjectFilter(uiConfig, uiObj);
+        UiBridge.UIObjectFilter(uiObj);
         
         CUIController uiBase = (CUIController)uiObj.AddComponent(openState.UIType);
 
@@ -476,22 +426,6 @@ public class CUIManager : ICModule
 
     void OnOpen(CUIState uiState, params object[] args)
     {
-
-        if (uiState.UISetting == null)
-        {
-            CBase.LogError("無UiConfig {0}", uiState.Name);
-        }
-
-        int mutexId = uiState.UISetting.MutexId;
-
-        CUIState mutexState;
-        if (mutexId > 0 && MutexUI.TryGetValue(mutexId, out mutexState) && mutexState != null
-            && mutexState != uiState) // 不是重复打开同一个
-        {
-            CloseWindow(mutexState.Name);
-        }
-        MutexUI[mutexId] = uiState;
-
         CUIController uiBase = uiState.UIWindow;
         uiBase.OnPreOpen();
         if (uiBase.gameObject.activeSelf)

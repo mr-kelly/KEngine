@@ -17,5 +17,5 @@ public class CUGUIBridge : ICUIBridge
         return null;
     }
 
-    public void UIObjectFilter(CUIConfig uiConfig, GameObject uiObject) { }
+    public void UIObjectFilter(GameObject uiObject) { }
 }

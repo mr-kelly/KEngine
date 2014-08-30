@@ -80,16 +80,16 @@ public partial class CBuild_UI : AutoBuildBase
 		}
 
         // UIConfig, 取代之前的UISetting
-        CUIConfig config = TempPanelObject.AddComponent<CUIConfig>();
-        config.UIName = UIName;
+        //CUIConfig config = TempPanelObject.AddComponent<CUIConfig>();
+        //config.UIName = UIName;
 
-        UIAnchor anchor = AnchorObject.GetComponent<UIAnchor>();
-        config.Side = anchor == null ? "Null" : anchor.side.ToString();
+        //UIAnchor anchor = AnchorObject.GetComponent<UIAnchor>();
+        //config.Side = anchor == null ? "Null" : anchor.side.ToString();
 
-        GameObject panelObj = AnchorObject.transform.GetChild(0).gameObject;  // 获取主面板，获取其localPosition信息
-        config.OffsetX = panelObj.transform.localPosition.x;
-        config.OffsetY = panelObj.transform.localPosition.y;
-        config.OffsetZ = panelObj.transform.localPosition.z;
+        //GameObject panelObj = AnchorObject.transform.GetChild(0).gameObject;  // 获取主面板，获取其localPosition信息
+        //config.OffsetX = panelObj.transform.localPosition.x;
+        //config.OffsetY = panelObj.transform.localPosition.y;
+        //config.OffsetZ = panelObj.transform.localPosition.z;
 	}
 
 	void DestroyTempPrefab()
