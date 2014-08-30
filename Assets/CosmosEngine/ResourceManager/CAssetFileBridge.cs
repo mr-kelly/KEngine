@@ -50,6 +50,9 @@ public class CAssetFileBridge
     {
         yield return null; // 延遲1幀
 
+        string extension = System.IO.Path.GetExtension(path);
+        path = path.Substring(0, path.Length - extension.Length);  // remove extensions
+
         UnityEngine.Object asset = Resources.Load<UnityEngine.Object>(path);
         if (asset == null)
         {

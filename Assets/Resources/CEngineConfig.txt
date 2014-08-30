@@ -2,5 +2,5 @@
 ProductRelPath	../Build	
 AssetBundleRelPath	StreamingAssets	
 AssetBundleExt	.unity3d	base
-IsLoadAssetBundle	1	
-UIBridgeType	NO_UI	
+IsLoadAssetBundle	0	
+UIBridgeType	NGUI	

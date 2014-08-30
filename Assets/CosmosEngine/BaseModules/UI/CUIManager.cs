@@ -350,7 +350,12 @@ public class CUIManager : ICModule
         GameObject uiObj = (GameObject)assetLoader.Asset;
 
         CUIConfig uiConfig = uiObj.GetComponent<CUIConfig>();
-        CBase.Assert(uiConfig);
+        if (uiConfig == null)
+        {
+            uiConfig = uiObj.AddComponent<CUIConfig>();
+            uiConfig.UIName = name;
+        }
+            
         openState.DestroyAfterClose = uiConfig.DestroyAfterClose;
         openState.NotDestroyAfterLeave = uiConfig.NotDestroyAfterLeave;
         openState.UISetting = uiConfig;

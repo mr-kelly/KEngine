@@ -22,7 +22,8 @@ public class CNGUIBridge : ICUIBridge
 
     public void UIObjectFilter(CUIConfig uiConfig, GameObject uiObj)
     {
-        uiObj.transform.parent = AnchorSide[uiConfig.Side];
+        string side = uiConfig.Side ?? "";
+        uiObj.transform.parent = AnchorSide[side];
         uiObj.transform.localPosition = new Vector3(uiConfig.OffsetX, uiConfig.OffsetY, uiConfig.OffsetZ); // 根据表中偏移
         uiObj.transform.localScale = new Vector3(1, 1, 1);
     }
@@ -72,6 +73,7 @@ public class CNGUIBridge : ICUIBridge
         GameObject nullAnchor = new GameObject("Null");
         CTool.SetChild(nullAnchor.transform, panelTrans);
         AnchorSide["Null"] = nullAnchor.transform;
+        AnchorSide[""] = AnchorSide[UIAnchor.Side.Center.ToString()]; // default
 
         NGUITools.SetLayer(uiRootobj, (int)CLayerDef.UI);
 
