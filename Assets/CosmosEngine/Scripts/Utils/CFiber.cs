@@ -27,7 +27,17 @@ using System.Collections.Generic;
 
 public class CFiber : MonoBehaviour
 {
-    public static CFiber Instance;
+    private static CFiber _Instance;
+    public static CFiber Instance
+    {
+        get
+        {
+            if (_Instance == null)
+                new GameObject("CFiber").AddComponent<CFiber>();
+
+            return _Instance;
+        }
+    }
 
     Queue<CCoroutineWrapper> AddQueue = new Queue<CCoroutineWrapper>();
     Queue<CCoroutineWrapper> DeleteQueue = new Queue<CCoroutineWrapper>();
@@ -40,11 +50,11 @@ public class CFiber : MonoBehaviour
 
     void Awake()
     {
-        Instance = this;
+        _Instance = this;
 
     }
 
-    private CCoroutineWrapper _NewCoroutine(IEnumerator coFunc)
+    public CCoroutineWrapper _NewCoroutine(IEnumerator coFunc)
     {
         var co = new CCoroutineWrapper() { CoroutineId = IdGen, CoroutineFunc = coFunc };
         IdGen++;
@@ -110,7 +120,7 @@ public class CFiber : MonoBehaviour
         coWrapper.Suspend = false;
     }
 
-    IEnumerator _HandleCustomRoutine(int coId, CCoroutineWrapper coWrapper, CCoroutineBase wait)
+    IEnumerator _HandleCustomRoutine(int coId, CCoroutineWrapper coWrapper, CFiberBase wait)
     {
         coWrapper.Suspend = true;
         _NewCoroutine(wait.DoRun()); // var co = 
@@ -144,21 +154,6 @@ public class CFiber : MonoBehaviour
         return true;
     }
 
-
-    public void Test()
-    {
-        PlayCoroutine(TestCo());
-    }
-
-    IEnumerator TestCo()
-    {
-        yield return new WaitForSeconds(1f);
-        Debug.Log("Success! Wait For seconds" + Time.time);
-
-        yield return new CWaitForMileSeconds(3000);
-        Debug.Log("Success! Wait For mileseconds" + Time.time);
-    }
-
     public class CCoroutineWrapper
     {
         public bool Suspend = false;
@@ -177,9 +172,9 @@ public class CFiber : MonoBehaviour
                 {
                     CFiber.Instance.StartCoroutine(CFiber.Instance._HandleUnityCoroutine(this, yieldVal as Coroutine));
                 }
-                else if (yieldVal is CCoroutineBase)
+                else if (yieldVal is CFiberBase)
                 {
-                    CCoroutineBase customRoutine = yieldVal as CCoroutineBase;
+                    CFiberBase customRoutine = yieldVal as CFiberBase;
                     CFiber.Instance.PlayCoroutine(CFiber.Instance._HandleCustomRoutine(CoroutineId, this, customRoutine));
                 }// else do nothing
 
@@ -198,7 +193,7 @@ public class CFiber : MonoBehaviour
 /// <summary>
 /// use for custom a croutine for CRoutine
 /// </summary>
-public abstract class CCoroutineBase
+public abstract class CFiberBase
 {
     public bool IsFinish = false;
     public IEnumerator DoRun()
@@ -216,26 +211,4 @@ public abstract class CCoroutineBase
     {
         return CFiber.Instance.StartCoroutine(coFunc);
     }
-}
-
-
-public class CWaitForMileSeconds : CCoroutineBase
-{
-    private int MileSeconds;
-
-    private float StartTime;
-
-    public CWaitForMileSeconds(int mileseconds)
-    {
-        MileSeconds = mileseconds;
-        StartTime = Time.time;
-    }
-    
-    public override IEnumerator Wait()
-    {
-        float endTime = StartTime + (float)MileSeconds / 1000f;
-        while (Time.time < endTime)
-            yield return null;
-    }
-
 }
