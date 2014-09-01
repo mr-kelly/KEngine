@@ -1,4 +1,5 @@
-﻿/// 
+﻿#if NGUI
+/// 
 /// Author: KK
 /// Email: 23110388@qq.com
 /// 
@@ -95,3 +96,4 @@ public class UIColorQuad : UIWidget
             CheckQuadMaterial(); // 確保Shader不為空，才能進入OnFill
     }
 }
+#endif
