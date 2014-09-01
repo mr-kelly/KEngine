@@ -10,7 +10,7 @@ using System.Collections;
 /// 纯色正方形，使用两个三角形组成，仅4个顶点
 /// </summary>
 [ExecuteInEditMode]
-[AddComponentMenu("NGUI/AC-Plugins/ColorQuad")]
+[AddComponentMenu("NGUI/ComsosEngine-Plugins/ColorQuad")]
 public class UIColorQuad : UIWidget
 {
     /// <summary>
