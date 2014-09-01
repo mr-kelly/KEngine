@@ -2,7 +2,7 @@
 =====
 [https://github.com/mr-kelly/CosmosEngine](https://github.com/mr-kelly/CosmosEngine "CosmosEngine")
 
-
+* [快速入门](#cn-quick-start)
 * [简介](#cn-intro)
 * [特性](#cn-feature)
 * [约定](#cn-convention)
@@ -10,6 +10,13 @@
 * [使用经验](#cn-exp)
 * [未来功能](#cn-future)
 
+<a name="cn-quick-start"></a>快速入门
+------------------
+* 1.将NGUI 3.7+版拷到Assets目录下
+* 2.在安装Unity的电脑上，打开场景文件: Assets/CosmosEngine/Demo/DemoGame/Bootstrap.unity
+* 点击播放，开始一个框架DEMO, 功能包括：打开一个的UI窗（自动匹配脚本）、读取一个Tab表格
+
+[回目录](#cn-title)
 
 <a name="cn-intro"></a>简介
 ------------------
