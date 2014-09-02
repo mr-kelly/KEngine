@@ -12,6 +12,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
+/// <summary>
+/// Load from Local hard disk or 
+/// Load from a AssetBundles..
+/// </summary>
 [CDependencyClass(typeof(CResourceManager))]
 public class CSettingManager : ICModule
 {
@@ -70,10 +74,10 @@ public class CSettingManager : ICModule
 		LoadFinished = true;
 	}
 
-	public string LoadSetting(string path, bool isGBK = false)
+	public string LoadSetting(string path)
 	{
 		if (SettingOutPackage)
-            return LoadSettingOutPackage(path, isGBK);   // WWW读取模式
+            return LoadSettingOutPackage(path);   // WWW读取模式
         else
             return LoadSettingInPackage(path);  // scriptableObject获取
 	}
@@ -92,12 +96,12 @@ public class CSettingManager : ICModule
 	}
 
     // 仅在PC版可用
-    string LoadSettingOutPackage(string path, bool isGBK)
+    string LoadSettingOutPackage(string path)
 	{
 		string fullPath = CResourceManager.ApplicationPath + path;
         fullPath = fullPath.Replace(CResourceManager.GetFileProtocol(), "");
 
-        System.Text.Encoding encoding = System.Text.Encoding.UTF8;//isGBK ? GBK.GBKEncodingManager.Encoding : System.Text.Encoding.UTF8;
+        System.Text.Encoding encoding = System.Text.Encoding.UTF8;
 
         return System.IO.File.ReadAllText(fullPath, encoding);
 	}
