@@ -18,9 +18,9 @@ public interface ICModule
 }
 
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
-public class CModuleDependency : Attribute
+public class CDependencyClass : Attribute
 {
-    public CModuleDependency(Type dependencyType)
+    public CDependencyClass(Type dependencyType)
     {
 
     }

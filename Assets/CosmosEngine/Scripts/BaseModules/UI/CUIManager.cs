@@ -13,7 +13,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
-[CModuleDependency(typeof(CResourceManager))]
+[CDependencyClass(typeof(CResourceManager))]
 public class CUIManager : ICModule
 {
     class _InstanceClass {public static CUIManager _Instance = new CUIManager();}
@@ -290,9 +290,6 @@ public class CUIManager : ICModule
         openState.IsStaticUI = true;
         openState.OpenArgs = args;
         openState.OpenWhenFinish = openWhenFinish;
-        //openState.DestroyAfterClose = uiSetting.DestroyAfterClose;
-        //openState.NotDestroyAfterLeave = uiSetting.NotDestroyAfterLeave;
-        //openState.UISetting = uiSetting;
 
         CResourceManager.Instance.StartCoroutine(LoadUIAssetBundle(path, name, openState));
 
@@ -393,35 +390,6 @@ public class CUIManager : ICModule
         {
             callback((T)_uibase, _args);
         }, args);
-    }
-
-    [System.Obsolete("[警告]CallUIMethod过时了~ 请尽快改成CallUI()")]
-    public void CallUIMethod(string uiName, string methodName, params object[] args)
-    {
-        CBase.LogError("[警告]CallUIMethod过时了~ 请尽快改成CallUI()");
-
-        CUIController uiBase = GetUIBase(uiName);
-        if (uiBase == null)
-        {
-            CBase.LogWarning("CallUIMethod Failed, UI not load, UI={0}, Method={1}", uiName, methodName);
-            return;
-        }
-
-        MethodInfo method = uiBase.GetType().GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-        if (method == null)
-        {
-            CBase.LogError("CallUIMethod Failed, invalid method, UI={0}, Method={1}", uiName, methodName);
-            return;
-        }
-
-        try
-        {
-            method.Invoke(uiBase, args);
-        }
-        catch (System.ArgumentException ex)
-        {
-            CBase.LogError("CallUIMethod Failed, runtime error, {0}, UI={1}, Method={2}", ex.Message, uiName, methodName);
-        }
     }
 
     void OnOpen(CUIState uiState, params object[] args)

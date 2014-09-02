@@ -23,7 +23,7 @@ public abstract class CUIController : MonoBehaviour
     public bool IsDynamicWindow { get { return UITemplateName != UIName; } }
 
     public virtual void OnPreOpen() { }
-    //ShowNavigationBar
+
     public virtual void OnOpen(params object[] args)
     {
     }
@@ -108,52 +108,16 @@ public abstract class CUIController : MonoBehaviour
         CTool.DestroyGameObjectChildren(go);
     }
 
-    // 抄 NGUISelectionTool的同名方法，将位置旋转缩放清零
+    /// <summary>
+    /// 模仿 NGUISelectionTool的同名方法，将位置旋转缩放清零
+    /// </summary>
+    /// <param name="t"></param>
     public void ClearLocalTransform(Transform t)
     {
         t.localPosition = Vector3.zero;
         t.localRotation = Quaternion.identity;
         t.localScale = Vector3.one;
     }
-
-
-    /// <summary>
-    /// 传入指定数量， 对List<GameObject>里指定数量项SetActive(true)/或创建, 其余的SetActive(false)
-    /// 常用于UIGrid下的对象动态增长
-    /// </summary>
-    //[System.Obsolete("用ResizeUIGridGameObjects代替，不用List了")]
-    //public void ResizeGameObjectList(ref List<GameObject> gameObjList, int resizeCount, GameObject templateForNew = null, Transform newTemplateParent = null)
-    //{
-    //	if (templateForNew == null)
-    //		templateForNew = default(GameObject);
-
-    //	for (int i = 0; i < resizeCount; i++)
-    //	{
-    //		if (i >= gameObjList.Count)
-    //		{
-    //			GameObject newTemplate = Instantiate(templateForNew) as GameObject;
-    //			newTemplate.transform.parent = newTemplateParent;
-    //			ClearLocalTransform(newTemplate.transform);
-
-    //			gameObjList.Add(newTemplate);
-    //		}
-    //		gameObjList[i].SetActive(true);
-    //	}
-
-    //	for (int i = resizeCount; i < gameObjList.Count; ++i)
-    //	{
-    //		gameObjList[i].SetActive(false);
-    //	}
-    //}
-
-    // 类似上面，直接传入UIGrid
-    //[System.Obsolete("用下面那个代替，不用List了")]
-    //public void ResizeUIGridGameObjects(UIGrid uiGrid, ref List<GameObject> gameObjList, int resizeCount, GameObject templateForNew = null)
-    //{
-    //	CBase.Assert(uiGrid);
-    //	ResizeGameObjectList(ref gameObjList, resizeCount, templateForNew, uiGrid.transform);
-    //	uiGrid.Reposition();
-    //}
 
     /// <summary>
     /// 传入指定数量， 对UIGrid里指定数量项SetActive(true)/或创建, 其余的SetActive(false)

@@ -30,8 +30,6 @@ public class CResourceManager : MonoBehaviour, ICModule
 		ShowTime,
 		ShowDetail,
 	}
-    public static bool CacheWWW = false;
-    public static int CacheVersion = -1;  // Load from bundleVersion
 
     private static CResourceManager _Instance;
     public static CResourceManager Instance
@@ -142,10 +140,6 @@ public class CResourceManager : MonoBehaviour, ICModule
 	{
         if (_Instance != null)
             CBase.Assert(_Instance == this);
-
-        //CacheVersion = int.Parse(PlayerSettings.bundleVersion.Replace(".", ""));
-        //CBase.Log("Cache Version: {0}", CacheVersion.ToString());
-
 	}
 
 	public IEnumerator Init()
@@ -159,6 +153,12 @@ public class CResourceManager : MonoBehaviour, ICModule
         yield break;
     }
 
+    /// <summary>
+    /// Different platform's assetBundles is incompatible. 
+    /// CosmosEngine put different platform's assetBundles in different folder.
+    /// Here, get Platform name that represent the AssetBundles Folder.
+    /// </summary>
+    /// <returns>Platform folder Name</returns>
     public static string GetBuildPlatformName()
     {
         string buildPlatformName = "Win32"; // default
@@ -197,6 +197,11 @@ public class CResourceManager : MonoBehaviour, ICModule
 
         return buildPlatformName;
     }
+
+    /// <summary>
+    /// On Windows, file protocol has a strange rule that has one more slash
+    /// </summary>
+    /// <returns>string, file protocol string</returns>
     public static string GetFileProtocol()
     {
         string fileProtocol = "file://";
@@ -205,11 +210,15 @@ public class CResourceManager : MonoBehaviour, ICModule
 
         return fileProtocol;
     }
+
+    /// <summary>
+    /// Initialize the path of AssetBundles store place ( Maybe in PersitentDataPath or StreamingAssetsPath )
+    /// </summary>
+    /// <returns></returns>
 	public static IEnumerator InitResourcePath()
     {
         string productPath = Path.Combine(Application.dataPath, CCosmosEngine.GetConfig("ProductRelPath"));
         string assetBundlePath = Path.Combine(Application.dataPath, CCosmosEngine.GetConfig("AssetBundleRelPath"));
-        //string productDirName = Path.GetFileName(CCosmosEngine.GetConfig("ProductRelPath"));
         string resourceDirName = Path.GetFileName(CCosmosEngine.GetConfig("AssetBundleRelPath"));
 
         BuildPlatformName = GetBuildPlatformName();

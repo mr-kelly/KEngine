@@ -12,7 +12,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
-[CModuleDependency(typeof(CResourceManager))]
+[CDependencyClass(typeof(CResourceManager))]
 public class CSettingManager : ICModule
 {
     static CSettingManager _Instance;

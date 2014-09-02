@@ -12,7 +12,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-// 纹理加载后，纹理是唯一存在，直接用AssetBundle里的
+
+[CDependencyClass(typeof(CAssetFileBridge))]
 public class CTextureLoader
 {
 	public bool IsFinished = false;

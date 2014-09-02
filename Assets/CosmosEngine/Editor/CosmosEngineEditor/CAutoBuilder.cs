@@ -9,7 +9,6 @@ using System.Text.RegularExpressions;
 
 public static class CAutoBuilder
 {
-    
     static string GetProjectName()
     {
         string[] s = Application.dataPath.Split('/');
@@ -188,7 +187,7 @@ public static class CAutoBuilder
         PerformBuild("Apps/Client.apk", BuildTarget.Android, BuildOptions.Development | BuildOptions.AllowDebugging | BuildOptions.ConnectWithProfiler);
     }
 
-    [MenuItem("CosmosEngine/清理PC缓存文件夹")]
+    [MenuItem("CosmosEngine/Clear PC PersitentDataPath")]
     static void ClearPersistentDataPath()
     {
         foreach (string dir in Directory.GetDirectories(CResourceManager.GetAppDataPath()))
@@ -197,13 +196,13 @@ public static class CAutoBuilder
         }
         
     }
-    [MenuItem("CosmosEngine/打开PC缓存文件夹")]
+    [MenuItem("CosmosEngine/Open PC PersitentDataPath Folder")]
     static void OpenPersistentDataPath()
     {
         System.Diagnostics.Process.Start(CResourceManager.GetAppDataPath());
     }
 
-    [MenuItem("CosmosEngine/清理Prefs")]
+    [MenuItem("CosmosEngine/Clear Prefs")]
     static void ClearPlayerPrefs()
     {
         PlayerPrefs.DeleteAll();

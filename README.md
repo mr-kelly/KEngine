@@ -128,7 +128,7 @@ CosmosEngine旨在让一些复杂的事情变得简单。
 CosmosEngine
 ==============================================================
 
-CosmosEngine - A Unity3D All-In-One Mobile Game Develop Framework
+CosmosEngine - A Unity3D Game Framework
 
 Design Origin
 --------------------------------------------------------
@@ -156,12 +156,3 @@ Structure
 ------------------------------
 
 ![Cosmos Engine Structure](https://raw.githubusercontent.com/mr-kelly/CosmosEngine/master/CosmosEngineStructure.png)
-
-Quick Start
------------------------------------------------
-
-CosmosEngine is weak now, no enough documentation support to it.
-
-CosmosEngine can embed different UI Plugin. Currently we use NGUI as the main UI plugins by default.
-
-*You should copy the NGUI source code to the Assets/Plugins/CosmosEnginePlugins/ directory to make the example project right*
