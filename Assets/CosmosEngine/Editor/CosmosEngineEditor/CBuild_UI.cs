@@ -77,20 +77,7 @@ public partial class CBuild_UI : AutoBuildBase
             {
                 Debug.LogWarning(UIName + " " + go.name + " UIButton 的Target 目标不是当前UIButton 子节点 ");
             }
-
         }
-
-        // UIConfig, 取代之前的UISetting
-        //CUIConfig config = TempPanelObject.AddComponent<CUIConfig>();
-        //config.UIName = UIName;
-
-        //UIAnchor anchor = AnchorObject.GetComponent<UIAnchor>();
-        //config.Side = anchor == null ? "Null" : anchor.side.ToString();
-
-        //GameObject panelObj = AnchorObject.transform.GetChild(0).gameObject;  // 获取主面板，获取其localPosition信息
-        //config.OffsetX = panelObj.transform.localPosition.x;
-        //config.OffsetY = panelObj.transform.localPosition.y;
-        //config.OffsetZ = panelObj.transform.localPosition.z;
     }
 
     void DestroyTempPrefab()

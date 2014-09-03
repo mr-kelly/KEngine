@@ -13,6 +13,9 @@ using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 
+/// <summary>
+/// Abstract class of all UI Script
+/// </summary>
 public abstract class CUIController : MonoBehaviour
 {
     public string UITemplateName = "";
@@ -165,24 +168,20 @@ public abstract class CUIController : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Shortcuts for UIModule's Open Window
+    /// </summary>
     protected void OpenWindow(string uiName, params object[] args)
     {
         CUIManager.Instance.OpenWindow(uiName, args);
     }
 
+    /// <summary>
+    /// Shortcuts for UIModule's Close Window
+    /// </summary>
+    /// <param name="uiName"></param>
     protected void CloseWindow(string uiName = null)
     {
         CUIManager.Instance.CloseWindow(uiName == null ? UIName : uiName);
     }
-
-    protected void MsgBox(string msg)
-    {
-        CUIManager.Instance.OpenWindow("MsgBox", msg);
-    }
-
-    protected void Notify(string msg)
-    {
-        CUIManager.Instance.OpenWindow("MsgBox", msg);
-    }
-
 }
