@@ -44,6 +44,11 @@ public class CCosmosEngine : MonoBehaviour
     private CoroutineDelegate BeforeInitModules = null;
     private CoroutineDelegate AfterInitModules = null;
 
+    public static CCosmosEngine New(GameObject gameObjectToAttach, ICModule[] modules)
+    {
+        return New(gameObjectToAttach, modules);
+    }
+
     /// <summary>
     /// Engine entry.... all begins from here
     /// </summary>
@@ -94,6 +99,9 @@ public class CCosmosEngine : MonoBehaviour
         StartCoroutine(DoInit());
     }
 
+    /// <summary>
+    /// Use Coroutine to initialize the two base modules: Resource & UI
+    /// </summary>
     IEnumerator DoInit()
     {
         ICModule[] baseModules = new ICModule[] {  // 基础三件套
