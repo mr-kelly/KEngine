@@ -13,34 +13,49 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-// Cosmos Engine - Unity3D Game Develop Framework
+/// <summary>
+/// Cosmos Engine - Unity3D Game Develop Framework 
+/// </summary>
 public class CCosmosEngine : MonoBehaviour
 {
+    /// <summary>
+    /// To Display FPS in the Debug Mode (Debug.isDebugBuild is true)
+    /// </summary>
     static CFpsWatcher RenderWatcher;  // 帧数监听器
+
+    /// <summary>
+    /// In Init func has a check if the user has the write privillige
+    /// </summary>
     public static bool IsRootUser;  // 是否越狱iOS
 
     static CCosmosEngine EngineInstance;
 
+    /// <summary>
+    /// Read Tab file (CEngineConfig.txt), cache to here
+    /// </summary>
     static Dictionary<string, string> ConfigMap = null;// 遊戲配置，讀取Resources目錄里
 
-    public delegate IEnumerator CoroutineDelegate();
-
+    /// <summary>
+    /// Modules passed from the CosmosEngine.New function. All your custom game logic modules 
+    /// </summary>
     private ICModule[] GameModules;
 
+    public delegate IEnumerator CoroutineDelegate();
     private CoroutineDelegate BeforeInitModules = null;
     private CoroutineDelegate AfterInitModules = null;
 
-    public static CCosmosEngine New(GameObject host, ICModule[] modules, CoroutineDelegate before, CoroutineDelegate after)
+    /// <summary>
+    /// Engine entry.... all begins from here
+    /// </summary>
+    public static CCosmosEngine New(GameObject gameObjectToAttach, ICModule[] modules, CoroutineDelegate before, CoroutineDelegate after)
     {
-        CBase.Assert(host != null && modules != null);
-        CCosmosEngine engine = host.AddComponent<CCosmosEngine>();
+        CBase.Assert(gameObjectToAttach != null && modules != null);
+        CCosmosEngine engine = gameObjectToAttach.AddComponent<CCosmosEngine>();
         engine.GameModules = modules;
         engine.BeforeInitModules = before;
         engine.AfterInitModules = after;
         return engine;
     }
-
-
 
     private void Awake()
     {
