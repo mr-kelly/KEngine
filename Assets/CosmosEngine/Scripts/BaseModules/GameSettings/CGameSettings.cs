@@ -23,6 +23,19 @@ public class CGameSettings : ICModule
 
     public Dictionary<Type, Dictionary<string, CBaseInfo>> SettingInfos = new Dictionary<Type, Dictionary<string, CBaseInfo>>();
 
+    public IEnumerator Init()
+    {
+        if (this.InitAction == null)
+            CBase.LogError("GameSettings沒有定義初始化行為！！！");
+        else
+            this.InitAction();
+        yield break;
+    }
+
+    public IEnumerator UnInit()
+    {
+        yield break;
+    }
     public Action InitAction; // Init時調用的委託、函數指針
 
     public void LoadTab<T>(string tabPath) where T : CBaseInfo, new()
@@ -102,19 +115,6 @@ public class CGameSettings : ICModule
         return GetInfo<T>(id.ToString());
     }
 
-    public IEnumerator Init()
-    {
-        if (this.InitAction == null)
-            CBase.LogError("GameSettings沒有定義初始化行為！！！");
-        else
-            this.InitAction();
-        yield break;
-    }
-
-    public IEnumerator UnInit()
-    {
-        yield break;
-    }
 }
 
 public class CBaseInfo
