@@ -1,5 +1,5 @@
 <a name="cn-title"></a>CosmosEngine
-=====
+=========================================
 [https://github.com/mr-kelly/CosmosEngine](https://github.com/mr-kelly/CosmosEngine "CosmosEngine")
 
 * [快速入门](#cn-quick-start)
@@ -8,7 +8,11 @@
 * [约定](#cn-convention)
 * [整体架构图](#cn-structure)
 * [使用经验](#cn-exp)
+* [工作流](#cn-workflow)
 * [未来功能](#cn-future)
+
+
+
 
 <a name="cn-quick-start"></a>快速入门
 ------------------
@@ -18,11 +22,19 @@
 
 [回目录](#cn-title)
 
+
+
+
+
 <a name="cn-intro"></a>简介
 ------------------
-CosmosEngine - Unity3D /2D 轻量级模块化游戏开发框架，包含轻量级的代码和常用模块，提供一定的编程范式作约束，旨在减少开发人员的重复工作和做决定的次数。
+CosmosEngine - Unity3D /2D 轻量级模块化游戏开发框架，包含轻量级的代码和常用模块，提供一定的编程范式作约束和工作流程，旨在减少开发人员的重复工作和做决定的次数。
 
 [回目录](#cn-title)
+
+
+
+
 
 <a name="cn-feature"></a>特性
 ----------------------------
@@ -49,6 +61,10 @@ CosmosEngine中假定耦合是不可避免的，对依赖和耦合持开放的�
 同时CosmosEngine中更多的通过C#的委托/事件机制来减少降低耦合度，譬如说，在快速入门的DEMO中，UI依赖资源，但是GameSettings并不需要依赖资源模块。
 
 [回目录](#cn-title)
+
+
+
+
 
 <a name="cn-convention"></a>约定
 -------------------------------------------------------
@@ -79,11 +95,16 @@ CosmosEngine中的所有设计，都基于这个开始思考的。
 [回目录](#cn-title)
 
 
+
+
 <a name="cn-structure"></a>整体结构图
 ----------------------------------------------
 ![Structure of CosmosEngine](https://raw.githubusercontent.com/mr-kelly/CosmosEngine/master/CosmosEngineStructure.png)
 
 [回目录](#cn-title)
+
+
+
 
 <a name="cn-exp"></a>使用经验
 ----------------------------------------------
@@ -105,6 +126,30 @@ CosmosEngine的设计原则是，把一个类拷到另一个项目，可以完�
 使用Excel表的过程中，会使用GBK进行表的保存。我们在使用CosmosEngine中對Excel表中实行编译机制，既把GBK转成UTF-8，同时又可以对未编译的Excel表进行批注、乱涂乱画。
 
 [回目录](#cn-title)
+
+
+
+<a name="cn-workflow"></a>工作流
+------------------------------------------
+![Workflow of CosmosEngine](https://raw.githubusercontent.com/mr-kelly/CosmosEngine/master/Docs/Workflow.png)
+
+CosmosEngine为三个角色（程序、美术、策划）的团队协作提供一个工作流：
+* 程序进行代码的编写，修改进行提交
+* 美术进行资源设计，修改后进行提交
+* 策划以Excel形式进行游戏内容编辑，通过Excel编译器编译成Tab-CSV或其它程序可读内容。（在另一个开源项目[KKDaemon](https://github.com/mr-kelly/KKDaemon)中实现）
+* Robot——机器人，CosmosEngine可配合另一个开源项目[Handyman](https://github.com/mr-kelly/Handyman)，进行Web端的定时自动代码编译、资源编译等。（类似的还有QuickBuild等）
+
+乍一看，它没啥特别，事实它着重希望砍掉的一些重复的工作：
+* 避免人工化的资源操作，譬如美术希望看到资源在游戏中的效果，提交并呼唤Robot进行资源编译就可以了，不用打扰程序和策划
+* 策划可以自由使用成熟的编辑器——Excel进行编辑，可以加注释等让自己工作更轻松
+* 程序不用每天被策划问表怎么填和被美术呼唤帮忙试一下了
+* 释放多余劳动力，减少人力成本和时间成本————就是帮老板省钱
+
+[回目录](#cn-title)
+
+
+
+
 
 <a name="cn-future"></a>未来功能
 ----------------------------------------------

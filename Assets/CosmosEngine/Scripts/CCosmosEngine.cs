@@ -142,6 +142,9 @@ public class CCosmosEngine : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Ensure the CEngineConfig file loaded.
+    /// </summary>
     static void EnsureConfigTab()
     {
         if (ConfigMap == null)
@@ -162,6 +165,9 @@ public class CCosmosEngine : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Get Config from the CEngineConfig file through key
+    /// </summary>
     public static string GetConfig(string key)
     {
         EnsureConfigTab();

@@ -10,7 +10,9 @@
 using UnityEngine;
 using System.Collections;
 
-// Unity Offical Layer Define
+/// <summary>
+/// Unity Official Layer Define 
+/// </summary>
 public enum CLayerDef
 {
     Default = 0,

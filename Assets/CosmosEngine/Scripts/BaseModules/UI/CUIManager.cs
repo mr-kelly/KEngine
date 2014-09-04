@@ -13,44 +13,18 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
+/// <summary>
+/// UI Module
+/// </summary>
 [CDependencyClass(typeof(CResourceManager))]
 public class CUIManager : ICModule
 {
     class _InstanceClass {public static CUIManager _Instance = new CUIManager();}
     public static CUIManager Instance { get { return _InstanceClass._Instance; } }
 
-    public class CUIState
-    {
-        public string Name;
-        public CUIController UIWindow;
-        public string UIType;
-        public bool IsLoading;
-        public bool IsStaticUI; // 非复制出来的, 静态UI
-
-        public bool OpenWhenFinish;
-        public object[] OpenArgs;
-
-        public Queue<Action<CUIController, object[]>> CallbacksWhenFinish;
-        public Queue<object[]> CallbacksArgsWhenFinish;
-
-        public CUIState(string _UITypeName)
-        {
-            Name = _UITypeName;
-            UIWindow = null;
-            UIType = "CUI" + _UITypeName;
-
-            IsLoading = true;
-            OpenWhenFinish = false;
-            OpenArgs = null;
-
-            CallbacksWhenFinish = new Queue<Action<CUIController, object[]>>();
-            CallbacksArgsWhenFinish = new Queue<object[]>();
-        }
-    }
-
     public ICUIBridge UiBridge;
 
-    public Dictionary<string, CUIState> UIWindows = new Dictionary<string, CUIState>();
+    public Dictionary<string, CUILoadState> UIWindows = new Dictionary<string, CUILoadState>();
 
     public bool UIRootLoaded = false;
 
@@ -91,7 +65,7 @@ public class CUIManager : ICModule
     // 打开窗口（非复制）
     public void OpenWindow(string name, params object[] args)
     {
-        CUIState uiState;
+        CUILoadState uiState;
         if (!UIWindows.TryGetValue(name, out uiState))
         {
             LoadWindow(name, true, args);
@@ -128,7 +102,7 @@ public class CUIManager : ICModule
     // Dynamic动态窗口，复制基准面板，需预加载
     public void OpenDynamicWindow(string template, string name, params object[] args)
     {
-        CUIState uiState = _GetUIState(name);
+        CUILoadState uiState = _GetUIState(name);
         if (uiState != null)
         {
             OnOpen(uiState, args);
@@ -136,11 +110,11 @@ public class CUIManager : ICModule
         }
 
         CallUI(template, (_ui, _args) => {  // _args useless
-            CUIState uiInstanceState;
-            CUIState uiTemplateState = _GetUIState(template);
+            CUILoadState uiInstanceState;
+            CUILoadState uiTemplateState = _GetUIState(template);
             if (!UIWindows.TryGetValue(name, out uiInstanceState)) // 实例创建
             {
-                uiInstanceState = new CUIState(template);
+                uiInstanceState = new CUILoadState(template);
                 uiInstanceState.IsStaticUI = false;
                 uiInstanceState.IsLoading = true;
                 uiInstanceState.UIWindow = null;
@@ -173,7 +147,7 @@ public class CUIManager : ICModule
         uiBase.UITemplateName = template;
         uiBase.UIName = name;
 
-        CUIState _instanceUIState = UIWindows[name];
+        CUILoadState _instanceUIState = UIWindows[name];
 
         _instanceUIState.IsLoading = false;
         _instanceUIState.UIWindow = uiBase;
@@ -198,7 +172,7 @@ public class CUIManager : ICModule
 
     public void CloseWindow(string name)
     {
-        CUIState uiState;
+        CUILoadState uiState;
         if (!UIWindows.TryGetValue(name, out uiState))
         {
             return; // 未开始Load
@@ -221,7 +195,7 @@ public class CUIManager : ICModule
     {
         List<string> LoadList = new List<string>();
 
-        foreach (KeyValuePair<string, CUIState> uiWindow in UIWindows)
+        foreach (KeyValuePair<string, CUILoadState> uiWindow in UIWindows)
         {
             if (IsLoad(uiWindow.Key))
             {
@@ -236,7 +210,7 @@ public class CUIManager : ICModule
 
     public void CloseAllWindows()
     {
-        foreach (KeyValuePair<string, CUIState> uiWindow in UIWindows)
+        foreach (KeyValuePair<string, CUILoadState> uiWindow in UIWindows)
         {
             if (IsOpen(uiWindow.Key))
             {
@@ -245,9 +219,9 @@ public class CUIManager : ICModule
         }
     }
 
-    CUIState _GetUIState(string name)
+    CUILoadState _GetUIState(string name)
     {
-        CUIState uiState;
+        CUILoadState uiState;
         UIWindows.TryGetValue(name, out uiState);
         if (uiState != null)
             return uiState;
@@ -257,7 +231,7 @@ public class CUIManager : ICModule
 
     CUIController GetUIBase(string name)
     {
-        CUIState uiState;
+        CUILoadState uiState;
         UIWindows.TryGetValue(name, out uiState);
         if (uiState != null && uiState.UIWindow != null)
             return uiState.UIWindow;
@@ -278,7 +252,7 @@ public class CUIManager : ICModule
         return false;
     }
 
-    public CUIState LoadWindow(string name, bool openWhenFinish, params object[] args)
+    public CUILoadState LoadWindow(string name, bool openWhenFinish, params object[] args)
     {
         if (UIWindows.ContainsKey(name))
             CBase.LogError("[LoadWindow]多次重复LoadWindow: {0}", name);
@@ -286,7 +260,7 @@ public class CUIManager : ICModule
 
         string path = string.Format("UI/{0}_UI{1}", name, CCosmosEngine.GetConfig("AssetBundleExt"));
 
-        CUIState openState = new CUIState(name);
+        CUILoadState openState = new CUILoadState(name);
         openState.IsStaticUI = true;
         openState.OpenArgs = args;
         openState.OpenWhenFinish = openWhenFinish;
@@ -298,7 +272,7 @@ public class CUIManager : ICModule
         return openState;
     }
 
-    IEnumerator LoadUIAssetBundle(string path, string name, CUIState openState)
+    IEnumerator LoadUIAssetBundle(string path, string name, CUILoadState openState)
     {
         XAssetLoader assetLoader = new XAssetLoader(path);
         while (!assetLoader.IsFinished)
@@ -325,7 +299,7 @@ public class CUIManager : ICModule
 
     public void DestroyWindow(string name)
     {
-        CUIState uiState;
+        CUILoadState uiState;
         UIWindows.TryGetValue(name, out uiState);
         if (uiState == null || uiState.UIWindow == null)
         {
@@ -359,7 +333,7 @@ public class CUIManager : ICModule
     {
         CBase.Assert(callback);
 
-        CUIState uiState;
+        CUILoadState uiState;
         if (!UIWindows.TryGetValue(uiName, out uiState))
         {
             uiState = LoadWindow(uiName, false);  // 加载，这样就有UIState了
@@ -367,7 +341,7 @@ public class CUIManager : ICModule
 
         if (uiState.IsLoading) // Loading
         {
-            CUIState openState = UIWindows[uiName];
+            CUILoadState openState = UIWindows[uiName];
             openState.CallbacksWhenFinish.Enqueue(callback);
             openState.CallbacksArgsWhenFinish.Enqueue(args);
             return;
@@ -392,7 +366,7 @@ public class CUIManager : ICModule
         }, args);
     }
 
-    void OnOpen(CUIState uiState, params object[] args)
+    void OnOpen(CUILoadState uiState, params object[] args)
     {
         CUIController uiBase = uiState.UIWindow;
         uiBase.OnPreOpen();
@@ -405,7 +379,7 @@ public class CUIManager : ICModule
     }
 
 
-    void InitWindow(CUIState uiState, CUIController uiBase, bool open, params object[] args)
+    void InitWindow(CUILoadState uiState, CUIController uiBase, bool open, params object[] args)
     {
         uiBase.OnInit();
 
@@ -416,7 +390,7 @@ public class CUIManager : ICModule
         }
 
     }
-    void OnUIWindowLoaded(CUIState uiState, CUIController uiBase)
+    void OnUIWindowLoaded(CUILoadState uiState, CUIController uiBase)
     {
         //if (openState.OpenWhenFinish)  // 加载完打开 模式下，打开时执行回调
         {
@@ -427,5 +401,37 @@ public class CUIManager : ICModule
                 callback(uiBase, _args);
             }
         }
+    }
+}
+
+/// <summary>
+/// UI Async Load State class
+/// </summary>
+public class CUILoadState
+{
+    public string Name;
+    public CUIController UIWindow;
+    public string UIType;
+    public bool IsLoading;
+    public bool IsStaticUI; // 非复制出来的, 静态UI
+
+    public bool OpenWhenFinish;
+    public object[] OpenArgs;
+
+    public Queue<Action<CUIController, object[]>> CallbacksWhenFinish;
+    public Queue<object[]> CallbacksArgsWhenFinish;
+
+    public CUILoadState(string _UITypeName)
+    {
+        Name = _UITypeName;
+        UIWindow = null;
+        UIType = "CUI" + _UITypeName;
+
+        IsLoading = true;
+        OpenWhenFinish = false;
+        OpenArgs = null;
+
+        CallbacksWhenFinish = new Queue<Action<CUIController, object[]>>();
+        CallbacksArgsWhenFinish = new Queue<object[]>();
     }
 }
