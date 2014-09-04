@@ -1,13 +1,13 @@
-﻿//-------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
 //      CosmosEngine - The Lightweight Unity3D Game Develop Framework
 //
+//                         version 0.8
 //                     Copyright © 2011-2014
 //                   MrKelly <23110388@qq.com>
 //              https://github.com/mr-kelly/CosmosEngine
 //
-//-------------------------------------------------------------------------
-
+//------------------------------------------------------------------------------
 /// Coroutine++
 /// 
 /// Unity's courinte is excellent, but YieldInstruction cannot let you custom your own coroutine Class.

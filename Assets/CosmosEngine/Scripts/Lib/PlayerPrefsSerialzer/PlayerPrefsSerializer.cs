@@ -1,12 +1,13 @@
-//-------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
 //      CosmosEngine - The Lightweight Unity3D Game Develop Framework
 //
+//                         version 0.8
 //                     Copyright Â© 2011-2014
 //                   MrKelly <23110388@qq.com>
 //              https://github.com/mr-kelly/CosmosEngine
 //
-//-------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 /**
 * @file PlayerPrefsSerializer.cs
 * @brief Code snippet from UnityForum (http://forum.unity3d.com/threads/72156-C-Serialization-PlayerPrefs-mystery)
@@ -22,7 +23,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 
  /// <summary>
- /// ¶ÔPlayerPrefsÖÐ±£´æµÄÃ÷ÎÄÊý¾Ý½øÐÐÐòÁÐ»¯
+ /// ï¿½ï¿½PlayerPrefsï¿½Ð±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð»ï¿½
  /// </summary>
 public class PlayerPrefsSerializer  
 {
@@ -40,7 +41,7 @@ public class PlayerPrefsSerializer
     // serializableObject is any struct or class marked with [Serializable]
     public static void Save (string prefKey, object serializableObject)
     {
-        // Environment.SetEnvironmentVariable("MONO_REFLECTION_SERIALIZER", "yes");  Ê¹ÓÃß@¾ä¿É±ÜÃâIOSŸo·¨ÐòÁÐ»¯†–î}£¬•º•r±ÜÃâÊ¹ÓÃ
+        // Environment.SetEnvironmentVariable("MONO_REFLECTION_SERIALIZER", "yes");  Ê¹ï¿½ï¿½ï¿½@ï¿½ï¿½É±ï¿½ï¿½ï¿½IOSï¿½oï¿½ï¿½ï¿½ï¿½ï¿½Ð»ï¿½ï¿½ï¿½ï¿½}ï¿½ï¿½ï¿½ï¿½ï¿½rï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½
 
         MemoryStream memoryStream = new MemoryStream ();
         bf.Serialize (memoryStream, serializableObject);
@@ -49,7 +50,7 @@ public class PlayerPrefsSerializer
     }
     
 	/// <summary>
-	/// PlayerPrefs.GetString() ÒÑÍ¨¹ý½âÃÜ
+	/// PlayerPrefs.GetString() ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
 	/// <param name="prefKey"></param>
@@ -74,7 +75,7 @@ public class PlayerPrefsSerializer
 
 
 	/// <summary>
-	/// ±àÂë
+	/// ï¿½ï¿½ï¿½ï¿½
 	/// </summary>
 	/// <param name="serializableObject"></param>
 	/// <returns></returns>
@@ -87,7 +88,7 @@ public class PlayerPrefsSerializer
     }
 
 	/// <summary>
-	/// ½âÂë
+	/// ï¿½ï¿½ï¿½ï¿½
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
 	/// <param name="serialized"></param>
