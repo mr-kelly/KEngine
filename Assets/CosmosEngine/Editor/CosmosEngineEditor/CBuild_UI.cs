@@ -25,7 +25,7 @@ public partial class CBuild_UI : AutoBuildBase
     public void ExportCurrentUI()
     {
         CreateTempPrefab();
-        if (!CBuildTools.HookFunc(typeof(CBuild_UI), "Custom_ExportCurrentUI", UIScenePath, UIName, TempPanelObject))
+        if (!CBuildTools.HookFunc(typeof(CBuild_UI), "Custom_ExportCurrentUI", this, UIScenePath, UIName, TempPanelObject))
         {
             CBuildTools.BuildAssetBundle(TempPanelObject, GetBuildRelPath(UIName));
         }
