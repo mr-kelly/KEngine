@@ -22,6 +22,9 @@ public class CUIManager : ICModule
     class _InstanceClass {public static CUIManager _Instance = new CUIManager();}
     public static CUIManager Instance { get { return _InstanceClass._Instance; } }
 
+    /// <summary>
+    /// A bridge for different UI System, for instance, you can use NGUI or EZGUI or etc.. UI Plugin through UIBridge
+    /// </summary>
     public ICUIBridge UiBridge;
 
     public Dictionary<string, CUILoadState> UIWindows = new Dictionary<string, CUILoadState>();
@@ -99,7 +102,10 @@ public class CUIManager : ICModule
         }
     }
 
-    // Dynamic动态窗口，复制基准面板，需预加载
+    
+    /// <summary>
+    /// // Dynamic动态窗口，复制基准面板
+    /// </summary>
     public void OpenDynamicWindow(string template, string name, params object[] args)
     {
         CUILoadState uiState = _GetUIState(name);
@@ -139,7 +145,6 @@ public class CUIManager : ICModule
         GameObject uiObj = (GameObject)UnityEngine.Object.Instantiate(_ui.gameObject);
 
         uiObj.name = name;
-
 
         UiBridge.UIObjectFilter(uiObj);
 
@@ -191,6 +196,10 @@ public class CUIManager : ICModule
             DestroyWindow(name);
     }
 
+    /// <summary>
+    /// Destroy all windows that has LoadState.
+    /// Be careful to use.
+    /// </summary>
     public void DestroyAllWindows()
     {
         List<string> LoadList = new List<string>();
@@ -305,14 +314,6 @@ public class CUIManager : ICModule
         {
             CBase.Log("{0} has been destroyed", name);
             return;
-        }
-
-        if (!uiState.UIWindow.IsDynamicWindow)
-        {
-            //foreach (var item in uiState.TextureDict)
-            //{
-            //    //CResourceManager.DestroyTexture(item.Value);
-            //}
         }
 
         UnityEngine.Object.Destroy(uiState.UIWindow.gameObject);

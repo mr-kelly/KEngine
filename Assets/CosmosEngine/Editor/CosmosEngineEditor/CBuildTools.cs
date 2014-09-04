@@ -125,7 +125,7 @@ public partial class CBuildTools
 
 	public static uint BuildAssetBundle(Object asset, string path, BuildTarget buildTarget)
 	{
-		if (asset == null || string.IsNullOrEmpty(path))
+		if (asset == null || string.IsNullOrEmpty(path)) 
 		{
 			BuildError("BuildAssetBundle: {0}", path);
 			return 0;

@@ -23,8 +23,6 @@ public abstract class CUIController : MonoBehaviour
     public string UITitle = "(未设置)"; // UI的标题
     public bool HasBackBtn = true; // 是否有返回按钮
 
-    public bool IsDynamicWindow { get { return UITemplateName != UIName; } }
-
     public virtual void OnPreOpen() { }
 
     public virtual void OnOpen(params object[] args)

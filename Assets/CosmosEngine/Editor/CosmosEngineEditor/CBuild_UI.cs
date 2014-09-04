@@ -24,11 +24,12 @@ public partial class CBuild_UI : AutoBuildBase
 
     public void ExportCurrentUI()
     {
+        CreateTempPrefab();
         if (!CBuildTools.HookFunc(typeof(CBuild_UI), "Custom_ExportCurrentUI", UIScenePath, UIName, TempPanelObject))
         {
             CBuildTools.BuildAssetBundle(TempPanelObject, GetBuildRelPath(UIName));
         }
-
+        DestroyTempPrefab();
     }
 
     public override void BeginExport()
@@ -45,8 +46,6 @@ public partial class CBuild_UI : AutoBuildBase
         if (!CheckUI(false))
             return;
 
-        CreateTempPrefab();
-
         ExportCurrentUI();
     }
 
@@ -54,7 +53,6 @@ public partial class CBuild_UI : AutoBuildBase
     {
         CBuildTools.HookFunc(typeof(CBuild_UI), "Custom_EndExport", this);
 
-        DestroyTempPrefab();
     }
 
     void CreateTempPrefab()
