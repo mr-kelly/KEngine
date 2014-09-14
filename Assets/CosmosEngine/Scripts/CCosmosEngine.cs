@@ -46,7 +46,7 @@ public class CCosmosEngine : MonoBehaviour
 
     public static CCosmosEngine New(GameObject gameObjectToAttach, ICModule[] modules)
     {
-        return New(gameObjectToAttach, modules);
+        return New(gameObjectToAttach, modules, null, null);
     }
 
     /// <summary>
