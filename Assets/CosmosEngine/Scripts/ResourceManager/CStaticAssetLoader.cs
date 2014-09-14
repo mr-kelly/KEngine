@@ -2,7 +2,7 @@
 //
 //      CosmosEngine - The Lightweight Unity3D Game Develop Framework
 // 
-//                     Version 0.8 (20140904)
+//                          Version 0.8
 //                     Copyright © 2011-2014
 //                   MrKelly <23110388@qq.com>
 //              https://github.com/mr-kelly/CosmosEngine
@@ -22,7 +22,7 @@ public class CStaticAssetLoader
 
     public Object Asset { get { return ResultAsset; } }
 
-    public CStaticAssetLoader(string path)
+    public CStaticAssetLoader(string path, System.Action<UnityEngine.Object> callback = null)
     {
         if (string.IsNullOrEmpty(path))
             CBase.LogError("XStaticAssetLoader 空资源路径!");
@@ -35,6 +35,9 @@ public class CStaticAssetLoader
                 asset = Object.Instantiate(_obj);
                 CachcedAssets[path] = asset;
             }
+            
+            if (callback != null)
+                callback(asset);
 
             OnLoad(path, asset);
 

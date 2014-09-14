@@ -2,7 +2,7 @@
 //
 //      CosmosEngine - The Lightweight Unity3D Game Develop Framework
 // 
-//                     Version 0.8 (20140904)
+//                          Version 0.8
 //                     Copyright © 2011-2014
 //                   MrKelly <23110388@qq.com>
 //              https://github.com/mr-kelly/CosmosEngine
@@ -45,7 +45,8 @@ public class CGameSettings : ICModule
 #if GAME_CLIENT
         tabFile = CTabFile.LoadFromString(CSettingManager.Instance.LoadSetting(tabPath));
 #else 
-        string p1 = System.IO.Path.GetFullPath(Application.dataPath + "/" + CCosmosEngine.GetConfig("ProductRelPath") + "/") + tabPath;
+        // Editor Only
+        string p1 = System.IO.Path.GetFullPath("Assets/" + CCosmosEngine.GetConfig("ProductRelPath") + "/") + tabPath;
         tabFile = CTabFile.LoadFromString(System.IO.File.ReadAllText(p1));
 #endif
 
