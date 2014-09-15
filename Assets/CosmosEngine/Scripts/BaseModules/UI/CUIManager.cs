@@ -27,10 +27,11 @@ public class CUIManager : ICModule
     /// A bridge for different UI System, for instance, you can use NGUI or EZGUI or etc.. UI Plugin through UIBridge
     /// </summary>
     public ICUIBridge UiBridge;
-
     public Dictionary<string, CUILoadState> UIWindows = new Dictionary<string, CUILoadState>();
-
     public bool UIRootLoaded = false;
+
+    public event System.Action<string> OpenWindowEvent;
+    public event System.Action<string> CloseWindowEvent;
 
     private CUIManager()
     {
@@ -178,6 +179,9 @@ public class CUIManager : ICModule
 
     public void CloseWindow(string name)
     {
+        if (CloseWindowEvent != null)
+            CloseWindowEvent(name);
+
         CUILoadState uiState;
         if (!UIWindows.TryGetValue(name, out uiState))
         {
@@ -370,6 +374,9 @@ public class CUIManager : ICModule
 
     void OnOpen(CUILoadState uiState, params object[] args)
     {
+        if (OpenWindowEvent != null)
+            OpenWindowEvent(uiState.UIType);
+
         CUIController uiBase = uiState.UIWindow;
         uiBase.OnPreOpen();
         if (uiBase.gameObject.activeSelf)

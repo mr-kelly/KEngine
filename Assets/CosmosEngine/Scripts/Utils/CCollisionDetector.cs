@@ -143,21 +143,41 @@ public class CCollisionDetector : CBehaviour
 
     public Vector2 GetTouchPoint(Collider2D selfCol, Collider2D hitCollider)
     {
+        Bounds selfBounds = selfCol.bounds;
+        Bounds hitBounds = hitCollider.bounds;
         // 计算碰撞点，取对方离我最近的点
         Vector2 selfColCenter = Vector2.zero;
         float selfColRadius = 0;
         Vector2 hitColCenter = Vector2.zero;
-        if (selfCol is BoxCollider2D)
+        if (hitCollider is BoxCollider2D)
         {
-            BoxCollider2D selfBox = (selfCol as BoxCollider2D);
-            selfColCenter = (Vector2)selfCol.transform.position + selfBox.center;
-            selfColRadius = Mathf.Min(selfBox.size.x, selfBox.size.y);  // 矩形暂时取最短的，后面优化吧
+            selfColCenter = selfBounds.center;
+            hitColCenter = hitBounds.center;
+            Vector2 xReverseForce = Vector2.zero;// 反作用力
+            Vector2 yReverseForce = Vector2.zero;
+
+            if (selfColCenter.y < (hitColCenter.y - hitBounds.size.y / 2f))
+                xReverseForce = -Vector2.up;
+            else if (selfColCenter.y > (hitColCenter.y + hitBounds.size.y / 2f))
+                xReverseForce = Vector2.up;
+
+            if (selfColCenter.x < (hitColCenter.x - hitBounds.size.x / 2f))
+                yReverseForce = -Vector2.right;
+            else if (selfColCenter.x > (hitColCenter.x + hitBounds.size.x / 2f))
+                yReverseForce = Vector2.right;
+
+            return (xReverseForce + yReverseForce) * -1 + (Vector2)selfCol.transform.position;
         }
-        else if (selfCol is CircleCollider2D)
+        else if (hitCollider is CircleCollider2D)
         {
-            CircleCollider2D selfBox = (selfCol as CircleCollider2D);
-            selfColCenter = (Vector2)selfCol.transform.position + (selfCol as CircleCollider2D).center;
-            selfColRadius = selfBox.radius;
+            CircleCollider2D hitCircle = (hitCollider as CircleCollider2D);
+            selfColCenter = selfBounds.center;
+            selfColRadius = hitCircle.radius;
+            hitColCenter = hitBounds.center;
+
+            Vector2 touchPos = (hitColCenter - selfColCenter).normalized * selfColRadius + hitColCenter;
+
+            return touchPos;
         }
         else
             CBase.Assert(false);
@@ -170,8 +190,8 @@ public class CCollisionDetector : CBehaviour
             CBase.Assert(false);
 
 
-        Vector2 touchPos = (hitColCenter - selfColCenter).normalized * selfColRadius + selfColCenter;
+        Vector2 touchPos2 = (hitColCenter - selfColCenter).normalized * selfColRadius + selfColCenter;
 
-        return touchPos;
+        return touchPos2;
     }
 }

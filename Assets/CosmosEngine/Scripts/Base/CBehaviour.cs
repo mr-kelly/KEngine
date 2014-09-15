@@ -22,8 +22,13 @@ public class CBehaviour : MonoBehaviour
 
     static bool IsApplicationQuited = false;  // 全局标记, 程序是否退出状态
     public static System.Action ApplicationQuitEvent;
- 
-    public float TimeScale = 1f;  // TODO: In Actor, Bullet,....
+
+    private float _TimeScale = 1f;  // TODO: In Actor, Bullet,....
+    public virtual float TimeScale
+    {
+        get { return _TimeScale; }
+        set { _TimeScale = value; }
+    }
 
     public virtual void Awake()
     {
