@@ -67,7 +67,7 @@ public class CCollisionDetector : CBehaviour
         {
             if (col is BoxCollider2D)
             {
-                BoxCollider2D boxCol = col as BoxCollider2D;
+                BoxCollider2D boxCol = col as BoxCollider2D; 
 
                 Vector2 leftTopPoint = (Vector2)_Transform.position + boxCol.center + new Vector2(-boxCol.size.x / 2, boxCol.size.y / 2);
                 Vector2 rightBottomPoint = (Vector2)_Transform.position + boxCol.center + new Vector2(boxCol.size.x / 2, -boxCol.size.y / 2);

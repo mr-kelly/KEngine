@@ -34,3 +34,11 @@
 /SyncFromClient2.bat
 *SyncToy*
 _gsdata_
+/Assembly-CSharp-Editor-vs.csproj
+/Assembly-CSharp-Editor.csproj
+/Assembly-CSharp-vs.csproj
+/Assembly-CSharp.csproj
+/CosmosEngineBootstrap-csharp.sln
+/CosmosEngineBootstrap.sln
+/UnityVS.CosmosEngineBootstrap.CSharp.Editor.Plugins.csproj
+/UnityVS.CosmosEngineBootstrap.v11.suo
