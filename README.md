@@ -158,14 +158,14 @@ CosmosEngine旨在让一些复杂的事情变得简单。
 
 未来将把这些模块整合进去, 它们基本都是已实现的独立模块：
 
-* 通用技能模块(Skill-Bullet-Buff)
-* 资源自动更新模块(CUpdateModule)
-* Http模块
-* 新的资源依赖处理系统(CDependencyModule)
-* 多语言系统(CLocalization)
-* 预加载机制(CPreloadModule)
-* 声效模块(CAudioModule)
-* Lua引擎(CScripts)
+* []通用技能模块(Skill-Bullet-Buff)
+* []资源自动更新模块(CUpdateModule)
+* []Http模块
+* []新的资源依赖处理系统(CDependencyModule)
+* []多语言系统(CLocalization)
+* []预加载机制(CPreloadModule)
+* []声效模块(CAudioModule)
+* []Lua引擎(CScripts)
 
 * etc...
 
