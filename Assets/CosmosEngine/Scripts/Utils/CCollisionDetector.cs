@@ -96,7 +96,8 @@ public class CCollisionDetector : CBehaviour
 
         return result;
     }
-    override public void Update()
+    
+    void LateUpdate()
     {
         if (IsDeleted) return;
 
@@ -141,7 +142,7 @@ public class CCollisionDetector : CBehaviour
 
     }
 
-    public Vector2 GetTouchPoint(Collider2D selfCol, Collider2D hitCollider)
+    public static Vector2 GetTouchPoint(Collider2D selfCol, Collider2D hitCollider)
     {
         Bounds selfBounds = selfCol.bounds;
         Bounds hitBounds = hitCollider.bounds;

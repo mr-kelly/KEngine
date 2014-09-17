@@ -77,7 +77,7 @@ public class CBase
 
 	public static void Log(string log)
 	{
-		log = string.Format("[{0}] {1}\n\n===============================================================================\n\n", DateTime.Now.ToString("HH:mm:ss"), log);
+		log = string.Format("[{0}] {1}\n\n===============================================================================\n\n", DateTime.Now.ToString("HH:mm:ss.ffff"), log);
         DoLog(log, XLogType.NORMAL);
 	}
 

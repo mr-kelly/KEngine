@@ -14,7 +14,7 @@ using System.Collections.Generic;
 using System;
 
 /// <summary>
-/// Cosmos Engine - Unity3D Game Develop Framework 
+/// Cosmos Engine - Unity3D Game Develop Framework
 /// </summary>
 public class CCosmosEngine : MonoBehaviour
 {
