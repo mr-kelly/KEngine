@@ -14,33 +14,20 @@ using System.Collections.Generic;
 
 public class CAudioLoader
 {
-    class XAssetBundleCache
-    {
-        public string URL;
-        public AudioClip Clip;
-        public float UpdateTime;
-        public XAssetBundleCache(string url)
-        {
-            URL = url;
-        }
-    }
-
     AudioClip ResultAudioClip;
 
     public bool IsFinished { get { return ResultAudioClip != null; } }
 
     public AudioClip Clip { get { return ResultAudioClip; } }
-    string Url;
 
     public CAudioLoader(string url, System.Action<AudioClip> callback = null)
     {
-        Url = url;
         new CAssetFileBridge(url, (UnityEngine.Object obj, object[] args) =>
         {
             AudioClip clip = obj as AudioClip;
 
             if (clip == null)
-                CBase.LogError("Null Audio Clip!!!: {0}", this.Url);
+                CBase.LogError("Null Audio Clip!!!: {0}", url);
 
             ResultAudioClip = clip;
 
