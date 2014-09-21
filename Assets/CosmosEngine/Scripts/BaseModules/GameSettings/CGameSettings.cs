@@ -122,6 +122,21 @@ public class CGameSettings : ICModule
 public class CBaseInfo
 {
     public string Id;
+
+    /// <summary>
+    /// Id是一個字符串, 嘗試Id轉成Int
+    /// </summary>
+    public int IntId
+    {
+        get
+        {
+            int tryInt;
+            if (!int.TryParse(Id, out tryInt))
+                CBase.LogError("錯誤解析Int Id");
+            return tryInt;
+        }
+    }
+    
     public virtual void Parse()
     {
 
