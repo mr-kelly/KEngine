@@ -53,6 +53,13 @@ public class CWWWLoader
         CResourceManager.Instance.StartCoroutine(CoLoad(url, callback, callbackArgs));//开启协程加载Assetbundle，执行Callback
     }
 
+	/// <summary>
+	/// 协和加载Assetbundle，加载完后执行callback
+	/// </summary>
+	/// <param name="url">资源的url</param>
+	/// <param name="callback"></param>
+	/// <param name="callbackArgs"></param>
+	/// <returns></returns>
     IEnumerator CoLoad(string url, Action<WWW, object[]> callback = null, params object[] callbackArgs)
     {
         if (CResourceManager.LoadByQueue)
@@ -72,6 +79,7 @@ public class CWWWLoader
             System.DateTime beginTime = System.DateTime.Now;
             WWW www = new WWW(url);
 
+			//设置AssetBundle解压缩线程的优先级
             www.threadPriority = Application.backgroundLoadingPriority;  // 取用全局的加载优先速度
             while (!www.isDone)
             {
