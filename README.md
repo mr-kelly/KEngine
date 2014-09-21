@@ -176,13 +176,14 @@ CosmosEngine旨在让一些复杂的事情变得简单。
 
 Author/Contributors
 ===================
-[mr-kelly](https://github.com/mr-kelly)
+* [mr-kelly](https://github.com/mr-kelly)
 
 
 Forks
 ================
-[Stable/Official](https://github.com/Cosmosbox/CosmosEngine)
-[Alpha Fork](https://github.com/mr-kelly/CosmosEngine)
+
+* [Stable/Official](https://github.com/Cosmosbox/CosmosEngine)
+* [Alpha Fork](https://github.com/mr-kelly/CosmosEngine)
 
 
 
