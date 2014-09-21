@@ -27,7 +27,10 @@ public static class CExtensions
 	{
 		t.position = new Vector3(t.position.x, newY, t.position.z);
 	}
-
+    public static void SetLocalPositionY(this Transform t, float newY)
+    {
+        t.localPosition = new Vector3(t.localPosition.x, newY, t.localPosition.z);
+    }
 	public static void SetPositionZ(this Transform t, float newZ)
 	{
 		t.position = new Vector3(t.position.x, t.position.y, newZ);

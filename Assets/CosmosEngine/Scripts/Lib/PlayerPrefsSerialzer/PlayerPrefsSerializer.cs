@@ -41,7 +41,7 @@ public class PlayerPrefsSerializer
     // serializableObject is any struct or class marked with [Serializable]
     public static void Save (string prefKey, object serializableObject)
     {
-        // Environment.SetEnvironmentVariable("MONO_REFLECTION_SERIALIZER", "yes");  ʹ���@��ɱ���IOS�o�����л����}�����r����ʹ��
+        // Environment.SetEnvironmentVariable("MONO_REFLECTION_SERIALIZER", "yes"); // fix IOS jit BUG
 
         MemoryStream memoryStream = new MemoryStream ();
         bf.Serialize (memoryStream, serializableObject);
