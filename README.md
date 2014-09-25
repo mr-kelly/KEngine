@@ -1,6 +1,6 @@
 <a name="cn-title"></a>CosmosEngine
 =========================================
-[https://github.com/mr-kelly/CosmosEngine](https://github.com/mr-kelly/CosmosEngine "CosmosEngine")
+[https://github.com/Cosmosbox/CosmosEngine](https://github.com/Cosmosbox/CosmosEngine "CosmosEngine")
 
 * [快速入门](#cn-quick-start)
 * [简介](#cn-intro)
@@ -173,6 +173,18 @@ CosmosEngine旨在让一些复杂的事情变得简单。
 [回目录](#cn-title)
 
 [中文博客介绍](http://www.cnblogs.com/mrkelly/p/3944773.html)
+
+Author/Contributors
+===================
+* [mr-kelly](https://github.com/mr-kelly)
+
+
+Forks
+================
+
+* [Stable/Official](https://github.com/Cosmosbox/CosmosEngine)
+* [Alpha Fork](https://github.com/mr-kelly/CosmosEngine)
+
 
 
 
