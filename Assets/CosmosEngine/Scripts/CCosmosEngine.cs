@@ -110,7 +110,10 @@ public class CCosmosEngine : MonoBehaviour
         };
         foreach (ICModule mod in baseModules)
         {
+            float startInitTime = Time.time;
             yield return StartCoroutine(mod.Init());
+            if (Debug.isDebugBuild)
+                CBase.Log("Init Module: #{0}# Time:{1}", mod.GetType().FullName, Time.time - startInitTime);
         }
 
         CBase.Log("Finish Init ResourceManager + UIManager!");
@@ -128,7 +131,10 @@ public class CCosmosEngine : MonoBehaviour
     {
         foreach (ICModule initModule in GameModules)
         {
+            float startInitTime = Time.time;
             yield return StartCoroutine(initModule.Init());
+            if (Debug.isDebugBuild)
+                CBase.Log("Init Module: #{0}# Time:{1}", initModule.GetType().FullName, Time.time - startInitTime);
         }
 
     }

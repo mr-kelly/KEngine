@@ -288,7 +288,7 @@ public class CUIManager : ICModule
 
     IEnumerator LoadUIAssetBundle(string path, string name, CUILoadState openState)
     {
-        XAssetLoader assetLoader = new XAssetLoader(path);
+        CAssetLoader assetLoader = new CAssetLoader(path);
         while (!assetLoader.IsFinished)
             yield return null;
 

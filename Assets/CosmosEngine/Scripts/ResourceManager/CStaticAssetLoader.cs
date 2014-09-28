@@ -22,7 +22,7 @@ public class CStaticAssetLoader
 
     public Object Asset { get { return ResultAsset; } }
 
-    public CStaticAssetLoader(string path, System.Action<UnityEngine.Object> callback = null)
+    public CStaticAssetLoader(string path, CResourceManager.ASyncLoadABAssetDelegate callback = null, params object[] args)
     {
         if (string.IsNullOrEmpty(path))
             CBase.LogError("XStaticAssetLoader 空资源路径!");
@@ -37,7 +37,7 @@ public class CStaticAssetLoader
             }
             
             if (callback != null)
-                callback(asset);
+                callback(asset, args);
 
             OnLoad(path, asset);
 

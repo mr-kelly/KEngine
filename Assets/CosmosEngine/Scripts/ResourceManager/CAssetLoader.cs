@@ -12,7 +12,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class XAssetLoader
+public class CAssetLoader
 {
     public CResourceManager.ASyncLoadABAssetDelegate Callback;
     public object[] CallbackArgs;
@@ -23,7 +23,7 @@ public class XAssetLoader
 
     public Object Asset { get { return ResultAsset; } }
 
-    public XAssetLoader(string path, string assetName = null, CResourceManager.ASyncLoadABAssetDelegate callback = null, params object[] args)
+    public CAssetLoader(string path, string assetName = null, CResourceManager.ASyncLoadABAssetDelegate callback = null, params object[] args)
     {
         object[] newArgs = new object[2];
         newArgs[0] = assetName;
