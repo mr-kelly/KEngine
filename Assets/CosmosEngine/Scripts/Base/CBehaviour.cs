@@ -12,7 +12,7 @@ using UnityEngine;
 using System.Collections;
 
 /// <summary>
-/// TODO:只有Actor停止，Hero不停止
+///
 /// </summary>
 public class CBehaviour : MonoBehaviour
 {
