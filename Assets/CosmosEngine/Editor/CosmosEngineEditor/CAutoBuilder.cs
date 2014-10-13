@@ -188,7 +188,7 @@ public static class CAutoBuilder
     [MenuItem("CosmosEngine/AutoBuilder/iOS")]
     static void PerformiOSBuild()
     {
-        PerformBuild("Apps/ClientIOS", BuildTarget.iPhone, BuildOptions.Development | BuildOptions.ConnectWithProfiler);
+        PerformBuild("Apps/ClientIOSProject", BuildTarget.iPhone, BuildOptions.Development | BuildOptions.ConnectWithProfiler);
     }
 
     [MenuItem("CosmosEngine/AutoBuilder/Android")]

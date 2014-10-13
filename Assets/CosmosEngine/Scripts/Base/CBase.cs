@@ -16,9 +16,11 @@ using System.Diagnostics;
 /// A File logger + Debug Tools
 public class CBase
 {
-    static bool IsLogFile = false; // 是否輸出到日誌
+    static bool IsLogFile = true; // 是否輸出到日誌
 
     static bool IsDebugBuild;
+
+    public static event Action<string> LogErrorEvent;
 
     static CBase()
     {
@@ -104,6 +106,9 @@ public class CBase
 		string log = string.Format("[ERROR]{0}\n\n{1}:{2}\t{3}", err, sf.GetFileName(), sf.GetFileLineNumber(), sf.GetMethod());
 		Console.Write(log);
         DoLog(log, XLogType.ERROR);
+
+        if (LogErrorEvent != null)
+            LogErrorEvent(err);
 	}
 
 	public static void LogError(string err, params object[] args)

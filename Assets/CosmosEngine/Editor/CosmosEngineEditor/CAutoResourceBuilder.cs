@@ -34,12 +34,17 @@ public partial class CAutoResourceBuilder
         string ext = export.GetExtention();
         string[] itemArray;
 
-        if (ext == "dir")
+        if (ext.StartsWith("dir:"))  // 目錄下的所有文件，包括子文件夾
+        {
+            string newExt = ext.Replace("dir:", "");
+            itemArray = Directory.GetFiles("Assets/Product/" + export.GetDirectory(), newExt, SearchOption.AllDirectories);
+        }
+        else if (ext == "dir")
             itemArray = Directory.GetDirectories("Assets/Product/" + export.GetDirectory());
         else if (ext == "")
             itemArray = new string[0];
         else
-            itemArray = Directory.GetFiles("Assets/Product/" + export.GetDirectory(), export.GetExtention());
+            itemArray = Directory.GetFiles("Assets/Product/" + export.GetDirectory(), export.GetExtention());  // 不包括子文件夾
 
         export.BeginExport();
         foreach (string item in itemArray)

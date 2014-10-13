@@ -72,7 +72,7 @@ public class CResourceManager : MonoBehaviour, ICModule
         string inAppUrl;
         bool hasInAppUrl = TryGetInAppResourceUrl(url, out inAppUrl);
 
-        if (ResourcePathType == CResourceManagerPathType.StreamingAssetsPathPriority)  // 優先下載資源模式
+        if (ResourcePathType == CResourceManagerPathType.PersistentDataPathPriority)  // 優先下載資源模式
         {
             if (hasDocUrl)
             {
