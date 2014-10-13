@@ -58,7 +58,7 @@ public class CSettingManager : ICModule
 
 	IEnumerator InitSetting()
 	{
-		XAssetLoader assetLoader = new XAssetLoader("GameSetting" + CCosmosEngine.GetConfig("AssetBundleExt"), null);
+		CAssetLoader assetLoader = new CAssetLoader("GameSetting" + CCosmosEngine.GetConfig("AssetBundleExt"), null);
 		while (!assetLoader.IsFinished)
 			yield return null;
 

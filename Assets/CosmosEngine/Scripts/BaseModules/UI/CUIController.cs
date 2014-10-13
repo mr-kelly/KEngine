@@ -61,6 +61,12 @@ public abstract class CUIController : MonoBehaviour
         return trans.GetComponent(type);
     }
 
+    /// <summary>
+    /// 默认在当前transfrom下根据Name查找子控件
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="name"></param>
+    /// <returns></returns>
     public T FindControl<T>(string name) where T : Component
     {
         GameObject obj = DFSFindObject(transform, name);
@@ -84,7 +90,12 @@ public abstract class CUIController : MonoBehaviour
 
         return obj;
     }
-
+    /// <summary>
+    /// 从parent下根据Name查找
+    /// </summary>
+    /// <param name="parent"></param>
+    /// <param name="name"></param>
+    /// <returns></returns>
     public GameObject DFSFindObject(Transform parent, string name)
     {
         for (int i = 0; i < parent.childCount; ++i)

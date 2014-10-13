@@ -15,7 +15,6 @@ using System;
 public interface ICModule
 {
     IEnumerator Init();
-    IEnumerator UnInit();
 }
 
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]

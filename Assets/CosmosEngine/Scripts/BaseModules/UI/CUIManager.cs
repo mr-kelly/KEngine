@@ -222,14 +222,22 @@ public class CUIManager : ICModule
 
     }
 
+    [Obsolete("Deprecated: Please don't use this")]
     public void CloseAllWindows()
     {
+        List<string> toCloses = new List<string>();
+
         foreach (KeyValuePair<string, CUILoadState> uiWindow in UIWindows)
         {
             if (IsOpen(uiWindow.Key))
             {
-                CloseWindow(uiWindow.Key);
+                toCloses.Add(uiWindow.Key);
             }
+        }
+
+        for (int i = toCloses.Count - 1; i >= 0; i--)
+        {
+            CloseWindow(toCloses[i]);
         }
     }
 
@@ -288,7 +296,7 @@ public class CUIManager : ICModule
 
     IEnumerator LoadUIAssetBundle(string path, string name, CUILoadState openState)
     {
-        XAssetLoader assetLoader = new XAssetLoader(path);
+        CAssetLoader assetLoader = new CAssetLoader(path);
         while (!assetLoader.IsFinished)
             yield return null;
 

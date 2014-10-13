@@ -332,6 +332,10 @@ public class CTool
         return result;
     }
 
+    public static void SetChild(GameObject child, GameObject parent)
+    {
+        SetChild(child.transform, parent.transform);
+    }
     public static void SetChild(Transform child, Transform parent)
     {
         child.parent = parent;
@@ -434,6 +438,22 @@ public class CTool
         }
     }
 
+    //设置粒子系统的RenderQueue
+    public static void SetParticleSystemRenderQueue(Transform parent,int renderQueue=30001)
+    {
+        int childCount = parent.childCount;
+        for (int i = 0; i < childCount; i++)
+        {
+            Transform child= parent.GetChild(i);
+            if(child.childCount>0)
+                SetParticleSystemRenderQueue(child,renderQueue);
+            if (child.GetComponent<ParticleSystem>() != null)
+            {
+                var particleSystem = child.GetComponent<ParticleSystem>();
+                particleSystem.renderer.material.renderQueue = renderQueue;
+            }
+        }
+    }
     public static void MoveAllCollidersToGameObject(GameObject srcGameObject, GameObject targetGameObject)
     {
         CBase.Assert(srcGameObject != targetGameObject);

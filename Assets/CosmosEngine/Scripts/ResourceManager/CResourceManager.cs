@@ -24,13 +24,13 @@ public enum CResourceManagerPathType
 }
 public class CResourceManager : MonoBehaviour, ICModule
 {
-	public delegate void ASyncLoadABAssetDelegate(Object asset, params object[] args);
-	public enum LoadingLogLevel
-	{
-		Quite,
-		ShowTime,
-		ShowDetail,
-	}
+    public delegate void ASyncLoadABAssetDelegate(Object asset, object[] args);
+    public enum LoadingLogLevel
+    {
+        Quite,
+        ShowTime,
+        ShowDetail,
+    }
 
     private static CResourceManager _Instance;
     public static CResourceManager Instance
@@ -48,21 +48,21 @@ public class CResourceManager : MonoBehaviour, ICModule
             return _Instance;
         }
     }
-	public static bool LoadByQueue = false;
-	public static int LogLevel = (int)LoadingLogLevel.Quite;
+    public static bool LoadByQueue = false;
+    public static int LogLevel = (int)LoadingLogLevel.Quite;
     public static string BuildPlatformName;
-	public static string ResourcesPath;
+    public static string ResourcesPath;
     public static string ResourcesPathWithOutFileProtocol;
-	public static string ApplicationPath;
-	public static string DocumentResourcesPathWithOutFileStart;
-	private static string DocumentResourcesPath;
+    public static string ApplicationPath;
+    public static string DocumentResourcesPathWithOutFileStart;
+    private static string DocumentResourcesPath;
 
     public static CResourceManagerPathType ResourcePathType = CResourceManagerPathType.StreamingAssetsPathPriority;  // 是否優先找下載的資源?還是app本身資源優先
 
     public static System.Func<string, string> CustomGetResourcesPath; // 自定义资源路径。。。
 
-	public static string GetResourcesPath(string url) 
-	{
+    public static string GetResourcesPath(string url)
+    {
         if (string.IsNullOrEmpty(url))
             CBase.LogError("尝试获取一个空的资源路径！");
 
@@ -72,7 +72,7 @@ public class CResourceManager : MonoBehaviour, ICModule
         string inAppUrl;
         bool hasInAppUrl = TryGetInAppResourceUrl(url, out inAppUrl);
 
-        if (ResourcePathType == CResourceManagerPathType.StreamingAssetsPathPriority)  // 優先下載資源模式
+        if (ResourcePathType == CResourceManagerPathType.PersistentDataPathPriority)  // 優先下載資源模式
         {
             if (hasDocUrl)
             {
@@ -93,7 +93,7 @@ public class CResourceManager : MonoBehaviour, ICModule
 
             // ？？ 沒有本地資源但又遠程資源？竟然！!?
         }
-	}
+    }
 
     /// <summary>
     /// 獲取app數據目錄，可寫，同Application.PersitentDataPath，但在windows平台時為了避免www類中文目錄無法讀取問題，單獨實現
@@ -137,17 +137,17 @@ public class CResourceManager : MonoBehaviour, ICModule
         return false;
     }
 
-	void Awake()
-	{
+    void Awake()
+    {
         if (_Instance != null)
             CBase.Assert(_Instance == this);
-	}
+    }
 
-	public IEnumerator Init()
-	{
-        yield return StartCoroutine(InitResourcePath());
+    public IEnumerator Init()
+    {
+        InitResourcePath();
         yield break;
-	}
+    }
 
     public IEnumerator UnInit()
     {
@@ -216,7 +216,7 @@ public class CResourceManager : MonoBehaviour, ICModule
     /// Initialize the path of AssetBundles store place ( Maybe in PersitentDataPath or StreamingAssetsPath )
     /// </summary>
     /// <returns></returns>
-	public static IEnumerator InitResourcePath()
+    public static void InitResourcePath()
     {
         string productPath = Path.Combine(Application.dataPath, CCosmosEngine.GetConfig("ProductRelPath"));
         string assetBundlePath = Path.Combine(Application.dataPath, CCosmosEngine.GetConfig("AssetBundleRelPath"));
@@ -229,107 +229,81 @@ public class CResourceManager : MonoBehaviour, ICModule
         DocumentResourcesPathWithOutFileStart = string.Format("{0}/{1}/{2}/", GetAppDataPath(), resourceDirName, GetBuildPlatformName());  // 各平台通用
         DocumentResourcesPath = fileProtocol + DocumentResourcesPathWithOutFileStart;
 
-		switch (Application.platform)
-		{
-			case RuntimePlatform.WindowsEditor:
-			case RuntimePlatform.OSXEditor:
-				{
+
+
+        switch (Application.platform)
+        {
+            case RuntimePlatform.WindowsEditor:
+            case RuntimePlatform.OSXEditor:
+                {
                     ApplicationPath = string.Format("{0}{1}/", fileProtocol, productPath);
                     ResourcesPath = fileProtocol + assetBundlePath + "/" + BuildPlatformName + "/";
                     ResourcesPathWithOutFileProtocol = assetBundlePath + "/" + BuildPlatformName + "/";
 
-				}
-				break;
-			case RuntimePlatform.WindowsPlayer:
-			case RuntimePlatform.OSXPlayer:
-				{
-					string path = Application.dataPath.Replace('\\', '/');
-					path = path.Substring(0, path.LastIndexOf('/') + 1);
+                }
+                break;
+            case RuntimePlatform.WindowsPlayer:
+            case RuntimePlatform.OSXPlayer:
+                {
+                    string path = Application.dataPath.Replace('\\', '/');
+                    path = path.Substring(0, path.LastIndexOf('/') + 1);
                     ApplicationPath = string.Format("{0}{1}/", fileProtocol, path);
                     ResourcesPath = string.Format("{0}{1}{2}/{3}", fileProtocol, path, resourceDirName, GetBuildPlatformName());
                     ResourcesPathWithOutFileProtocol = string.Format("{0}{1}/{2}/", path, resourceDirName, GetBuildPlatformName());
 
-				}
-				break;
-			case RuntimePlatform.Android:
-				{
+                }
+                break;
+            case RuntimePlatform.Android:
+                {
                     ApplicationPath = string.Concat("jar:", fileProtocol, Application.dataPath, "!/assets/");
 
                     ResourcesPath = string.Concat(ApplicationPath, GetBuildPlatformName(), "/");
                     ResourcesPathWithOutFileProtocol = string.Concat(Application.dataPath, "!/assets/", GetBuildPlatformName() + "/");  // 注意，StramingAsset在Android平台中，是在壓縮的apk里，不做文件檢查
-				}
-				break;
-			case RuntimePlatform.IPhonePlayer:
-				{
+                }
+                break;
+            case RuntimePlatform.IPhonePlayer:
+                {
                     ApplicationPath = System.Uri.EscapeUriString(fileProtocol + Application.streamingAssetsPath + "/");  // MacOSX下，带空格的文件夹，空格字符需要转义成%20
                     ResourcesPath = string.Format("{0}{1}/", ApplicationPath, GetBuildPlatformName());  // only iPhone need to Escape the fucking Url!!! other platform works without it!!! Keng Die!
                     ResourcesPathWithOutFileProtocol = Application.streamingAssetsPath + "/" + GetBuildPlatformName() + "/";
-				}
-				break;
-			default:
-				{
-					CBase.Assert(false);
-				}
-				break;
-		}
-
-
+                }
+                break;
+            default:
+                {
+                    CBase.Assert(false);
+                }
+                break;
+        }
 
         if (Debug.isDebugBuild)
-		{
-			CBase.Log("ResourceManager ApplicationPath: {0}", ApplicationPath);
+        {
+            CBase.Log("ResourceManager ApplicationPath: {0}", ApplicationPath);
             CBase.Log("ResourceManager ResourcesPath: {0}", ResourcesPath);
             CBase.Log("ResourceManager DocumentResourcesPath: {0}", DocumentResourcesPath);
             CBase.Log("================================================================================");
-		}
-        yield break;
-	}
+        }
+    }
 
-	public static void LogRequest(string resType, string resPath)
-	{
-		if (LogLevel < (int)LoadingLogLevel.ShowDetail)
-			return;
-	
-		CBase.Log("[Request] {0}, {1}", resType, resPath);
-	}
+    public static void LogRequest(string resType, string resPath)
+    {
+        if (LogLevel < (int)LoadingLogLevel.ShowDetail)
+            return;
 
-	public static void LogLoadTime(string resType, string resPath, System.DateTime begin)
-	{
-		if (LogLevel < (int)LoadingLogLevel.ShowTime)
-			return;
+        CBase.Log("[Request] {0}, {1}", resType, resPath);
+    }
 
-		CBase.Log("[Load] {0}, {1}, {2}s", resType, resPath, (System.DateTime.Now - begin).TotalSeconds);
-	}
+    public static void LogLoadTime(string resType, string resPath, System.DateTime begin)
+    {
+        if (LogLevel < (int)LoadingLogLevel.ShowTime)
+            return;
 
-	//加载Asset bundle 并执行回调
-	public static void LoadAsset(string path, ASyncLoadABAssetDelegate callback, params object[] args)
-	{
-        new XAssetLoader(path, null, callback, args);
-	}
+        CBase.Log("[Load] {0}, {1}, {2}s", resType, resPath, (System.DateTime.Now - begin).TotalSeconds);
+    }
 
-	public static void LoadStaticAsset(string path, ASyncLoadABAssetDelegate callback, params object[] args)
-	{
-		Instance.StartCoroutine(Instance.CoLoadStaticAssetFromAssetBundle(path, callback, args));
-	}
+    public static void Collect()
+    {
+        Resources.UnloadUnusedAssets();
+        System.GC.Collect();
+    }
 
-	public static void LoadTextureAsset(string path, CTextureLoader.CTextureLoaderDelegate callback, params object[] args)
-	{
-        new CTextureLoader(path, callback, args);
-	}
-
-	public static void Collect()
-	{
-		Resources.UnloadUnusedAssets();
-		System.GC.Collect();
-	}
-
-	IEnumerator CoLoadStaticAssetFromAssetBundle(string path, ASyncLoadABAssetDelegate callback, params object[] args)
-	{
-		CStaticAssetLoader assetLoader = new CStaticAssetLoader(path);
-		while (!assetLoader.IsFinished)
-			yield return null;
-
-		if (callback != null)
-			callback(assetLoader.Asset, args);
-	}
 }

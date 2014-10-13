@@ -107,7 +107,7 @@ public class CGameSettings : ICModule
                 CBase.LogError("找不到类型{0} Id为{1}的配置对象, 类型表里共有对象{2}", typeof(T).Name, id, dict.Count);
         }
         else
-            CBase.LogError("找不到类型配置{0}, 总类型数{1}", typeof(T).Name, SettingInfos.Count);
+            CBase.LogError("嘗試Id {0}, 找不到类型配置{1}, 总类型数{2}", id, typeof(T).Name, SettingInfos.Count);
 
         return null;
     }
