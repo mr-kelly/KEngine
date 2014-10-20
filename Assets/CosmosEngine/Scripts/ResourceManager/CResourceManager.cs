@@ -146,6 +146,7 @@ public class CResourceManager : MonoBehaviour, ICModule
     public IEnumerator Init()
     {
         InitResourcePath();
+        
         yield break;
     }
 
@@ -228,8 +229,6 @@ public class CResourceManager : MonoBehaviour, ICModule
 
         DocumentResourcesPathWithOutFileStart = string.Format("{0}/{1}/{2}/", GetAppDataPath(), resourceDirName, GetBuildPlatformName());  // 各平台通用
         DocumentResourcesPath = fileProtocol + DocumentResourcesPathWithOutFileStart;
-
-
 
         switch (Application.platform)
         {

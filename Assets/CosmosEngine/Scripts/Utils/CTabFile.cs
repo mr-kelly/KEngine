@@ -20,7 +20,7 @@ public class CTabFileDef
     public static char[] Separators = new char[] { '\t' };
 }
 
-public class CTabFile : IEnumerable, IDisposable
+public class CTabFile : IEnumerable, IDisposable, ICTabReadble
 {
     CTabRow tabRowCache;
     public CTabFile()
@@ -75,7 +75,7 @@ public class CTabFile : IEnumerable, IDisposable
     protected bool ParseReader(TextReader oReader)
     {
         string sLine = "";
-        int indexLine = 1;
+        int indexLine = 0; // 0 是行头
         sLine = oReader.ReadLine(); // 首行
         if (sLine == null)
         {
@@ -313,11 +313,11 @@ public class CTabFile : IEnumerable, IDisposable
             ColIndex.Add(colName, ColIndex.Count + 1);
         ColCount++;
 
-        if (!TabInfo.ContainsKey(1))
-            TabInfo[1] = new List<string>();
-        TabInfo[1].Add(colName);
+        if (!TabInfo.ContainsKey(0))
+            TabInfo[0] = new List<string>();  // 0 行是行头
+        TabInfo[0].Add(colName);
 
-        for (int i = 2; i <= TabInfo.Count; i++)
+        for (int i = 1; i < TabInfo.Count; i++)
         {
             TabInfo[i].Add("");
         }
@@ -332,8 +332,9 @@ public class CTabFile : IEnumerable, IDisposable
         {
             list.Add("");
         }
-        TabInfo.Add(TabInfo.Count + 1, list);
-        return TabInfo.Count;
+        int rowId = TabInfo.Count;
+        TabInfo.Add(rowId, list);
+        return rowId;
     }
 
     public int GetHeight()
@@ -353,7 +354,7 @@ public class CTabFile : IEnumerable, IDisposable
             return false;
         }
         string content = Convert.ToString(value);
-        if (row == 1)
+        if (row == 0)
         {
             foreach (KeyValuePair<string, int> item in ColIndex)
             {
@@ -381,8 +382,8 @@ public class CTabFile : IEnumerable, IDisposable
 
     public IEnumerator GetEnumerator()
     {
-        int rowStart = 2;
-        for (int i = rowStart; i <= GetHeight(); i++)
+        int rowStart = 1;
+        for (int i = rowStart; i < GetHeight(); i++)
         {
             tabRowCache.Row = i;
             yield return tabRowCache;
@@ -414,5 +415,10 @@ public class CTabFile : IEnumerable, IDisposable
     {
         this.ColIndex.Clear();
         this.TabInfo.Clear();
+    }
+
+    public void Close()
+    {
+        Dispose();
     }
 }

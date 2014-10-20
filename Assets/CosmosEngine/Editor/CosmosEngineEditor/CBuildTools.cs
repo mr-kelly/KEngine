@@ -8,12 +8,15 @@
 //              https://github.com/mr-kelly/CosmosEngine
 //
 //------------------------------------------------------------------------------
+
+using System;
 using UnityEngine;
 using UnityEditor;
 using System.Collections;
 using System.IO;
 using System.Reflection;
 using System.Collections.Generic;
+using Object = UnityEngine.Object;
 
 public partial class CBuildTools
 {
@@ -27,6 +30,8 @@ public partial class CBuildTools
 	};
 
 	static int PushedAssetCount = 0;
+    
+    public event Action<UnityEngine.Object, string, string> BeforeBuildAssetBundleEvent;
 
     // 鉤子函數, 動態改變某些打包行為
     public static bool HookFunc(System.Type classType, string funcName, params object[] args)
