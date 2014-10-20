@@ -160,13 +160,15 @@ public class CCosmosEngine : MonoBehaviour
 
             CBase.Assert(textAsset);
 
-            CTabFile configTab = CTabFile.LoadFromString(textAsset.text);
-            ConfigMap = new Dictionary<string, string>();
-            foreach (CTabFile.CTabRow row in configTab)
+            using (CTabFile configTab = CTabFile.LoadFromString(textAsset.text))
             {
-                string key = row.GetString("Key");
-                string value = row.GetString("Value");
-                ConfigMap[key] = value;
+                ConfigMap = new Dictionary<string, string>();
+                foreach (CTabFile.CTabRow row in configTab)
+                {
+                    string key = row.GetString("Key");
+                    string value = row.GetString("Value");
+                    ConfigMap[key] = value;
+                }  
             }
         }
     }

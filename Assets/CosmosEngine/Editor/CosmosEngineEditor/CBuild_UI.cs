@@ -8,6 +8,8 @@
 //              https://github.com/mr-kelly/CosmosEngine
 //
 //------------------------------------------------------------------------------
+
+using System;
 using UnityEngine;
 using UnityEditor;
 using System.IO;
@@ -26,6 +28,8 @@ public partial class CBuild_UI : AutoBuildBase
 
     public override string GetDirectory() { return "UI"; }
     public override string GetExtention() { return "*.unity"; }
+
+    public static event Action<CBuild_UI> Custom_BeginExport;
 
     public static string GetBuildRelPath(string uiName)
     {
