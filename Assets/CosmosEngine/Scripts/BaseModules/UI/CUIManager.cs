@@ -30,8 +30,8 @@ public class CUIManager : ICModule
     public Dictionary<string, CUILoadState> UIWindows = new Dictionary<string, CUILoadState>();
     public bool UIRootLoaded = false;
 
-    public event System.Action<string> OpenWindowEvent;
-    public event System.Action<string> CloseWindowEvent;
+    public static event Action<CUIController> OnOpenEvent;
+    public static event Action<CUIController> OnCloseEvent;
 
     private CUIManager()
     {
@@ -164,7 +164,8 @@ public class CUIManager : ICModule
             originArgs[i - 2] = _args[i];
 
         InitWindow(_instanceUIState, uiBase, true, originArgs);
-        OnUIWindowLoaded(_instanceUIState, uiBase);
+        OnUIWindowLoadedCallbacks(_instanceUIState, uiBase);
+        
     }
 
     public void CloseWindow(Type t)
@@ -179,9 +180,6 @@ public class CUIManager : ICModule
 
     public void CloseWindow(string name)
     {
-        if (CloseWindowEvent != null)
-            CloseWindowEvent(name);
-
         CUILoadState uiState;
         if (!UIWindows.TryGetValue(name, out uiState))
         {
@@ -195,6 +193,9 @@ public class CUIManager : ICModule
         }
 
         uiState.UIWindow.gameObject.SetActive(false);
+
+        if (OnCloseEvent != null)
+            OnCloseEvent(uiState.UIWindow);
         uiState.UIWindow.OnClose();
 
         if (!uiState.IsStaticUI)
@@ -315,7 +316,7 @@ public class CUIManager : ICModule
 
         uiBase.UIName = uiBase.UITemplateName = openState.Name;
         InitWindow(openState, uiBase, openState.OpenWhenFinish, openState.OpenArgs);
-        OnUIWindowLoaded(openState, uiBase);
+        OnUIWindowLoadedCallbacks(openState, uiBase);
 
     }
 
@@ -382,16 +383,18 @@ public class CUIManager : ICModule
 
     void OnOpen(CUILoadState uiState, params object[] args)
     {
-        if (OpenWindowEvent != null)
-            OpenWindowEvent(uiState.UIType);
-
         CUIController uiBase = uiState.UIWindow;
         uiBase.OnPreOpen();
         if (uiBase.gameObject.activeSelf)
+        {
             uiBase.OnClose();
+        }
         else
             uiBase.gameObject.SetActive(true);
 
+
+        if (OnOpenEvent != null)
+            OnOpenEvent(uiBase);
         uiBase.OnOpen(args);
     }
 
@@ -407,7 +410,7 @@ public class CUIManager : ICModule
         }
 
     }
-    void OnUIWindowLoaded(CUILoadState uiState, CUIController uiBase)
+    void OnUIWindowLoadedCallbacks(CUILoadState uiState, CUIController uiBase)
     {
         //if (openState.OpenWhenFinish)  // 加载完打开 模式下，打开时执行回调
         {

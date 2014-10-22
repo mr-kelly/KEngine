@@ -31,27 +31,8 @@ public partial class CBuildTools
 
 	static int PushedAssetCount = 0;
     
-    public event Action<UnityEngine.Object, string, string> BeforeBuildAssetBundleEvent;
-
-    // 鉤子函數, 動態改變某些打包行為
-    public static bool HookFunc(System.Type classType, string funcName, params object[] args)
-    {
-        if (classType == null)
-        {
-            return false;
-        }
-
-        MethodInfo methodInfo = classType.GetMethod(funcName, BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
-        if (methodInfo == null)
-        {
-            return false;
-        }
-
-        CBase.Log("HookFunc- {0}:{1}", classType.Name, funcName);
-        methodInfo.Invoke(null, args);
-
-        return true;
-    }
+    public static event Action<UnityEngine.Object, string, string> BeforeBuildAssetBundleEvent;
+    public static event Action<UnityEngine.Object, string, string> AfterBuildAssetBundleEvent;
 
     #region 打包功能
 	public static string MakeSureExportPath(string path, BuildTarget buildTarget)
@@ -154,7 +135,11 @@ public partial class CBuildTools
         string relativePath = path;
 		path = MakeSureExportPath(path, buildTarget);
 
-		if ((prefabType == PrefabType.None && AssetDatabase.GetAssetPath(asset) == string.Empty) ||
+	    if (asset is Texture)
+	    {
+	        asset = asset; // Texutre不复制拷贝一份
+	    }
+		else if ((prefabType == PrefabType.None && AssetDatabase.GetAssetPath(asset) == string.Empty) ||
 			(prefabType == PrefabType.ModelPrefabInstance))
 		{
 			tmpObj = (GameObject)GameObject.Instantiate(asset);
@@ -166,8 +151,8 @@ public partial class CBuildTools
 			asset = PrefabUtility.GetPrefabParent(asset);
 		}
 
-
-        HookFunc(typeof(CBuildTools), "BeforeBuildAssetBundle", asset, path, relativePath);
+	    if (BeforeBuildAssetBundleEvent != null)
+	        BeforeBuildAssetBundleEvent(asset, path, relativePath);
 
 		uint crc;
 		BuildPipeline.BuildAssetBundle(
@@ -186,8 +171,8 @@ public partial class CBuildTools
 
 		CBase.Log("生成文件： {0}", path);
 
-
-        HookFunc(typeof(CBuildTools), "AfterBuildAssetBundle", asset, path, relativePath);
+        if (AfterBuildAssetBundleEvent != null)
+            AfterBuildAssetBundleEvent(asset, path, relativePath);
 
 		return crc;
 	}

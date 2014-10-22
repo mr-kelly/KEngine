@@ -55,6 +55,7 @@ public class CNGUIBridge : ICUIBridge
         CBase.Assert(UiRoot);
         UiRoot.scalingStyle = UIRoot.Scaling.ConstrainedOnMobiles;
         UiRoot.manualHeight = 1920;
+        UiRoot.manualWidth = 1080;
 
         GameObject panelRootObj = new GameObject("PanelRoot");
         CTool.SetChild(panelRootObj.transform, uiRootobj.transform);
