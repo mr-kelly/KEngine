@@ -29,7 +29,11 @@ public partial class CBuild_UI : AutoBuildBase
     public override string GetDirectory() { return "UI"; }
     public override string GetExtention() { return "*.unity"; }
 
-    public static event Action<CBuild_UI> Custom_BeginExport;
+    public static event Action<CBuild_UI> BeginExportEvent;
+    public static event Action<CBuild_UI, string, string, GameObject> ExportCurrentUIEvent;
+    public static event Action ExportUIMenuEvent;
+    public static event Action<CBuild_UI> EndExportEvent;
+
 
     public static string GetBuildRelPath(string uiName)
     {
@@ -39,7 +43,12 @@ public partial class CBuild_UI : AutoBuildBase
     public void ExportCurrentUI()
     {
         CreateTempPrefab();
-        if (!CBuildTools.HookFunc(typeof(CBuild_UI), "Custom_ExportCurrentUI", this, UIScenePath, UIName, TempPanelObject))
+
+        if (ExportCurrentUIEvent != null)
+        {
+            ExportCurrentUIEvent(this, UIScenePath, UIName, TempPanelObject);
+        }
+        else
         {
             CBuildTools.BuildAssetBundle(TempPanelObject, GetBuildRelPath(UIName));
         }
@@ -48,7 +57,10 @@ public partial class CBuild_UI : AutoBuildBase
 
     public override void BeginExport()
     {
-        CBuildTools.HookFunc(typeof(CBuild_UI), "Custom_BeginExport", this);
+        if (BeginExportEvent != null)
+        {
+            BeginExportEvent(this);
+        }
     }
 
     public override void Export(string path)
@@ -65,7 +77,10 @@ public partial class CBuild_UI : AutoBuildBase
 
     public override void EndExport()
     {
-        CBuildTools.HookFunc(typeof(CBuild_UI), "Custom_EndExport", this);
+        if (EndExportEvent != null)
+        {
+            EndExportEvent(this);
+        }
 
     }
 
@@ -208,8 +223,9 @@ public partial class CBuild_UI : AutoBuildBase
     [MenuItem("CosmosEngine/UI/Export Current UI %&U")]
     public static void ExportUIMenu()
     {
-        CBuildTools.HookFunc(typeof(CBuild_UI), "Custom_ExportUIMenu");
-
+        if (ExportUIMenuEvent != null)
+            ExportUIMenuEvent();
+        
         CBuild_UI uiBuild = new CBuild_UI();
         if (!uiBuild.CheckUI(true))
             return;

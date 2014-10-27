@@ -1,5 +1,5 @@
 ﻿Key	Value	Comment
-ProductRelPath	../Product	
+ProductRelPath	../App	
 AssetBundleRelPath	StreamingAssets	
 AssetBundleExt	.unity3d	base
 IsLoadAssetBundle	1	
