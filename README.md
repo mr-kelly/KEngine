@@ -7,6 +7,10 @@
 * [特性](#cn-feature)
 * [约定](#cn-convention)
 * [整体架构图](#cn-structure)
+* [目录结构简介](#cn-directories)
+* [基础模块使用](#cn-base-modules)
+	* [资源模块(ResourceModule)](#cn-module-resource)
+	* [用户界面模块(UIModule)](#cn-module-ui)
 * [使用经验](#cn-exp)
 * [工作流](#cn-workflow)
 * [未来功能](#cn-future)
@@ -21,10 +25,6 @@
 * 点击播放，开始一个框架DEMO, 功能包括：打开一个的UI窗（自动匹配脚本）、读取一个Tab表格
 
 [回目录](#cn-title)
-
-
-
-
 
 <a name="cn-intro"></a>简介
 ------------------
@@ -103,8 +103,71 @@ CosmosEngine中的所有设计，都基于这个开始思考的。
 
 [回目录](#cn-title)
 
+<a name="cn-directories"></a>目录结构简介
+----------------------------------------------
+(TODO)
+
+[回目录](#cn-title)
+
+<a name="cn-base-modules"></a>基础模块使用
+----------------------------------------------
+CosmosEngine有两个基础模块：资源模块和UI模块，它们是底层模块，默认必须加载。（参看CCosmosEngine.cs)
 
 
+### <a name="cn-module-resource"></a>资源模块(ResourceModule)
+
+资源模块包含了模块主体（CResourceModule.cs)和一系列的资源加载器（如CTextureLoader纹理加载、CAudioLoader音频加载）。
+
+* 模块主体，CResourceModule主要负责路径初始化，分别处理在Android/iOS/PC平台下不同的资源读取路径。
+* 各系列的加载，如CTextureLoader等，负责实际的资源加载。至于加载的指定资源，是在CResourceModule中就被配置好的。
+
+注意的是，资源加载器的使用，既可以协程，也可以回调的形式，比如：
+
+加载一个游戏对象，完成后输出一个日志
+方法一：
+```
+IEnumerator DoLoad()
+{
+	var assetLoader = new CAssetLoader("a_obj.unity3d");
+	while (!assetLoader.IsFinished)
+		yield return null;
+
+	CBase.Log("Finish load!");
+}
+```
+
+方法二：
+
+```
+void DoLoad()
+{
+	new CAssetLoader("a_obj.unity3d", (obj, args)=>{
+		CBase.Log("Finish load!");
+	});
+}
+```
+
+### <a name="cn-module-ui"></a>用户界面模块(UIModule)
+
+![UIModule of CosmosEngine](https://raw.githubusercontent.com/mr-kelly/CosmosEngine/master/Docs/ui_module.png)
+UI模块主要用于模仿MVC设计模式的V和C层: 
+* C即Controller，控制器，代表一个独立的脚本，以CUI开头并继承CUIController
+* V即View, 视图，代表一个prefab、或GameObject
+
+CosmosEngine菜单的UI菜单中，提供UI的打包工具，支持把一个UI打包成AssetBundle。
+基于约定由于配置的方式，在使用UIModule时，比如制作了一个UI叫Login登录界面，那么制作UI时命名Login，新建一个脚本CUILogin，并对UI进行打包。那么在CUIModule使用：
+
+```
+CUIModule.Instance.OpenWindow<CUILogin>();
+```
+
+由于CosmosEngine中所有资源采用异步加载的方式，因此对UI的脚本调用时使用回调进行的：
+
+```
+CUIModule.Instance.CallUI<CUILogin>(ui=> ui.DoStuff());
+```
+
+[回目录](#cn-title)
 
 <a name="cn-exp"></a>使用经验
 ----------------------------------------------
