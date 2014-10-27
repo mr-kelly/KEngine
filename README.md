@@ -157,13 +157,13 @@ UI模块主要用于模仿MVC设计模式的V和C层:
 CosmosEngine菜单的UI菜单中，提供UI的打包工具，支持把一个UI打包成AssetBundle。
 基于约定由于配置的方式，在使用UIModule时，比如制作了一个UI叫Login登录界面，那么制作UI时命名Login，新建一个脚本CUILogin，并对UI进行打包。那么在CUIModule使用：
 
-```
+```csharp
 CUIModule.Instance.OpenWindow<CUILogin>();
 ```
 
 由于CosmosEngine中所有资源采用异步加载的方式，因此对UI的脚本调用时使用回调进行的：
 
-```
+```C#
 CUIModule.Instance.CallUI<CUILogin>(ui=> ui.DoStuff());
 ```
 
