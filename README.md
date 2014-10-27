@@ -125,7 +125,7 @@ CosmosEngine有两个基础模块：资源模块和UI模块，它们是底层模
 
 加载一个游戏对象，完成后输出一个日志
 方法一：
-```
+```c#
 IEnumerator DoLoad()
 {
 	var assetLoader = new CAssetLoader("a_obj.unity3d");
@@ -138,7 +138,7 @@ IEnumerator DoLoad()
 
 方法二：
 
-```
+```csharp
 void DoLoad()
 {
 	new CAssetLoader("a_obj.unity3d", (obj, args)=>{
