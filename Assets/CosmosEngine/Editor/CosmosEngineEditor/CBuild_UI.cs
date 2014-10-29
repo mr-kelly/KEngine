@@ -239,7 +239,7 @@ public partial class CBuild_UI : AutoBuildBase
     }
 
     /// <summary>
-    /// Buidl All UI Scene under Assets/Products/ folder
+    /// Buidl All UI Scene under Assets/_ResourcesBuild_s/ folder
     /// </summary>
     [MenuItem("CosmosEngine/UI/Export All UI")]
     public static void ExportAllUI()
