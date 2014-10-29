@@ -88,15 +88,15 @@ public partial class CBuild_UI : AutoBuildBase
     {
         TempPanelObject = (GameObject)GameObject.Instantiate(WindowObject);
 
-        if (WindowObject.GetComponent<UIPanel>() == null)
-        {
-            // 读取UIPanel的depth, 遍历所有UI控件，将其depth加上UIPanel Depth， 以此设置层级关系
-            // 如PanelRoot Depth填10,  子控件填0,1,2   打包后，子控件层级为 10 << 5 | 1 = 320, 321, 322
-            foreach (UIWidget uiWidget in TempPanelObject.GetComponentsInChildren<UIWidget>(true))
-            {
-                uiWidget.depth = (PanelRoot.depth + 15) << 5 | (uiWidget.depth + 15);  // + 15是为了杜绝负数！不要填-15以上的
-            }
-        }
+        //if (WindowObject.GetComponent<UIPanel>() == null)
+        //{
+        //    // 读取UIPanel的depth, 遍历所有UI控件，将其depth加上UIPanel Depth， 以此设置层级关系
+        //    // 如PanelRoot Depth填10,  子控件填0,1,2   打包后，子控件层级为 10 << 5 | 1 = 320, 321, 322
+        //    foreach (UIWidget uiWidget in TempPanelObject.GetComponentsInChildren<UIWidget>(true))
+        //    {
+        //        uiWidget.depth = (PanelRoot.depth + 15) << 5 | (uiWidget.depth + 15);  // + 15是为了杜绝负数！不要填-15以上的
+        //    }
+        //}
 
         foreach (UIButton go in TempPanelObject.GetComponentsInChildren<UIButton>(true))
         {
@@ -186,7 +186,10 @@ public partial class CBuild_UI : AutoBuildBase
 
         UIRoot uiRoot = uiRootObj.AddComponent<UIRoot>();
         uiRoot.scalingStyle = UIRoot.Scaling.ConstrainedOnMobiles;
-        uiRoot.manualHeight = 960;
+        uiRoot.manualHeight = 1920;
+        uiRoot.manualWidth = 1080;
+        uiRoot.fitHeight = true;
+        uiRoot.fitWidth = true;
 
         GameObject cameraObj = new GameObject("Camera");
         cameraObj.layer = (int)CLayerDef.UI;

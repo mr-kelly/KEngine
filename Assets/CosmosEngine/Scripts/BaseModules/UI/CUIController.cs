@@ -125,7 +125,7 @@ public abstract class CUIController : MonoBehaviour
     /// 模仿 NGUISelectionTool的同名方法，将位置旋转缩放清零
     /// </summary>
     /// <param name="t"></param>
-    public void ClearLocalTransform(Transform t)
+    public void ResetLocalTransform(Transform t)
     {
         t.localPosition = Vector3.zero;
         t.localRotation = Quaternion.identity;
@@ -160,7 +160,7 @@ public abstract class CUIController : MonoBehaviour
             {
                 newTemplate = Instantiate(templateForNew) as GameObject;
                 newTemplate.transform.parent = uiGrid.transform;
-                ClearLocalTransform(newTemplate.transform);
+                ResetLocalTransform(newTemplate.transform);
 
                 //gameObjList.Add(newTemplate);
             }

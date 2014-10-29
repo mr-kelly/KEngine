@@ -196,7 +196,7 @@ public class CTool
 
     public static string HumanizeTimeString(int seconds)
     {
-        TimeSpan ts = new TimeSpan(0, 0, seconds);
+        TimeSpan ts = TimeSpan.FromSeconds(seconds);
         string timeStr = string.Format("{0}{1}{2}{3}",
             ts.Days == 0 ? "" : ts.Days + "天",
             ts.Hours == 0 ? "" : ts.Hours + "小时",
@@ -221,16 +221,26 @@ public class CTool
         DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
         return origin.AddSeconds(unixTimeStamp);
     }
+    /// <summary>
+    /// Unix時間總毫秒數
+    /// </summary>
+    /// <returns></returns>
+    public static double GetUTCMilliseconds()
+    {
+        DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+        TimeSpan diff = DateTime.UtcNow - origin;
+        return diff.TotalMilliseconds;
+    }
 
     /// <summary>
     /// Unix時間總秒數
     /// </summary>
     /// <returns></returns>
-    public static uint GetUnixSeconds()
+    public static double GetUTCSeconds()
     {
         DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-        TimeSpan diff = DateTime.Now - origin;
-        return (uint)diff.TotalSeconds;
+        TimeSpan diff = DateTime.UtcNow - origin;
+        return diff.TotalSeconds;
     }
 
     public static UInt64 GetTimeEx()
@@ -330,6 +340,22 @@ public class CTool
             result[i - 1] = match.Groups[i].Value;
 
         return result;
+    }
+
+    /// <summary>
+    /// Recursively set the game object's layer.
+    /// </summary>
+    static public void SetLayer(GameObject go, int layer)
+    {
+        go.layer = layer;
+
+        var t = go.transform;
+
+        for (int i = 0, imax = t.childCount; i < imax; ++i)
+        {
+            var child = t.GetChild(i);
+            SetLayer(child.gameObject, layer);
+        }
     }
 
     public static void SetChild(GameObject child, GameObject parent)
