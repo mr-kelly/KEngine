@@ -20,7 +20,9 @@ public class CBehaviour : MonoBehaviour
     public GameObject _GameObject;
     protected bool IsDeleted = false;
 
-    static bool IsApplicationQuited = false;  // 全局标记, 程序是否退出状态
+    static bool _IsApplicationQuited = false;  // 全局标记, 程序是否退出状态
+    public static bool IsApplicationQuited {get { return _IsApplicationQuited; }}
+
     public static System.Action ApplicationQuitEvent;
 
     private float _TimeScale = 1f;  // TODO: In Actor, Bullet,....
@@ -71,10 +73,10 @@ public class CBehaviour : MonoBehaviour
 
     void OnApplicationQuit()
     {
-        if (!IsApplicationQuited)
+        if (!_IsApplicationQuited)
             CBase.Log("OnApplicationQuit!");
 
-        IsApplicationQuited = true;
+        _IsApplicationQuited = true;
 
         if (ApplicationQuitEvent != null)
             ApplicationQuitEvent();
