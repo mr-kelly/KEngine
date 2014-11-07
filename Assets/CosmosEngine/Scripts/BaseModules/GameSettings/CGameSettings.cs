@@ -24,9 +24,11 @@ public class CGameSettings : ICModule
 
     public Dictionary<Type, Dictionary<string, CBaseInfo>> SettingInfos = new Dictionary<Type, Dictionary<string, CBaseInfo>>();
 
-    private Dictionary<Type, string> LazyLoad = new Dictionary<Type, string>();
+    private Dictionary<Type, string[]> LazyLoad = new Dictionary<Type, string[]>();
 
     public Action InitAction; // Init時調用的委託、函數指針
+    
+    public static event Action<string, string> FoundDuplicatedIdEvent;
 
     public IEnumerator Init()
     {
@@ -42,56 +44,65 @@ public class CGameSettings : ICModule
         yield break;
     }
 
-    public void LoadTab<T>(string tabPath) where T : CBaseInfo
+    public void LoadTab<T>(params string[] tabPaths) where T : CBaseInfo
     {
-        LazyLoad[typeof(T)] = tabPath;
+        LazyLoad[typeof(T)] = tabPaths;
     }
 
     private void EnsureLoad<T>() where T : CBaseInfo
     {
         Type type = typeof (T);
-        string loadFilePath;
-        if (LazyLoad.TryGetValue(type, out loadFilePath))
+        string[] loadFilePaths;
+        if (LazyLoad.TryGetValue(type, out loadFilePaths))
         {
-            DoLoadTab<T>(loadFilePath);
+            DoLoadTab<T>(loadFilePaths);
             LazyLoad.Remove(type);
         }
     }
 
-    private void DoLoadTab<T>(string tabPath) where T : CBaseInfo
+    private void DoLoadTab<T>(string[] tabPaths) where T : CBaseInfo
     {
+        foreach (string tabPath in tabPaths)
+        {
 #if GAME_CLIENT
-        //using (CTabReader tabFile = CTabReader.LoadFromString(tabPath, CSettingManager.Instance.LoadSetting(tabPath)))
-        using (CTabFile tabFile = CTabFile.LoadFromString(CSettingManager.Instance.LoadSetting(tabPath)))
+            using (CTabFile tabFile = CTabFile.LoadFromString(CSettingManager.Instance.LoadSetting(tabPath)))
 #else 
-        // Editor Only
+    // Editor Only
         string p1 = System.IO.Path.GetFullPath("Assets/" + CCosmosEngine.GetConfig("ProductRelPath") + "/") + tabPath;
         using (CTabFile tabFile = CTabFile.LoadFromString(System.IO.File.ReadAllText(p1)))
 #endif
-        {
-            int rowStart = 1;
-            Dictionary<string, CBaseInfo> dict = new Dictionary<string, CBaseInfo>();
-            for (int i = rowStart; i < tabFile.GetHeight(); i++)
             {
-                // 先读取ID， 获取是否之前已经读取过配置，
-                // 如果已经读取过，那么获取原配置对象，并重新赋值 (因为游戏中其它地方已经存在它的引用了，直接替换内存泄露)
-                string id = tabFile.GetString(i, "Id");  // 获取ID是否存在, 如果已经存在，那么替换其属性，不new一个
-                CBaseInfo existOne;
-                if (dict.TryGetValue(id, out existOne))
-                {
-                    CBaseInfo existT = existOne;
-                    CBaseInfo.LoadFromTab(typeof(T), ref existT, tabFile, i);  // 修改原对象，不new
-                    (existT as CBaseInfo).Parse();
-                }
-                else
-                {
-                    T pInfo = CBaseInfo.LoadFromTab(typeof(T), tabFile, i) as T;
-                    pInfo.Parse();
-                    dict[pInfo.Id] = pInfo;  // 不存在，直接new
-                }
-            }
+                
+                Dictionary<string, CBaseInfo> dict;
+                if (!SettingInfos.TryGetValue(typeof(T), out dict))  // 如果没有才添加
+                    dict = new Dictionary<string, CBaseInfo>();
 
-            SettingInfos[typeof(T)] = dict;
+                const int rowStart = 1;
+                for (int i = rowStart; i < tabFile.GetHeight(); i++)
+                {
+                    // 先读取ID， 获取是否之前已经读取过配置，
+                    // 如果已经读取过，那么获取原配置对象，并重新赋值 (因为游戏中其它地方已经存在它的引用了，直接替换内存泄露)
+                    string id = tabFile.GetString(i, "Id"); // 获取ID是否存在, 如果已经存在，那么替换其属性，不new一个
+                    CBaseInfo existOne;
+                    if (dict.TryGetValue(id, out existOne))
+                    {
+                        if (FoundDuplicatedIdEvent != null)
+                            FoundDuplicatedIdEvent(tabPath, id);
+
+                        CBaseInfo existT = existOne;
+                        CBaseInfo.LoadFromTab(typeof (T), ref existT, tabFile, i); // 修改原对象，不new
+                        (existT as CBaseInfo).Parse();
+                    }
+                    else
+                    {
+                        T pInfo = CBaseInfo.LoadFromTab(typeof (T), tabFile, i) as T;
+                        pInfo.Parse();
+                        dict[pInfo.Id] = pInfo; // 不存在，直接new
+                    }
+                }
+
+                SettingInfos[typeof (T)] = dict;
+            }
         }
     }
 
@@ -147,6 +158,8 @@ public class CBaseInfo
 {
     public string Id;
 
+    private int? _CacheIntId;
+
     /// <summary>
     /// Id是一個字符串, 嘗試Id轉成Int
     /// </summary>
@@ -154,10 +167,16 @@ public class CBaseInfo
     {
         get
         {
+            if (_CacheIntId != null)
+                return _CacheIntId.Value;
+
             int tryInt;
             if (!int.TryParse(Id, out tryInt))
                 CBase.LogError("錯誤解析Int Id");
-            return tryInt;
+            
+            _CacheIntId = tryInt;
+
+            return _CacheIntId.Value;
         }
     }
     

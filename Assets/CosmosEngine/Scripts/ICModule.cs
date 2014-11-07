@@ -12,6 +12,9 @@ using UnityEngine;
 using System.Collections;
 using System;
 
+/// <summary>
+/// CosmosEngine's Module must has IEnumerator Init method
+/// </summary>
 public interface ICModule
 {
     IEnumerator Init();
