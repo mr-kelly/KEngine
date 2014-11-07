@@ -247,7 +247,7 @@ public class CResourceManager : MonoBehaviour, ICModule
                     string path = Application.dataPath.Replace('\\', '/');
                     path = path.Substring(0, path.LastIndexOf('/') + 1);
                     ApplicationPath = string.Format("{0}{1}/", fileProtocol, path);
-                    ResourcesPath = string.Format("{0}{1}{2}/{3}", fileProtocol, path, resourceDirName, GetBuildPlatformName());
+                    ResourcesPath = string.Format("{0}{1}{2}/{3}/", fileProtocol, path, resourceDirName, GetBuildPlatformName());
                     ResourcesPathWithOutFileProtocol = string.Format("{0}{1}/{2}/", path, resourceDirName, GetBuildPlatformName());
 
                 }

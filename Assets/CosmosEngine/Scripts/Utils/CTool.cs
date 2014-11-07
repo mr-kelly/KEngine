@@ -47,6 +47,46 @@ public class CTool
         }
     }
 
+    /// <summary>
+    /// A:1|B:2|C:3这类字符串转成字典
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="K"></typeparam>
+    /// <param name="str"></param>
+    /// <param name="delimeter1">分隔符</param>
+    /// <param name="delimeter2"></param>
+    /// <returns></returns>
+    public static Dictionary<T, K> SplitToDict<T, K>(string str, char delimeter1 = '|', char delimeter2 = ':')
+    {
+        var dict = new Dictionary<T, K>();
+        if (!string.IsNullOrEmpty(str))
+        {
+            string[] strs = str.Split(delimeter1);
+            foreach (string s in strs)
+            {
+                string trimS = s.Trim();
+                if (!string.IsNullOrEmpty(trimS))
+                {
+                    string[] strs2 = trimS.Split(delimeter2);
+                    if (strs2.Length == 2)
+                    {
+                        T val1 = (T) Convert.ChangeType(strs2[0], typeof (T));
+                        K val2 = (K) Convert.ChangeType(strs2[1], typeof (K));
+                        dict[val1] = val2;
+                    }
+                }
+            }
+        }
+        return dict;
+    }
+
+    /// <summary>
+    /// 截断字符串变成数组
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="str"></param>
+    /// <param name="args"></param>
+    /// <returns></returns>
     public static List<T> Split<T>(string str, params char[] args)
     {
         List<T> retList = new List<T>();
@@ -71,6 +111,7 @@ public class CTool
 
         return retList;
     }
+
     public static Shader FindShader(string shaderName)
     {
         Shader shader;
