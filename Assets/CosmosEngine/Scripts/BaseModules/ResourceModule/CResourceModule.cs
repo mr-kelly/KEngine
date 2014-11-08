@@ -39,9 +39,9 @@ public class CResourceModule : MonoBehaviour, ICModule
         {
             if (_Instance == null)
             {
-                GameObject resMgr = GameObject.Find("ResourceManager");
+                GameObject resMgr = GameObject.Find("_ResourceModule_");
                 if (resMgr == null)
-                    resMgr = new GameObject("ResourceManager");
+                    resMgr = new GameObject("_ResourceModule_");
 
                 _Instance = resMgr.AddComponent<CResourceModule>();
             }
