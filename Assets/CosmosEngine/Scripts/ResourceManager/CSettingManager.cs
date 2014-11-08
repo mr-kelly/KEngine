@@ -17,7 +17,7 @@ using System.Reflection;
 /// Load from Local hard disk or 
 /// Load from a AssetBundles..
 /// </summary>
-[CDependencyClass(typeof(CResourceManager))]
+[CDependencyClass(typeof(CResourceModule))]
 public class CSettingManager : ICModule
 {
     static CSettingManager _Instance;
@@ -48,7 +48,7 @@ public class CSettingManager : ICModule
         }
 
 		CBase.Log("Load setting out of package = {0}", SettingOutPackage.ToString());
-		yield return CResourceManager.Instance.StartCoroutine(InitSetting());
+		yield return CResourceModule.Instance.StartCoroutine(InitSetting());
 	}
 
     public IEnumerator UnInit()
@@ -99,8 +99,8 @@ public class CSettingManager : ICModule
     // 仅在PC版可用
     string LoadSettingOutPackage(string path)
 	{
-		string fullPath = CResourceManager.ApplicationPath + path;
-        fullPath = fullPath.Replace(CResourceManager.GetFileProtocol(), "");
+		string fullPath = CResourceModule.ApplicationPath + path;
+        fullPath = fullPath.Replace(CResourceModule.GetFileProtocol(), "");
 
         System.Text.Encoding encoding = System.Text.Encoding.UTF8;
 

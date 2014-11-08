@@ -183,7 +183,7 @@ public abstract class CUIController : MonoBehaviour
     /// </summary>
     protected void OpenWindow(string uiName, params object[] args)
     {
-        CUIManager.Instance.OpenWindow(uiName, args);
+        CUIModule.Instance.OpenWindow(uiName, args);
     }
 
     /// <summary>
@@ -192,6 +192,6 @@ public abstract class CUIController : MonoBehaviour
     /// <param name="uiName"></param>
     protected void CloseWindow(string uiName = null)
     {
-        CUIManager.Instance.CloseWindow(uiName == null ? UIName : uiName);
+        CUIModule.Instance.CloseWindow(uiName == null ? UIName : uiName);
     }
 }

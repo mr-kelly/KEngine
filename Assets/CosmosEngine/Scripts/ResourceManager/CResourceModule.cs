@@ -22,7 +22,7 @@ public enum CResourceManagerPathType
     StreamingAssetsPathPriority, // 忽略PersitentDataPath
     PersistentDataPathPriority,  // 尝试在Persistent目錄尋找，找不到再去StreamingAssets
 }
-public class CResourceManager : MonoBehaviour, ICModule
+public class CResourceModule : MonoBehaviour, ICModule
 {
     public delegate void ASyncLoadABAssetDelegate(Object asset, object[] args);
     public enum LoadingLogLevel
@@ -32,8 +32,8 @@ public class CResourceManager : MonoBehaviour, ICModule
         ShowDetail,
     }
 
-    private static CResourceManager _Instance;
-    public static CResourceManager Instance
+    private static CResourceModule _Instance;
+    public static CResourceModule Instance
     {
         get
         {
@@ -43,7 +43,7 @@ public class CResourceManager : MonoBehaviour, ICModule
                 if (resMgr == null)
                     resMgr = new GameObject("ResourceManager");
 
-                _Instance = resMgr.AddComponent<CResourceManager>();
+                _Instance = resMgr.AddComponent<CResourceModule>();
             }
             return _Instance;
         }

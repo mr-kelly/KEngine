@@ -15,7 +15,7 @@ using System.Collections.Generic;
 using System.Reflection;
 
 
-[CDependencyClass(typeof(CResourceManager))]
+[CDependencyClass(typeof(CResourceModule))]
 [CDependencyClass(typeof(CSettingManager))]
 public class CGameSettings : ICModule
 {

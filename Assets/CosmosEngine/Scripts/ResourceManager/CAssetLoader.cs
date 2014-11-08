@@ -14,7 +14,7 @@ using System.Collections.Generic;
 
 public class CAssetLoader
 {
-    public CResourceManager.ASyncLoadABAssetDelegate Callback;
+    public CResourceModule.ASyncLoadABAssetDelegate Callback;
     public object[] CallbackArgs;
 
     Object ResultAsset;
@@ -23,7 +23,7 @@ public class CAssetLoader
 
     public Object Asset { get { return ResultAsset; } }
 
-    public CAssetLoader(string path, string assetName = null, CResourceManager.ASyncLoadABAssetDelegate callback = null, params object[] args)
+    public CAssetLoader(string path, string assetName = null, CResourceModule.ASyncLoadABAssetDelegate callback = null, params object[] args)
     {
         object[] newArgs = new object[2];
         newArgs[0] = assetName;

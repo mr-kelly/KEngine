@@ -33,7 +33,7 @@ public class CAssetBundleParser
         var func = ParseFunc ?? DefaultParseAb;
         CreateRequest = func(RelativeUrl, bytes);  // 不重複創建...
 
-        CResourceManager.Instance.StartCoroutine(WaitCreateAssetBundle(CreateRequest));
+        CResourceModule.Instance.StartCoroutine(WaitCreateAssetBundle(CreateRequest));
     }
 
 

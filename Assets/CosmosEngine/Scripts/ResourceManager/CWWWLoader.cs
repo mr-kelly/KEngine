@@ -17,7 +17,7 @@ using System.Collections.Generic;
 /// Load www, A wrapper of WWW.  
 /// Current version, loaded Resource will never release in memory
 /// </summary>
-[CDependencyClass(typeof(CResourceManager))]
+[CDependencyClass(typeof(CResourceModule))]
 public class CWWWLoader
 {
     class CLoadingCache
@@ -50,7 +50,7 @@ public class CWWWLoader
     /// </summary>
     public CWWWLoader(string url, Action<WWW, object[]> callback = null, params object[] callbackArgs)
     {
-        CResourceManager.Instance.StartCoroutine(CoLoad(url, callback, callbackArgs));//开启协程加载Assetbundle，执行Callback
+        CResourceModule.Instance.StartCoroutine(CoLoad(url, callback, callbackArgs));//开启协程加载Assetbundle，执行Callback
     }
 
 	/// <summary>
@@ -62,13 +62,13 @@ public class CWWWLoader
 	/// <returns></returns>
     IEnumerator CoLoad(string url, Action<WWW, object[]> callback = null, params object[] callbackArgs)
     {
-        if (CResourceManager.LoadByQueue)
+        if (CResourceModule.LoadByQueue)
         {
             while (Loaded.Count != 0)
                 yield return null;
         }
 
-        CResourceManager.LogRequest("WWW", url);
+        CResourceModule.LogRequest("WWW", url);
 
         CLoadingCache cache = null;
 
@@ -92,7 +92,7 @@ public class CWWWLoader
             if (!string.IsNullOrEmpty(www.error))
             {
                 IsError = true;
-                string fileProtocol = CResourceManager.GetFileProtocol();
+                string fileProtocol = CResourceModule.GetFileProtocol();
                 if (url.StartsWith(fileProtocol))
                 {
                     string fileRealPath = url.Replace(fileProtocol, "");
@@ -102,7 +102,7 @@ public class CWWWLoader
                 CBase.LogError(www.error + " " + url);
             }
 
-            CResourceManager.LogLoadTime("WWW", url, beginTime);
+            CResourceModule.LogLoadTime("WWW", url, beginTime);
 
             cache.Www = www;
 

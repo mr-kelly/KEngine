@@ -17,11 +17,11 @@ using System.Reflection;
 /// <summary>
 /// UI Module
 /// </summary>
-[CDependencyClass(typeof(CResourceManager))]
-public class CUIManager : ICModule
+[CDependencyClass(typeof(CResourceModule))]
+public class CUIModule : ICModule
 {
-    class _InstanceClass {public static CUIManager _Instance = new CUIManager();}
-    public static CUIManager Instance { get { return _InstanceClass._Instance; } }
+    class _InstanceClass {public static CUIModule _Instance = new CUIModule();}
+    public static CUIModule Instance { get { return _InstanceClass._Instance; } }
 
     /// <summary>
     /// A bridge for different UI System, for instance, you can use NGUI or EZGUI or etc.. UI Plugin through UIBridge
@@ -33,7 +33,7 @@ public class CUIManager : ICModule
     public static event Action<CUIController> OnOpenEvent;
     public static event Action<CUIController> OnCloseEvent;
 
-    private CUIManager()
+    private CUIModule()
     {
     }
 
@@ -288,7 +288,7 @@ public class CUIManager : ICModule
         openState.OpenArgs = args;
         openState.OpenWhenFinish = openWhenFinish;
 
-        CResourceManager.Instance.StartCoroutine(LoadUIAssetBundle(path, name, openState));
+        CResourceModule.Instance.StartCoroutine(LoadUIAssetBundle(path, name, openState));
 
         UIWindows.Add(name, openState);
 
@@ -341,22 +341,22 @@ public class CUIManager : ICModule
     /// 等待并获取UI实例，执行callback
     /// 源起Loadindg UI， 在加载过程中，进度条设置方法会失效
     /// </summary>
-    /// <param name="uiName"></param>
+    /// <param name="uiTemplateName"></param>
     /// <param name="callback"></param>
     /// <param name="args"></param>
-    public void CallUI(string uiName, Action<CUIController, object[]> callback, params object[] args)
+    public void CallUI(string uiTemplateName, Action<CUIController, object[]> callback, params object[] args)
     {
         CBase.Assert(callback);
 
         CUILoadState uiState;
-        if (!UIWindows.TryGetValue(uiName, out uiState))
+        if (!UIWindows.TryGetValue(uiTemplateName, out uiState))
         {
-            uiState = LoadWindow(uiName, false);  // 加载，这样就有UIState了
+            uiState = LoadWindow(uiTemplateName, false);  // 加载，这样就有UIState了
         }
 
         if (uiState.IsLoading) // Loading
         {
-            CUILoadState openState = UIWindows[uiName];
+            CUILoadState openState = UIWindows[uiTemplateName];
             openState.CallbacksWhenFinish.Enqueue(callback);
             openState.CallbacksArgsWhenFinish.Enqueue(args);
             return;
@@ -365,6 +365,10 @@ public class CUIManager : ICModule
         callback(uiState.UIWindow, args);
     }
 
+    public void CallUI(string template, string uiName, Action<CUIController, object[]> callback, object[] args)
+    {
+
+    }
     public void CallUI<T>(Action<T> callback) where T : CUIController
     {
         CallUI<T>((_ui, _args) => callback(_ui));

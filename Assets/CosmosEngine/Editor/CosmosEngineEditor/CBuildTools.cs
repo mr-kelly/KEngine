@@ -63,7 +63,7 @@ public partial class CBuildTools
 			case BuildTarget.Android:
 			case BuildTarget.iPhone:
 			case BuildTarget.StandaloneWindows:
-                path = basePath + CResourceManager.GetBuildPlatformName() + "/";
+                path = basePath + CResourceModule.GetBuildPlatformName() + "/";
 				break;
 			default:
 				CBuildTools.ShowDialog("构建平台配置错误");

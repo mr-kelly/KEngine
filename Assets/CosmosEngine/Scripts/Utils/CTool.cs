@@ -257,6 +257,11 @@ public class CTool
         return span.Days;
     }
 
+    public static DateTime GetDateTimeFromUTC(long utcTime)
+    {
+        DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+        return origin.AddMilliseconds(utcTime);
+    }
     public static DateTime GetDateTime(double unixTimeStamp)
     {
         DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);

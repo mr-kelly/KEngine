@@ -40,11 +40,11 @@ public class CAssetBundleLoader
         CallbackArgs = callbackArgs;
 
         RelativeResourceUrl = url;
-        FullUrl = CResourceManager.GetResourcesPath(url);
+        FullUrl = CResourceModule.GetResourcesPath(url);
 
-        CResourceManager.LogRequest("AssetBundle", FullUrl);
+        CResourceModule.LogRequest("AssetBundle", FullUrl);
 
-        CResourceManager.Instance.StartCoroutine(LoadAssetBundle(RelativeResourceUrl));
+        CResourceModule.Instance.StartCoroutine(LoadAssetBundle(RelativeResourceUrl));
 
     }
     

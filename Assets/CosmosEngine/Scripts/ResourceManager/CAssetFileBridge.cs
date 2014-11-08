@@ -39,7 +39,7 @@ public class CAssetFileBridge
 
         if (CCosmosEngine.GetConfig("IsLoadAssetBundle").ToInt32() == 0)
         {
-            CResourceManager.Instance.StartCoroutine(LoadInResourceFolder(path));
+            CResourceModule.Instance.StartCoroutine(LoadInResourceFolder(path));
         }
         else
         {
@@ -84,7 +84,7 @@ public class CAssetFileBridge
             asset = request.asset;
         }
 
-        CResourceManager.LogLoadTime("AssetFileBridge", url, beginTime);
+        CResourceModule.LogLoadTime("AssetFileBridge", url, beginTime);
 
         if (asset == null)
         {

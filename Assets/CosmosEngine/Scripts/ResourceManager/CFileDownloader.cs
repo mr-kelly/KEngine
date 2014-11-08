@@ -34,10 +34,10 @@ public class CWWWDownloader
     public CWWWDownloader(string fullUrl, string toPath)
     {
         ToPath = toPath;
-        _SavePath = CResourceManager.GetAppDataPath() + "/" + ToPath;
+        _SavePath = CResourceModule.GetAppDataPath() + "/" + ToPath;
 
         WWWLoader = new CWWWLoader(fullUrl);
-        CResourceManager.Instance.StartCoroutine(StartDownload(fullUrl));
+        CResourceModule.Instance.StartCoroutine(StartDownload(fullUrl));
     }
 
     IEnumerator StartDownload(string fullUrl)

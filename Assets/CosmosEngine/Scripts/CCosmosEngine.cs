@@ -105,8 +105,8 @@ public class CCosmosEngine : MonoBehaviour
     IEnumerator DoInit()
     {
         ICModule[] baseModules = new ICModule[] {  // 基础三件套
-            CResourceManager.Instance, 
-            CUIManager.Instance, 
+            CResourceModule.Instance, 
+            CUIModule.Instance, 
         };
         foreach (ICModule mod in baseModules)
         {

@@ -200,7 +200,7 @@ public static class CAutoBuilder
     [MenuItem("CosmosEngine/Clear PC PersitentDataPath")]
     static void ClearPersistentDataPath()
     {
-        foreach (string dir in Directory.GetDirectories(CResourceManager.GetAppDataPath()))
+        foreach (string dir in Directory.GetDirectories(CResourceModule.GetAppDataPath()))
         {
             Directory.Delete(dir, true);
         }
@@ -209,7 +209,7 @@ public static class CAutoBuilder
     [MenuItem("CosmosEngine/Open PC PersitentDataPath Folder")]
     static void OpenPersistentDataPath()
     {
-        System.Diagnostics.Process.Start(CResourceManager.GetAppDataPath());
+        System.Diagnostics.Process.Start(CResourceModule.GetAppDataPath());
     }
 
     [MenuItem("CosmosEngine/Clear Prefs")]
