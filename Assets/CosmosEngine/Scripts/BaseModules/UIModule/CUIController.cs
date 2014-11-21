@@ -24,14 +24,28 @@ public abstract class CUIController : MonoBehaviour
     public string UITitle = "(未设置)"; // UI的标题
     public bool HasBackBtn = true; // 是否有返回按钮
 
-    public virtual void OnPreOpen() { }
+    public virtual void OnInit() { }
+
+    /// <summary>
+    /// Hook, if false, block "Open" action
+    /// </summary>
+    /// <param name="doOpenAction"></param>
+    /// <returns></returns>
+    public virtual bool OnBeforeOpenHook(Action doOpenAction)
+    {
+        return true;
+    }
 
     public virtual void OnOpen(params object[] args)
     {
     }
 
+    public virtual bool OnBeforeCloseHook(Action doCloseAction)
+    {
+        return true;
+    }
     public virtual void OnClose() { }
-    public virtual void OnInit() { }
+    
 
     /// <summary>
     /// 输入uri搜寻控件
@@ -138,17 +152,17 @@ public abstract class CUIController : MonoBehaviour
     /// </summary>
     public void ResizeUIGridGameObjects(UIGrid uiGrid, int resizeCount, GameObject templateForNew)
     {
-        _ResizeUIWidgetContainerGameObjects(uiGrid, resizeCount, templateForNew);
+        _ResizeUIWidgetContainerGameObjects(uiGrid.transform, resizeCount, templateForNew);
         uiGrid.Reposition();
     }
 
     public void ResizeUITableGameObjects(UITable uiTable, int resizeCount, GameObject templateForNew)
     {
-        _ResizeUIWidgetContainerGameObjects(uiTable, resizeCount, templateForNew);
+        _ResizeUIWidgetContainerGameObjects(uiTable.transform, resizeCount, templateForNew);
         uiTable.Reposition();
     }
 
-    void _ResizeUIWidgetContainerGameObjects(UIWidgetContainer uiGrid, int resizeCount, GameObject templateForNew)
+    public void _ResizeUIWidgetContainerGameObjects(Transform transf, int resizeCount, GameObject templateForNew)
     {
         if (templateForNew == null)
             templateForNew = default(GameObject);
@@ -156,22 +170,22 @@ public abstract class CUIController : MonoBehaviour
         for (int i = 0; i < resizeCount; i++)
         {
             GameObject newTemplate = null;
-            if (i >= uiGrid.transform.childCount)
+            if (i >= transf.childCount)
             {
                 newTemplate = Instantiate(templateForNew) as GameObject;
-                newTemplate.transform.parent = uiGrid.transform;
+                newTemplate.transform.parent = transf;
                 ResetLocalTransform(newTemplate.transform);
 
                 //gameObjList.Add(newTemplate);
             }
-            newTemplate = uiGrid.transform.GetChild(i).gameObject;
+            newTemplate = transf.GetChild(i).gameObject;
             if (!newTemplate.activeSelf)
                 newTemplate.SetActive(true);
         }
 
-        for (int i = resizeCount; i < uiGrid.transform.childCount; ++i)
+        for (int i = resizeCount; i < transf.childCount; ++i)
         {
-            GameObject newTemplate = uiGrid.transform.GetChild(i).gameObject;
+            GameObject newTemplate = transf.GetChild(i).gameObject;
             if (newTemplate.activeSelf)
                 newTemplate.SetActive(false);
         }
@@ -194,4 +208,34 @@ public abstract class CUIController : MonoBehaviour
     {
         CUIModule.Instance.CloseWindow(uiName == null ? UIName : uiName);
     }
+
+
+    /// <summary>
+    /// 从数组获取参数，并且不报错，返回null, 一般用于OnOpen, OnClose的可变参数
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="openArgs"></param>
+    /// <param name="offset"></param>
+    /// <returns></returns>
+    protected T GetFromArgs<T>(object[] openArgs, int offset, bool isLog = true)
+    {
+        T ret;
+        if ((openArgs.Length - 1) >= offset)
+        {
+            var arrElement = openArgs[offset];
+            if (arrElement == null)
+                ret = default(T);
+            else
+                ret = (T) Convert.ChangeType(arrElement, typeof (T));
+        }
+        else
+        {
+            ret = default(T);
+            if (isLog)
+                CBase.LogError("[GetFromArgs] {0} args - offset: {1}", this.UIName, offset);
+        }
+
+        return ret;
+    }
+
 }

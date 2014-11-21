@@ -126,30 +126,37 @@ public class CGameSettings : ICModule
 
         return null;
     }
-    public T GetInfo<T>(string id) where T : CBaseInfo
+
+    public T GetInfo<T>(string id, bool printLog = true) where T : CBaseInfo
     {
         EnsureLoad<T>();
 
         Dictionary<string, CBaseInfo> dict;
-        if (SettingInfos.TryGetValue(typeof(T), out dict))
+        if (SettingInfos.TryGetValue(typeof (T), out dict))
         {
             CBaseInfo tabInfo;
             if (dict.TryGetValue(id, out tabInfo))
             {
-                return (T)tabInfo;
+                return (T) tabInfo;
             }
             else
-                CBase.LogError("找不到类型{0} Id为{1}的配置对象, 类型表里共有对象{2}", typeof(T).Name, id, dict.Count);
+            {
+                if (printLog)
+                    CBase.LogError("找不到类型{0} Id为{1}的配置对象, 类型表里共有对象{2}", typeof (T).Name, id, dict.Count);
+            }
         }
         else
-            CBase.LogError("嘗試Id {0}, 找不到类型配置{1}, 总类型数{2}", id, typeof(T).Name, SettingInfos.Count);
+        {
+            if (printLog)
+                CBase.LogError("嘗試Id {0}, 找不到类型配置{1}, 总类型数{2}", id, typeof (T).Name, SettingInfos.Count);
+        }
 
         return null;
     }
     // 数字ID是索引
-    public T GetInfo<T>(int id) where T : CBaseInfo
+    public T GetInfo<T>(int id, bool printLog = true) where T : CBaseInfo
     {
-        return GetInfo<T>(id.ToString());
+        return GetInfo<T>(id.ToString(), printLog);
     }
 
 }
@@ -179,7 +186,18 @@ public class CBaseInfo
             return _CacheIntId.Value;
         }
     }
-    
+
+    /// <summary>
+    /// 清理一些缓存起来的运算配置
+    /// </summary>
+    public virtual void ClearCache()
+    {
+        _CacheIntId = null;
+    }
+
+    /// <summary>
+    /// 某些值的特殊解析
+    /// </summary>
     public virtual void Parse()
     {
 
@@ -298,14 +316,14 @@ public class CBaseInfo
                 value = null;
             }
 
-            if (field.Name == "Id")  // 如果是Id主键，确保数字成整数！不是浮点数  因为excel转tab可能转成浮点
+            if (field.Name == "Id")  // 如果是Id主键，确保数字成整数！
             {
-                float fValue;
-                if (float.TryParse((string)value, out fValue))
+                int fValue;
+                if (int.TryParse((string)value, out fValue))
                 {
                     try
                     {
-                        value = ((int)fValue).ToString();
+                        value = fValue.ToString();
                     }
                     catch
                     {

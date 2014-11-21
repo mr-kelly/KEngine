@@ -37,8 +37,7 @@ public class CWWWLoader
 
     public bool IsFinished { get { return WwwCache != null; } }  // 可协程不停判断， 或通过回调
 
-    bool _IsError = false;
-    public bool IsError { get { return _IsError; } private set { _IsError = value; } }
+    public bool IsError { get; private set; }
 
     public WWW Www { get { return WwwCache.Www; } }
 
@@ -50,10 +49,11 @@ public class CWWWLoader
     /// </summary>
     public CWWWLoader(string url, Action<WWW, object[]> callback = null, params object[] callbackArgs)
     {
+        IsError = false;
         CResourceModule.Instance.StartCoroutine(CoLoad(url, callback, callbackArgs));//开启协程加载Assetbundle，执行Callback
     }
 
-	/// <summary>
+    /// <summary>
 	/// 协和加载Assetbundle，加载完后执行callback
 	/// </summary>
 	/// <param name="url">资源的url</param>
@@ -100,14 +100,17 @@ public class CWWWLoader
 
                 }
                 CBase.LogError(www.error + " " + url);
+                yield break;
             }
+            else
+            {
+                CResourceModule.LogLoadTime("WWW", url, beginTime);
 
-            CResourceModule.LogLoadTime("WWW", url, beginTime);
+                cache.Www = www;
 
-            cache.Www = www;
-
-            if (WWWFinishCallback != null)
-                WWWFinishCallback(url);
+                if (WWWFinishCallback != null)
+                    WWWFinishCallback(url);
+            }
 
         }
         else
@@ -115,13 +118,15 @@ public class CWWWLoader
             if (cache.Www != null)
                 yield return null;  // 确保每一次异步读取资源都延迟一帧
 
-            while (cache.Www == null)  // 未加载完
+            while (cache.Www == null)  // 加载中，但未加载完
                 yield return null;
         }
 
+        
         Progress = cache.Www.progress;
         WwwCache = cache;
         if (callback != null)
             callback(WwwCache.Www, callbackArgs);
+
     }
 }

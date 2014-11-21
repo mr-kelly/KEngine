@@ -73,7 +73,7 @@ public static class CExtensions
 
 	public static int ToInt32(this string val)
 	{
-		return Convert.ToInt32(Convert.ToSingle(val));
+		return Convert.ToInt32(val);
 	}
 
 	public static float ToFloat(this string val)
@@ -81,23 +81,4 @@ public static class CExtensions
 	    if (val == null || val.Equals("")) return 0f;
 		return Convert.ToSingle(val);
 	}
-
-#if GAME_CLIENT
-    public static object Get<T>(this SimpleJson.JsonObject jsonObj, string key)
-    {
-        object retObj;
-        if (jsonObj.TryGetValue(key, out retObj))
-        {
-            if (retObj == null)
-            {
-                return default(T);
-            }
-            return retObj;
-        }
-        else
-        {
-            return default(T);
-        }
-    }
-#endif
 }

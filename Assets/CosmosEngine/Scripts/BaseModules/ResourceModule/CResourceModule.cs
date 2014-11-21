@@ -63,6 +63,15 @@ public class CResourceModule : MonoBehaviour, ICModule
 
     public static string GetResourcesPath(string url)
     {
+        string fullPath;
+        if (GetResourcesPath(url, out fullPath))
+            return fullPath;
+
+        return null;
+    }
+
+    public static bool GetResourcesPath(string url, out string fullPath)
+    {
         if (string.IsNullOrEmpty(url))
             CBase.LogError("尝试获取一个空的资源路径！");
 
@@ -78,21 +87,22 @@ public class CResourceModule : MonoBehaviour, ICModule
             {
                 if (Application.isEditor)
                     CBase.LogWarning("使用外部资源 {0}", docUrl);
-                return docUrl;
+                fullPath = docUrl;
+                return true;
             }
-            else
-            {
-                return inAppUrl;  // 優先下載資源，但又沒有下載資源文件！使用本地資源目錄
-            }
+            // 優先下載資源，但又沒有下載資源文件！使用本地資源目錄 
         }
-        else
-        {
-            if (!hasInAppUrl)
-                CBase.LogError("找不到InApp的資源: {0}", url);
-            return inAppUrl;  // 直接使用本地資源！
 
-            // ？？ 沒有本地資源但又遠程資源？竟然！!?
+        if (!hasInAppUrl) // 连本地资源都没有，直接失败吧 ？？ 沒有本地資源但又遠程資源？竟然！!?
+        {
+            CBase.LogError("找不到InApp的資源: {0}", url);
+            fullPath = null;
+            return false;
         }
+
+        fullPath = inAppUrl;  // 直接使用本地資源！
+
+        return true;
     }
 
     /// <summary>
@@ -112,6 +122,7 @@ public class CResourceModule : MonoBehaviour, ICModule
         return Application.persistentDataPath;
     }
 
+    // (not android ) only! Android资源不在目录！
     public static bool TryGetInAppResourceUrl(string url, out string newUrl)
     {
         newUrl = ResourcesPath + url;

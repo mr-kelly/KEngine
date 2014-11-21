@@ -50,11 +50,11 @@ public class CTool
     /// <summary>
     /// A:1|B:2|C:3这类字符串转成字典
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <typeparam name="K"></typeparam>
-    /// <param name="str"></param>
-    /// <param name="delimeter1">分隔符</param>
-    /// <param name="delimeter2"></param>
+    /// <typeparam name="T">string</typeparam>
+    /// <typeparam name="K">string</typeparam>
+    /// <param name="str">原始字符串</param>
+    /// <param name="delimeter1">分隔符1</param>
+    /// <param name="delimeter2">分隔符2</param>
     /// <returns></returns>
     public static Dictionary<T, K> SplitToDict<T, K>(string str, char delimeter1 = '|', char delimeter2 = ':')
     {
@@ -70,8 +70,8 @@ public class CTool
                     string[] strs2 = trimS.Split(delimeter2);
                     if (strs2.Length == 2)
                     {
-                        T val1 = (T) Convert.ChangeType(strs2[0], typeof (T));
-                        K val2 = (K) Convert.ChangeType(strs2[1], typeof (K));
+                        T val1 = (T)Convert.ChangeType(strs2[0], typeof(T));
+                        K val2 = (K)Convert.ChangeType(strs2[1], typeof(K));
                         dict[val1] = val2;
                     }
                 }
@@ -387,6 +387,34 @@ public class CTool
 
         return result;
     }
+    /// <summary>
+    /// 模板获取
+    /// </summary>
+    /// <param name="source">模板内容</param>
+    /// <param name="data">数据来源</param>
+    /// <returns></returns>
+    public static string Template(string source, object data)
+    {
+        var result = source;
+        var regex = new Regex(@"\{.+?\}");
+        var matches = regex.Matches(source);
+        foreach (Match match in matches)
+        {
+            var paramRex = match.Value;
+            var paramKey = paramRex.Substring(1, paramRex.Length - 2).Trim(); // 截头截尾
+            try
+            {
+                var paramValue = data.GetType().GetField(paramKey).GetValue(data).ToString();
+                result = result.Replace(paramRex, paramValue);
+            }
+            catch (Exception)
+            {
+                CBase.LogError("not find field \"{0}\" for {1}", paramKey, data.GetType());
+            }
+        }
+
+        return result;
+    }
 
     /// <summary>
     /// Recursively set the game object's layer.
@@ -402,6 +430,27 @@ public class CTool
             var child = t.GetChild(i);
             SetLayer(child.gameObject, layer);
         }
+    }
+
+    /// <summary>
+    /// 传入uri寻找指定控件
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="findTrans"></param>
+    /// <param name="uri"></param>
+    /// <param name="isLog"></param>
+    /// <returns></returns>
+    public static T GetChildComponent<T>(Transform findTrans, string uri, bool isLog = true) where T : Component
+    {
+        Transform trans = findTrans.Find(uri);
+        if (trans == null)
+        {
+            if (isLog)
+                CBase.LogError("Get Child Error: " + uri);
+            return default(T);
+        }
+
+        return (T)trans.GetComponent(typeof(T));
     }
 
     public static void SetChild(GameObject child, GameObject parent)
@@ -511,14 +560,14 @@ public class CTool
     }
 
     //设置粒子系统的RenderQueue
-    public static void SetParticleSystemRenderQueue(Transform parent,int renderQueue=30001)
+    public static void SetParticleSystemRenderQueue(Transform parent, int renderQueue = 30001)
     {
         int childCount = parent.childCount;
         for (int i = 0; i < childCount; i++)
         {
-            Transform child= parent.GetChild(i);
-            if(child.childCount>0)
-                SetParticleSystemRenderQueue(child,renderQueue);
+            Transform child = parent.GetChild(i);
+            if (child.childCount > 0)
+                SetParticleSystemRenderQueue(child, renderQueue);
             if (child.GetComponent<ParticleSystem>() != null)
             {
                 var particleSystem = child.GetComponent<ParticleSystem>();
@@ -718,53 +767,52 @@ public class CTool
         return true;
     }
 
-	/// <summary>
-	/// 呈弧形，传入一个参考点根据角度和半径计算出其它位置的坐标
-	/// </summary>
-	/// <param name="nNum">需要的数量</param>
-	/// <param name="pAnchorPos">锚定点/参考点</param>
-	/// <param name="nAngle">角度</param>
-	/// <param name="nRadius">半径</param>
-	/// <returns></returns>
-	public static Vector3[] GetSmartNpcPoints(int nNum, Vector3 pAnchorPos, int nAngle, float nRadius)
-	{
-		bool bPlural = nNum % 2 == 0 ? true : false; // 是否复数模式
-		Vector3 vDir = Vector3.down.normalized;
-		int nMidNum = bPlural ? nNum / 2 : nNum / 2 + 1; // 中间数, 循环过了中间数后，另一个方向起排布
-		Vector3 vRPos = vDir * nRadius; //// 计算直线在圆形上的顶点 半径是表现距离
-		Vector3[] targetPos = new Vector3[nNum];
-		for (int i = 1; i <= nNum; i++)
-		{
-			int nAddAngle = 0;
+    /// <summary>
+    /// 呈弧形，传入一个参考点根据角度和半径计算出其它位置的坐标
+    /// </summary>
+    /// <param name="nNum">需要的数量</param>
+    /// <param name="pAnchorPos">锚定点/参考点</param>
+    /// <param name="nAngle">角度</param>
+    /// <param name="nRadius">半径</param>
+    /// <returns></returns>
+    public static Vector3[] GetSmartNpcPoints(int nNum, Vector3 pAnchorPos, int nAngle, float nRadius)
+    {
+        bool bPlural = nNum % 2 == 0 ? true : false; // 是否复数模式
+        Vector3 vDir = Vector3.down.normalized;
+        int nMidNum = bPlural ? nNum / 2 : nNum / 2 + 1; // 中间数, 循环过了中间数后，另一个方向起排布
+        Vector3 vRPos = vDir * nRadius; //// 计算直线在圆形上的顶点 半径是表现距离
+        Vector3[] targetPos = new Vector3[nNum];
+        for (int i = 1; i <= nNum; i++)
+        {
+            int nAddAngle = 0;
 
-			if (bPlural) // 复数模式
-			{
-				if (i > nMidNum)
-					nAddAngle = nAngle * ((i % nMidNum) + 1) - nAngle / 2;
-				else
-					nAddAngle = -nAngle * ((i % nMidNum) + 1) + nAngle / 2; // 除以2，是为了顶端NPC均匀排布 by KK
-			}
-			else // 单数模式
-			{
-				// 判断是否过了中间数
-				if (i > nMidNum)
-				{
-					nAddAngle = nAngle * ((i % nMidNum) + 1); // 添加NPC的角度
-				}
-				else if (i < nMidNum) // 非复数模式， 中间数NPC 放在正方向
-				{
-					nAddAngle = -nAngle * ((i % nMidNum) + 1); // 反方向角度
-				}
-				else
-					nAddAngle = 0; // 正方向
-			}
+            if (bPlural) // 复数模式
+            {
+                if (i > nMidNum)
+                    nAddAngle = nAngle * ((i % nMidNum) + 1) - nAngle / 2;
+                else
+                    nAddAngle = -nAngle * ((i % nMidNum) + 1) + nAngle / 2; // 除以2，是为了顶端NPC均匀排布 by KK
+            }
+            else // 单数模式
+            {
+                // 判断是否过了中间数
+                if (i > nMidNum)
+                {
+                    nAddAngle = nAngle * ((i % nMidNum) + 1); // 添加NPC的角度
+                }
+                else if (i < nMidNum) // 非复数模式， 中间数NPC 放在正方向
+                {
+                    nAddAngle = -nAngle * ((i % nMidNum) + 1); // 反方向角度
+                }
+                else
+                    nAddAngle = 0; // 正方向
+            }
 
-			Vector3 vTargetPos = pAnchorPos + Quaternion.AngleAxis(nAddAngle, Vector3.forward) * vRPos;
-			targetPos[i - 1] = vTargetPos;
-		}
-		return targetPos;
-	}
-
+            Vector3 vTargetPos = pAnchorPos + Quaternion.AngleAxis(nAddAngle, Vector3.forward) * vRPos;
+            targetPos[i - 1] = vTargetPos;
+        }
+        return targetPos;
+    }
 }
 
 public class XMemoryParser<T>

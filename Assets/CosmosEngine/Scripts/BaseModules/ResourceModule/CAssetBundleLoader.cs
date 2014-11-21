@@ -25,6 +25,7 @@ public class CAssetBundleLoader
 
     static Dictionary<string, XLoadCache> AssetBundlesCache = new Dictionary<string, XLoadCache>();
 
+    public bool IsError { get; private set; }
     public bool IsFinished { get { return Bundle != null; } }
     public AssetBundle Bundle { get; private set; }
 
@@ -36,16 +37,22 @@ public class CAssetBundleLoader
 
     public CAssetBundleLoader(string url, Action<string, AssetBundle, object[]> callback = null, params object[] callbackArgs)
     {
+        IsError = false;
         Callback = callback;
         CallbackArgs = callbackArgs;
 
         RelativeResourceUrl = url;
-        FullUrl = CResourceModule.GetResourcesPath(url);
+        if (CResourceModule.GetResourcesPath(url, out FullUrl))
+        {
+            CResourceModule.LogRequest("AssetBundle", FullUrl);
 
-        CResourceModule.LogRequest("AssetBundle", FullUrl);
-
-        CResourceModule.Instance.StartCoroutine(LoadAssetBundle(RelativeResourceUrl));
-
+            CResourceModule.Instance.StartCoroutine(LoadAssetBundle(RelativeResourceUrl));
+        }
+        else
+        {
+            CBase.LogError("[CAssetBundleLoader]Error Path: {0}", url);
+            IsError = true;
+        }
     }
     
     IEnumerator LoadAssetBundle(string relativeUrl)
@@ -59,18 +66,27 @@ public class CAssetBundleLoader
             CWWWLoader wwwLoader = new CWWWLoader(FullUrl);
             while (!wwwLoader.IsFinished)
                 yield return null;
-
-            // 解密
-            CAssetBundleParser parser = new CAssetBundleParser(RelativeResourceUrl, wwwLoader.Www.bytes);
-            while (!parser.IsFinished)
+            if (wwwLoader.IsError)
             {
-                yield return null;
+                CBase.LogError("[CAssetBundleLoader]Error Load AssetBundle: {0}", relativeUrl);
+                IsError = true;
+                yield break;
+            }
+            else
+            {
+                // 解密
+                CAssetBundleParser parser = new CAssetBundleParser(RelativeResourceUrl, wwwLoader.Www.bytes);
+                while (!parser.IsFinished)
+                {
+                    yield return null;
+                }
+
+                if (parser.Bundle == null)
+                    CBase.LogError("WWW.assetBundle is NULL: {0}", FullUrl);
+
+                loadCache.Ab = parser.Bundle;
             }
 
-            if (parser.Bundle == null)
-                CBase.LogError("WWW.assetBundle is NULL: {0}", FullUrl);
-
-            loadCache.Ab = parser.Bundle;
 
         }
         else

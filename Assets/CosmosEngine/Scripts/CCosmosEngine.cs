@@ -28,7 +28,7 @@ public class CCosmosEngine : MonoBehaviour
     /// </summary>
     public static bool IsRootUser;  // 是否越狱iOS
 
-    static CCosmosEngine EngineInstance;
+    public static CCosmosEngine EngineInstance { get; private set; }
 
     /// <summary>
     /// Read Tab file (CEngineConfig.txt), cache to here
