@@ -5,14 +5,10 @@ using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 
-public class XBuild_Audio : AutoBuildBase
+public class XBuild_Audio : CBuild_Base
 {
 	public override string GetDirectory() { return "Audio"; }
 	public override string GetExtention() { return "dir"; }
-
-	public override void BeginExport()
-	{
-	}
 
 	public override void Export(string path)
 	{
@@ -28,12 +24,8 @@ public class XBuild_Audio : AutoBuildBase
 		}
 		else
 		{
-			CBase.LogError("Error Build Audio {0}", path);
+			CDebug.LogError("Error Build Audio {0}", path);
 		}
-	}
-
-	public override void EndExport()
-	{
 	}
 
 	void ExportPkg(string path)

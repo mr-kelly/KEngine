@@ -24,19 +24,19 @@ public class CUIDemoHome : CUIController
         base.OnInit();
 
         HomeButton = GetControl<UIButton>("Button"); // child
-        CBase.Assert(HomeButton);
+        CDebug.Assert(HomeButton);
 
         HomeLabel = GetControl<UILabel>("Button/Label"); // uri....
-        CBase.Assert(HomeLabel);
+        CDebug.Assert(HomeLabel);
 
         HomeButton = FindControl<UIButton>("Button"); // find by gameobject name
-        CBase.Assert(HomeButton);
+        CDebug.Assert(HomeButton);
 
         HomeLabel = FindControl<UILabel>("Label"); // child name
-        CBase.Assert(HomeLabel);
+        CDebug.Assert(HomeLabel);
 
         HomeButton.onClick.Add(new EventDelegate(() => {
-            CBase.LogWarning("Click Home Button!");
+            CDebug.LogWarning("Click Home Button!");
         }));
         
     }

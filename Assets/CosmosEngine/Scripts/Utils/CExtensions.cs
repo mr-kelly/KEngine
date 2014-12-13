@@ -97,7 +97,6 @@ public static class CExtensions
     /// <returns></returns>
     public static T Get<T>(this object[] openArgs, int offset, bool isLog = true)
     {
-        Array a;
         T ret;
         if ((openArgs.Length - 1) >= offset)
         {

@@ -65,7 +65,6 @@ public class CAssetLoader
     //仅仅是预加载，回调仅告知是否加载成功
     public static IEnumerator CoPreload(string path, string assetName = null, System.Action<bool> callback = null)
     {
-        bool waiting = true;
         var w = new CAssetFileBridge(path, assetName, null);
 
         while (!w.IsFinished)

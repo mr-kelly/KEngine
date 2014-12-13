@@ -145,7 +145,7 @@ public abstract class CUIController : MonoBehaviour
         t.localRotation = Quaternion.identity;
         t.localScale = Vector3.one;
     }
-
+#if GAME_CLIENT
     /// <summary>
     /// 传入指定数量， 对UIGrid里指定数量项SetActive(true)/或创建, 其余的SetActive(false)
     /// 常用于UIGrid下的对象动态增长
@@ -196,6 +196,7 @@ public abstract class CUIController : MonoBehaviour
         }
 
     }
+#endif
 
     /// <summary>
     /// Shortcuts for UIModule's Open Window
