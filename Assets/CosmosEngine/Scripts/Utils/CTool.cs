@@ -31,6 +31,15 @@ public class CTool
 
     static Dictionary<string, Shader> CacheShaders = new Dictionary<string, Shader>(); // Shader.Find是一个非常消耗的函数，因此尽量缓存起来
 
+    /// <summary>
+    /// Whether In Wifi or Cable Network
+    /// </summary>
+    /// <returns></returns>
+    public static bool IsWifi()
+    {
+        return Application.internetReachability == NetworkReachability.ReachableViaLocalAreaNetwork;
+    }
+
     // 需要StartCoroutine
     public static IEnumerator TimeCallback(float time, Action callback)
     {
@@ -68,12 +77,19 @@ public class CTool
                 if (!string.IsNullOrEmpty(trimS))
                 {
                     string[] strs2 = trimS.Split(delimeter2);
+                    K val2 = default(K);
+                    T val1 = default(T);
+                    if (strs2.Length > 0)
+                    {
+                        val1 = (T)Convert.ChangeType(strs2[0], typeof(T));
+                    }
                     if (strs2.Length == 2)
                     {
-                        T val1 = (T)Convert.ChangeType(strs2[0], typeof(T));
-                        K val2 = (K)Convert.ChangeType(strs2[1], typeof(K));
-                        dict[val1] = val2;
+                        
+                        val2 = (K)Convert.ChangeType(strs2[1], typeof(K));
+                        
                     }
+                    dict[val1] = val2;
                 }
             }
         }
@@ -453,20 +469,22 @@ public class CTool
         return (T)trans.GetComponent(typeof(T));
     }
 
-    public static void SetChild(GameObject child, GameObject parent)
+    public static void SetChild(GameObject child, GameObject parent, bool ignoreRotation = false, bool ignoreScale = false)
     {
-        SetChild(child.transform, parent.transform);
+        SetChild(child.transform, parent.transform, ignoreRotation, ignoreScale);
     }
-    public static void SetChild(Transform child, Transform parent)
+    public static void SetChild(Transform child, Transform parent, bool ignoreRotation = false, bool ignoreScale = false)
     {
         child.parent = parent;
-        ResetTransform(child);
+        ResetTransform(child, ignoreRotation, ignoreScale);
     }
-    public static void ResetTransform(UnityEngine.Transform transform)
+    public static void ResetTransform(UnityEngine.Transform transform, bool ignoreRotation = false, bool ignoreScale = false)
     {
         transform.localPosition = UnityEngine.Vector3.zero;
-        transform.localScale = UnityEngine.Vector3.one;
-        transform.localEulerAngles = UnityEngine.Vector3.zero;
+        if (!ignoreScale)
+            transform.localScale = UnityEngine.Vector3.one;
+        if (!ignoreRotation)
+            transform.localEulerAngles = UnityEngine.Vector3.zero;
     }
 
     // 获取指定流的MD5
@@ -533,8 +551,9 @@ public class CTool
 
     public static void ResetUITween(UnityEngine.GameObject gameObj)
     {
+        gameObj.SetActive(true);
         // 重置出现 移动动画
-        foreach (UITweener tween in gameObj.GetComponentsInChildren<UITweener>())
+        foreach (UITweener tween in gameObj.GetComponentsInChildren<UITweener>(true))
         {
             tween.ResetToBeginning();
             tween.PlayForward();
@@ -560,7 +579,7 @@ public class CTool
     }
 
     //设置粒子系统的RenderQueue
-    public static void SetParticleSystemRenderQueue(Transform parent, int renderQueue = 30001)
+    public static void SetParticleSystemRenderQueue(Transform parent, int renderQueue = 3900)
     {
         int childCount = parent.childCount;
         for (int i = 0; i < childCount; i++)
@@ -573,6 +592,11 @@ public class CTool
                 var particleSystem = child.GetComponent<ParticleSystem>();
                 particleSystem.renderer.material.renderQueue = renderQueue;
             }
+        }
+        if (parent.GetComponent<ParticleSystem>() != null)
+        {
+            var particleSystem = parent.GetComponent<ParticleSystem>();
+            particleSystem.renderer.material.renderQueue = renderQueue;
         }
     }
     public static void MoveAllCollidersToGameObject(GameObject srcGameObject, GameObject targetGameObject)
@@ -775,10 +799,10 @@ public class CTool
     /// <param name="nAngle">角度</param>
     /// <param name="nRadius">半径</param>
     /// <returns></returns>
-    public static Vector3[] GetSmartNpcPoints(int nNum, Vector3 pAnchorPos, int nAngle, float nRadius)
+    public static Vector3[] GetSmartNpcPoints(Vector3 startDirection, int nNum, Vector3 pAnchorPos, int nAngle, float nRadius)
     {
         bool bPlural = nNum % 2 == 0 ? true : false; // 是否复数模式
-        Vector3 vDir = Vector3.down.normalized;
+        Vector3 vDir = startDirection;
         int nMidNum = bPlural ? nNum / 2 : nNum / 2 + 1; // 中间数, 循环过了中间数后，另一个方向起排布
         Vector3 vRPos = vDir * nRadius; //// 计算直线在圆形上的顶点 半径是表现距离
         Vector3[] targetPos = new Vector3[nNum];
@@ -813,6 +837,47 @@ public class CTool
         }
         return targetPos;
     }
+
+    /// 返回localPoint
+    public static Vector3[] GetParallelPoints(Vector3 startPos, Vector3 startDirection, int nNum, float meterInterval)
+    {
+        bool bPlural = nNum % 2 == 0 ? true : false; // 是否复数模式
+        int nMidNum = bPlural ? nNum / 2 : nNum / 2 + 1; // 中间数, 循环过了中间数后，另一个方向起排布
+        Vector3[] targetPos = new Vector3[nNum];
+        for (int i = 1; i <= nNum; i++)
+        {
+            float fAddInterval = 0;
+
+            if (bPlural) // 复数模式
+            {
+                if (i > nMidNum)
+                    fAddInterval = meterInterval * ((i % nMidNum) + 1) - meterInterval / 2;
+                else
+                    fAddInterval = -meterInterval * ((i % nMidNum) + 1) + meterInterval / 2; // 除以2，是为了顶端NPC均匀排布 by KK
+            }
+            else // 单数模式
+            {
+                // 判断是否过了中间数
+                if (i > nMidNum)
+                {
+                    fAddInterval = meterInterval * ((i % nMidNum) + 1); // 添加NPC的角度
+                }
+                else if (i < nMidNum) // 非复数模式， 中间数NPC 放在正方向
+                {
+                    fAddInterval = -meterInterval * ((i % nMidNum) + 1); // 反方向角度
+                }
+                else
+                    fAddInterval = 0; // 正方向
+            }
+
+            // 90度旋转求垂直
+            Vector3 vTargetPos = startPos + Quaternion.AngleAxis(90, Vector3.forward) * startDirection * fAddInterval;
+            //Vector3 vTargetPos = direction*fAddInterval;
+            targetPos[i - 1] = vTargetPos;
+        }
+        return targetPos;
+    }
+
 }
 
 public class XMemoryParser<T>

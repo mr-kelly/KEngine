@@ -18,7 +18,7 @@ using System.Collections.Generic;
 /// Current version, loaded Resource will never release in memory
 /// </summary>
 [CDependencyClass(typeof(CResourceModule))]
-public class CWWWLoader
+public class CWWWLoader : IDisposable
 {
     class CLoadingCache
     {
@@ -35,7 +35,7 @@ public class CWWWLoader
     static Dictionary<string, CLoadingCache> Loaded = new Dictionary<string, CLoadingCache>();
     CLoadingCache WwwCache = null;
 
-    public bool IsFinished { get { return WwwCache != null; } }  // 可协程不停判断， 或通过回调
+    public bool IsFinished { get { return WwwCache != null || IsError; } }  // 可协程不停判断， 或通过回调
 
     public bool IsError { get; private set; }
 
@@ -47,7 +47,7 @@ public class CWWWLoader
     /// Use this to directly load WWW by Callback or Coroutine, pass a full URL.
     /// A wrapper of Unity's WWW class.
     /// </summary>
-    public CWWWLoader(string url, Action<WWW, object[]> callback = null, params object[] callbackArgs)
+    public CWWWLoader(string url, Action<bool, WWW, object[]> callback = null, params object[] callbackArgs)
     {
         IsError = false;
         CResourceModule.Instance.StartCoroutine(CoLoad(url, callback, callbackArgs));//开启协程加载Assetbundle，执行Callback
@@ -60,7 +60,7 @@ public class CWWWLoader
 	/// <param name="callback"></param>
 	/// <param name="callbackArgs"></param>
 	/// <returns></returns>
-    IEnumerator CoLoad(string url, Action<WWW, object[]> callback = null, params object[] callbackArgs)
+    IEnumerator CoLoad(string url, Action<bool, WWW, object[]> callback = null, params object[] callbackArgs)
     {
         if (CResourceModule.LoadByQueue)
         {
@@ -100,6 +100,8 @@ public class CWWWLoader
 
                 }
                 CBase.LogError(www.error + " " + url);
+                if (callback != null)
+                    callback(false, null, null); // 失败callback
                 yield break;
             }
             else
@@ -115,8 +117,8 @@ public class CWWWLoader
         }
         else
         {
-            if (cache.Www != null)
-                yield return null;  // 确保每一次异步读取资源都延迟一帧
+            //if (cache.Www != null)
+            //    yield return null;  // 确保每一次异步读取资源都延迟一帧
 
             while (cache.Www == null)  // 加载中，但未加载完
                 yield return null;
@@ -125,8 +127,23 @@ public class CWWWLoader
         
         Progress = cache.Www.progress;
         WwwCache = cache;
-        if (callback != null)
-            callback(WwwCache.Www, callbackArgs);
 
+        if (callback != null)
+            callback(true, WwwCache.Www, callbackArgs);
+
+    }
+    
+    /// <summary>
+    /// 手动释放该部分内存
+    /// </summary>
+    public void Dispose()
+    {
+        if (WwwCache != null)
+        {
+            WwwCache.Www.Dispose();
+            Loaded.Remove(WwwCache.Url);
+        }
+        else
+            CBase.LogError("[CWWWLoader:Release]无缓存的WWW");
     }
 }

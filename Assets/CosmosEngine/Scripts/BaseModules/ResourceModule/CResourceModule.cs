@@ -61,16 +61,32 @@ public class CResourceModule : MonoBehaviour, ICModule
 
     public static System.Func<string, string> CustomGetResourcesPath; // 自定义资源路径。。。
 
-    public static string GetResourcesPath(string url)
+    /// <summary>
+    /// 统一在字符串后加上.box, 取决于配置的AssetBundle后缀
+    /// </summary>
+    /// <param name="path"></param>
+    /// <param name="formats"></param>
+    /// <returns></returns>
+    public static string GetAssetBundlePath(string path, params object[] formats)
+    {
+        return string.Format(path + CCosmosEngine.GetConfig("AssetBundleExt"), formats);
+    }
+
+    /// <summary>
+    /// 完整路径，www加载
+    /// </summary>
+    /// <param name="url"></param>
+    /// <returns></returns>
+    public static string GetResourceFullPath(string url)
     {
         string fullPath;
-        if (GetResourcesPath(url, out fullPath))
+        if (GetResourceFullPath(url, out fullPath))
             return fullPath;
 
         return null;
     }
 
-    public static bool GetResourcesPath(string url, out string fullPath)
+    public static bool GetResourceFullPath(string url, out string fullPath)
     {
         if (string.IsNullOrEmpty(url))
             CBase.LogError("尝试获取一个空的资源路径！");

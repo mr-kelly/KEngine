@@ -20,9 +20,9 @@ public class CAudioLoader
 
     public AudioClip Clip { get { return ResultAudioClip; } }
 
-    public CAudioLoader(string url, System.Action<AudioClip> callback = null)
+    public CAudioLoader(string url, System.Action<bool, AudioClip> callback = null)
     {
-        new CAssetFileBridge(url, (UnityEngine.Object obj, object[] args) =>
+        new CAssetFileBridge(url, (bool isOk, UnityEngine.Object obj) =>
         {
             AudioClip clip = obj as AudioClip;
 
@@ -32,7 +32,7 @@ public class CAudioLoader
             ResultAudioClip = clip;
 
             if (callback != null)
-                callback(ResultAudioClip);
+                callback(isOk, ResultAudioClip);
         });
     }
 }

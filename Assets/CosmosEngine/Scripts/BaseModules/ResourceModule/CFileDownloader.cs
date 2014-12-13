@@ -67,5 +67,7 @@ public class CWWWDownloader
             Directory.CreateDirectory(dir);
 
         System.IO.File.WriteAllBytes(_SavePath, WWWLoader.Www.bytes);
+        // WWW没用了
+        WWWLoader.Dispose();
     }
 }

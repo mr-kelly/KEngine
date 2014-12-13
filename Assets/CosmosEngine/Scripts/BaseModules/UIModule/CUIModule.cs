@@ -319,7 +319,7 @@ public class CUIModule : ICModule
 
         GameObject uiObj = (GameObject)assetLoader.Asset;
 
-        openState.IsLoading = false;
+        openState.IsLoading = false;  // Load完
 
         uiObj.SetActive(false);
         uiObj.name = openState.TemplateName;

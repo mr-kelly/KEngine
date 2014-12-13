@@ -27,7 +27,7 @@ public class CStaticAssetLoader
         if (string.IsNullOrEmpty(path))
             CBase.LogError("XStaticAssetLoader 空资源路径!");
 
-        new CAssetFileBridge(path, (_obj, _args) =>
+        new CAssetFileBridge(path, (_isOk, _obj) =>
         {
             Object asset = null;
             if (!CachcedAssets.TryGetValue(path, out asset))

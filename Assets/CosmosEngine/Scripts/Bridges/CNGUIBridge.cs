@@ -63,6 +63,7 @@ public class CNGUIBridge : ICUIBridge
         Transform panelTrans = panelRootObj.transform;
         PanelRoot = panelRootObj.AddComponent<UIPanel>();
         CBase.Assert(PanelRoot);
+        PanelRoot.generateNormals = true;
 
         GameObject uiCamObj = new GameObject("UICamera");
         CTool.SetChild(uiCamObj.transform, UiRoot.transform);

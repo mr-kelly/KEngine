@@ -137,7 +137,7 @@ public partial class CBuildTools
 
 	    if (asset is Texture)
 	    {
-	        asset = asset; // Texutre不复制拷贝一份
+            //asset = asset; // Texutre不复制拷贝一份
 	    }
 		else if ((prefabType == PrefabType.None && AssetDatabase.GetAssetPath(asset) == string.Empty) ||
 			(prefabType == PrefabType.ModelPrefabInstance))

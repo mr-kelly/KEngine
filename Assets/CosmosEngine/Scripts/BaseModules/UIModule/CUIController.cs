@@ -162,6 +162,11 @@ public abstract class CUIController : MonoBehaviour
         uiTable.Reposition();
     }
 
+    public void ResizeCUITableGridGameObjects(CUITableGrid uiTable, int resizeCount, GameObject templateForNew)
+    {
+        _ResizeUIWidgetContainerGameObjects(uiTable.transform, resizeCount, templateForNew);
+        uiTable.Reposition();
+    }
     public void _ResizeUIWidgetContainerGameObjects(Transform transf, int resizeCount, GameObject templateForNew)
     {
         if (templateForNew == null)
@@ -219,23 +224,7 @@ public abstract class CUIController : MonoBehaviour
     /// <returns></returns>
     protected T GetFromArgs<T>(object[] openArgs, int offset, bool isLog = true)
     {
-        T ret;
-        if ((openArgs.Length - 1) >= offset)
-        {
-            var arrElement = openArgs[offset];
-            if (arrElement == null)
-                ret = default(T);
-            else
-                ret = (T) Convert.ChangeType(arrElement, typeof (T));
-        }
-        else
-        {
-            ret = default(T);
-            if (isLog)
-                CBase.LogError("[GetFromArgs] {0} args - offset: {1}", this.UIName, offset);
-        }
-
-        return ret;
+        return openArgs.Get<T>(offset, isLog);
     }
 
 }

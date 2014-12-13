@@ -21,7 +21,8 @@ public class CTextureLoader
 
     public Texture Asset { get; private set; }
 
-    public delegate void CTextureLoaderDelegate(Texture tex, object[] args);
+    public delegate void CTextureLoaderDelegate(bool isOk, Texture tex, object[] args);
+
     public CTextureLoaderDelegate Callback;
     public object[] CallbackArgs;
 
@@ -37,16 +38,14 @@ public class CTextureLoader
         new CAssetFileBridge(path, OnAssetLoaded);
     }
 
-    void OnAssetLoaded(UnityEngine.Object obj, object[] args)
+    void OnAssetLoaded(bool isOk, UnityEngine.Object obj)
     {
-        Texture tex = obj as Texture;
-        CBase.Assert(tex);
-        
-        if (Callback != null)
-            Callback(tex, CallbackArgs);
-
-        Asset = tex;
+        Asset = obj as Texture;
         IsFinished = true;
+
+        if (Callback != null)
+            Callback(isOk, Asset, CallbackArgs);
+
     }
 
 }

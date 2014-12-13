@@ -28,7 +28,7 @@ public class CGameSettings : ICModule
 
     public Action InitAction; // Init時調用的委託、函數指針
     
-    public static event Action<string, string> FoundDuplicatedIdEvent;
+    public static event Action<string, int, string> FoundDuplicatedIdEvent;
 
     public IEnumerator Init()
     {
@@ -43,25 +43,41 @@ public class CGameSettings : ICModule
     {
         yield break;
     }
-
-    public void LoadTab<T>(params string[] tabPaths) where T : CBaseInfo
+    public void LoadTab(Type type, bool lazyLoad, params string[] tabPaths)
     {
-        LazyLoad[typeof(T)] = tabPaths;
+        CBase.Assert(typeof(CBaseInfo).IsAssignableFrom(type));
+
+        LazyLoad[type] = tabPaths;
+        if (!lazyLoad)
+            EnsureLoad(type);
     }
 
-    private void EnsureLoad<T>() where T : CBaseInfo
+    public void LoadTab<T>(bool lazyLoad, string[] tabPaths) where T : CBaseInfo
     {
-        Type type = typeof (T);
+        LoadTab(typeof (T), lazyLoad, tabPaths);
+    }
+
+    private void EnsureLoad(Type type)
+    {
+        CBase.Assert(typeof(CBaseInfo).IsAssignableFrom(type));
+
         string[] loadFilePaths;
         if (LazyLoad.TryGetValue(type, out loadFilePaths))
         {
-            DoLoadTab<T>(loadFilePaths);
+            DoLoadTab(type, loadFilePaths);
             LazyLoad.Remove(type);
         }
     }
-
-    private void DoLoadTab<T>(string[] tabPaths) where T : CBaseInfo
+    private void EnsureLoad<T>() where T : CBaseInfo
     {
+        Type type = typeof (T);
+        EnsureLoad(type);
+    }
+
+    private void DoLoadTab(Type type, string[] tabPaths)
+    {
+        CBase.Assert(typeof(CBaseInfo).IsAssignableFrom(type));
+
         foreach (string tabPath in tabPaths)
         {
 #if GAME_CLIENT
@@ -72,9 +88,9 @@ public class CGameSettings : ICModule
         using (CTabFile tabFile = CTabFile.LoadFromString(System.IO.File.ReadAllText(p1)))
 #endif
             {
-                
+
                 Dictionary<string, CBaseInfo> dict;
-                if (!SettingInfos.TryGetValue(typeof(T), out dict))  // 如果没有才添加
+                if (!SettingInfos.TryGetValue(type, out dict))  // 如果没有才添加
                     dict = new Dictionary<string, CBaseInfo>();
 
                 const int rowStart = 1;
@@ -87,23 +103,28 @@ public class CGameSettings : ICModule
                     if (dict.TryGetValue(id, out existOne))
                     {
                         if (FoundDuplicatedIdEvent != null)
-                            FoundDuplicatedIdEvent(tabPath, id);
+                            FoundDuplicatedIdEvent(tabPath, i, id);
 
                         CBaseInfo existT = existOne;
-                        CBaseInfo.LoadFromTab(typeof (T), ref existT, tabFile, i); // 修改原对象，不new
+                        CBaseInfo.LoadFromTab(type, ref existT, tabFile, i); // 修改原对象，不new
                         (existT as CBaseInfo).Parse();
                     }
                     else
                     {
-                        T pInfo = CBaseInfo.LoadFromTab(typeof (T), tabFile, i) as T;
+                        CBaseInfo pInfo = CBaseInfo.LoadFromTab(type, tabFile, i);
                         pInfo.Parse();
                         dict[pInfo.Id] = pInfo; // 不存在，直接new
                     }
                 }
 
-                SettingInfos[typeof (T)] = dict;
+                SettingInfos[type] = dict;
             }
         }
+    }
+
+    private void DoLoadTab<T>(string[] tabPaths) where T : CBaseInfo
+    {
+        DoLoadTab(typeof (T), tabPaths);
     }
 
     public List<T> GetInfos<T>() where T : CBaseInfo
@@ -179,8 +200,10 @@ public class CBaseInfo
 
             int tryInt;
             if (!int.TryParse(Id, out tryInt))
+            {
                 CBase.LogError("錯誤解析Int Id");
-            
+            }
+
             _CacheIntId = tryInt;
 
             return _CacheIntId.Value;

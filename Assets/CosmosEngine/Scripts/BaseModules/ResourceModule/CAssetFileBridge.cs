@@ -16,25 +16,28 @@ using System.Collections;
 /// </summary>
 public class CAssetFileBridge
 {
-    System.Action<UnityEngine.Object, object[]> AssetFileLoadedCallback;
-    object[] CallbackArgs;
-    string AssetInBundleName;  // AssetBundle里的名字, Resources時不用
+    public delegate void CAssetFileBridgeDelegate(bool isOk, UnityEngine.Object assetObject);
 
-    public CAssetFileBridge(string path, System.Action<UnityEngine.Object, object[]> assetFileLoadedCallback, params object[] args)
+    CAssetFileBridgeDelegate AssetFileLoadedCallback;
+    string AssetInBundleName;  // AssetBundle里的名字, Resources時不用
+    
+    public bool IsFinished { get; private set; }
+    public bool IsError { get; private set; }
+
+    public CAssetFileBridge(string path, CAssetFileBridgeDelegate assetFileLoadedCallback)
     {
-        _Init(path, null, assetFileLoadedCallback, args);
+        _Init(path, null, assetFileLoadedCallback);
     }
 
     // AssetBundle或Resource文件夾的資源文件
-    public CAssetFileBridge(string path, string assetName, System.Action<UnityEngine.Object, object[]> assetFileLoadedCallback, params object[] args)
+    public CAssetFileBridge(string path, string assetName, CAssetFileBridgeDelegate assetFileLoadedCallback)
     {
-        _Init(path, assetName, assetFileLoadedCallback, args);
+        _Init(path, assetName, assetFileLoadedCallback);
     }
 
-    void _Init(string path, string assetName, System.Action<UnityEngine.Object, object[]> assetFileLoadedCallback, object[] args)
+    void _Init(string path, string assetName, CAssetFileBridgeDelegate assetFileLoadedCallback)
     {
         AssetFileLoadedCallback = assetFileLoadedCallback;
-        CallbackArgs = args;
         AssetInBundleName = assetName;
 
         if (CCosmosEngine.GetConfig("IsLoadAssetBundle").ToInt32() == 0)
@@ -59,10 +62,13 @@ public class CAssetFileBridge
         {
             CBase.LogError("Asset is NULL(from Resources Folder): {0}", path);
         }
-        AssetFileLoadedCallback(asset, CallbackArgs);
+        IsFinished = true;
+        IsError = asset == null;
+        if (AssetFileLoadedCallback != null)
+            AssetFileLoadedCallback(asset != null, asset);
     }
 
-    void OnAssetBundleLoaded(string url, AssetBundle assetBundle, params object[] args)
+    void OnAssetBundleLoaded(bool isOk, string url, AssetBundle assetBundle, params object[] args)
     {
         Object asset = null;
         System.DateTime beginTime = System.DateTime.Now;
@@ -91,6 +97,9 @@ public class CAssetFileBridge
             CBase.LogError("Asset is NULL: {0}", url);
         }
 
-        AssetFileLoadedCallback(asset, CallbackArgs);
+        IsFinished = true;
+        IsError = asset == null;
+        if (AssetFileLoadedCallback != null)
+            AssetFileLoadedCallback(asset != null, asset);
     }
 }

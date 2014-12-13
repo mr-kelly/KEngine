@@ -16,7 +16,7 @@ public class CFontLoader
 {
 	public CFontLoader(string path, System.Action<Font> callback)
 	{
-        new CAssetFileBridge(path, (_obj, _args) => {
+        new CAssetFileBridge(path, (_isOk, _obj) => {
             Font font = _obj as Font;
             callback(font);
         });

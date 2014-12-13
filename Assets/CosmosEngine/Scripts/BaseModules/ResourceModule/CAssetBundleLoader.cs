@@ -16,6 +16,8 @@ using System.Collections.Generic;
 // 調用WWWLoader
 public class CAssetBundleLoader
 {
+    public delegate void CAssetBundleLoaderDelegate(bool isOk, string fullUrl, AssetBundle ab, object[] args);
+
     class XLoadCache
     {
         public string RelativeUrl;
@@ -29,20 +31,20 @@ public class CAssetBundleLoader
     public bool IsFinished { get { return Bundle != null; } }
     public AssetBundle Bundle { get; private set; }
 
-    Action<string, AssetBundle, object[]> Callback;
+    CAssetBundleLoaderDelegate Callback;  // full url, ab, args
     object[] CallbackArgs;
 
     string RelativeResourceUrl;
     string FullUrl;
 
-    public CAssetBundleLoader(string url, Action<string, AssetBundle, object[]> callback = null, params object[] callbackArgs)
+    public CAssetBundleLoader(string url, CAssetBundleLoaderDelegate callback = null, params object[] callbackArgs)
     {
         IsError = false;
         Callback = callback;
         CallbackArgs = callbackArgs;
 
         RelativeResourceUrl = url;
-        if (CResourceModule.GetResourcesPath(url, out FullUrl))
+        if (CResourceModule.GetResourceFullPath(url, out FullUrl))
         {
             CResourceModule.LogRequest("AssetBundle", FullUrl);
 
@@ -52,6 +54,9 @@ public class CAssetBundleLoader
         {
             CBase.LogError("[CAssetBundleLoader]Error Path: {0}", url);
             IsError = true;
+
+            if (Callback != null)
+                Callback(false, url, Bundle, CallbackArgs);
         }
     }
     
@@ -70,6 +75,8 @@ public class CAssetBundleLoader
             {
                 CBase.LogError("[CAssetBundleLoader]Error Load AssetBundle: {0}", relativeUrl);
                 IsError = true;
+                if (Callback != null)
+                    Callback(false, FullUrl, Bundle, CallbackArgs);
                 yield break;
             }
             else
@@ -85,6 +92,9 @@ public class CAssetBundleLoader
                     CBase.LogError("WWW.assetBundle is NULL: {0}", FullUrl);
 
                 loadCache.Ab = parser.Bundle;
+
+                // 释放WWW加载的字节。。释放该部分内存，因为AssetBundle已经自己有缓存了
+                wwwLoader.Dispose();
             }
 
 
@@ -105,7 +115,7 @@ public class CAssetBundleLoader
         Bundle = loadCache.Ab;
 
         if (Callback != null)
-            Callback(FullUrl, Bundle, CallbackArgs);
+            Callback(true, FullUrl, Bundle, CallbackArgs);
     }
 
     /// 舊的tips~忽略

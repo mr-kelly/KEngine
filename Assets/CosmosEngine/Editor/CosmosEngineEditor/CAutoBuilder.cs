@@ -217,6 +217,7 @@ public static class CAutoBuilder
     {
         PlayerPrefs.DeleteAll();
         PlayerPrefs.Save();
+        CBuildTools.ShowDialog("Prefs Cleared!");
     }
 
 }
