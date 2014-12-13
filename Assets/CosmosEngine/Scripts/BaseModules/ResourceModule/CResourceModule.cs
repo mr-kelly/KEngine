@@ -48,8 +48,8 @@ public class CResourceModule : MonoBehaviour, ICModule
             return _Instance;
         }
     }
-    public const bool LoadByQueue = false;
-    public const int LogLevel = (int)LoadingLogLevel.None;
+    public static bool LoadByQueue = false;
+    public static int LogLevel = (int)LoadingLogLevel.None;
     public static string BuildPlatformName;
     public static string ResourcesPath;
     public static string ResourcesPathWithOutFileProtocol;
