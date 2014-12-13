@@ -16,7 +16,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
-public abstract class AutoBuildBase
+public abstract class CBuild_Base
 {
 	public virtual void BeginExport() { }
     public abstract void Export(string path);
@@ -29,7 +29,7 @@ public abstract class AutoBuildBase
 
 public partial class CAutoResourceBuilder
 {
-    public static void ProductExport(AutoBuildBase export)
+    public static void ProductExport(CBuild_Base export)
     {
         string ext = export.GetExtention();
         string[] itemArray;

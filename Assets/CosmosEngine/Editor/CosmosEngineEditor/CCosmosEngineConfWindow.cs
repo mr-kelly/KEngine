@@ -74,7 +74,7 @@ public class CCosmosEngineWindow : EditorWindow
             }
             confFile.Save(ConfFilePath);
 
-            CBase.Log("新建CosmosEngine配置文件: {0}", ConfFilePath);
+            CDebug.Log("新建CosmosEngine配置文件: {0}", ConfFilePath);
             AssetDatabase.Refresh();
         }
 

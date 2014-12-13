@@ -26,19 +26,19 @@ public class CMyGame : MonoBehaviour
             null);
 
         
-        CUIManager.Instance.OpenWindow<CUIDemoHome>();
+        CUIModule.Instance.OpenWindow<CUIDemoHome>();
     }
 
     void OnGameSettingsInit()
     {
         CGameSettings _ = CGameSettings.Instance;
 
-        CBase.Log("Begin Load tab file...");
-        _.LoadTab<CTestTabInfo>("setting/test_tab.bytes");
-        CBase.Log("Output the tab file...");
+        CDebug.Log("Begin Load tab file...");
+        _.LoadTab<CTestTabInfo>(false, new string[] {"setting/test_tab.bytes"});
+        CDebug.Log("Output the tab file...");
         foreach (CTestTabInfo info in _.GetInfos<CTestTabInfo>())
         {
-            CBase.Log("Id:{0}, Name: {1}", info.Id, info.Name);
+            CDebug.Log("Id:{0}, Name: {1}", info.Id, info.Name);
         }
 
     }

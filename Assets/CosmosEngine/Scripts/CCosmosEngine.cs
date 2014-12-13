@@ -28,7 +28,7 @@ public class CCosmosEngine : MonoBehaviour
     /// </summary>
     public static bool IsRootUser;  // 是否越狱iOS
 
-    static CCosmosEngine EngineInstance;
+    public static CCosmosEngine EngineInstance { get; private set; }
 
     /// <summary>
     /// Read Tab file (CEngineConfig.txt), cache to here
@@ -54,7 +54,7 @@ public class CCosmosEngine : MonoBehaviour
     /// </summary>
     public static CCosmosEngine New(GameObject gameObjectToAttach, ICModule[] modules, CoroutineDelegate before, CoroutineDelegate after)
     {
-        CBase.Assert(gameObjectToAttach != null && modules != null);
+        CDebug.Assert(gameObjectToAttach != null && modules != null);
         CCosmosEngine engine = gameObjectToAttach.AddComponent<CCosmosEngine>();
         engine.GameModules = modules;
         engine.BeforeInitModules = before;
@@ -66,7 +66,7 @@ public class CCosmosEngine : MonoBehaviour
     {
         if (EngineInstance != null)
         {
-            CBase.LogError("Duplicated Instance CCosmosEngine!!!");
+            CDebug.LogError("Duplicated Instance CCosmosEngine!!!");
         }
 
         EngineInstance = this;
@@ -85,16 +85,16 @@ public class CCosmosEngine : MonoBehaviour
 
         if (Debug.isDebugBuild)
         {
-            CBase.Log("====================================================================================");
-            CBase.Log("Application.platform = {0}", Application.platform);
-            CBase.Log("Application.dataPath = {0} , WritePermission: {1}", Application.dataPath, IsRootUser);
-            CBase.Log("Application.streamingAssetsPath = {0} , WritePermission: {1}", Application.streamingAssetsPath, CTool.HasWriteAccessToFolder(Application.streamingAssetsPath));
-            CBase.Log("Application.persistentDataPath = {0} , WritePermission: {1}", Application.persistentDataPath, CTool.HasWriteAccessToFolder(Application.persistentDataPath));
-            CBase.Log("Application.temporaryCachePath = {0} , WritePermission: {1}", Application.temporaryCachePath, CTool.HasWriteAccessToFolder(Application.temporaryCachePath));
-            CBase.Log("Application.unityVersion = {0}", Application.unityVersion);
-            CBase.Log("SystemInfo.deviceModel = {0}", SystemInfo.deviceModel);
-            CBase.Log("SystemInfo.deviceUniqueIdentifier = {0}", SystemInfo.deviceUniqueIdentifier);
-            CBase.Log("====================================================================================");
+            CDebug.Log("====================================================================================");
+            CDebug.Log("Application.platform = {0}", Application.platform);
+            CDebug.Log("Application.dataPath = {0} , WritePermission: {1}", Application.dataPath, IsRootUser);
+            CDebug.Log("Application.streamingAssetsPath = {0} , WritePermission: {1}", Application.streamingAssetsPath, CTool.HasWriteAccessToFolder(Application.streamingAssetsPath));
+            CDebug.Log("Application.persistentDataPath = {0} , WritePermission: {1}", Application.persistentDataPath, CTool.HasWriteAccessToFolder(Application.persistentDataPath));
+            CDebug.Log("Application.temporaryCachePath = {0} , WritePermission: {1}", Application.temporaryCachePath, CTool.HasWriteAccessToFolder(Application.temporaryCachePath));
+            CDebug.Log("Application.unityVersion = {0}", Application.unityVersion);
+            CDebug.Log("SystemInfo.deviceModel = {0}", SystemInfo.deviceModel);
+            CDebug.Log("SystemInfo.deviceUniqueIdentifier = {0}", SystemInfo.deviceUniqueIdentifier);
+            CDebug.Log("====================================================================================");
         }
         StartCoroutine(DoInit());
     }
@@ -105,18 +105,18 @@ public class CCosmosEngine : MonoBehaviour
     IEnumerator DoInit()
     {
         ICModule[] baseModules = new ICModule[] {  // 基础三件套
-            CResourceManager.Instance, 
-            CUIManager.Instance, 
+            CResourceModule.Instance, 
+            CUIModule.Instance, 
         };
         foreach (ICModule mod in baseModules)
         {
             float startInitTime = Time.time;
             yield return StartCoroutine(mod.Init());
             if (Debug.isDebugBuild)
-                CBase.Log("Init Module: #{0}# Time:{1}", mod.GetType().FullName, Time.time - startInitTime);
+                CDebug.Log("Init Module: #{0}# Time:{1}", mod.GetType().FullName, Time.time - startInitTime);
         }
 
-        CBase.Log("Finish Init ResourceManager + UIManager!");
+        CDebug.Log("Finish Init ResourceManager + UIManager!");
 
         if (BeforeInitModules != null)
             yield return StartCoroutine(BeforeInitModules());
@@ -134,7 +134,7 @@ public class CCosmosEngine : MonoBehaviour
             float startInitTime = Time.time;
             yield return StartCoroutine(initModule.Init());
             if (Debug.isDebugBuild)
-                CBase.Log("Init Module: #{0}# Time:{1}", initModule.GetType().FullName, Time.time - startInitTime);
+                CDebug.Log("Init Module: #{0}# Time:{1}", initModule.GetType().FullName, Time.time - startInitTime);
         }
 
     }
@@ -158,7 +158,7 @@ public class CCosmosEngine : MonoBehaviour
             TextAsset textAsset;
             textAsset = Resources.Load<TextAsset>("CEngineConfig");
 
-            CBase.Assert(textAsset);
+            CDebug.Assert(textAsset);
 
             using (CTabFile configTab = CTabFile.LoadFromString(textAsset.text))
             {
@@ -183,7 +183,7 @@ public class CCosmosEngine : MonoBehaviour
         string getValue;
         if (!ConfigMap.TryGetValue(key, out getValue))
         {
-            CBase.LogError("Cannot get CosmosConfig: {0}", key);
+            CDebug.LogError("Cannot get CosmosConfig: {0}", key);
         }
         return getValue;
     }

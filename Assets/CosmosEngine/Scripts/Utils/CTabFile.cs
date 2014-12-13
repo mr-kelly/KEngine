@@ -20,7 +20,7 @@ public class CTabFileDef
     public static char[] Separators = new char[] { '\t' };
 }
 
-public class CTabFile : IEnumerable, IDisposable, ICTabReadble
+public class CTabFile : IDisposable, ICTabReadble, IEnumerable<CTabFile.CTabRow>
 {
     CTabRow tabRowCache;
     public CTabFile()
@@ -54,21 +54,23 @@ public class CTabFile : IEnumerable, IDisposable, ICTabReadble
 
     public bool LoadByIO(string fileName)
     {
-        FileStream fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);  // 不会锁死, 允许其它程序打开
-
-        StreamReader oReader;
-        try
+        using (FileStream fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            // 不会锁死, 允许其它程序打开
         {
-            oReader = new StreamReader(fileStream, System.Text.Encoding.UTF8);
-        }
-        catch
-        {
-            return false;
+
+            StreamReader oReader;
+            try
+            {
+                oReader = new StreamReader(fileStream, System.Text.Encoding.UTF8);
+            }
+            catch
+            {
+                return false;
+            }
+
+            ParseReader(oReader);
         }
 
-        ParseReader(oReader);
-
-        oReader.Close();
         return true;
     }
 
@@ -378,6 +380,16 @@ public class CTabFile : IEnumerable, IDisposable, ICTabReadble
             return false;
 
         return SetValue(row, column, value);
+    }
+
+    IEnumerator<CTabRow> IEnumerable<CTabRow>.GetEnumerator()
+    {
+        int rowStart = 1;
+        for (int i = rowStart; i < GetHeight(); i++)
+        {
+            tabRowCache.Row = i;
+            yield return tabRowCache;
+        }
     }
 
     public IEnumerator GetEnumerator()

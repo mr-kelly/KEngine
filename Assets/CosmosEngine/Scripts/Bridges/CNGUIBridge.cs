@@ -44,7 +44,7 @@ public class CNGUIBridge : ICUIBridge
         if (comName == "Camera")
             return UiCamera;
 
-        CBase.Assert(false);
+        CDebug.Assert(false);
         return null;
     }
 
@@ -52,7 +52,7 @@ public class CNGUIBridge : ICUIBridge
     {
         GameObject uiRootobj = new GameObject("UIRoot");
         UiRoot = uiRootobj.AddComponent<UIRoot>();
-        CBase.Assert(UiRoot);
+        CDebug.Assert(UiRoot);
         UiRoot.scalingStyle = UIRoot.Scaling.ConstrainedOnMobiles;
         UiRoot.manualHeight = 1920;
         UiRoot.manualWidth = 1080;
@@ -62,7 +62,8 @@ public class CNGUIBridge : ICUIBridge
 
         Transform panelTrans = panelRootObj.transform;
         PanelRoot = panelRootObj.AddComponent<UIPanel>();
-        CBase.Assert(PanelRoot);
+        CDebug.Assert(PanelRoot);
+        PanelRoot.generateNormals = true;
 
         GameObject uiCamObj = new GameObject("UICamera");
         CTool.SetChild(uiCamObj.transform, UiRoot.transform);

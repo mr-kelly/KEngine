@@ -11,6 +11,7 @@
 using UnityEngine;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
 
 /// <summary>
@@ -35,6 +36,10 @@ public static class CExtensions
 	{
 		t.position = new Vector3(t.position.x, t.position.y, newZ);
 	}
+    public static void SetLocalPositionZ(this Transform t, float newZ)
+    {
+        t.localPosition = new Vector3(t.localPosition.x, t.localPosition.y, newZ);
+    }
 
 	public static float GetPositionX(this Transform t)
 	{
@@ -73,7 +78,7 @@ public static class CExtensions
 
 	public static int ToInt32(this string val)
 	{
-		return Convert.ToInt32(Convert.ToSingle(val));
+		return Convert.ToInt32(val);
 	}
 
 	public static float ToFloat(this string val)
@@ -82,22 +87,33 @@ public static class CExtensions
 		return Convert.ToSingle(val);
 	}
 
-#if GAME_CLIENT
-    public static object Get<T>(this SimpleJson.JsonObject jsonObj, string key)
+    /// <summary>
+    /// Get from object Array
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="openArgs"></param>
+    /// <param name="offset"></param>
+    /// <param name="isLog"></param>
+    /// <returns></returns>
+    public static T Get<T>(this object[] openArgs, int offset, bool isLog = true)
     {
-        object retObj;
-        if (jsonObj.TryGetValue(key, out retObj))
+        T ret;
+        if ((openArgs.Length - 1) >= offset)
         {
-            if (retObj == null)
-            {
-                return default(T);
-            }
-            return retObj;
+            var arrElement = openArgs[offset];
+            if (arrElement == null)
+                ret = default(T);
+            else
+                ret = (T)Convert.ChangeType(arrElement, typeof(T));
         }
         else
         {
-            return default(T);
+            ret = default(T);
+            if (isLog)
+                CDebug.LogError("[GetArg] {0} args - offset: {1}", openArgs, offset);
         }
+
+        return ret;
     }
-#endif
+
 }

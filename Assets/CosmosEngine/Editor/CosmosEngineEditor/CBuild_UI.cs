@@ -17,14 +17,17 @@ using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 
-public partial class CBuild_UI : AutoBuildBase
+public partial class CBuild_UI : CBuild_Base
 {
     string UIName;
-    UIPanel PanelRoot;
+    //UIPanel PanelRoot;
     GameObject AnchorObject;
     GameObject WindowObject;
     GameObject TempPanelObject;
     string UIScenePath;
+
+    // 判断本次是否全局打包，是否剔除没用的UIlabel string
+    public bool IsBuildAll = false; 
 
     public override string GetDirectory() { return "UI"; }
     public override string GetExtention() { return "*.unity"; }
@@ -33,7 +36,6 @@ public partial class CBuild_UI : AutoBuildBase
     public static event Action<CBuild_UI, string, string, GameObject> ExportCurrentUIEvent;
     public static event Action ExportUIMenuEvent;
     public static event Action<CBuild_UI> EndExportEvent;
-
 
     public static string GetBuildRelPath(string uiName)
     {
@@ -118,7 +120,7 @@ public partial class CBuild_UI : AutoBuildBase
 
     public bool CheckUI(bool showMsg)
     {
-        PanelRoot = GameObject.Find("UIRoot/PanelRoot").GetComponent<UIPanel>();
+        //PanelRoot = GameObject.Find("UIRoot/PanelRoot").GetComponent<UIPanel>();
         AnchorObject = (GameObject)GameObject.Find("UIRoot/PanelRoot/Anchor");
 
         if (AnchorObject == null)
@@ -230,6 +232,7 @@ public partial class CBuild_UI : AutoBuildBase
             ExportUIMenuEvent();
         
         CBuild_UI uiBuild = new CBuild_UI();
+        uiBuild.IsBuildAll = false;
         if (!uiBuild.CheckUI(true))
             return;
 
@@ -244,7 +247,9 @@ public partial class CBuild_UI : AutoBuildBase
     [MenuItem("CosmosEngine/UI/Export All UI")]
     public static void ExportAllUI()
     {
-        CAutoResourceBuilder.ProductExport(new CBuild_UI());
+        var buildUI = new CBuild_UI();
+        buildUI.IsBuildAll = true;
+        CAutoResourceBuilder.ProductExport(buildUI);
     } 
 
 }

@@ -74,7 +74,7 @@ public class CBehaviour : MonoBehaviour
     void OnApplicationQuit()
     {
         if (!_IsApplicationQuited)
-            CBase.Log("OnApplicationQuit!");
+            CDebug.Log("OnApplicationQuit!");
 
         _IsApplicationQuited = true;
 

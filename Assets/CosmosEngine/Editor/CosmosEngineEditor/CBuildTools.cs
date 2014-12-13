@@ -63,7 +63,7 @@ public partial class CBuildTools
 			case BuildTarget.Android:
 			case BuildTarget.iPhone:
 			case BuildTarget.StandaloneWindows:
-                path = basePath + CResourceManager.GetBuildPlatformName() + "/";
+                path = basePath + CResourceModule.GetBuildPlatformName() + "/";
 				break;
 			default:
 				CBuildTools.ShowDialog("构建平台配置错误");
@@ -137,7 +137,7 @@ public partial class CBuildTools
 
 	    if (asset is Texture)
 	    {
-	        asset = asset; // Texutre不复制拷贝一份
+            //asset = asset; // Texutre不复制拷贝一份
 	    }
 		else if ((prefabType == PrefabType.None && AssetDatabase.GetAssetPath(asset) == string.Empty) ||
 			(prefabType == PrefabType.ModelPrefabInstance))
@@ -169,7 +169,7 @@ public partial class CBuildTools
 			AssetDatabase.DeleteAsset(tmpPrefabPath);
 		}
 
-		CBase.Log("生成文件： {0}", path);
+		CDebug.Log("生成文件： {0}", path);
 
         if (AfterBuildAssetBundleEvent != null)
             AfterBuildAssetBundleEvent(asset, path, relativePath);

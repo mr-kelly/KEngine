@@ -31,6 +31,15 @@ public class CTool
 
     static Dictionary<string, Shader> CacheShaders = new Dictionary<string, Shader>(); // Shader.Find是一个非常消耗的函数，因此尽量缓存起来
 
+    /// <summary>
+    /// Whether In Wifi or Cable Network
+    /// </summary>
+    /// <returns></returns>
+    public static bool IsWifi()
+    {
+        return Application.internetReachability == NetworkReachability.ReachableViaLocalAreaNetwork;
+    }
+
     // 需要StartCoroutine
     public static IEnumerator TimeCallback(float time, Action callback)
     {
@@ -50,11 +59,11 @@ public class CTool
     /// <summary>
     /// A:1|B:2|C:3这类字符串转成字典
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <typeparam name="K"></typeparam>
-    /// <param name="str"></param>
-    /// <param name="delimeter1">分隔符</param>
-    /// <param name="delimeter2"></param>
+    /// <typeparam name="T">string</typeparam>
+    /// <typeparam name="K">string</typeparam>
+    /// <param name="str">原始字符串</param>
+    /// <param name="delimeter1">分隔符1</param>
+    /// <param name="delimeter2">分隔符2</param>
     /// <returns></returns>
     public static Dictionary<T, K> SplitToDict<T, K>(string str, char delimeter1 = '|', char delimeter2 = ':')
     {
@@ -68,12 +77,19 @@ public class CTool
                 if (!string.IsNullOrEmpty(trimS))
                 {
                     string[] strs2 = trimS.Split(delimeter2);
+                    K val2 = default(K);
+                    T val1 = default(T);
+                    if (strs2.Length > 0)
+                    {
+                        val1 = (T)Convert.ChangeType(strs2[0], typeof(T));
+                    }
                     if (strs2.Length == 2)
                     {
-                        T val1 = (T) Convert.ChangeType(strs2[0], typeof (T));
-                        K val2 = (K) Convert.ChangeType(strs2[1], typeof (K));
-                        dict[val1] = val2;
+                        
+                        val2 = (K)Convert.ChangeType(strs2[1], typeof(K));
+                        
                     }
+                    dict[val1] = val2;
                 }
             }
         }
@@ -120,7 +136,7 @@ public class CTool
             shader = Shader.Find(shaderName);
             CacheShaders[shaderName] = shader;
             if (shader == null)
-                CBase.LogError("缺少Shader：{0}  ， 检查Graphics Settings的预置shader", shaderName);
+                CDebug.LogError("缺少Shader：{0}  ， 检查Graphics Settings的预置shader", shaderName);
         }
 
         return shader;
@@ -194,8 +210,8 @@ public class CTool
                     convertedObj = BitConverter.ToUInt64(bytes, offset);
                     break;
                 default:
-                    CBase.LogError("Unsupport Type {0} in StrBytesToArray(), You can custom this.", typeCode);
-                    CBase.Assert(false);
+                    CDebug.LogError("Unsupport Type {0} in StrBytesToArray(), You can custom this.", typeCode);
+                    CDebug.Assert(false);
                     break;
             }
 
@@ -257,6 +273,11 @@ public class CTool
         return span.Days;
     }
 
+    public static DateTime GetDateTimeFromUTC(long utcTime)
+    {
+        DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+        return origin.AddMilliseconds(utcTime);
+    }
     public static DateTime GetDateTime(double unixTimeStamp)
     {
         DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
@@ -331,7 +352,7 @@ public class CTool
         double s = (UnityEngine.Time.realtimeSinceStartup - RecordTime[RecordPos]);
         if (printLog)
         {
-            CBase.Log("[RecordTime] {0} use {1}s", RecordKey[RecordPos], s);
+            CDebug.Log("[RecordTime] {0} use {1}s", RecordKey[RecordPos], s);
         }
         return string.Format("[RecordTime] {0} use {1}s.", RecordKey[RecordPos], s);
     }
@@ -358,7 +379,7 @@ public class CTool
         double millseconds = timespan.TotalMilliseconds;
         decimal seconds = (decimal)millseconds / 1000m;
 
-        CBase.LogWarning(outputStr, seconds.ToString("F7")); // 7位精度
+        CDebug.LogWarning(outputStr, seconds.ToString("F7")); // 7位精度
     }
 
     // 仅用于捕获
@@ -382,6 +403,34 @@ public class CTool
 
         return result;
     }
+    /// <summary>
+    /// 模板获取
+    /// </summary>
+    /// <param name="source">模板内容</param>
+    /// <param name="data">数据来源</param>
+    /// <returns></returns>
+    public static string Template(string source, object data)
+    {
+        var result = source;
+        var regex = new Regex(@"\{.+?\}");
+        var matches = regex.Matches(source);
+        foreach (Match match in matches)
+        {
+            var paramRex = match.Value;
+            var paramKey = paramRex.Substring(1, paramRex.Length - 2).Trim(); // 截头截尾
+            try
+            {
+                var paramValue = data.GetType().GetField(paramKey).GetValue(data).ToString();
+                result = result.Replace(paramRex, paramValue);
+            }
+            catch (Exception)
+            {
+                CDebug.LogError("not find field \"{0}\" for {1}", paramKey, data.GetType());
+            }
+        }
+
+        return result;
+    }
 
     /// <summary>
     /// Recursively set the game object's layer.
@@ -399,20 +448,43 @@ public class CTool
         }
     }
 
-    public static void SetChild(GameObject child, GameObject parent)
+    /// <summary>
+    /// 传入uri寻找指定控件
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="findTrans"></param>
+    /// <param name="uri"></param>
+    /// <param name="isLog"></param>
+    /// <returns></returns>
+    public static T GetChildComponent<T>(Transform findTrans, string uri, bool isLog = true) where T : Component
     {
-        SetChild(child.transform, parent.transform);
+        Transform trans = findTrans.Find(uri);
+        if (trans == null)
+        {
+            if (isLog)
+                CDebug.LogError("Get Child Error: " + uri);
+            return default(T);
+        }
+
+        return (T)trans.GetComponent(typeof(T));
     }
-    public static void SetChild(Transform child, Transform parent)
+
+    public static void SetChild(GameObject child, GameObject parent, bool ignoreRotation = false, bool ignoreScale = false)
+    {
+        SetChild(child.transform, parent.transform, ignoreRotation, ignoreScale);
+    }
+    public static void SetChild(Transform child, Transform parent, bool ignoreRotation = false, bool ignoreScale = false)
     {
         child.parent = parent;
-        ResetTransform(child);
+        ResetTransform(child, ignoreRotation, ignoreScale);
     }
-    public static void ResetTransform(UnityEngine.Transform transform)
+    public static void ResetTransform(UnityEngine.Transform transform, bool ignoreRotation = false, bool ignoreScale = false)
     {
         transform.localPosition = UnityEngine.Vector3.zero;
-        transform.localScale = UnityEngine.Vector3.one;
-        transform.localEulerAngles = UnityEngine.Vector3.zero;
+        if (!ignoreScale)
+            transform.localScale = UnityEngine.Vector3.one;
+        if (!ignoreRotation)
+            transform.localEulerAngles = UnityEngine.Vector3.zero;
     }
 
     // 获取指定流的MD5
@@ -479,8 +551,9 @@ public class CTool
 
     public static void ResetUITween(UnityEngine.GameObject gameObj)
     {
+        gameObj.SetActive(true);
         // 重置出现 移动动画
-        foreach (UITweener tween in gameObj.GetComponentsInChildren<UITweener>())
+        foreach (UITweener tween in gameObj.GetComponentsInChildren<UITweener>(true))
         {
             tween.ResetToBeginning();
             tween.PlayForward();
@@ -506,24 +579,29 @@ public class CTool
     }
 
     //设置粒子系统的RenderQueue
-    public static void SetParticleSystemRenderQueue(Transform parent,int renderQueue=30001)
+    public static void SetParticleSystemRenderQueue(Transform parent, int renderQueue = 3900)
     {
         int childCount = parent.childCount;
         for (int i = 0; i < childCount; i++)
         {
-            Transform child= parent.GetChild(i);
-            if(child.childCount>0)
-                SetParticleSystemRenderQueue(child,renderQueue);
+            Transform child = parent.GetChild(i);
+            if (child.childCount > 0)
+                SetParticleSystemRenderQueue(child, renderQueue);
             if (child.GetComponent<ParticleSystem>() != null)
             {
                 var particleSystem = child.GetComponent<ParticleSystem>();
                 particleSystem.renderer.material.renderQueue = renderQueue;
             }
         }
+        if (parent.GetComponent<ParticleSystem>() != null)
+        {
+            var particleSystem = parent.GetComponent<ParticleSystem>();
+            particleSystem.renderer.material.renderQueue = renderQueue;
+        }
     }
     public static void MoveAllCollidersToGameObject(GameObject srcGameObject, GameObject targetGameObject)
     {
-        CBase.Assert(srcGameObject != targetGameObject);
+        CDebug.Assert(srcGameObject != targetGameObject);
         foreach (Collider collider2d in srcGameObject.GetComponentsInChildren<Collider>())
         {
             CopyColliderToGameObject(collider2d, targetGameObject);
@@ -713,52 +791,92 @@ public class CTool
         return true;
     }
 
-	/// <summary>
-	/// 呈弧形，传入一个参考点根据角度和半径计算出其它位置的坐标
-	/// </summary>
-	/// <param name="nNum">需要的数量</param>
-	/// <param name="pAnchorPos">锚定点/参考点</param>
-	/// <param name="nAngle">角度</param>
-	/// <param name="nRadius">半径</param>
-	/// <returns></returns>
-	public static Vector3[] GetSmartNpcPoints(int nNum, Vector3 pAnchorPos, int nAngle, float nRadius)
-	{
-		bool bPlural = nNum % 2 == 0 ? true : false; // 是否复数模式
-		Vector3 vDir = Vector3.down.normalized;
-		int nMidNum = bPlural ? nNum / 2 : nNum / 2 + 1; // 中间数, 循环过了中间数后，另一个方向起排布
-		Vector3 vRPos = vDir * nRadius; //// 计算直线在圆形上的顶点 半径是表现距离
-		Vector3[] targetPos = new Vector3[nNum];
-		for (int i = 1; i <= nNum; i++)
-		{
-			int nAddAngle = 0;
+    /// <summary>
+    /// 呈弧形，传入一个参考点根据角度和半径计算出其它位置的坐标
+    /// </summary>
+    /// <param name="nNum">需要的数量</param>
+    /// <param name="pAnchorPos">锚定点/参考点</param>
+    /// <param name="nAngle">角度</param>
+    /// <param name="nRadius">半径</param>
+    /// <returns></returns>
+    public static Vector3[] GetSmartNpcPoints(Vector3 startDirection, int nNum, Vector3 pAnchorPos, int nAngle, float nRadius)
+    {
+        bool bPlural = nNum % 2 == 0 ? true : false; // 是否复数模式
+        Vector3 vDir = startDirection;
+        int nMidNum = bPlural ? nNum / 2 : nNum / 2 + 1; // 中间数, 循环过了中间数后，另一个方向起排布
+        Vector3 vRPos = vDir * nRadius; //// 计算直线在圆形上的顶点 半径是表现距离
+        Vector3[] targetPos = new Vector3[nNum];
+        for (int i = 1; i <= nNum; i++)
+        {
+            int nAddAngle = 0;
 
-			if (bPlural) // 复数模式
-			{
-				if (i > nMidNum)
-					nAddAngle = nAngle * ((i % nMidNum) + 1) - nAngle / 2;
-				else
-					nAddAngle = -nAngle * ((i % nMidNum) + 1) + nAngle / 2; // 除以2，是为了顶端NPC均匀排布 by KK
-			}
-			else // 单数模式
-			{
-				// 判断是否过了中间数
-				if (i > nMidNum)
-				{
-					nAddAngle = nAngle * ((i % nMidNum) + 1); // 添加NPC的角度
-				}
-				else if (i < nMidNum) // 非复数模式， 中间数NPC 放在正方向
-				{
-					nAddAngle = -nAngle * ((i % nMidNum) + 1); // 反方向角度
-				}
-				else
-					nAddAngle = 0; // 正方向
-			}
+            if (bPlural) // 复数模式
+            {
+                if (i > nMidNum)
+                    nAddAngle = nAngle * ((i % nMidNum) + 1) - nAngle / 2;
+                else
+                    nAddAngle = -nAngle * ((i % nMidNum) + 1) + nAngle / 2; // 除以2，是为了顶端NPC均匀排布 by KK
+            }
+            else // 单数模式
+            {
+                // 判断是否过了中间数
+                if (i > nMidNum)
+                {
+                    nAddAngle = nAngle * ((i % nMidNum) + 1); // 添加NPC的角度
+                }
+                else if (i < nMidNum) // 非复数模式， 中间数NPC 放在正方向
+                {
+                    nAddAngle = -nAngle * ((i % nMidNum) + 1); // 反方向角度
+                }
+                else
+                    nAddAngle = 0; // 正方向
+            }
 
-			Vector3 vTargetPos = pAnchorPos + Quaternion.AngleAxis(nAddAngle, Vector3.forward) * vRPos;
-			targetPos[i - 1] = vTargetPos;
-		}
-		return targetPos;
-	}
+            Vector3 vTargetPos = pAnchorPos + Quaternion.AngleAxis(nAddAngle, Vector3.forward) * vRPos;
+            targetPos[i - 1] = vTargetPos;
+        }
+        return targetPos;
+    }
+
+    /// 返回localPoint
+    public static Vector3[] GetParallelPoints(Vector3 startPos, Vector3 startDirection, int nNum, float meterInterval)
+    {
+        bool bPlural = nNum % 2 == 0 ? true : false; // 是否复数模式
+        int nMidNum = bPlural ? nNum / 2 : nNum / 2 + 1; // 中间数, 循环过了中间数后，另一个方向起排布
+        Vector3[] targetPos = new Vector3[nNum];
+        for (int i = 1; i <= nNum; i++)
+        {
+            float fAddInterval = 0;
+
+            if (bPlural) // 复数模式
+            {
+                if (i > nMidNum)
+                    fAddInterval = meterInterval * ((i % nMidNum) + 1) - meterInterval / 2;
+                else
+                    fAddInterval = -meterInterval * ((i % nMidNum) + 1) + meterInterval / 2; // 除以2，是为了顶端NPC均匀排布 by KK
+            }
+            else // 单数模式
+            {
+                // 判断是否过了中间数
+                if (i > nMidNum)
+                {
+                    fAddInterval = meterInterval * ((i % nMidNum) + 1); // 添加NPC的角度
+                }
+                else if (i < nMidNum) // 非复数模式， 中间数NPC 放在正方向
+                {
+                    fAddInterval = -meterInterval * ((i % nMidNum) + 1); // 反方向角度
+                }
+                else
+                    fAddInterval = 0; // 正方向
+            }
+
+            // 90度旋转求垂直
+            Vector3 vTargetPos = startPos + Quaternion.AngleAxis(90, Vector3.forward) * startDirection * fAddInterval;
+            //Vector3 vTargetPos = direction*fAddInterval;
+            targetPos[i - 1] = vTargetPos;
+        }
+        return targetPos;
+    }
 
 }
 
@@ -793,7 +911,7 @@ public class XMemoryParser<T>
     {
         get
         {
-            CBase.Assert(index < MaxCount);
+            CDebug.Assert(index < MaxCount);
             IntPtr p = (IntPtr)(SourceBytesPtr.ToInt32() + Marshal.SizeOf(typeof(T)) * index);
             return (T)Marshal.PtrToStructure(p, typeof(T));
         }

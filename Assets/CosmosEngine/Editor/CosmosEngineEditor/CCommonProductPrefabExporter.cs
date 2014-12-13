@@ -13,7 +13,7 @@ using UnityEditor;
 using System.Collections;
 using System.IO;
 
-public class CCommonProductPrefabExporter : AutoBuildBase
+public class CCommonProductPrefabExporter : CBuild_Base
 {
     public override string GetDirectory() { return ""; }
     public override string GetExtention() { return "dir"; }
@@ -29,7 +29,7 @@ public class CCommonProductPrefabExporter : AutoBuildBase
         foreach (string file in fileArray)
         {
             string filePath = file.Replace('\\', '/');
-            CBase.Log("Build Func To: " + filePath);
+            CDebug.Log("Build Func To: " + filePath);
         }
     }
 

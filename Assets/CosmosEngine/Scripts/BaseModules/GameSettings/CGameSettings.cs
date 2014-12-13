@@ -15,7 +15,7 @@ using System.Collections.Generic;
 using System.Reflection;
 
 
-[CDependencyClass(typeof(CResourceManager))]
+[CDependencyClass(typeof(CResourceModule))]
 [CDependencyClass(typeof(CSettingManager))]
 public class CGameSettings : ICModule
 {
@@ -28,12 +28,12 @@ public class CGameSettings : ICModule
 
     public Action InitAction; // Init時調用的委託、函數指針
     
-    public static event Action<string, string> FoundDuplicatedIdEvent;
+    public static event Action<string, int, string> FoundDuplicatedIdEvent;
 
     public IEnumerator Init()
     {
         if (this.InitAction == null)
-            CBase.LogError("GameSettings沒有定義初始化行為！！！");
+            CDebug.LogError("GameSettings沒有定義初始化行為！！！");
         else
             this.InitAction();
         yield break;
@@ -43,25 +43,41 @@ public class CGameSettings : ICModule
     {
         yield break;
     }
-
-    public void LoadTab<T>(params string[] tabPaths) where T : CBaseInfo
+    public void LoadTab(Type type, bool lazyLoad, params string[] tabPaths)
     {
-        LazyLoad[typeof(T)] = tabPaths;
+        CDebug.Assert(typeof(CBaseInfo).IsAssignableFrom(type));
+
+        LazyLoad[type] = tabPaths;
+        if (!lazyLoad)
+            EnsureLoad(type);
     }
 
-    private void EnsureLoad<T>() where T : CBaseInfo
+    public void LoadTab<T>(bool lazyLoad, string[] tabPaths) where T : CBaseInfo
     {
-        Type type = typeof (T);
+        LoadTab(typeof (T), lazyLoad, tabPaths);
+    }
+
+    private void EnsureLoad(Type type)
+    {
+        CDebug.Assert(typeof(CBaseInfo).IsAssignableFrom(type));
+
         string[] loadFilePaths;
         if (LazyLoad.TryGetValue(type, out loadFilePaths))
         {
-            DoLoadTab<T>(loadFilePaths);
+            DoLoadTab(type, loadFilePaths);
             LazyLoad.Remove(type);
         }
     }
-
-    private void DoLoadTab<T>(string[] tabPaths) where T : CBaseInfo
+    private void EnsureLoad<T>() where T : CBaseInfo
     {
+        Type type = typeof (T);
+        EnsureLoad(type);
+    }
+
+    private void DoLoadTab(Type type, string[] tabPaths)
+    {
+        CDebug.Assert(typeof(CBaseInfo).IsAssignableFrom(type));
+
         foreach (string tabPath in tabPaths)
         {
 #if GAME_CLIENT
@@ -72,9 +88,9 @@ public class CGameSettings : ICModule
         using (CTabFile tabFile = CTabFile.LoadFromString(System.IO.File.ReadAllText(p1)))
 #endif
             {
-                
+
                 Dictionary<string, CBaseInfo> dict;
-                if (!SettingInfos.TryGetValue(typeof(T), out dict))  // 如果没有才添加
+                if (!SettingInfos.TryGetValue(type, out dict))  // 如果没有才添加
                     dict = new Dictionary<string, CBaseInfo>();
 
                 const int rowStart = 1;
@@ -87,23 +103,28 @@ public class CGameSettings : ICModule
                     if (dict.TryGetValue(id, out existOne))
                     {
                         if (FoundDuplicatedIdEvent != null)
-                            FoundDuplicatedIdEvent(tabPath, id);
+                            FoundDuplicatedIdEvent(tabPath, i, id);
 
                         CBaseInfo existT = existOne;
-                        CBaseInfo.LoadFromTab(typeof (T), ref existT, tabFile, i); // 修改原对象，不new
+                        CBaseInfo.LoadFromTab(type, ref existT, tabFile, i); // 修改原对象，不new
                         (existT as CBaseInfo).Parse();
                     }
                     else
                     {
-                        T pInfo = CBaseInfo.LoadFromTab(typeof (T), tabFile, i) as T;
+                        CBaseInfo pInfo = CBaseInfo.LoadFromTab(type, tabFile, i);
                         pInfo.Parse();
                         dict[pInfo.Id] = pInfo; // 不存在，直接new
                     }
                 }
 
-                SettingInfos[typeof (T)] = dict;
+                SettingInfos[type] = dict;
             }
         }
+    }
+
+    private void DoLoadTab<T>(string[] tabPaths) where T : CBaseInfo
+    {
+        DoLoadTab(typeof (T), tabPaths);
     }
 
     public List<T> GetInfos<T>() where T : CBaseInfo
@@ -113,7 +134,7 @@ public class CGameSettings : ICModule
         Dictionary<string, CBaseInfo> dict;
         if (SettingInfos.TryGetValue(typeof(T), out dict))
         {
-            //CBase.Log(dict.Count+"");
+            //CDebug.Log(dict.Count+"");
             List<T> list = new List<T>();
             foreach (CBaseInfo item in dict.Values)
             {
@@ -122,34 +143,41 @@ public class CGameSettings : ICModule
             return list;
         }
         else
-            CBase.LogError("找不到类型配置{0}, 总类型数{1}", typeof(T).Name, SettingInfos.Count);
+            CDebug.LogError("找不到类型配置{0}, 总类型数{1}", typeof(T).Name, SettingInfos.Count);
 
         return null;
     }
-    public T GetInfo<T>(string id) where T : CBaseInfo
+
+    public T GetInfo<T>(string id, bool printLog = true) where T : CBaseInfo
     {
         EnsureLoad<T>();
 
         Dictionary<string, CBaseInfo> dict;
-        if (SettingInfos.TryGetValue(typeof(T), out dict))
+        if (SettingInfos.TryGetValue(typeof (T), out dict))
         {
             CBaseInfo tabInfo;
             if (dict.TryGetValue(id, out tabInfo))
             {
-                return (T)tabInfo;
+                return (T) tabInfo;
             }
             else
-                CBase.LogError("找不到类型{0} Id为{1}的配置对象, 类型表里共有对象{2}", typeof(T).Name, id, dict.Count);
+            {
+                if (printLog)
+                    CDebug.LogError("找不到类型{0} Id为{1}的配置对象, 类型表里共有对象{2}", typeof (T).Name, id, dict.Count);
+            }
         }
         else
-            CBase.LogError("嘗試Id {0}, 找不到类型配置{1}, 总类型数{2}", id, typeof(T).Name, SettingInfos.Count);
+        {
+            if (printLog)
+                CDebug.LogError("嘗試Id {0}, 找不到类型配置{1}, 总类型数{2}", id, typeof (T).Name, SettingInfos.Count);
+        }
 
         return null;
     }
     // 数字ID是索引
-    public T GetInfo<T>(int id) where T : CBaseInfo
+    public T GetInfo<T>(int id, bool printLog = true) where T : CBaseInfo
     {
-        return GetInfo<T>(id.ToString());
+        return GetInfo<T>(id.ToString(), printLog);
     }
 
 }
@@ -172,14 +200,27 @@ public class CBaseInfo
 
             int tryInt;
             if (!int.TryParse(Id, out tryInt))
-                CBase.LogError("錯誤解析Int Id");
-            
+            {
+                CDebug.LogError("錯誤解析Int Id");
+            }
+
             _CacheIntId = tryInt;
 
             return _CacheIntId.Value;
         }
     }
-    
+
+    /// <summary>
+    /// 清理一些缓存起来的运算配置
+    /// </summary>
+    public virtual void ClearCache()
+    {
+        _CacheIntId = null;
+    }
+
+    /// <summary>
+    /// 某些值的特殊解析
+    /// </summary>
     public virtual void Parse()
     {
 
@@ -187,14 +228,14 @@ public class CBaseInfo
 
     public static void LoadFromTab(Type type, ref CBaseInfo newT, ICTabReadble tabFile, int row)
     {
-        CBase.Assert(typeof(CBaseInfo).IsAssignableFrom(type));
+        CDebug.Assert(typeof(CBaseInfo).IsAssignableFrom(type));
 
         FieldInfo[] fields = type.GetFields();
         foreach (FieldInfo field in fields)
         {
             if (!tabFile.HasColumn(field.Name))
             {
-                CBase.LogError("表{0} 找不到表头{1}", type.Name, field.Name);
+                CDebug.LogError("表{0} 找不到表头{1}", type.Name, field.Name);
                 continue;
             }
             object value;
@@ -294,22 +335,22 @@ public class CBaseInfo
             }
             else
             {
-                CBase.LogWarning("未知类型: {0}", field.Name);
+                CDebug.LogWarning("未知类型: {0}", field.Name);
                 value = null;
             }
 
-            if (field.Name == "Id")  // 如果是Id主键，确保数字成整数！不是浮点数  因为excel转tab可能转成浮点
+            if (field.Name == "Id")  // 如果是Id主键，确保数字成整数！
             {
-                float fValue;
-                if (float.TryParse((string)value, out fValue))
+                int fValue;
+                if (int.TryParse((string)value, out fValue))
                 {
                     try
                     {
-                        value = ((int)fValue).ToString();
+                        value = fValue.ToString();
                     }
                     catch
                     {
-                        CBase.LogError("转型错误...{0}", value.ToString());
+                        CDebug.LogError("转型错误...{0}", value.ToString());
                     }
 
                 }
