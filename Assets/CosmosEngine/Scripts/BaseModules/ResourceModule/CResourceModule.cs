@@ -27,7 +27,7 @@ public class CResourceModule : MonoBehaviour, ICModule
     public delegate void ASyncLoadABAssetDelegate(Object asset, object[] args);
     public enum LoadingLogLevel
     {
-        Quite,
+        None,
         ShowTime,
         ShowDetail,
     }
@@ -48,8 +48,8 @@ public class CResourceModule : MonoBehaviour, ICModule
             return _Instance;
         }
     }
-    public static bool LoadByQueue = false;
-    public static int LogLevel = (int)LoadingLogLevel.Quite;
+    public const bool LoadByQueue = false;
+    public const int LogLevel = (int)LoadingLogLevel.None;
     public static string BuildPlatformName;
     public static string ResourcesPath;
     public static string ResourcesPathWithOutFileProtocol;

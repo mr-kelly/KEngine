@@ -90,7 +90,7 @@ public class CUIModule : ICModule
     // 隐藏时打开，打开时隐藏
     public void ToggleWindow<T>(params object[] args)
     {
-        string uiName = typeof(T).Name.Remove(0, 3); // 去掉"XUI"
+        string uiName = typeof(T).Name.Remove(0, 3); // 去掉"CUI"
         ToggleWindow(uiName, args);
     }
     public void ToggleWindow(string name, params object[] args)
