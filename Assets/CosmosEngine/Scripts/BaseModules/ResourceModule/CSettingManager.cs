@@ -47,7 +47,7 @@ public class CSettingManager : ICModule
                 break;
         }
 
-		CBase.Log("Load setting out of package = {0}", SettingOutPackage.ToString());
+		CDebug.Log("Load setting out of package = {0}", SettingOutPackage.ToString());
 		yield return CResourceModule.Instance.StartCoroutine(InitSetting());
 	}
 
@@ -69,7 +69,7 @@ public class CSettingManager : ICModule
 			GameSettings.Add(gameSetting.SettingFiles[i], gameSetting.SettingContents[i]);
 		}
 
-		CBase.Log("{0} setting files loaded.", GameSettings.Count);
+		CDebug.Log("{0} setting files loaded.", GameSettings.Count);
 
 		Object.Destroy(gameSetting);
 		LoadFinished = true;
@@ -89,7 +89,7 @@ public class CSettingManager : ICModule
 		bool result = GameSettings.TryGetValue(path, out content);
 		if (!result)
 		{
-			CBase.LogError("Setting not fount, {0}", path);
+			CDebug.LogError("Setting not fount, {0}", path);
 			return null;
 		}
 

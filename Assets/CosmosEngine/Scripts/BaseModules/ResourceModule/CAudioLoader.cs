@@ -27,7 +27,7 @@ public class CAudioLoader
             AudioClip clip = obj as AudioClip;
 
             if (clip == null)
-                CBase.LogError("Null Audio Clip!!!: {0}", url);
+                CDebug.LogError("Null Audio Clip!!!: {0}", url);
 
             ResultAudioClip = clip;
 

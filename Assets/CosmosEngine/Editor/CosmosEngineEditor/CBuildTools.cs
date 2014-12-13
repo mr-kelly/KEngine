@@ -169,7 +169,7 @@ public partial class CBuildTools
 			AssetDatabase.DeleteAsset(tmpPrefabPath);
 		}
 
-		CBase.Log("生成文件： {0}", path);
+		CDebug.Log("生成文件： {0}", path);
 
         if (AfterBuildAssetBundleEvent != null)
             AfterBuildAssetBundleEvent(asset, path, relativePath);

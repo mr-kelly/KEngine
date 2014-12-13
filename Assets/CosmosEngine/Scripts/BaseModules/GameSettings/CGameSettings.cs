@@ -33,7 +33,7 @@ public class CGameSettings : ICModule
     public IEnumerator Init()
     {
         if (this.InitAction == null)
-            CBase.LogError("GameSettings沒有定義初始化行為！！！");
+            CDebug.LogError("GameSettings沒有定義初始化行為！！！");
         else
             this.InitAction();
         yield break;
@@ -45,7 +45,7 @@ public class CGameSettings : ICModule
     }
     public void LoadTab(Type type, bool lazyLoad, params string[] tabPaths)
     {
-        CBase.Assert(typeof(CBaseInfo).IsAssignableFrom(type));
+        CDebug.Assert(typeof(CBaseInfo).IsAssignableFrom(type));
 
         LazyLoad[type] = tabPaths;
         if (!lazyLoad)
@@ -59,7 +59,7 @@ public class CGameSettings : ICModule
 
     private void EnsureLoad(Type type)
     {
-        CBase.Assert(typeof(CBaseInfo).IsAssignableFrom(type));
+        CDebug.Assert(typeof(CBaseInfo).IsAssignableFrom(type));
 
         string[] loadFilePaths;
         if (LazyLoad.TryGetValue(type, out loadFilePaths))
@@ -76,7 +76,7 @@ public class CGameSettings : ICModule
 
     private void DoLoadTab(Type type, string[] tabPaths)
     {
-        CBase.Assert(typeof(CBaseInfo).IsAssignableFrom(type));
+        CDebug.Assert(typeof(CBaseInfo).IsAssignableFrom(type));
 
         foreach (string tabPath in tabPaths)
         {
@@ -134,7 +134,7 @@ public class CGameSettings : ICModule
         Dictionary<string, CBaseInfo> dict;
         if (SettingInfos.TryGetValue(typeof(T), out dict))
         {
-            //CBase.Log(dict.Count+"");
+            //CDebug.Log(dict.Count+"");
             List<T> list = new List<T>();
             foreach (CBaseInfo item in dict.Values)
             {
@@ -143,7 +143,7 @@ public class CGameSettings : ICModule
             return list;
         }
         else
-            CBase.LogError("找不到类型配置{0}, 总类型数{1}", typeof(T).Name, SettingInfos.Count);
+            CDebug.LogError("找不到类型配置{0}, 总类型数{1}", typeof(T).Name, SettingInfos.Count);
 
         return null;
     }
@@ -163,13 +163,13 @@ public class CGameSettings : ICModule
             else
             {
                 if (printLog)
-                    CBase.LogError("找不到类型{0} Id为{1}的配置对象, 类型表里共有对象{2}", typeof (T).Name, id, dict.Count);
+                    CDebug.LogError("找不到类型{0} Id为{1}的配置对象, 类型表里共有对象{2}", typeof (T).Name, id, dict.Count);
             }
         }
         else
         {
             if (printLog)
-                CBase.LogError("嘗試Id {0}, 找不到类型配置{1}, 总类型数{2}", id, typeof (T).Name, SettingInfos.Count);
+                CDebug.LogError("嘗試Id {0}, 找不到类型配置{1}, 总类型数{2}", id, typeof (T).Name, SettingInfos.Count);
         }
 
         return null;
@@ -201,7 +201,7 @@ public class CBaseInfo
             int tryInt;
             if (!int.TryParse(Id, out tryInt))
             {
-                CBase.LogError("錯誤解析Int Id");
+                CDebug.LogError("錯誤解析Int Id");
             }
 
             _CacheIntId = tryInt;
@@ -228,14 +228,14 @@ public class CBaseInfo
 
     public static void LoadFromTab(Type type, ref CBaseInfo newT, ICTabReadble tabFile, int row)
     {
-        CBase.Assert(typeof(CBaseInfo).IsAssignableFrom(type));
+        CDebug.Assert(typeof(CBaseInfo).IsAssignableFrom(type));
 
         FieldInfo[] fields = type.GetFields();
         foreach (FieldInfo field in fields)
         {
             if (!tabFile.HasColumn(field.Name))
             {
-                CBase.LogError("表{0} 找不到表头{1}", type.Name, field.Name);
+                CDebug.LogError("表{0} 找不到表头{1}", type.Name, field.Name);
                 continue;
             }
             object value;
@@ -335,7 +335,7 @@ public class CBaseInfo
             }
             else
             {
-                CBase.LogWarning("未知类型: {0}", field.Name);
+                CDebug.LogWarning("未知类型: {0}", field.Name);
                 value = null;
             }
 
@@ -350,7 +350,7 @@ public class CBaseInfo
                     }
                     catch
                     {
-                        CBase.LogError("转型错误...{0}", value.ToString());
+                        CDebug.LogError("转型错误...{0}", value.ToString());
                     }
 
                 }

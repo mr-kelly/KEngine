@@ -96,10 +96,10 @@ public class CWWWLoader : IDisposable
                 if (url.StartsWith(fileProtocol))
                 {
                     string fileRealPath = url.Replace(fileProtocol, "");
-                    CBase.LogError("File {0} Exist State: {1}", fileRealPath, System.IO.File.Exists(fileRealPath));
+                    CDebug.LogError("File {0} Exist State: {1}", fileRealPath, System.IO.File.Exists(fileRealPath));
 
                 }
-                CBase.LogError(www.error + " " + url);
+                CDebug.LogError(www.error + " " + url);
                 if (callback != null)
                     callback(false, null, null); // 失败callback
                 yield break;
@@ -144,6 +144,6 @@ public class CWWWLoader : IDisposable
             Loaded.Remove(WwwCache.Url);
         }
         else
-            CBase.LogError("[CWWWLoader:Release]无缓存的WWW");
+            CDebug.LogError("[CWWWLoader:Release]无缓存的WWW");
     }
 }

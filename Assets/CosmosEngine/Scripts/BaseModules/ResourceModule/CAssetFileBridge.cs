@@ -60,7 +60,7 @@ public class CAssetFileBridge
         UnityEngine.Object asset = Resources.Load<UnityEngine.Object>(path);
         if (asset == null)
         {
-            CBase.LogError("Asset is NULL(from Resources Folder): {0}", path);
+            CDebug.LogError("Asset is NULL(from Resources Folder): {0}", path);
         }
         IsFinished = true;
         IsError = asset == null;
@@ -81,7 +81,7 @@ public class CAssetFileBridge
             }
             catch
             {
-                CBase.LogError("[OnAssetBundleLoaded:mainAsset]{0}", url);
+                CDebug.LogError("[OnAssetBundleLoaded:mainAsset]{0}", url);
             }
         }
         else
@@ -94,7 +94,7 @@ public class CAssetFileBridge
 
         if (asset == null)
         {
-            CBase.LogError("Asset is NULL: {0}", url);
+            CDebug.LogError("Asset is NULL: {0}", url);
         }
 
         IsFinished = true;

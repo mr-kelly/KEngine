@@ -25,7 +25,7 @@ public class CStaticAssetLoader
     public CStaticAssetLoader(string path, CResourceModule.ASyncLoadABAssetDelegate callback = null, params object[] args)
     {
         if (string.IsNullOrEmpty(path))
-            CBase.LogError("XStaticAssetLoader 空资源路径!");
+            CDebug.LogError("XStaticAssetLoader 空资源路径!");
 
         new CAssetFileBridge(path, (_isOk, _obj) =>
         {

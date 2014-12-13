@@ -77,7 +77,7 @@ public class CFiber : MonoBehaviour
         int exeCount= 1;
         int interval = 0;
         
-        CBase.Assert(TimeScale > 0);
+        CDebug.Assert(TimeScale > 0);
 
         if (TimeScale > 1)
             exeCount = Mathf.FloorToInt(TimeScale);

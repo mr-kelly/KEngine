@@ -136,7 +136,7 @@ public class CTool
             shader = Shader.Find(shaderName);
             CacheShaders[shaderName] = shader;
             if (shader == null)
-                CBase.LogError("缺少Shader：{0}  ， 检查Graphics Settings的预置shader", shaderName);
+                CDebug.LogError("缺少Shader：{0}  ， 检查Graphics Settings的预置shader", shaderName);
         }
 
         return shader;
@@ -210,8 +210,8 @@ public class CTool
                     convertedObj = BitConverter.ToUInt64(bytes, offset);
                     break;
                 default:
-                    CBase.LogError("Unsupport Type {0} in StrBytesToArray(), You can custom this.", typeCode);
-                    CBase.Assert(false);
+                    CDebug.LogError("Unsupport Type {0} in StrBytesToArray(), You can custom this.", typeCode);
+                    CDebug.Assert(false);
                     break;
             }
 
@@ -352,7 +352,7 @@ public class CTool
         double s = (UnityEngine.Time.realtimeSinceStartup - RecordTime[RecordPos]);
         if (printLog)
         {
-            CBase.Log("[RecordTime] {0} use {1}s", RecordKey[RecordPos], s);
+            CDebug.Log("[RecordTime] {0} use {1}s", RecordKey[RecordPos], s);
         }
         return string.Format("[RecordTime] {0} use {1}s.", RecordKey[RecordPos], s);
     }
@@ -379,7 +379,7 @@ public class CTool
         double millseconds = timespan.TotalMilliseconds;
         decimal seconds = (decimal)millseconds / 1000m;
 
-        CBase.LogWarning(outputStr, seconds.ToString("F7")); // 7位精度
+        CDebug.LogWarning(outputStr, seconds.ToString("F7")); // 7位精度
     }
 
     // 仅用于捕获
@@ -425,7 +425,7 @@ public class CTool
             }
             catch (Exception)
             {
-                CBase.LogError("not find field \"{0}\" for {1}", paramKey, data.GetType());
+                CDebug.LogError("not find field \"{0}\" for {1}", paramKey, data.GetType());
             }
         }
 
@@ -462,7 +462,7 @@ public class CTool
         if (trans == null)
         {
             if (isLog)
-                CBase.LogError("Get Child Error: " + uri);
+                CDebug.LogError("Get Child Error: " + uri);
             return default(T);
         }
 
@@ -601,7 +601,7 @@ public class CTool
     }
     public static void MoveAllCollidersToGameObject(GameObject srcGameObject, GameObject targetGameObject)
     {
-        CBase.Assert(srcGameObject != targetGameObject);
+        CDebug.Assert(srcGameObject != targetGameObject);
         foreach (Collider collider2d in srcGameObject.GetComponentsInChildren<Collider>())
         {
             CopyColliderToGameObject(collider2d, targetGameObject);
@@ -911,7 +911,7 @@ public class XMemoryParser<T>
     {
         get
         {
-            CBase.Assert(index < MaxCount);
+            CDebug.Assert(index < MaxCount);
             IntPtr p = (IntPtr)(SourceBytesPtr.ToInt32() + Marshal.SizeOf(typeof(T)) * index);
             return (T)Marshal.PtrToStructure(p, typeof(T));
         }

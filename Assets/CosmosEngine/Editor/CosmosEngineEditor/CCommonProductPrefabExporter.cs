@@ -29,7 +29,7 @@ public class CCommonProductPrefabExporter : AutoBuildBase
         foreach (string file in fileArray)
         {
             string filePath = file.Replace('\\', '/');
-            CBase.Log("Build Func To: " + filePath);
+            CDebug.Log("Build Func To: " + filePath);
         }
     }
 

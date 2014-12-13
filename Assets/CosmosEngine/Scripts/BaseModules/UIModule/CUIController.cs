@@ -65,7 +65,7 @@ public abstract class CUIController : MonoBehaviour
         if (trans == null)
         {
             if (isLog)
-                CBase.LogError("Get UI Control Error: " + uri);
+                CDebug.LogError("Get UI Control Error: " + uri);
             return null;
         }
 
@@ -86,7 +86,7 @@ public abstract class CUIController : MonoBehaviour
         GameObject obj = DFSFindObject(transform, name);
         if (obj == null)
         {
-            CBase.LogError("Find UI Control Error: " + name);
+            CDebug.LogError("Find UI Control Error: " + name);
             return null;
         }
 
@@ -98,7 +98,7 @@ public abstract class CUIController : MonoBehaviour
         GameObject obj = DFSFindObject(transform, name);
         if (obj == null)
         {
-            CBase.LogError("Find GemeObject Error: " + name);
+            CDebug.LogError("Find GemeObject Error: " + name);
             return null;
         }
 

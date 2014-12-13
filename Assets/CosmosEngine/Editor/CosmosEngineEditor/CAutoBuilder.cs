@@ -110,7 +110,7 @@ public static class CAutoBuilder
         if (!Directory.Exists(fullDir))
             Directory.CreateDirectory(fullDir);
 
-        CBase.Log("Build Client {0} to: {1}", tag, outputpath);
+        CDebug.Log("Build Client {0} to: {1}", tag, outputpath);
         BuildPipeline.BuildPlayer(GetScenePaths(), fullPath, tag, opt);
     }
 
@@ -162,15 +162,15 @@ public static class CAutoBuilder
             }
 
 
-            CBase.Log("Refresh ProgramVersion.txt!! SVN Version: {0}", nRevision);
+            CDebug.Log("Refresh ProgramVersion.txt!! SVN Version: {0}", nRevision);
         }
         else
-            CBase.LogError("Error Read svn Revision!");
+            CDebug.LogError("Error Read svn Revision!");
 
 
         str = p.StandardError.ReadToEnd();
         if (!string.IsNullOrEmpty(str))
-            CBase.LogError(str);
+            CDebug.LogError(str);
     }
 
     [MenuItem("CosmosEngine/AutoBuilder/WindowsX86D")]  // 注意，PC版本放在不一样的目录的！

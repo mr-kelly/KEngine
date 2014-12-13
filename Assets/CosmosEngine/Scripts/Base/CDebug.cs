@@ -14,7 +14,7 @@ using System.Diagnostics;
 
 /// Frequent Used,
 /// A File logger + Debug Tools
-public class CBase
+public class CDebug
 {
     static bool IsLogFile = true; // 是否輸出到日誌
 
@@ -22,7 +22,7 @@ public class CBase
 
     public static event Action<string> LogErrorEvent;
 
-    static CBase()
+    static CDebug()
     {
         // isDebugBuild先预存起来，因为它是一个get_属性, 在非Unity主线程里不能用，导致多线程网络打印log时报错
         IsDebugBuild = UnityEngine.Debug.isDebugBuild;

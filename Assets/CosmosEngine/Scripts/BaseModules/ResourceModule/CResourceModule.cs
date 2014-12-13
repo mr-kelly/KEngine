@@ -89,7 +89,7 @@ public class CResourceModule : MonoBehaviour, ICModule
     public static bool GetResourceFullPath(string url, out string fullPath)
     {
         if (string.IsNullOrEmpty(url))
-            CBase.LogError("尝试获取一个空的资源路径！");
+            CDebug.LogError("尝试获取一个空的资源路径！");
 
         string docUrl;
         bool hasDocUrl = TryGetDocumentResourceUrl(url, out docUrl);
@@ -102,7 +102,7 @@ public class CResourceModule : MonoBehaviour, ICModule
             if (hasDocUrl)
             {
                 if (Application.isEditor)
-                    CBase.LogWarning("使用外部资源 {0}", docUrl);
+                    CDebug.LogWarning("使用外部资源 {0}", docUrl);
                 fullPath = docUrl;
                 return true;
             }
@@ -111,7 +111,7 @@ public class CResourceModule : MonoBehaviour, ICModule
 
         if (!hasInAppUrl) // 连本地资源都没有，直接失败吧 ？？ 沒有本地資源但又遠程資源？竟然！!?
         {
-            CBase.LogError("找不到InApp的資源: {0}", url);
+            CDebug.LogError("找不到InApp的資源: {0}", url);
             fullPath = null;
             return false;
         }
@@ -146,7 +146,7 @@ public class CResourceModule : MonoBehaviour, ICModule
         // 注意，StreamingAssetsPath在Android平台時，壓縮在apk里面，不要做文件檢查了
         if (Application.platform != RuntimePlatform.Android && !File.Exists(ResourcesPathWithOutFileProtocol + url))
         {
-            CBase.LogError("[GetResourcePath:InAppUrl]Not Exist File: {0}", newUrl);
+            CDebug.LogError("[GetResourcePath:InAppUrl]Not Exist File: {0}", newUrl);
             return false;
         }
 
@@ -167,7 +167,7 @@ public class CResourceModule : MonoBehaviour, ICModule
     void Awake()
     {
         if (_Instance != null)
-            CBase.Assert(_Instance == this);
+            CDebug.Assert(_Instance == this);
     }
 
     public IEnumerator Init()
@@ -296,17 +296,17 @@ public class CResourceModule : MonoBehaviour, ICModule
                 break;
             default:
                 {
-                    CBase.Assert(false);
+                    CDebug.Assert(false);
                 }
                 break;
         }
 
         if (Debug.isDebugBuild)
         {
-            CBase.Log("ResourceManager ApplicationPath: {0}", ApplicationPath);
-            CBase.Log("ResourceManager ResourcesPath: {0}", ResourcesPath);
-            CBase.Log("ResourceManager DocumentResourcesPath: {0}", DocumentResourcesPath);
-            CBase.Log("================================================================================");
+            CDebug.Log("ResourceManager ApplicationPath: {0}", ApplicationPath);
+            CDebug.Log("ResourceManager ResourcesPath: {0}", ResourcesPath);
+            CDebug.Log("ResourceManager DocumentResourcesPath: {0}", DocumentResourcesPath);
+            CDebug.Log("================================================================================");
         }
     }
 
@@ -315,7 +315,7 @@ public class CResourceModule : MonoBehaviour, ICModule
         if (LogLevel < (int)LoadingLogLevel.ShowDetail)
             return;
 
-        CBase.Log("[Request] {0}, {1}", resType, resPath);
+        CDebug.Log("[Request] {0}, {1}", resType, resPath);
     }
 
     public static void LogLoadTime(string resType, string resPath, System.DateTime begin)
@@ -323,7 +323,7 @@ public class CResourceModule : MonoBehaviour, ICModule
         if (LogLevel < (int)LoadingLogLevel.ShowTime)
             return;
 
-        CBase.Log("[Load] {0}, {1}, {2}s", resType, resPath, (System.DateTime.Now - begin).TotalSeconds);
+        CDebug.Log("[Load] {0}, {1}, {2}s", resType, resPath, (System.DateTime.Now - begin).TotalSeconds);
     }
 
     public static void Collect()

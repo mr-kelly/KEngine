@@ -111,7 +111,7 @@ public static class CExtensions
         {
             ret = default(T);
             if (isLog)
-                CBase.LogError("[GetArg] {0} args - offset: {1}", openArgs, offset);
+                CDebug.LogError("[GetArg] {0} args - offset: {1}", openArgs, offset);
         }
 
         return ret;

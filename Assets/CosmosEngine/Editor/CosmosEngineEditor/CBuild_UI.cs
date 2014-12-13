@@ -17,7 +17,7 @@ using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 
-public partial class CBuild_UI : AutoBuildBase
+public partial class CBuild_UI : CBuild_Base
 {
     string UIName;
     //UIPanel PanelRoot;

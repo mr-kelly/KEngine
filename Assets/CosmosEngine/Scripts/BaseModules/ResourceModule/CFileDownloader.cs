@@ -48,7 +48,7 @@ public class CWWWDownloader
         {
             if (WWWLoader.Progress == 0 && Time.time - startTime > TIME_OUT_DEF)
             {
-                CBase.LogError("超時卻無下載 Timeout: {0}", fullUrl);
+                CDebug.LogError("超時卻無下載 Timeout: {0}", fullUrl);
                 break;
             }
 
@@ -56,7 +56,7 @@ public class CWWWDownloader
         }
         if (WWWLoader.IsError || !WWWLoader.IsFinished)
         {
-            CBase.LogError("Download WWW Error: {0}", fullUrl);
+            CDebug.LogError("Download WWW Error: {0}", fullUrl);
             ForceFinished = true;
 	        ForceError = true;
             yield break;

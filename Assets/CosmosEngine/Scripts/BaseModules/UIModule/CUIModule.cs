@@ -47,7 +47,7 @@ public class CUIModule : ICModule
             UiBridge.InitBridge();
         }
         else
-            CBase.Log("No UI Bridge in Use.");
+            CDebug.Log("No UI Bridge in Use.");
         
         yield break;
     }
@@ -188,14 +188,14 @@ public class CUIModule : ICModule
         if (!UIWindows.TryGetValue(name, out uiState))
         {
             if (Debug.isDebugBuild)
-                CBase.LogWarning("[CloseWindow]没有加载的UIWindow: {0}", name);
+                CDebug.LogWarning("[CloseWindow]没有加载的UIWindow: {0}", name);
             return; // 未开始Load
         }
 
         if (uiState.IsLoading)  // Loading中
         {
             if (Debug.isDebugBuild)
-                CBase.Log("[CloseWindow]IsLoading的{0}", name);
+                CDebug.Log("[CloseWindow]IsLoading的{0}", name);
             uiState.OpenWhenFinish = false;
             return;
         }
@@ -294,8 +294,8 @@ public class CUIModule : ICModule
     public CUILoadState LoadWindow(string windowTemplateName, bool openWhenFinish, params object[] args)
     {
         if (UIWindows.ContainsKey(windowTemplateName))
-            CBase.LogError("[LoadWindow]多次重复LoadWindow: {0}", windowTemplateName);
-        CBase.Assert(!UIWindows.ContainsKey(windowTemplateName));
+            CDebug.LogError("[LoadWindow]多次重复LoadWindow: {0}", windowTemplateName);
+        CDebug.Assert(!UIWindows.ContainsKey(windowTemplateName));
 
         string path = string.Format("UI/{0}_UI{1}", windowTemplateName, CCosmosEngine.GetConfig("AssetBundleExt"));
 
@@ -342,7 +342,7 @@ public class CUIModule : ICModule
         UIWindows.TryGetValue(name, out uiState);
         if (uiState == null || uiState.UIWindow == null)
         {
-            CBase.Log("{0} has been destroyed", name);
+            CDebug.Log("{0} has been destroyed", name);
             return;
         }
 
@@ -362,7 +362,7 @@ public class CUIModule : ICModule
     /// <param name="args"></param>
     public void CallUI(string uiTemplateName, Action<CUIController, object[]> callback, params object[] args)
     {
-        CBase.Assert(callback);
+        CDebug.Assert(callback);
 
         CUILoadState uiState;
         if (!UIWindows.TryGetValue(uiTemplateName, out uiState))

@@ -52,7 +52,7 @@ public class CAssetBundleLoader
         }
         else
         {
-            CBase.LogError("[CAssetBundleLoader]Error Path: {0}", url);
+            CDebug.LogError("[CAssetBundleLoader]Error Path: {0}", url);
             IsError = true;
 
             if (Callback != null)
@@ -73,7 +73,7 @@ public class CAssetBundleLoader
                 yield return null;
             if (wwwLoader.IsError)
             {
-                CBase.LogError("[CAssetBundleLoader]Error Load AssetBundle: {0}", relativeUrl);
+                CDebug.LogError("[CAssetBundleLoader]Error Load AssetBundle: {0}", relativeUrl);
                 IsError = true;
                 if (Callback != null)
                     Callback(false, FullUrl, Bundle, CallbackArgs);
@@ -89,7 +89,7 @@ public class CAssetBundleLoader
                 }
 
                 if (parser.Bundle == null)
-                    CBase.LogError("WWW.assetBundle is NULL: {0}", FullUrl);
+                    CDebug.LogError("WWW.assetBundle is NULL: {0}", FullUrl);
 
                 loadCache.Ab = parser.Bundle;
 
