@@ -20,7 +20,6 @@ using System.Collections.Generic;
 [CDependencyClass(typeof(CResourceModule))]
 public class CWWWLoader : CBaseResourceLoader
 {
-    private readonly string TheUrl;
     public static event Action<string> WWWFinishCallback;
 
     public WWW Www;
@@ -104,7 +103,7 @@ public class CWWWLoader : CBaseResourceLoader
 
         while (Debug.isDebugBuild && !IsDisposed)
         {
-            CDebug.LogError("[CWWWLoader]Not Disposed Yet! : {0}", this.TheUrl);
+            CDebug.LogError("[CWWWLoader]Not Disposed Yet! : {0}", this.Url);
             yield return null;
         }
 #endif

@@ -23,7 +23,6 @@ using Object = UnityEngine.Object;
 public class CStaticAssetLoader : CBaseResourceLoader
 {
     public UnityEngine.Object TheAsset; // Copy
-    public bool IsError = false;
     private CAssetFileLoader BridgeLoader;
     public override float Progress
     {
