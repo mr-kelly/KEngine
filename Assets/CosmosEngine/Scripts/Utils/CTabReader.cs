@@ -324,6 +324,11 @@ public class CTabReader : ICTabReadble, IDisposable
         return GetRowsCount();
     }
 
+    public int GetColumnCount()
+    {
+        return m_CachedColumns.Length;
+    }
+
     private bool ParseRowCount(byte[] bytes)
     {
         m_RowCount = 0;

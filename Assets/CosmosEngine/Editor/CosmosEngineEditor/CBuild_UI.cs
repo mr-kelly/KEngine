@@ -57,7 +57,7 @@ public partial class CBuild_UI : CBuild_Base
         DestroyTempPrefab();
     }
 
-    public override void BeginExport()
+    public override void BeforeExport()
     {
         if (BeginExportEvent != null)
         {
@@ -77,7 +77,7 @@ public partial class CBuild_UI : CBuild_Base
         ExportCurrentUI();
     }
 
-    public override void EndExport()
+    public override void AfterExport()
     {
         if (EndExportEvent != null)
         {
@@ -146,13 +146,13 @@ public partial class CBuild_UI : CBuild_Base
         UIName = UIName.Substring(0, UIName.LastIndexOf('.'));
 
         // 確保Layer正確
-        bool changeLayer = false;
+        //bool changeLayer = false;
         foreach (Transform loopTrans in GameObject.FindObjectsOfType<Transform>())
         {
             if (loopTrans.gameObject.layer != (int)CLayerDef.UI)
             {
                 NGUITools.SetLayer(loopTrans.gameObject, (int)CLayerDef.UI);
-                changeLayer = true;
+                //changeLayer = true;
             }
         }
 
@@ -162,14 +162,14 @@ public partial class CBuild_UI : CBuild_Base
             if (cam.cullingMask != 1 << (int)CLayerDef.UI)
             {
                 cam.cullingMask = 1 << (int)CLayerDef.UI;
-                changeLayer = true;
+                //changeLayer = true;
             }
 
         }
 
-        if (changeLayer)
+        //if (changeLayer)
         {
-            EditorApplication.SaveScene();
+            EditorApplication.SaveScene(); // 强制保存一下，保证一些Prefab更新
         }
 
 
@@ -236,9 +236,9 @@ public partial class CBuild_UI : CBuild_Base
         if (!uiBuild.CheckUI(true))
             return;
 
-        uiBuild.BeginExport();
+        uiBuild.BeforeExport();
         uiBuild.ExportCurrentUI();
-        uiBuild.EndExport();
+        uiBuild.AfterExport();
     }
 
     /// <summary>
@@ -250,6 +250,5 @@ public partial class CBuild_UI : CBuild_Base
         var buildUI = new CBuild_UI();
         buildUI.IsBuildAll = true;
         CAutoResourceBuilder.ProductExport(buildUI);
-    } 
-
+    }
 }

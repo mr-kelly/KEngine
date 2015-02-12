@@ -14,111 +14,108 @@ using System.Collections;
 using System.Collections.Generic;
 
 // 調用WWWLoader
-public class CAssetBundleLoader
+public class CAssetBundleLoader : CBaseResourceLoader
 {
-    public delegate void CAssetBundleLoaderDelegate(bool isOk, string fullUrl, AssetBundle ab, object[] args);
+    public delegate void CAssetBundleLoaderDelegate(bool isOk, AssetBundle ab);
 
-    class XLoadCache
+    private CAssetBundleParser BundleParser;
+    //private bool UnloadAllAssets; // Dispose时赋值
+    public AssetBundle Bundle
     {
-        public string RelativeUrl;
-        public AssetBundle Ab;
-        public bool IsLoadedFinish { get { return Ab != null; }}
+        get { return ResultObject as AssetBundle; }
     }
-
-    static Dictionary<string, XLoadCache> AssetBundlesCache = new Dictionary<string, XLoadCache>();
-
-    public bool IsError { get; private set; }
-    public bool IsFinished { get { return Bundle != null; } }
-    public AssetBundle Bundle { get; private set; }
-
-    CAssetBundleLoaderDelegate Callback;  // full url, ab, args
-    object[] CallbackArgs;
 
     string RelativeResourceUrl;
     string FullUrl;
 
-    public CAssetBundleLoader(string url, CAssetBundleLoaderDelegate callback = null, params object[] callbackArgs)
+    protected override void Init(string url)
     {
-        IsError = false;
-        Callback = callback;
-        CallbackArgs = callbackArgs;
+        base.Init(url);
 
         RelativeResourceUrl = url;
         if (CResourceModule.GetResourceFullPath(url, out FullUrl))
         {
             CResourceModule.LogRequest("AssetBundle", FullUrl);
-
-            CResourceModule.Instance.StartCoroutine(LoadAssetBundle(RelativeResourceUrl));
+            CResourceModule.Instance.StartCoroutine(LoadAssetBundle(url));
         }
         else
         {
             CDebug.LogError("[CAssetBundleLoader]Error Path: {0}", url);
-            IsError = true;
-
-            if (Callback != null)
-                Callback(false, url, Bundle, CallbackArgs);
+            OnFinish(null);
         }
     }
-    
+    public static CAssetBundleLoader Load(string url, CAssetBundleLoaderDelegate callback = null)
+    {
+        CLoaderDelgate newCallback = null;
+        if (callback != null)
+        {
+            newCallback = (isOk, obj) => callback(isOk, obj as AssetBundle);
+        }
+        var newLoader = AutoNew<CAssetBundleLoader>(url, newCallback);
+
+
+        return newLoader;
+    }
+
     IEnumerator LoadAssetBundle(string relativeUrl)
     {
-        XLoadCache loadCache;    
-        if (!AssetBundlesCache.TryGetValue(RelativeResourceUrl, out loadCache))
+        var wwwLoader = CWWWLoader.Load(FullUrl);
+        while (!wwwLoader.IsFinished)
         {
-            loadCache = new XLoadCache() { RelativeUrl = RelativeResourceUrl, Ab = null };
-            AssetBundlesCache[RelativeResourceUrl] = loadCache;
-
-            CWWWLoader wwwLoader = new CWWWLoader(FullUrl);
-            while (!wwwLoader.IsFinished)
-                yield return null;
-            if (wwwLoader.IsError)
-            {
-                CDebug.LogError("[CAssetBundleLoader]Error Load AssetBundle: {0}", relativeUrl);
-                IsError = true;
-                if (Callback != null)
-                    Callback(false, FullUrl, Bundle, CallbackArgs);
-                yield break;
-            }
-            else
-            {
-                // 解密
-                CAssetBundleParser parser = new CAssetBundleParser(RelativeResourceUrl, wwwLoader.Www.bytes);
-                while (!parser.IsFinished)
-                {
-                    yield return null;
-                }
-
-                if (parser.Bundle == null)
-                    CDebug.LogError("WWW.assetBundle is NULL: {0}", FullUrl);
-
-                loadCache.Ab = parser.Bundle;
-
-                // 释放WWW加载的字节。。释放该部分内存，因为AssetBundle已经自己有缓存了
-                wwwLoader.Dispose();
-            }
-
-
+            Progress = wwwLoader.Progress / 2f;  // 最多50%， 要算上Parser的嘛
+            yield return null;
+        }
+        if (wwwLoader.IsError)
+        {
+            CDebug.LogError("[CAssetBundleLoader]Error Load AssetBundle: {0}", relativeUrl);
+            OnFinish(null);
+            wwwLoader.Release();
+            yield break;
         }
         else
         {
-            if (loadCache.IsLoadedFinish)
-            {
-                yield return null;  // 确保每一次异步都延迟一帧
-            }
+            // 提前结束
 
-            while (!loadCache.IsLoadedFinish)
+            // 解密
+            // 释放WWW加载的字节。。释放该部分内存，因为AssetBundle已经自己有缓存了
+            var cloneBytes = (byte[])wwwLoader.Www.bytes.Clone();
+            wwwLoader.Release();
+
+            BundleParser = new CAssetBundleParser(RelativeResourceUrl, cloneBytes);
+            while (!BundleParser.IsFinished)
             {
-                yield return null; //Wait
+                if (IsDisposed)  // 中途释放
+                {
+                    OnFinish(null);
+                    yield break;
+                }
+                Progress = BundleParser.Progress + 1/2f;  // 最多50%， 要算上WWWLoader的嘛
+                yield return null;
             }
+            var assetBundle = BundleParser.Bundle;
+
+            if (assetBundle == null)
+                CDebug.LogError("WWW.assetBundle is NULL: {0}", FullUrl);
+
+            OnFinish(assetBundle);
+
+            //Array.Clear(cloneBytes, 0, cloneBytes.Length);  // 手工释放内存
         }
 
-        Bundle = loadCache.Ab;
+        
+        //GC.Collect(0);// 手工释放内存
+    }
 
-        if (Callback != null)
-            Callback(true, FullUrl, Bundle, CallbackArgs);
+    override protected void DoDispose()
+    {
+        base.DoDispose();
+
+        if (BundleParser != null)
+            BundleParser.Dispose(false);
     }
 
     /// 舊的tips~忽略
     /// 原以为，每次都通过getter取一次assetBundle会有序列化解压问题，会慢一点，后用AddWatch调试过，发现如果把.assetBundle放到Dictionary里缓存，查询会更慢
     /// 因为，估计.assetBundle是一个纯Getter，没有做序列化问题。  （不保证.mainAsset）
+
 }

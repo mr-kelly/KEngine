@@ -20,21 +20,18 @@ using Object = UnityEngine.Object;
 
 public partial class CBuildTools
 {
-	struct XVersionControlInfo
-	{
-		public string Server;
-		public int Port;
-		public string Database;
-		public string User;
-		public string Pass;
-	};
-
 	static int PushedAssetCount = 0;
     
     public static event Action<UnityEngine.Object, string, string> BeforeBuildAssetBundleEvent;
     public static event Action<UnityEngine.Object, string, string> AfterBuildAssetBundleEvent;
 
     #region 打包功能
+    /// <summary>
+    /// 获取完整的打包路径，并确保目录存在
+    /// </summary>
+    /// <param name="path"></param>
+    /// <param name="buildTarget"></param>
+    /// <returns></returns>
 	public static string MakeSureExportPath(string path, BuildTarget buildTarget)
 	{
 		path = CBuildTools.GetExportPath(buildTarget) + path;
@@ -80,11 +77,17 @@ public partial class CBuildTools
 		method.Invoke(null, null);
 	}
 
-	public static void ShowDialog(string msg, string title = "提示", string button = "确定")
+	public static bool ShowDialog(string msg, string title = "提示", string button = "确定")
 	{
-		EditorUtility.DisplayDialog(title, msg, button);
+		return EditorUtility.DisplayDialog(title, msg, button);
 	}
-
+    public static void ShowDialogSelection(string msg, Action yesCallback)
+    {
+        if (EditorUtility.DisplayDialog("确定吗", msg, "是!", "不！"))
+        {
+            yesCallback();
+        }
+    }
     public static void PushAssetBundle(Object asset, string path)
 	{
 		BuildPipeline.PushAssetDependencies();
@@ -220,5 +223,54 @@ public partial class CBuildTools
 			CopyFolder(subDir.FullName, dPath + "/" + subDir.Name);
 		}
 	}
+
+    /// <summary>
+    /// 是否有指定宏呢
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <returns></returns>
+    public static bool HasDefineSymbol(string symbol)
+    {
+        string symbolStrs = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
+        List<string> symbols = new List<string>(symbolStrs.Split(new char[] { ';' }, System.StringSplitOptions.RemoveEmptyEntries));
+        return symbols.Contains(symbol);
+    }
+
+    /// <summary>
+    /// 移除指定宏
+    /// </summary>
+    /// <param name="symbol"></param>
+    public static void RemoveDefineSymbols(string symbol)
+    {
+        foreach (BuildTargetGroup target in System.Enum.GetValues(typeof(BuildTargetGroup)))
+        {
+            string symbolStr = PlayerSettings.GetScriptingDefineSymbolsForGroup(target);
+            List<string> symbols = new List<string>(symbolStr.Split(new char[] { ';' }, System.StringSplitOptions.RemoveEmptyEntries));
+            if (symbols.Contains(symbol))
+                symbols.Remove(symbol);
+            PlayerSettings.SetScriptingDefineSymbolsForGroup(target, string.Join(";", symbols.ToArray()));
+        }
+
+
+    }
+
+    /// <summary>
+    /// 添加指定宏（不重复）
+    /// </summary>
+    /// <param name="symbol"></param>
+    public static void AddDefineSymbols(string symbol)
+    {
+        foreach (BuildTargetGroup target in System.Enum.GetValues(typeof(BuildTargetGroup)))
+        {
+            string symbolStr = PlayerSettings.GetScriptingDefineSymbolsForGroup(target);
+            List<string> symbols = new List<string>(symbolStr.Split(new char[] { ';' }, System.StringSplitOptions.RemoveEmptyEntries));
+            if (!symbols.Contains(symbol))
+            {
+                symbols.Add(symbol);
+                PlayerSettings.SetScriptingDefineSymbolsForGroup(target, string.Join(";", symbols.ToArray()));
+            }
+        }
+    }
+
 
 }

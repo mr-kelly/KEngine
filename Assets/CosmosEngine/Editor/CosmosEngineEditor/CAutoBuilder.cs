@@ -17,7 +17,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 
-public static class CAutoBuilder
+public class CAutoBuilder
 {
     static string GetProjectName()
     {
@@ -115,10 +115,10 @@ public static class CAutoBuilder
     }
 
     /// <summary>
-    /// 將svn的版本號寫入Resources目錄
+    /// 將svn的版本號寫入Resources目錄 TODO: 从cosmosengine移除
     /// </summary>
     [MenuItem("CosmosEngine/AutoBuilder/Refresh Program Version")]
-    static void RefreshProgramVersion()
+    public static void RefreshProgramVersion()
     {
         string cmd = string.Format("{0}/GetSvnInfo.bat", Application.dataPath);
 
@@ -174,7 +174,7 @@ public static class CAutoBuilder
     }
 
     [MenuItem("CosmosEngine/AutoBuilder/WindowsX86D")]  // 注意，PC版本放在不一样的目录的！
-    static void PerformWinBuild()
+    public static void PerformWinBuild()
     {
         PerformBuild("ClientX86D.exe", BuildTarget.StandaloneWindows, BuildOptions.Development | BuildOptions.AllowDebugging | BuildOptions.ConnectWithProfiler);
     }
@@ -186,19 +186,28 @@ public static class CAutoBuilder
     //}
 
     [MenuItem("CosmosEngine/AutoBuilder/iOS")]
-    static void PerformiOSBuild()
+    public static void PerformiOSBuild()
     {
         PerformBuild("Apps/ClientIOSProject", BuildTarget.iPhone, BuildOptions.Development | BuildOptions.ConnectWithProfiler);
     }
 
     [MenuItem("CosmosEngine/AutoBuilder/Android")]
-    static void PerformAndroidBuild()
+    public static void PerformAndroidBuild()
     {
-        PerformBuild("Apps/Client.apk", BuildTarget.Android, BuildOptions.Development | BuildOptions.AllowDebugging | BuildOptions.ConnectWithProfiler);
+        PerformAndroidBuild("Client");
+    }
+    public static void PerformAndroidBuild(string apkName, bool isDevelopment = true)
+    {
+        BuildOptions opt = isDevelopment
+            ? (BuildOptions.Development | BuildOptions.AllowDebugging | BuildOptions.ConnectWithProfiler)
+            : BuildOptions.None;
+        PerformBuild(
+            string.Format("Apps/{0}.apk", apkName),
+            BuildTarget.Android, opt);
     }
 
     [MenuItem("CosmosEngine/Clear PC PersitentDataPath")]
-    static void ClearPersistentDataPath()
+    public static void ClearPersistentDataPath()
     {
         foreach (string dir in Directory.GetDirectories(CResourceModule.GetAppDataPath()))
         {
@@ -207,13 +216,13 @@ public static class CAutoBuilder
         
     }
     [MenuItem("CosmosEngine/Open PC PersitentDataPath Folder")]
-    static void OpenPersistentDataPath()
+    public static void OpenPersistentDataPath()
     {
         System.Diagnostics.Process.Start(CResourceModule.GetAppDataPath());
     }
 
     [MenuItem("CosmosEngine/Clear Prefs")]
-    static void ClearPlayerPrefs()
+    public static void ClearPlayerPrefs()
     {
         PlayerPrefs.DeleteAll();
         PlayerPrefs.Save();

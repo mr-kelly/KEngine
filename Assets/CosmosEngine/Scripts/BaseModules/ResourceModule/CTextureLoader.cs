@@ -13,39 +13,48 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-
-[CDependencyClass(typeof(CAssetFileBridge))]
-public class CTextureLoader
+[CDependencyClass(typeof(CAssetFileLoader))]
+public class CTextureLoader : CBaseResourceLoader
 {
-	public bool IsFinished = false;
+    public Texture Asset { get { return ResultObject as Texture; } }
 
-    public Texture Asset { get; private set; }
+    public delegate void CTextureLoaderDelegate(bool isOk, Texture tex);
 
-    public delegate void CTextureLoaderDelegate(bool isOk, Texture tex, object[] args);
-
-    public CTextureLoaderDelegate Callback;
-    public object[] CallbackArgs;
-
-    public static void Load(string path, CTextureLoaderDelegate callback = null, params object[] args)
+    private CAssetFileLoader AssetFileBridge;
+    public override float Progress
     {
-        new CTextureLoader(path, callback, args);
+        get
+        {
+            return AssetFileBridge.Progress;
+        }
     }
+    public string Path { get; private set; }
 
-    public CTextureLoader(string path, CTextureLoaderDelegate callback = null, params object[] args)
+    public static CTextureLoader Load(string path, CTextureLoaderDelegate callback = null)
     {
-        Callback = callback;
-        CallbackArgs = args;
-        new CAssetFileBridge(path, OnAssetLoaded);
+        CLoaderDelgate newCallback = null;
+        if (callback != null)
+        {
+            newCallback = (isOk, obj) => callback(isOk, obj as Texture);
+        }
+        return AutoNew<CTextureLoader>(path, newCallback);
+    }
+    protected override void Init(string url)
+    {
+        base.Init(url);
+
+        Path = url;
+        AssetFileBridge = CAssetFileLoader.Load(Path, OnAssetLoaded);
     }
 
     void OnAssetLoaded(bool isOk, UnityEngine.Object obj)
     {
-        Asset = obj as Texture;
-        IsFinished = true;
-
-        if (Callback != null)
-            Callback(isOk, Asset, CallbackArgs);
-
+        OnFinish(obj);
     }
 
+    protected override void DoDispose()
+    {
+        base.DoDispose();
+        AssetFileBridge.Release(); // all, Texture is singleton!
+    }
 }

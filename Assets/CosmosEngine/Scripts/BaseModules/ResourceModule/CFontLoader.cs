@@ -8,18 +8,45 @@
 //              https://github.com/mr-kelly/CosmosEngine
 //
 //------------------------------------------------------------------------------
+
+using System;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class CFontLoader
+public class CFontLoader : CBaseResourceLoader
 {
-	public CFontLoader(string path, System.Action<Font> callback)
-	{
-        new CAssetFileBridge(path, (_isOk, _obj) => {
-            Font font = _obj as Font;
-            callback(font);
-        });
-	}
+    private CAssetFileLoader Bridge;
+    public override float Progress
+    {
+        get
+        {
+            return Bridge.Progress;
+        }
+    }
 
+    public static CFontLoader Load(string path, Action<bool, Font> callback = null)
+    {
+        CLoaderDelgate realcallback = null;
+        if (callback != null)
+        {
+            realcallback = (isOk, obj) => callback(isOk, obj as Font);
+        }
+
+        return AutoNew<CFontLoader>(path, realcallback);
+    }
+    protected override void Init(string url)
+    {
+        base.Init(url);
+
+        Bridge = CAssetFileLoader.Load(Url, (_isOk, _obj) =>
+        {
+            OnFinish(_obj);
+        });
+    }
+    protected override void DoDispose()
+    {
+        base.DoDispose();
+        Bridge.Release();
+    }
 }

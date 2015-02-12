@@ -26,26 +26,9 @@ public abstract class CUIController : MonoBehaviour
 
     public virtual void OnInit() { }
 
-    /// <summary>
-    /// Hook, if false, block "Open" action
-    /// </summary>
-    /// <param name="doOpenAction"></param>
-    /// <returns></returns>
-    public virtual bool OnBeforeOpenHook(Action doOpenAction)
-    {
-        return true;
-    }
+    public virtual void OnOpen(params object[] args) { }
 
-    public virtual void OnOpen(params object[] args)
-    {
-    }
-
-    public virtual bool OnBeforeCloseHook(Action doCloseAction)
-    {
-        return true;
-    }
     public virtual void OnClose() { }
-    
 
     /// <summary>
     /// 输入uri搜寻控件
@@ -134,69 +117,6 @@ public abstract class CUIController : MonoBehaviour
     {
         CTool.DestroyGameObjectChildren(go);
     }
-
-    /// <summary>
-    /// 模仿 NGUISelectionTool的同名方法，将位置旋转缩放清零
-    /// </summary>
-    /// <param name="t"></param>
-    public void ResetLocalTransform(Transform t)
-    {
-        t.localPosition = Vector3.zero;
-        t.localRotation = Quaternion.identity;
-        t.localScale = Vector3.one;
-    }
-#if GAME_CLIENT
-    /// <summary>
-    /// 传入指定数量， 对UIGrid里指定数量项SetActive(true)/或创建, 其余的SetActive(false)
-    /// 常用于UIGrid下的对象动态增长
-    /// </summary>
-    public void ResizeUIGridGameObjects(UIGrid uiGrid, int resizeCount, GameObject templateForNew)
-    {
-        _ResizeUIWidgetContainerGameObjects(uiGrid.transform, resizeCount, templateForNew);
-        uiGrid.Reposition();
-    }
-
-    public void ResizeUITableGameObjects(UITable uiTable, int resizeCount, GameObject templateForNew)
-    {
-        _ResizeUIWidgetContainerGameObjects(uiTable.transform, resizeCount, templateForNew);
-        uiTable.Reposition();
-    }
-
-    public void ResizeCUITableGridGameObjects(CUITableGrid uiTable, int resizeCount, GameObject templateForNew)
-    {
-        _ResizeUIWidgetContainerGameObjects(uiTable.transform, resizeCount, templateForNew);
-        uiTable.Reposition();
-    }
-    public void _ResizeUIWidgetContainerGameObjects(Transform transf, int resizeCount, GameObject templateForNew)
-    {
-        if (templateForNew == null)
-            templateForNew = default(GameObject);
-
-        for (int i = 0; i < resizeCount; i++)
-        {
-            GameObject newTemplate = null;
-            if (i >= transf.childCount)
-            {
-                newTemplate = Instantiate(templateForNew) as GameObject;
-                newTemplate.transform.parent = transf;
-                ResetLocalTransform(newTemplate.transform);
-
-                //gameObjList.Add(newTemplate);
-            }
-            newTemplate = transf.GetChild(i).gameObject;
-            if (!newTemplate.activeSelf)
-                newTemplate.SetActive(true);
-        }
-
-        for (int i = resizeCount; i < transf.childCount; ++i)
-        {
-            GameObject newTemplate = transf.GetChild(i).gameObject;
-            if (newTemplate.activeSelf)
-                newTemplate.SetActive(false);
-        }
-
-    }
-#endif
 
     /// <summary>
     /// Shortcuts for UIModule's Open Window

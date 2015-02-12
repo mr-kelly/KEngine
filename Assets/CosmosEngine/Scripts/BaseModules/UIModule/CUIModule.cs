@@ -109,13 +109,13 @@ public class CUIModule : ICModule
     /// <summary>
     /// // Dynamic动态窗口，复制基准面板
     /// </summary>
-    public void OpenDynamicWindow(string template, string name, params object[] args)
+    public CUILoadState OpenDynamicWindow(string template, string name, params object[] args)
     {
         CUILoadState uiState = _GetUIState(name);
         if (uiState != null)
         {
             OnOpen(uiState, args);
-            return;
+            return uiState;
         }
 
         CUILoadState uiInstanceState;
@@ -141,6 +141,8 @@ public class CUIModule : ICModule
 
             OnDynamicWindowCallback(uiTemplateState.UIWindow, totalArgs);
         });
+
+        return uiInstanceState;
     }
 
     void OnDynamicWindowCallback(CUIController _ui, object[] _args)
@@ -214,8 +216,7 @@ public class CUIModule : ICModule
             }
         };
 
-        if (uiState.UIWindow.OnBeforeCloseHook(doCloseAction))
-            doCloseAction();
+        doCloseAction();
     }
 
     /// <summary>
@@ -313,11 +314,12 @@ public class CUIModule : ICModule
 
     IEnumerator LoadUIAssetBundle(string path, string name, CUILoadState openState)
     {
-        CAssetLoader assetLoader = new CAssetLoader(path);
+        var assetLoader = CStaticAssetLoader.Load(path);
+        openState.UIResourceLoader = assetLoader;  // 基本不用手工释放的
         while (!assetLoader.IsFinished)
             yield return null;
 
-        GameObject uiObj = (GameObject)assetLoader.Asset;
+        GameObject uiObj = (GameObject)assetLoader.TheAsset;
 
         openState.IsLoading = false;  // Load完
 
@@ -333,7 +335,6 @@ public class CUIModule : ICModule
         uiBase.UIName = uiBase.UITemplateName = openState.TemplateName;
         InitWindow(openState, uiBase, openState.OpenWhenFinish, openState.OpenArgs);
         OnUIWindowLoadedCallbacks(openState, uiBase);
-
     }
 
     public void DestroyWindow(string name)
@@ -356,6 +357,8 @@ public class CUIModule : ICModule
     /// <summary>
     /// 等待并获取UI实例，执行callback
     /// 源起Loadindg UI， 在加载过程中，进度条设置方法会失效
+    /// 
+    /// 如果是DynamicWindow,，使用前务必先要Open!
     /// </summary>
     /// <param name="uiTemplateName"></param>
     /// <param name="callback"></param>
@@ -370,15 +373,29 @@ public class CUIModule : ICModule
             uiState = LoadWindow(uiTemplateName, false);  // 加载，这样就有UIState了
         }
 
-        if (uiState.IsLoading) // Loading
+        CUILoadState openState = UIWindows[uiTemplateName];
+        openState.DoCallback(callback, args);
+    }
+
+    /// <summary>
+    /// DynamicWindow专用, 不会自动加载，会提示报错
+    /// </summary>
+    /// <param name="uiName"></param>
+    /// <param name="callback"></param>
+    /// <param name="args"></param>
+    public void CallDynamicUI(string uiName, Action<CUIController, object[]> callback, params object[] args)
+    {
+        CDebug.Assert(callback);
+
+        CUILoadState uiState;
+        if (!UIWindows.TryGetValue(uiName, out uiState))
         {
-            CUILoadState openState = UIWindows[uiTemplateName];
-            openState.CallbacksWhenFinish.Enqueue(callback);
-            openState.CallbacksArgsWhenFinish.Enqueue(args);
+            CDebug.LogError("找不到UIState: {0}", uiName);
             return;
         }
 
-        callback(uiState.UIWindow, args);
+        CUILoadState openState = UIWindows[uiName];
+        openState.DoCallback(callback, args);
     }
 
     public void CallUI<T>(Action<T> callback) where T : CUIController
@@ -416,8 +433,7 @@ public class CUIModule : ICModule
             uiBase.OnOpen(args);
         };
 
-        if (uiBase.OnBeforeOpenHook(doOpenAction))
-            doOpenAction();
+        doOpenAction();
     }
 
 
@@ -472,8 +488,9 @@ public class CUILoadState
     public bool OpenWhenFinish;
     public object[] OpenArgs;
 
-    public Queue<Action<CUIController, object[]>> CallbacksWhenFinish;
-    public Queue<object[]> CallbacksArgsWhenFinish;
+    internal Queue<Action<CUIController, object[]>> CallbacksWhenFinish;
+    internal Queue<object[]> CallbacksArgsWhenFinish;
+    public CBaseResourceLoader UIResourceLoader; // 加载器，用于手动释放资源
 
     public CUILoadState(string uiTypeTemplateName)
     {
@@ -487,5 +504,26 @@ public class CUILoadState
 
         CallbacksWhenFinish = new Queue<Action<CUIController, object[]>>();
         CallbacksArgsWhenFinish = new Queue<object[]>();
+    }
+
+    /// <summary>
+    /// 确保加载完成后的回调
+    /// </summary>
+    /// <param name="callback"></param>
+    /// <param name="args"></param>
+    public void DoCallback(Action<CUIController, object[]> callback, object[] args = null)
+    {
+        if (args == null)
+            args = new object[0];
+
+        if (IsLoading) // Loading
+        {
+            CallbacksWhenFinish.Enqueue(callback);
+            CallbacksArgsWhenFinish.Enqueue(args);
+            return;
+        }
+
+        // 立即执行即可
+        callback(UIWindow, args);
     }
 }

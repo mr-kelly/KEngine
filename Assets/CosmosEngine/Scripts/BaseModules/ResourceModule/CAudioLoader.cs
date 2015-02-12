@@ -12,27 +12,44 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class CAudioLoader
+public class CAudioLoader : CBaseResourceLoader
 {
-    AudioClip ResultAudioClip;
+    AudioClip ResultAudioClip {get { return ResultObject as AudioClip; }}
 
-    public bool IsFinished { get { return ResultAudioClip != null; } }
+    CAssetFileLoader AssetFileBridge;
 
-    public AudioClip Clip { get { return ResultAudioClip; } }
-
-    public CAudioLoader(string url, System.Action<bool, AudioClip> callback = null)
+    public override float Progress
     {
-        new CAssetFileBridge(url, (bool isOk, UnityEngine.Object obj) =>
+        get { return AssetFileBridge.Progress; }
+    }
+
+    public static CAudioLoader Load(string url, System.Action<bool, AudioClip> callback = null)
+    {
+        CLoaderDelgate newCallback = null;
+        if (callback != null)
         {
-            AudioClip clip = obj as AudioClip;
+            newCallback = (isOk, obj) => callback(isOk, obj as AudioClip);
+        }
+        return AutoNew<CAudioLoader>(url, newCallback);
 
-            if (clip == null)
+    }
+    protected override void Init(string url)
+    {
+        base.Init(url);
+
+        AssetFileBridge = CAssetFileLoader.Load(url, (bool isOk, UnityEngine.Object obj) =>
+        {
+            ResultObject = obj;
+            if (ResultObject == null)
                 CDebug.LogError("Null Audio Clip!!!: {0}", url);
-
-            ResultAudioClip = clip;
-
-            if (callback != null)
-                callback(isOk, ResultAudioClip);
+            IsFinished = true;
+            DoCallback(ResultAudioClip != null, ResultAudioClip);
         });
+    }
+
+    public override void Release()
+    {
+        base.Release();
+        AssetFileBridge.Release();
     }
 }

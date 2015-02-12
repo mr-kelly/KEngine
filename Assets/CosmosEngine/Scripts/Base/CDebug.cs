@@ -77,15 +77,13 @@ public class CDebug
 #endif
     }
 
-	public static void Log(string log)
-	{
-		log = string.Format("[{0}] {1}\n\n===============================================================================\n\n", DateTime.Now.ToString("HH:mm:ss.ffff"), log);
+    public static void Log(string log)
+    {
         DoLog(log, LogType.NORMAL);
-	}
-
+    }
 	public static void Log(string log, params object[] args)
 	{
-		Log(string.Format(log, args));
+        DoLog(string.Format(log, args), LogType.NORMAL);
 	}
 	
 	public static void Logs(params object[] logs)
@@ -129,6 +127,8 @@ public class CDebug
 
     private static void DoLog(string szMsg, LogType emType)
     {
+        szMsg = string.Format("[{0}]{1}\n\n=================================================================", DateTime.Now.ToString("HH:mm:ss.ffff"), szMsg);
+
         switch (emType)
         {
             case LogType.NORMAL:

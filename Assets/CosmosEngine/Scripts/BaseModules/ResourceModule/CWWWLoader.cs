@@ -18,132 +18,103 @@ using System.Collections.Generic;
 /// Current version, loaded Resource will never release in memory
 /// </summary>
 [CDependencyClass(typeof(CResourceModule))]
-public class CWWWLoader : IDisposable
+public class CWWWLoader : CBaseResourceLoader
 {
-    class CLoadingCache
-    {
-        public string Url;
-        public WWW Www;
-        public CLoadingCache(string url)
-        {
-            Url = url;
-        }
-    }
-
+    private readonly string TheUrl;
     public static event Action<string> WWWFinishCallback;
 
-    static Dictionary<string, CLoadingCache> Loaded = new Dictionary<string, CLoadingCache>();
-    CLoadingCache WwwCache = null;
+    public WWW Www;
 
-    public bool IsFinished { get { return WwwCache != null || IsError; } }  // 可协程不停判断， 或通过回调
+    public override float Progress
+    {
+        get { return Www.progress; }
+    }
 
-    public bool IsError { get; private set; }
-
-    public WWW Www { get { return WwwCache.Www; } }
-
-    public float Progress = 0;
-
+    protected override void Init(string url)
+    {
+        base.Init(url);
+        CResourceModule.Instance.StartCoroutine(CoLoad(url));//开启协程加载Assetbundle，执行Callback
+    }
     /// <summary>
     /// Use this to directly load WWW by Callback or Coroutine, pass a full URL.
     /// A wrapper of Unity's WWW class.
     /// </summary>
-    public CWWWLoader(string url, Action<bool, WWW, object[]> callback = null, params object[] callbackArgs)
+    public static CWWWLoader Load(string url, CLoaderDelgate callback = null)
     {
-        IsError = false;
-        CResourceModule.Instance.StartCoroutine(CoLoad(url, callback, callbackArgs));//开启协程加载Assetbundle，执行Callback
+        return AutoNew<CWWWLoader>(url, callback);
     }
 
     /// <summary>
-	/// 协和加载Assetbundle，加载完后执行callback
-	/// </summary>
-	/// <param name="url">资源的url</param>
-	/// <param name="callback"></param>
-	/// <param name="callbackArgs"></param>
-	/// <returns></returns>
-    IEnumerator CoLoad(string url, Action<bool, WWW, object[]> callback = null, params object[] callbackArgs)
+    /// 协和加载Assetbundle，加载完后执行callback
+    /// </summary>
+    /// <param name="url">资源的url</param>
+    /// <param name="callback"></param>
+    /// <param name="callbackArgs"></param>
+    /// <returns></returns>
+    IEnumerator CoLoad(string url)
     {
         if (CResourceModule.LoadByQueue)
         {
-            while (Loaded.Count != 0)
+            while (GetCount<CWWWLoader>() != 0)
                 yield return null;
         }
 
         CResourceModule.LogRequest("WWW", url);
 
-        CLoadingCache cache = null;
+        System.DateTime beginTime = System.DateTime.Now;
+        Www = new WWW(url);
 
-        if (!Loaded.TryGetValue(url, out cache))
+        //设置AssetBundle解压缩线程的优先级
+        Www.threadPriority = Application.backgroundLoadingPriority;  // 取用全局的加载优先速度
+        while (!Www.isDone)
         {
-            cache = new CLoadingCache(url);
-            Loaded.Add(url, cache);
-            System.DateTime beginTime = System.DateTime.Now;
-            WWW www = new WWW(url);
+            yield return null;
+        }
 
-			//设置AssetBundle解压缩线程的优先级
-            www.threadPriority = Application.backgroundLoadingPriority;  // 取用全局的加载优先速度
-            while (!www.isDone)
+        yield return Www;
+
+        if (!string.IsNullOrEmpty(Www.error))
+        {
+            string fileProtocol = CResourceModule.GetFileProtocol();
+            if (url.StartsWith(fileProtocol))
             {
-                Progress = www.progress;
-                yield return null;
+                string fileRealPath = url.Replace(fileProtocol, "");
+                CDebug.LogError("File {0} Exist State: {1}", fileRealPath, System.IO.File.Exists(fileRealPath));
+
             }
+            CDebug.LogError("[CWWWLoader:Error]" + Www.error + " " + url);
 
-            yield return www;
-
-            if (!string.IsNullOrEmpty(www.error))
-            {
-                IsError = true;
-                string fileProtocol = CResourceModule.GetFileProtocol();
-                if (url.StartsWith(fileProtocol))
-                {
-                    string fileRealPath = url.Replace(fileProtocol, "");
-                    CDebug.LogError("File {0} Exist State: {1}", fileRealPath, System.IO.File.Exists(fileRealPath));
-
-                }
-                CDebug.LogError(www.error + " " + url);
-                if (callback != null)
-                    callback(false, null, null); // 失败callback
-                yield break;
-            }
-            else
-            {
-                CResourceModule.LogLoadTime("WWW", url, beginTime);
-
-                cache.Www = www;
-
-                if (WWWFinishCallback != null)
-                    WWWFinishCallback(url);
-            }
-
+            OnFinish(null);
+            yield break;
         }
         else
         {
-            //if (cache.Www != null)
-            //    yield return null;  // 确保每一次异步读取资源都延迟一帧
+            CResourceModule.LogLoadTime("WWW", url, beginTime);
+            if (WWWFinishCallback != null)
+                WWWFinishCallback(url);
 
-            while (cache.Www == null)  // 加载中，但未加载完
-                yield return null;
+            OnFinish(Www);
         }
 
-        
-        Progress = cache.Www.progress;
-        WwwCache = cache;
+#if UNITY_EDITOR  // 预防WWW加载器永不反初始化
+        while (GetCount<CWWWLoader>() > 0)
+            yield return null;
 
-        if (callback != null)
-            callback(true, WwwCache.Www, callbackArgs);
+        yield return new WaitForSeconds(5f);
 
+        while (Debug.isDebugBuild && !IsDisposed)
+        {
+            CDebug.LogError("[CWWWLoader]Not Disposed Yet! : {0}", this.TheUrl);
+            yield return null;
+        }
+#endif
     }
-    
-    /// <summary>
-    /// 手动释放该部分内存
-    /// </summary>
-    public void Dispose()
+
+    protected override void DoDispose()
     {
-        if (WwwCache != null)
-        {
-            WwwCache.Www.Dispose();
-            Loaded.Remove(WwwCache.Url);
-        }
-        else
-            CDebug.LogError("[CWWWLoader:Release]无缓存的WWW");
+        base.DoDispose();
+
+        Www.Dispose();
+        Www = null;
     }
 }

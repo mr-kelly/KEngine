@@ -124,49 +124,21 @@ public class CCosmosEngineWindow : EditorWindow
         if (selUiType != curUiType)
         {
             string uiType = selUiType.ToString();
-            DoSetUIBridge(uiType);
+            DoSetUIBridgeMacro(uiType);
             SetConfValue("UIBridgeType", uiType);
         }
     }
-
-    void RemoveDefineSymbols(string symbol)
-    {
-        foreach (BuildTargetGroup target in System.Enum.GetValues(typeof(BuildTargetGroup)))
-        {
-            string symbolStr = PlayerSettings.GetScriptingDefineSymbolsForGroup(target);
-            List<string> symbols = new List<string>(symbolStr.Split(new char[] { ';' }, System.StringSplitOptions.RemoveEmptyEntries));
-            if (symbols.Contains(symbol))
-                symbols.Remove(symbol);
-            PlayerSettings.SetScriptingDefineSymbolsForGroup(target, string.Join(";", symbols.ToArray()));
-        }
-
-
-    }
-
-    void AddDefineSymbols(string symbol)
-    {
-        foreach (BuildTargetGroup target in System.Enum.GetValues(typeof(BuildTargetGroup)))
-        {
-            string symbolStr = PlayerSettings.GetScriptingDefineSymbolsForGroup(target);
-            List<string> symbols = new List<string>(symbolStr.Split(new char[] { ';' }, System.StringSplitOptions.RemoveEmptyEntries));
-            if (!symbols.Contains(symbol))
-            {
-                symbols.Add(symbol);
-                PlayerSettings.SetScriptingDefineSymbolsForGroup(target, string.Join(";", symbols.ToArray()));
-            }
-        }
-    }
-
-    void DoSetUIBridge(string uiType)
+    // 宏
+    void DoSetUIBridgeMacro(string uiType)
     {
         switch (uiType)
         {
             case "NGUI":
-                AddDefineSymbols("NGUI");
+                CBuildTools.AddDefineSymbols("NGUI");
 
                 break;
             default:
-                RemoveDefineSymbols("NGUI");
+                CBuildTools.RemoveDefineSymbols("NGUI");
                 break;
         }
     }

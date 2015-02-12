@@ -344,6 +344,11 @@ public class CTabFile : IDisposable, ICTabReadble, IEnumerable<CTabFile.CTabRow>
         return TabInfo.Count;
     }
 
+    public int GetColumnCount()
+    {
+        return ColCount;
+    }
+
     public int GetWidth()
     {
         return ColCount;

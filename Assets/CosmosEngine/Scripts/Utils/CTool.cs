@@ -16,6 +16,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using UnityEngine;
 using System.IO;
 
@@ -46,14 +49,65 @@ public class CTool
         yield return new WaitForSeconds(time);
         callback();
     }
+
+    /// <summary>
+    /// 模仿 NGUISelectionTool的同名方法，将位置旋转缩放清零
+    /// </summary>
+    /// <param name="t"></param>
+    public static void ResetLocalTransform(Transform t)
+    {
+        t.localPosition = Vector3.zero;
+        t.localRotation = Quaternion.identity;
+        t.localScale = Vector3.one;
+    }
+
+    // 最大公约数
+    public static int GetGCD(int a, int b)
+    {
+        if (a < b) { int t = a; a = b; b = t; }
+        while (b > 0)
+        {
+            int t = a % b;
+            a = b;
+            b = t;
+        }
+        return a;
+    }
+
     public static void DestroyGameObjectChildren(GameObject go)
     {
-        foreach (Transform trans in go.GetComponentsInChildren<Transform>(true))
+        var tran = go.transform;
+
+        while(tran.childCount > 0)
         {
-            if (trans == go.transform) continue;  // 不干自己
-            trans.parent = null; // 清空父, 因为.Destroy非同步的
-            GameObject.Destroy(trans.gameObject);
+            var child = tran.GetChild(0);
+            child.parent = null; // 清空父, 因为.Destroy非同步的
+#if UNITY_EDITOR
+            if (!EditorApplication.isPlaying)
+                GameObject.DestroyImmediate(child.gameObject);
+            else
+#endif
+                GameObject.Destroy(child.gameObject);
         }
+    }
+
+    /// <summary>
+    /// 字典转到字符串A:1|B:2|C:3这类
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="K"></typeparam>
+    /// <param name="dict"></param>
+    /// <param name="delimeter1"></param>
+    /// <param name="delimeter2"></param>
+    /// <returns></returns>
+    public static string  DictToSplitStr<T, K>(Dictionary<T, K> dict, char delimeter1 = '|', char delimeter2 = ':')
+    {
+        var sb = new StringBuilder();
+        foreach (var kv in dict)
+        {
+            sb.AppendFormat("{0}{1}{2}{3}", kv.Key, delimeter2, kv.Value, delimeter1);
+        }
+        return sb.ToString();
     }
 
     /// <summary>
@@ -273,6 +327,22 @@ public class CTool
         return span.Days;
     }
 
+    public static int GetDeltaHours(DateTime origin)
+    {
+        DateTime now = DateTime.UtcNow;
+        var span = now - origin;
+
+        return span.Hours;
+    }
+
+    public static int GetDeltaDay(DateTime origin)
+    {
+        DateTime now = DateTime.UtcNow;
+        var span = now - origin;
+
+        return span.Days;
+    }
+
     public static DateTime GetDateTimeFromUTC(long utcTime)
     {
         DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
@@ -291,6 +361,16 @@ public class CTool
     {
         DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
         TimeSpan diff = DateTime.UtcNow - origin;
+        return diff.TotalMilliseconds;
+    }
+    /// <summary>
+    /// Unix時間總毫秒數
+    /// </summary>
+    /// <returns></returns>
+    public static double GetUTCMilliseconds(DateTime date)
+    {
+        DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+        TimeSpan diff = date - origin;
         return diff.TotalMilliseconds;
     }
 
@@ -407,10 +487,12 @@ public class CTool
     /// 模板获取
     /// </summary>
     /// <param name="source">模板内容</param>
-    /// <param name="data">数据来源</param>
+    /// <param name="data">数据来源[对象]</param>
     /// <returns></returns>
     public static string Template(string source, object data)
     {
+        if (data == null) return source;
+        var isJson = data is SimpleJson.JsonObject;
         var result = source;
         var regex = new Regex(@"\{.+?\}");
         var matches = regex.Matches(source);
@@ -420,12 +502,73 @@ public class CTool
             var paramKey = paramRex.Substring(1, paramRex.Length - 2).Trim(); // 截头截尾
             try
             {
-                var paramValue = data.GetType().GetField(paramKey).GetValue(data).ToString();
-                result = result.Replace(paramRex, paramValue);
+                if (isJson)
+                {
+                    object paramValue;
+                    (data as SimpleJson.JsonObject).TryGetValue(paramKey, out paramValue);
+                    if (paramValue != null)
+                    {
+                        result = result.Replace(paramRex, paramValue.ToString());
+                    }
+                }
+                else
+                {
+                    var field = data.GetType().GetField(paramKey);
+                    if (field != null)
+                    {
+                        var paramValue = field.GetValue(data).ToString();
+                        result = result.Replace(paramRex, paramValue);
+                    }
+                }
             }
             catch (Exception)
             {
                 CDebug.LogError("not find field \"{0}\" for {1}", paramKey, data.GetType());
+            }
+        }
+
+        return result;
+    }
+    /// <summary>
+    /// 混合模板
+    /// </summary>
+    /// <param name="source">模板内容</param>
+    /// <param name="data">数据来源[对象]</param>
+    /// <param name="args">数据来源[数组]</param>
+    /// <returns></returns>
+    public static string Template(string source, object data, string[] args)
+    {
+        return Format(Template(source, data), args);
+    }
+
+    /// <summary>
+    /// 模板获取
+    /// </summary>
+    /// <param name="source">模板内容</param>
+    /// <param name="args">数据来源[数组]</param>
+    /// <returns></returns>
+    public static string Format(string source, string[] args)
+    {
+        if (args == null) return source;
+        var result = source;
+        var regex = new Regex(@"\{\d+\}");
+        var matches = regex.Matches(source);
+        foreach (Match match in matches)
+        {
+            var paramRex = match.Value;
+            var paramKey = paramRex.Substring(1, paramRex.Length - 2).Trim(); // 截头截尾
+            try
+            {
+                var index = paramKey.ToInt32();
+                if (args.Length > index)
+                {
+                    var paramValue = args[index];
+                    result = result.Replace(paramRex, paramValue);
+                }
+            }
+            catch (Exception)
+            {
+                CDebug.LogError("not find argument index: \"{0}\" in array: {1}", paramKey, args);
             }
         }
 
@@ -467,6 +610,46 @@ public class CTool
         }
 
         return (T)trans.GetComponent(typeof(T));
+    }
+
+    public static T GetChildComponent<T>(string uri, Transform findTrans, bool isLog = true) where T : Component
+    {
+        Transform trans = findTrans.Find(uri);
+        if (trans == null)
+        {
+            if (isLog)
+                CDebug.LogError("Get Child Error: " + uri);
+            return default(T);
+        }
+
+        return (T)trans.GetComponent(typeof(T));
+    }
+
+    public static GameObject DFSFindObject(Transform parent, string name)
+    {
+        for (int i = 0; i < parent.childCount; ++i)
+        {
+            Transform node = parent.GetChild(i);
+            if (node.name == name)
+                return node.gameObject;
+
+            GameObject target = DFSFindObject(node, name);
+            if (target != null)
+                return target;
+        }
+
+        return null;
+    }
+    public static GameObject GetGameObject(string name, Transform findTrans, bool isLog = true)
+    {
+        GameObject obj = DFSFindObject(findTrans,name );
+        if (obj == null)
+        {
+            CDebug.LogError("Find GemeObject Error: " + name);
+            return null;
+        }
+
+        return obj;
     }
 
     public static void SetChild(GameObject child, GameObject parent, bool ignoreRotation = false, bool ignoreScale = false)
@@ -549,14 +732,31 @@ public class CTool
             return from;
     }
 
-    public static void ResetUITween(UnityEngine.GameObject gameObj)
+    public static void StopUITween(UnityEngine.GameObject gameObj, int tweenGroup = -1)
+    {
+        // 重置出现 移动动画
+        foreach (UITweener tween in gameObj.GetComponentsInChildren<UITweener>(true))
+        {
+            if (tweenGroup == -1 || tweenGroup == tween.tweenGroup)
+            {
+                tween.ResetToBeginning();
+                tween.enabled = false;
+            }
+        }
+    }
+
+    public static void ResetUITween(UnityEngine.GameObject gameObj, int tweenGroup = -1)
     {
         gameObj.SetActive(true);
         // 重置出现 移动动画
         foreach (UITweener tween in gameObj.GetComponentsInChildren<UITweener>(true))
         {
-            tween.ResetToBeginning();
-            tween.PlayForward();
+            if (tweenGroup == -1 || tweenGroup == tween.tweenGroup)
+            {
+                tween.enabled = true;
+                tween.ResetToBeginning();
+                tween.PlayForward();
+            }
         }
     }
 
@@ -590,13 +790,13 @@ public class CTool
             if (child.GetComponent<ParticleSystem>() != null)
             {
                 var particleSystem = child.GetComponent<ParticleSystem>();
-                particleSystem.renderer.material.renderQueue = renderQueue;
+                particleSystem.renderer.sharedMaterial.renderQueue = renderQueue;
             }
         }
         if (parent.GetComponent<ParticleSystem>() != null)
         {
             var particleSystem = parent.GetComponent<ParticleSystem>();
-            particleSystem.renderer.material.renderQueue = renderQueue;
+            particleSystem.renderer.sharedMaterial.renderQueue = renderQueue;
         }
     }
     public static void MoveAllCollidersToGameObject(GameObject srcGameObject, GameObject targetGameObject)
@@ -796,10 +996,10 @@ public class CTool
     /// </summary>
     /// <param name="nNum">需要的数量</param>
     /// <param name="pAnchorPos">锚定点/参考点</param>
-    /// <param name="nAngle">角度</param>
+    /// <param name="fAngle">角度</param>
     /// <param name="nRadius">半径</param>
     /// <returns></returns>
-    public static Vector3[] GetSmartNpcPoints(Vector3 startDirection, int nNum, Vector3 pAnchorPos, int nAngle, float nRadius)
+    public static Vector3[] GetSmartNpcPoints(Vector3 startDirection, int nNum, Vector3 pAnchorPos, float fAngle, float nRadius)
     {
         bool bPlural = nNum % 2 == 0 ? true : false; // 是否复数模式
         Vector3 vDir = startDirection;
@@ -808,25 +1008,25 @@ public class CTool
         Vector3[] targetPos = new Vector3[nNum];
         for (int i = 1; i <= nNum; i++)
         {
-            int nAddAngle = 0;
+            float nAddAngle = 0;
 
             if (bPlural) // 复数模式
             {
                 if (i > nMidNum)
-                    nAddAngle = nAngle * ((i % nMidNum) + 1) - nAngle / 2;
+                    nAddAngle = fAngle * ((i % nMidNum) + 1) - fAngle / 2;
                 else
-                    nAddAngle = -nAngle * ((i % nMidNum) + 1) + nAngle / 2; // 除以2，是为了顶端NPC均匀排布 by KK
+                    nAddAngle = -fAngle * ((i % nMidNum) + 1) + fAngle / 2; // 除以2，是为了顶端NPC均匀排布 by KK
             }
             else // 单数模式
             {
                 // 判断是否过了中间数
                 if (i > nMidNum)
                 {
-                    nAddAngle = nAngle * ((i % nMidNum) + 1); // 添加NPC的角度
+                    nAddAngle = fAngle * (i % nMidNum); // 添加NPC的角度
                 }
                 else if (i < nMidNum) // 非复数模式， 中间数NPC 放在正方向
                 {
-                    nAddAngle = -nAngle * ((i % nMidNum) + 1); // 反方向角度
+                    nAddAngle = -fAngle * (i % nMidNum); // 反方向角度
                 }
                 else
                     nAddAngle = 0; // 正方向
@@ -877,7 +1077,50 @@ public class CTool
         }
         return targetPos;
     }
+	
+	// 两线交点（忽略长度）
+    public static bool LineIntersectionPoint(out Vector2 intersectPoint, Vector2 ps1, Vector2 pe1, Vector2 ps2,
+        Vector2 pe2)
+    {
+        intersectPoint = Vector2.zero;
 
+        // Get A,B,C of first line - points : ps1 to pe1
+        float A1 = pe1.y - ps1.y;
+        float B1 = ps1.x - pe1.x;
+        float C1 = A1 * ps1.x + B1 * ps1.y;
+
+        // Get A,B,C of second line - points : ps2 to pe2
+        float A2 = pe2.y - ps2.y;
+        float B2 = ps2.x - pe2.x;
+        float C2 = A2 * ps2.x + B2 * ps2.y;
+
+        // Get delta and check if the lines are parallel
+        float delta = A1 * B2 - A2 * B1;
+        if (delta == 0)
+            return false;
+
+        // now return the Vector2 intersection point
+        intersectPoint = new Vector2(
+            (B2 * C1 - B1 * C2) / delta,
+            (A1 * C2 - A2 * C1) / delta
+        );
+        return true;
+    }
+    /// <summary>
+    /// 判断字符串是否是数字
+    /// </summary>
+    /// <param name="str"></param>
+    /// <returns></returns>
+    public static bool IsNumber(string str)
+    {
+        if (string.IsNullOrEmpty(str))
+        {
+            CDebug.LogWarning("传入的值为空！请检查");
+            return false;
+        }
+        var pattern = @"^\d*$";
+        return  Regex.IsMatch(str, pattern);  
+    }
 }
 
 public class XMemoryParser<T>

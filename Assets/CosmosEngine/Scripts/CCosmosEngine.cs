@@ -104,13 +104,16 @@ public class CCosmosEngine : MonoBehaviour
     /// </summary>
     IEnumerator DoInit()
     {
-        ICModule[] baseModules = new ICModule[] {  // 基础三件套
+        var baseModules = new ICModule[] {  // 基础三件套
             CResourceModule.Instance, 
             CUIModule.Instance, 
         };
+
+        var startInitTime = 0f;
         foreach (ICModule mod in baseModules)
         {
-            float startInitTime = Time.time;
+            if (Debug.isDebugBuild)
+                startInitTime = Time.time;
             yield return StartCoroutine(mod.Init());
             if (Debug.isDebugBuild)
                 CDebug.Log("Init Module: #{0}# Time:{1}", mod.GetType().FullName, Time.time - startInitTime);
@@ -129,9 +132,11 @@ public class CCosmosEngine : MonoBehaviour
 
     IEnumerator DoInitModules()
     {
+        var startInitTime = 0f;
         foreach (ICModule initModule in GameModules)
         {
-            float startInitTime = Time.time;
+            if (Debug.isDebugBuild)
+                startInitTime = Time.time;
             yield return StartCoroutine(initModule.Init());
             if (Debug.isDebugBuild)
                 CDebug.Log("Init Module: #{0}# Time:{1}", initModule.GetType().FullName, Time.time - startInitTime);
@@ -143,6 +148,7 @@ public class CCosmosEngine : MonoBehaviour
         if (Debug.isDebugBuild)
         {
             GUILayout.BeginVertical(GUILayout.Width(300));
+            GUILayout.Label(string.Format("CodeMemory: {0}KB", GC.GetTotalMemory(false) / 1000f));
             GUILayout.Label(RenderWatcher.Watch("FPS: {0:N0}", 1f / Time.deltaTime));
             GUILayout.EndVertical();
         }

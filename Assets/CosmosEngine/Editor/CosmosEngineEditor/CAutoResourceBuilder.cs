@@ -18,10 +18,10 @@ using System.Reflection;
 
 public abstract class CBuild_Base
 {
-	public virtual void BeginExport() { }
+	public virtual void BeforeExport() { }
     public abstract void Export(string path);
 
-	public virtual void EndExport() { }
+	public virtual void AfterExport() { }
 
 	public abstract string GetDirectory();
 	public abstract string GetExtention();
@@ -46,12 +46,12 @@ public partial class CAutoResourceBuilder
         else
             itemArray = Directory.GetFiles("Assets/_ResourcesBuild_/" + export.GetDirectory(), export.GetExtention());  // 不包括子文件夾
 
-        export.BeginExport();
+        export.BeforeExport();
         foreach (string item in itemArray)
         {
             export.Export(item.Replace('\\', '/'));
         }
-        export.EndExport();
+        export.AfterExport();
     }
 
 }

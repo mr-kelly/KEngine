@@ -18,9 +18,6 @@ public class CCommonProductPrefabExporter : CBuild_Base
     public override string GetDirectory() { return ""; }
     public override string GetExtention() { return "dir"; }
 
-    public override void BeginExport()
-    {
-    }
     public override void Export(string path)
     {
         path = path.Replace('\\', '/');
@@ -31,10 +28,6 @@ public class CCommonProductPrefabExporter : CBuild_Base
             string filePath = file.Replace('\\', '/');
             CDebug.Log("Build Func To: " + filePath);
         }
-    }
-
-    public override void EndExport()
-    {
     }
 
     [MenuItem("CosmosEngine/Build Product Folder Prefabs")]
