@@ -24,7 +24,7 @@ public partial class CBuildTools
     
     public static event Action<UnityEngine.Object, string, string> BeforeBuildAssetBundleEvent;
     public static event Action<UnityEngine.Object, string, string> AfterBuildAssetBundleEvent;
-
+    
     #region 打包功能
     /// <summary>
     /// 获取完整的打包路径，并确保目录存在

@@ -60,7 +60,11 @@ class CExcelFile
         
     }
 
-    public void RemoveRow(int row)
+    /// <summary>
+    /// 清除行内容
+    /// </summary>
+    /// <param name="row"></param>
+    public void ClearRow(int row)
     {
         var theRow = Worksheet.GetRow(row);
         Worksheet.RemoveRow(theRow);
@@ -87,18 +91,27 @@ class CExcelFile
         return cell.ToString();
     }
 
-    public int GetRows()
+    public int GetRowsCount()
     {
-        return Worksheet.LastRowNum;
+        return Worksheet.LastRowNum + 1;
     }
 
-    public void SetRowColor(int row, short colorIndex)
+    private ICellStyle GreyCellStyleCache;
+    public void SetRowGrey(int row)
     {
         var theRow = Worksheet.GetRow(row);
         foreach (var cell in theRow.Cells)
         {
-            var style = cell.CellStyle;
-            style.FillBackgroundColor = colorIndex;
+            if (GreyCellStyleCache == null)
+            {
+                var newStyle = Workbook.CreateCellStyle();
+                newStyle.CloneStyleFrom(cell.CellStyle);
+                //newStyle.FillBackgroundColor = colorIndex;
+                newStyle.FillPattern = FillPattern.Diamonds;
+                GreyCellStyleCache = newStyle;
+            }
+
+            cell.CellStyle = GreyCellStyleCache;
         }
     }
 
@@ -120,6 +133,18 @@ class CExcelFile
 
     public void Save()
     {
+        /*for (var loopRow = Worksheet.FirstRowNum; loopRow <= Worksheet.LastRowNum; loopRow++)
+        {
+            var row = Worksheet.GetRow(loopRow);
+            bool emptyRow = true;
+            foreach (var cell in row.Cells)
+            {
+                if (!string.IsNullOrEmpty(cell.ToString()))
+                    emptyRow = false;
+            }
+            if (emptyRow)
+                Worksheet.RemoveRow(row);
+        }*/
         //try
         {
             using (var memStream = new MemoryStream())

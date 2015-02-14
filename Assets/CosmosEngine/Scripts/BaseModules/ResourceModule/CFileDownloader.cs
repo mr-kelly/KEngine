@@ -27,7 +27,8 @@ public class CWWWDownloader
     private bool FinishedFlag = false;
     public bool IsFinished { get { return ErrorFlag || FinishedFlag; } }
 	private bool ErrorFlag = false;
-    public bool IsError { get { return WWWLoader.IsError || ErrorFlag; } }
+    public bool IsError { get { return ErrorFlag; } }
+
     public WWW Www { get { return WWWLoader.Www; } }
     public float Progress { get {return WWWLoader.Progress;}} // 進度
 
@@ -51,6 +52,7 @@ public class CWWWDownloader
         if (File.Exists(_SavePath))
         {
             FinishedFlag = true;
+            ErrorFlag = false;
             yield break;
         }
 
@@ -65,6 +67,7 @@ public class CWWWDownloader
 
             yield return null;
         }
+
         if (WWWLoader.IsError || !WWWLoader.IsFinished)
         {
             CDebug.LogError("Download WWW Error: {0}", fullUrl);

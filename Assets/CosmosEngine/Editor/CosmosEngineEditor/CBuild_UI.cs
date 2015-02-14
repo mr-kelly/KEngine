@@ -17,6 +17,16 @@ using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 
+public abstract class CBaseUIBuilder
+{
+    
+}
+
+public class CUGUIBuilder
+{
+    
+}
+
 public partial class CBuild_UI : CBuild_Base
 {
     string UIName;
@@ -44,6 +54,24 @@ public partial class CBuild_UI : CBuild_Base
 
     public void ExportCurrentUI()
     {
+        //if (changeLayer)
+        {
+            // 去掉一些残留的Clone
+            var allTrans = GameObject.FindObjectsOfType<Transform>();
+            for (var i = allTrans.Length - 1; i >= 0 ; i--)
+            {
+                var child = allTrans[i];
+                if (child != null && child.gameObject.name.EndsWith("Window(Clone)"))
+                {
+                    GameObject.DestroyImmediate(child.gameObject);
+                }
+            }
+            EditorApplication.SaveScene(); // 强制保存一下，保证一些Prefab更新
+
+        }
+
+        UIScenePath = Path.GetFileNameWithoutExtension(EditorApplication.currentScene);
+
         CreateTempPrefab();
 
         if (ExportCurrentUIEvent != null)
@@ -67,8 +95,6 @@ public partial class CBuild_UI : CBuild_Base
 
     public override void Export(string path)
     {
-        UIScenePath = path;
-
         EditorApplication.OpenScene(path);
 
         if (!CheckUI(false))
@@ -166,13 +192,6 @@ public partial class CBuild_UI : CBuild_Base
             }
 
         }
-
-        //if (changeLayer)
-        {
-            EditorApplication.SaveScene(); // 强制保存一下，保证一些Prefab更新
-        }
-
-
 
         return true;
     }
