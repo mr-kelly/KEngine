@@ -28,6 +28,8 @@ public class CWWWDownloader
     public bool IsFinished { get { return ErrorFlag || FinishedFlag; } }
 	private bool ErrorFlag = false;
     public bool IsError { get { return ErrorFlag; } }
+    
+    private bool UseCache;
 
     public WWW Www { get { return WWWLoader.Www; } }
     public float Progress { get {return WWWLoader.Progress;}} // 進度
@@ -42,14 +44,14 @@ public class CWWWDownloader
     {
         ToPath = toPath;
         _SavePath = CResourceModule.GetAppDataPath() + "/" + ToPath;
-
+        UseCache = useCache;
         CResourceModule.Instance.StartCoroutine(StartDownload(fullUrl));
     }
 
     IEnumerator StartDownload(string fullUrl)
     {
         float startTime = Time.time;
-        if (File.Exists(_SavePath))
+        if (UseCache && File.Exists(_SavePath))
         {
             FinishedFlag = true;
             ErrorFlag = false;

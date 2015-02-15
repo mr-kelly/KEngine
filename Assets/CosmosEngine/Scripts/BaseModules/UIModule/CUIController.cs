@@ -21,7 +21,6 @@ public abstract class CUIController : MonoBehaviour
 {
     public string UITemplateName = "";
     public string UIName = "";
-    public string UITitle = "(未设置)"; // UI的标题
     public bool HasBackBtn = true; // 是否有返回按钮
 
     public virtual void OnInit() { }

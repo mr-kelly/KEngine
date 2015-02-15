@@ -16,16 +16,8 @@ using System.IO;
 using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
-
-public abstract class CBaseUIBuilder
-{
-    
-}
-
-public class CUGUIBuilder
-{
-    
-}
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public partial class CBuild_UI : CBuild_Base
 {
@@ -261,7 +253,7 @@ public partial class CBuild_UI : CBuild_Base
     }
 
     /// <summary>
-    /// Buidl All UI Scene under Assets/_ResourcesBuild_s/ folder
+    /// Buidl All UI Scene under Assets/"+ CCosmosEngineDef.ResourcesBuildDir + "/ folder
     /// </summary>
     [MenuItem("CosmosEngine/UI/Export All UI")]
     public static void ExportAllUI()

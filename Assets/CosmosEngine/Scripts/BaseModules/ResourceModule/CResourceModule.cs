@@ -57,7 +57,7 @@ public class CResourceModule : MonoBehaviour, ICModule
     public static string DocumentResourcesPathWithOutFileStart;
     private static string DocumentResourcesPath;
 
-    public static CResourceManagerPathType ResourcePathType = CResourceManagerPathType.StreamingAssetsPathPriority;  // 是否優先找下載的資源?還是app本身資源優先
+    public static CResourceManagerPathType ResourcePathType = CResourceManagerPathType.PersistentDataPathPriority;  // 是否優先找下載的資源?還是app本身資源優先
 
     public static System.Func<string, string> CustomGetResourcesPath; // 自定义资源路径。。。
 
