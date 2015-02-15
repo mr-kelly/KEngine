@@ -53,7 +53,6 @@ public class CUGUIBuilder : CBuild_Base
         camera.farClipPlane = 2f;
 
         camera.gameObject.AddComponent<AudioListener>();
-        camera.gameObject.AddComponent<UICamera>();
 
         Selection.activeGameObject = uiObj;
     }

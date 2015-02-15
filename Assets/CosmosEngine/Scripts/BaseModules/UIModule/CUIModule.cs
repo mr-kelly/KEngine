@@ -26,7 +26,7 @@ public class CUIModule : ICModule
     /// <summary>
     /// A bridge for different UI System, for instance, you can use NGUI or EZGUI or etc.. UI Plugin through UIBridge
     /// </summary>
-    public ICUIBridge UiBridge;
+    public ICUIBridge UiBridge = new CUGUIBridge();
     public Dictionary<string, CUILoadState> UIWindows = new Dictionary<string, CUILoadState>();
     public bool UIRootLoaded = false;
 
@@ -38,17 +38,18 @@ public class CUIModule : ICModule
     {
     }
 
+    public void SetupUIBridge(ICUIBridge bridge)
+    {
+        UiBridge = bridge;
+    }
+
     public IEnumerator Init()
     {
-        Type bridgeType = Type.GetType(string.Format("C{0}Bridge", CCosmosEngine.GetConfig("UIBridgeType")));
-        if (bridgeType != null)
-        {
-            UiBridge = Activator.CreateInstance(bridgeType) as ICUIBridge;
-            UiBridge.InitBridge();
-        }
-        else
-            CDebug.Log("No UI Bridge in Use.");
-        
+        if (UiBridge == null)
+            UiBridge = new CUGUIBridge();
+
+        UiBridge.InitBridge();
+
         yield break;
     }
 

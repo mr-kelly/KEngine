@@ -110,43 +110,9 @@ public class CCosmosEngineWindow : EditorWindow
         AssetDatabase.Refresh();
     }
 
-    void OnGUI_SetUIBridge()
-    {
-        string uiBridgeType = GetConfValue("UIBridgeType");
-        CUIBridgeType curUiType = CUIBridgeType.NO_UI;
-        if (uiBridgeType == "NGUI")
-        {
-            curUiType = CUIBridgeType.NGUI;
-        }
-
-
-        CUIBridgeType selUiType = (CUIBridgeType)EditorGUILayout.EnumPopup("Use UI Bridge", curUiType);
-        if (selUiType != curUiType)
-        {
-            string uiType = selUiType.ToString();
-            DoSetUIBridgeMacro(uiType);
-            SetConfValue("UIBridgeType", uiType);
-        }
-    }
-    // 宏
-    void DoSetUIBridgeMacro(string uiType)
-    {
-        switch (uiType)
-        {
-            case "NGUI":
-                CBuildTools.AddDefineSymbols("NGUI");
-
-                break;
-            default:
-                CBuildTools.RemoveDefineSymbols("NGUI");
-                break;
-        }
-    }
-
     void OnGUI()
     {
         EditorGUILayout.LabelField("== Configure the CosmosEngine ==");
-        OnGUI_SetUIBridge();
 
         EditorGUILayout.Space();
 

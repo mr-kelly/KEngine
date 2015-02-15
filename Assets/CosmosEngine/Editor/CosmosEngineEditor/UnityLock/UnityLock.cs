@@ -120,7 +120,7 @@ public class UnityLock : EditorWindow
     {
         if (EditorPrefs.GetBool(addUndoRedoPrefKey))
         {
-            Undo.RegisterSceneUndo("Lock Object");
+            Undo.RecordObjects(new Object[] {go}, "Lock Object");
         }
         go.hideFlags |= HideFlags.NotEditable;
         foreach (Component comp in go.GetComponents(typeof(Component)))
@@ -141,7 +141,7 @@ public class UnityLock : EditorWindow
     {
         if (EditorPrefs.GetBool(addUndoRedoPrefKey))
         {
-            Undo.RegisterSceneUndo("Unlock Object");
+            Undo.RecordObjects(new Object[]{go}, "Unlock Object");
         }
         go.hideFlags &= ~HideFlags.NotEditable;
         foreach (Component comp in go.GetComponents(typeof(Component)))

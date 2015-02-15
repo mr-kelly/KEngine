@@ -732,34 +732,6 @@ public class CTool
             return from;
     }
 
-    public static void StopUITween(UnityEngine.GameObject gameObj, int tweenGroup = -1)
-    {
-        // 重置出现 移动动画
-        foreach (UITweener tween in gameObj.GetComponentsInChildren<UITweener>(true))
-        {
-            if (tweenGroup == -1 || tweenGroup == tween.tweenGroup)
-            {
-                tween.ResetToBeginning();
-                tween.enabled = false;
-            }
-        }
-    }
-
-    public static void ResetUITween(UnityEngine.GameObject gameObj, int tweenGroup = -1)
-    {
-        gameObj.SetActive(true);
-        // 重置出现 移动动画
-        foreach (UITweener tween in gameObj.GetComponentsInChildren<UITweener>(true))
-        {
-            if (tweenGroup == -1 || tweenGroup == tween.tweenGroup)
-            {
-                tween.enabled = true;
-                tween.ResetToBeginning();
-                tween.PlayForward();
-            }
-        }
-    }
-
     // 粒子特效比例缩放
     public static void ScaleParticleSystem(GameObject gameObj, float scale)
     {

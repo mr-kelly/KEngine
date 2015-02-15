@@ -1,65 +1,56 @@
-﻿////------------------------------------------------------------------------------
-////
-////      CosmosEngine - The Lightweight Unity3D Game Develop Framework
-//// 
-////                     Version 0.8 (20140904)
-////                     Copyright © 2011-2014
-////                   MrKelly <23110388@qq.com>
-////              https://github.com/mr-kelly/CosmosEngine
-////
-////------------------------------------------------------------------------------
-//using UnityEngine;
-//using System.Collections;
+﻿//------------------------------------------------------------------------------
+//
+//      CosmosEngine - The Lightweight Unity3D Game Develop Framework
+// 
+//                     Version 0.8 (20140904)
+//                     Copyright © 2011-2014
+//                   MrKelly <23110388@qq.com>
+//              https://github.com/mr-kelly/CosmosEngine
+//
+//------------------------------------------------------------------------------
+using UnityEngine;
+using System.Collections;
+using UnityEngine.UI;
 
-///// <summary>
-///// A script class that auto AddComponent to the UI AssetBundle(or Prefab)
-///// </summary>
-//public class CUIDemoHome : CUIController
-//{
-//    UIButton HomeButton;
-//    UILabel HomeLabel;
+/// <summary>
+/// A script class that auto AddComponent to the UI AssetBundle(or Prefab)
+/// </summary>
+public class CUIDemoHome : CUIController
+{
+    Button Button1;
+    private Text HomeLabel;
+    public override void OnInit()
+    {
+        base.OnInit();
 
-//    public override void OnInit()
-//    {
-//        base.OnInit();
+        Button1 = GetControl<Button>("Button1"); // child
+        CDebug.Assert(Button1);
 
-//        HomeButton = GetControl<UIButton>("Button"); // child
-//        CDebug.Assert(HomeButton);
+        HomeLabel = GetControl<Text>("HomeText");
 
-//        HomeLabel = GetControl<UILabel>("Button/Label"); // uri....
-//        CDebug.Assert(HomeLabel);
+        Button1.onClick.AddListener(() => CDebug.LogWarning("Click Home Button!"));
 
-//        HomeButton = FindControl<UIButton>("Button"); // find by gameobject name
-//        CDebug.Assert(HomeButton);
+    }
 
-//        HomeLabel = FindControl<UILabel>("Label"); // child name
-//        CDebug.Assert(HomeLabel);
+    public override void OnOpen(params object[] args)
+    {
+        base.OnOpen(args);
 
-//        HomeButton.onClick.Add(new EventDelegate(() => {
-//            CDebug.LogWarning("Click Home Button!");
-//        }));
-        
-//    }
+        StartCoroutine(DemoUIAnimate());
+    }
 
-//    public override void OnOpen(params object[] args)
-//    {
-//        base.OnOpen(args);
+    IEnumerator DemoUIAnimate()
+    {
+        yield return new WaitForSeconds(1f);
+        HomeLabel.text = "Change UI Label...... 1";
 
-//        StartCoroutine(DemoUIAnimate());
-//    }
+        yield return new WaitForSeconds(1f);
+        HomeLabel.text = "Change UI Label...... 2";
 
-//    IEnumerator DemoUIAnimate()
-//    {
-//        yield return new WaitForSeconds(1f);
-//        HomeLabel.text = "Change UI Label...... 1";
+        yield return new WaitForSeconds(1f);
+        HomeLabel.text = "Change UI Label...... 3";
 
-//        yield return new WaitForSeconds(1f);
-//        HomeLabel.text = "Change UI Label...... 2";
-
-//        yield return new WaitForSeconds(1f);
-//        HomeLabel.text = "Change UI Label...... 3";
-
-//        yield return new WaitForSeconds(1f);
-//        HomeLabel.text = "CosmosEngine Demo!";
-//    }
-//}
+        yield return new WaitForSeconds(1f);
+        HomeLabel.text = "CosmosEngine Demo!";
+    }
+}

@@ -279,7 +279,6 @@ public partial class CBuildTools
     public static string ExecutePyFile(string pyFileFullPath, string arguments)
     {
         var guids = AssetDatabase.FindAssets("py");
-        var success = false;
         foreach (var guid in guids)
         {
             var assetPath = AssetDatabase.GUIDToAssetPath(guid);
