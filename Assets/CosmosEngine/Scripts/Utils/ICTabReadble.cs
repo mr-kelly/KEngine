@@ -6,12 +6,14 @@ public interface ICTabReadble
     bool HasColumn(string columnName);
     int GetInteger(int row, string columnName);
     string GetString(int row, string columnName);
+    string GetString(int row, int columnIndex);
     float GetFloat(int row, string columnName);
     bool GetBool(int row, string columnName);
     double GetDouble(int row, string columnName);
     uint GetUInteger(int row, string columnName);
 
     int GetHeight();
+    int GetColumnCount();
 
     void Close();
 }

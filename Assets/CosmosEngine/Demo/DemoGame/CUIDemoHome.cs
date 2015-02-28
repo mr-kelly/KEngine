@@ -10,35 +10,26 @@
 //------------------------------------------------------------------------------
 using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 /// <summary>
 /// A script class that auto AddComponent to the UI AssetBundle(or Prefab)
 /// </summary>
 public class CUIDemoHome : CUIController
 {
-    UIButton HomeButton;
-    UILabel HomeLabel;
-
+    Button Button1;
+    private Text HomeLabel;
     public override void OnInit()
     {
         base.OnInit();
 
-        HomeButton = GetControl<UIButton>("Button"); // child
-        CDebug.Assert(HomeButton);
+        Button1 = GetControl<Button>("Button1"); // child
+        CDebug.Assert(Button1);
 
-        HomeLabel = GetControl<UILabel>("Button/Label"); // uri....
-        CDebug.Assert(HomeLabel);
+        HomeLabel = GetControl<Text>("HomeText");
 
-        HomeButton = FindControl<UIButton>("Button"); // find by gameobject name
-        CDebug.Assert(HomeButton);
+        Button1.onClick.AddListener(() => CDebug.LogWarning("Click Home Button!"));
 
-        HomeLabel = FindControl<UILabel>("Label"); // child name
-        CDebug.Assert(HomeLabel);
-
-        HomeButton.onClick.Add(new EventDelegate(() => {
-            CDebug.LogWarning("Click Home Button!");
-        }));
-        
     }
 
     public override void OnOpen(params object[] args)

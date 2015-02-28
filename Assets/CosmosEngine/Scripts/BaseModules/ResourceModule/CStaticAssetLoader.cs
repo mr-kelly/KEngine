@@ -8,46 +8,62 @@
 //              https://github.com/mr-kelly/CosmosEngine
 //
 //------------------------------------------------------------------------------
-using UnityEngine;
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
+using Object = UnityEngine.Object;
 
-public class CStaticAssetLoader
+/// <summary>
+/// 静态对象加载，通常用于全局唯一的GameObject，  
+/// 跟其它TextureLoader不一样的是,它会拷一份
+/// 原加载对象(AssetFileBridge)会被删除，节省内存
+/// </summary>
+public class CStaticAssetLoader : CBaseResourceLoader
 {
-    static Dictionary<string, Object> CachcedAssets = new Dictionary<string, Object>();
-
-    Object ResultAsset;
-
-    public bool IsFinished = false;
-
-    public Object Asset { get { return ResultAsset; } }
-
-    public CStaticAssetLoader(string path, CResourceModule.ASyncLoadABAssetDelegate callback = null, params object[] args)
+    public UnityEngine.Object TheAsset; // Copy
+    private CAssetFileLoader BridgeLoader;
+    public override float Progress
     {
+        get
+        {
+            return BridgeLoader.Progress;
+        }
+    }
+    public static CStaticAssetLoader Load(string url, CAssetFileLoader.CAssetFileBridgeDelegate callback = null)
+    {
+        CLoaderDelgate newCallback = null;
+        if (callback != null)
+        {
+            newCallback = (isOk, obj) => callback(isOk, obj as UnityEngine.Object);
+        }
+
+        return AutoNew<CStaticAssetLoader>(url, newCallback);
+    }
+
+    protected override void Init(string path)
+    {
+        base.Init(path);
         if (string.IsNullOrEmpty(path))
             CDebug.LogError("XStaticAssetLoader 空资源路径!");
 
-        new CAssetFileBridge(path, (_isOk, _obj) =>
+        BridgeLoader = CAssetFileLoader.Load(path, (_isOk, _obj) =>
         {
-            Object asset = null;
-            if (!CachcedAssets.TryGetValue(path, out asset))
-            {
-                asset = Object.Instantiate(_obj);
-                CachcedAssets[path] = asset;
-            }
-            
-            if (callback != null)
-                callback(asset, args);
-
-            OnLoad(path, asset);
-
+            TheAsset = Object.Instantiate(_obj);
+            OnFinish(TheAsset);
+#if UNITY_EDITOR
+            if (TheAsset != null)
+                CResourceLoadObjectDebugger.Create("StaticAsset", path, TheAsset);
+#endif
         });
     }
 
-    void OnLoad(string path, UnityEngine.Object staticAsset)
+    protected override void DoDispose()
     {
-        ResultAsset = staticAsset;
-
-        IsFinished = true;
+        base.DoDispose();
+        
+        GameObject.Destroy(TheAsset);
+        BridgeLoader.Release();
     }
 }

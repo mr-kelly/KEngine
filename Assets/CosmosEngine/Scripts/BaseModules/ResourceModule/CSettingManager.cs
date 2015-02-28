@@ -58,11 +58,11 @@ public class CSettingManager : ICModule
 
 	IEnumerator InitSetting()
 	{
-		CAssetLoader assetLoader = new CAssetLoader("GameSetting" + CCosmosEngine.GetConfig("AssetBundleExt"), null);
+		var assetLoader = CStaticAssetLoader.Load("GameSetting" + CCosmosEngine.GetConfig("AssetBundleExt"), null);
 		while (!assetLoader.IsFinished)
 			yield return null;
 
-        CGameSettingFiles gameSetting = (CGameSettingFiles)assetLoader.Asset;
+        CGameSettingFiles gameSetting = (CGameSettingFiles)assetLoader.TheAsset;
 
 		for (int i = 0; i < gameSetting.SettingFiles.Length; ++i)
 		{
@@ -72,6 +72,7 @@ public class CSettingManager : ICModule
 		CDebug.Log("{0} setting files loaded.", GameSettings.Count);
 
 		Object.Destroy(gameSetting);
+	    assetLoader.Release();
 		LoadFinished = true;
 	}
 

@@ -110,71 +110,9 @@ public class CCosmosEngineWindow : EditorWindow
         AssetDatabase.Refresh();
     }
 
-    void OnGUI_SetUIBridge()
-    {
-        string uiBridgeType = GetConfValue("UIBridgeType");
-        CUIBridgeType curUiType = CUIBridgeType.NO_UI;
-        if (uiBridgeType == "NGUI")
-        {
-            curUiType = CUIBridgeType.NGUI;
-        }
-
-
-        CUIBridgeType selUiType = (CUIBridgeType)EditorGUILayout.EnumPopup("Use UI Bridge", curUiType);
-        if (selUiType != curUiType)
-        {
-            string uiType = selUiType.ToString();
-            DoSetUIBridge(uiType);
-            SetConfValue("UIBridgeType", uiType);
-        }
-    }
-
-    void RemoveDefineSymbols(string symbol)
-    {
-        foreach (BuildTargetGroup target in System.Enum.GetValues(typeof(BuildTargetGroup)))
-        {
-            string symbolStr = PlayerSettings.GetScriptingDefineSymbolsForGroup(target);
-            List<string> symbols = new List<string>(symbolStr.Split(new char[] { ';' }, System.StringSplitOptions.RemoveEmptyEntries));
-            if (symbols.Contains(symbol))
-                symbols.Remove(symbol);
-            PlayerSettings.SetScriptingDefineSymbolsForGroup(target, string.Join(";", symbols.ToArray()));
-        }
-
-
-    }
-
-    void AddDefineSymbols(string symbol)
-    {
-        foreach (BuildTargetGroup target in System.Enum.GetValues(typeof(BuildTargetGroup)))
-        {
-            string symbolStr = PlayerSettings.GetScriptingDefineSymbolsForGroup(target);
-            List<string> symbols = new List<string>(symbolStr.Split(new char[] { ';' }, System.StringSplitOptions.RemoveEmptyEntries));
-            if (!symbols.Contains(symbol))
-            {
-                symbols.Add(symbol);
-                PlayerSettings.SetScriptingDefineSymbolsForGroup(target, string.Join(";", symbols.ToArray()));
-            }
-        }
-    }
-
-    void DoSetUIBridge(string uiType)
-    {
-        switch (uiType)
-        {
-            case "NGUI":
-                AddDefineSymbols("NGUI");
-
-                break;
-            default:
-                RemoveDefineSymbols("NGUI");
-                break;
-        }
-    }
-
     void OnGUI()
     {
         EditorGUILayout.LabelField("== Configure the CosmosEngine ==");
-        OnGUI_SetUIBridge();
 
         EditorGUILayout.Space();
 

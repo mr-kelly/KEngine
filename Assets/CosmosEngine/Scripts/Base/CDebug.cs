@@ -28,7 +28,7 @@ public class CDebug
         IsDebugBuild = UnityEngine.Debug.isDebugBuild;
     }
 
-    enum XLogType
+    enum LogType
     {
         NORMAL,
         WARNING, 
@@ -77,15 +77,13 @@ public class CDebug
 #endif
     }
 
-	public static void Log(string log)
-	{
-		log = string.Format("[{0}] {1}\n\n===============================================================================\n\n", DateTime.Now.ToString("HH:mm:ss.ffff"), log);
-        DoLog(log, XLogType.NORMAL);
-	}
-
+    public static void Log(string log)
+    {
+        DoLog(log, LogType.NORMAL);
+    }
 	public static void Log(string log, params object[] args)
 	{
-		Log(string.Format(log, args));
+        DoLog(string.Format(log, args), LogType.NORMAL);
 	}
 	
 	public static void Logs(params object[] logs)
@@ -105,7 +103,7 @@ public class CDebug
 		StackFrame sf = stackFrames[stack];
 		string log = string.Format("[ERROR]{0}\n\n{1}:{2}\t{3}", err, sf.GetFileName(), sf.GetFileLineNumber(), sf.GetMethod());
 		Console.Write(log);
-        DoLog(log, XLogType.ERROR);
+        DoLog(log, LogType.ERROR);
 
         if (LogErrorEvent != null)
             LogErrorEvent(err);
@@ -119,7 +117,7 @@ public class CDebug
 	public static void LogWarning(string err, params object[] args)
 	{
 		string log = string.Format(err, args);
-        DoLog(log, XLogType.WARNING);
+        DoLog(log, LogType.WARNING);
 	}
 
 	public static void Pause()
@@ -127,17 +125,19 @@ public class CDebug
 		UnityEngine.Debug.Break();
 	}
 
-    private static void DoLog(string szMsg, XLogType emType)
+    private static void DoLog(string szMsg, LogType emType)
     {
+        szMsg = string.Format("[{0}]{1}\n\n=================================================================", DateTime.Now.ToString("HH:mm:ss.ffff"), szMsg);
+
         switch (emType)
         {
-            case XLogType.NORMAL:
+            case LogType.NORMAL:
                 UnityEngine.Debug.Log(szMsg);
                 break;
-            case XLogType.WARNING:
+            case LogType.WARNING:
                 UnityEngine.Debug.LogWarning(szMsg);
                 break;
-            case XLogType.ERROR:
+            case LogType.ERROR:
                 UnityEngine.Debug.LogError(szMsg);
                 break;
         }

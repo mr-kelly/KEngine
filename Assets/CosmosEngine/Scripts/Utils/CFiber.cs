@@ -80,9 +80,9 @@ public class CFiber : MonoBehaviour
         CDebug.Assert(TimeScale > 0);
 
         if (TimeScale > 1)
-            exeCount = Mathf.FloorToInt(TimeScale);
+            exeCount = Mathf.RoundToInt(TimeScale);
         else if (TimeScale < 1)
-            interval = Mathf.FloorToInt(1f / TimeScale);
+            interval = Mathf.RoundToInt(1f / TimeScale);
 
         if (interval == 0 || UpdateCount % interval == 0)
         {

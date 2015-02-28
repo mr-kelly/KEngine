@@ -24,26 +24,41 @@ public class CWWWDownloader
 
     float TIME_OUT_DEF = 5f; // 5秒延遲
 
-    private bool ForceFinished = false;
-    public bool IsFinished { get { return WWWLoader.IsError || WWWLoader.IsFinished || ForceFinished; } }
-	private bool ForceError = false;
-    public bool IsError { get { return WWWLoader.IsError || ForceError; } }
+    private bool FinishedFlag = false;
+    public bool IsFinished { get { return ErrorFlag || FinishedFlag; } }
+	private bool ErrorFlag = false;
+    public bool IsError { get { return ErrorFlag; } }
+    
+    private bool UseCache;
+
     public WWW Www { get { return WWWLoader.Www; } }
     public float Progress { get {return WWWLoader.Progress;}} // 進度
 
-    public CWWWDownloader(string fullUrl, string toPath)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="fullUrl"></param>
+    /// <param name="toPath"></param>
+    /// <param name="useCache">如果存在则不下载了！</param>
+    public CWWWDownloader(string fullUrl, string toPath, bool useCache = false)
     {
         ToPath = toPath;
         _SavePath = CResourceModule.GetAppDataPath() + "/" + ToPath;
-
-        WWWLoader = new CWWWLoader(fullUrl);
+        UseCache = useCache;
         CResourceModule.Instance.StartCoroutine(StartDownload(fullUrl));
     }
 
     IEnumerator StartDownload(string fullUrl)
     {
         float startTime = Time.time;
-        
+        if (UseCache && File.Exists(_SavePath))
+        {
+            FinishedFlag = true;
+            ErrorFlag = false;
+            yield break;
+        }
+
+        WWWLoader = CWWWLoader.Load(fullUrl);
         while (!WWWLoader.IsFinished)
         {
             if (WWWLoader.Progress == 0 && Time.time - startTime > TIME_OUT_DEF)
@@ -54,20 +69,30 @@ public class CWWWDownloader
 
             yield return null;
         }
+
         if (WWWLoader.IsError || !WWWLoader.IsFinished)
         {
             CDebug.LogError("Download WWW Error: {0}", fullUrl);
-            ForceFinished = true;
-	        ForceError = true;
+            FinishedFlag = true;
+	        ErrorFlag = true;
             yield break;
         }
 
+        
         string dir = Path.GetDirectoryName(_SavePath);
         if (!Directory.Exists(dir))
             Directory.CreateDirectory(dir);
 
         System.IO.File.WriteAllBytes(_SavePath, WWWLoader.Www.bytes);
+
+        FinishedFlag = true;
         // WWW没用了
-        WWWLoader.Dispose();
+        WWWLoader.Release();
+    }
+
+    public byte[] GetDatas()
+    {
+        CDebug.Assert(IsFinished);
+        return System.IO.File.ReadAllBytes(_SavePath);
     }
 }

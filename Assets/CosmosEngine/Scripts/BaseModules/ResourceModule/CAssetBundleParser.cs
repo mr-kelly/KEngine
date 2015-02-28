@@ -13,26 +13,29 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+/// <summary>
+/// AssetBundle字节解析器
+/// </summary>
 public class CAssetBundleParser
 {
-    string RelativeUrl;
-    Action<AssetBundle> Callback;
+    private bool IsDisposed = false;
+    private bool UnloadAllAssets; // Dispose时赋值
 
-    AssetBundleCreateRequest CreateRequest;
-
-    public bool IsFinished { get { return CreateRequest.isDone; } }
-    public AssetBundle Bundle {get {return CreateRequest.assetBundle;}}
-
+    readonly Action<AssetBundle> Callback;
+    public bool IsFinished;
+    public AssetBundle Bundle;
     public static Func<string, byte[], AssetBundleCreateRequest> ParseFunc = null; // 可以放置資源加密函數
+    private static int AutoPriority = 1;
+    private readonly AssetBundleCreateRequest CreateRequest;
+    public float Progress {get { return CreateRequest.progress; }}
 
     public CAssetBundleParser(string relativePath, byte[] bytes, Action<AssetBundle> callback = null)
     {
-        RelativeUrl = relativePath;
         Callback = callback;
 
         var func = ParseFunc ?? DefaultParseAb;
-        CreateRequest = func(RelativeUrl, bytes);  // 不重複創建...
-
+        CreateRequest = func(relativePath, bytes);
+        CreateRequest.priority = AutoPriority++; // 后进先出
         CResourceModule.Instance.StartCoroutine(WaitCreateAssetBundle(CreateRequest));
     }
 
@@ -44,13 +47,34 @@ public class CAssetBundleParser
             yield return null;
         }
 
-        if (Callback != null)
-            Callback(Bundle);
+        IsFinished = true;
+        Bundle = req.assetBundle;
+
+        if (IsDisposed)
+            DisposeBundle();
+        else
+        {
+            if (Callback != null)
+                Callback(Bundle);    
+        }
     }
 
 
     static AssetBundleCreateRequest DefaultParseAb(string relativePath, byte[] bytes)
     {
         return AssetBundle.CreateFromMemory(bytes);
+    }
+
+    private void DisposeBundle()
+    {
+        Bundle.Unload(UnloadAllAssets);
+    }
+
+    public void Dispose(bool unloadAllAssets)
+    {
+        UnloadAllAssets = unloadAllAssets;
+        if (Bundle != null)
+            DisposeBundle();
+        IsDisposed = true;
     }
 }

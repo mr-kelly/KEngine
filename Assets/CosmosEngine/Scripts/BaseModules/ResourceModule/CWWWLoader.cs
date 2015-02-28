@@ -18,132 +18,149 @@ using System.Collections.Generic;
 /// Current version, loaded Resource will never release in memory
 /// </summary>
 [CDependencyClass(typeof(CResourceModule))]
-public class CWWWLoader : IDisposable
+public class CWWWLoader : CBaseResourceLoader
 {
-    class CLoadingCache
-    {
-        public string Url;
-        public WWW Www;
-        public CLoadingCache(string url)
-        {
-            Url = url;
-        }
-    }
-
+    // 前几项用于监控器
+    private static IEnumerator CachedWWWLoaderMonitorCoroutine; // 专门监控WWW的协程
+    const int MAX_WWW_COUNT = 5;
+    private static int WWWLoadingCount = 0; // 有多少个WWW正在运作, 有上限的
+    private static readonly Stack<CWWWLoader> WWWLoadersStack = new Stack<CWWWLoader>();  // WWWLoader的加载是后进先出! 有一个协程全局自我管理. 后来涌入的优先加载！
+    
     public static event Action<string> WWWFinishCallback;
-
-    static Dictionary<string, CLoadingCache> Loaded = new Dictionary<string, CLoadingCache>();
-    CLoadingCache WwwCache = null;
-
-    public bool IsFinished { get { return WwwCache != null || IsError; } }  // 可协程不停判断， 或通过回调
-
-    public bool IsError { get; private set; }
-
-    public WWW Www { get { return WwwCache.Www; } }
-
-    public float Progress = 0;
+    
+    public WWW Www;
 
     /// <summary>
     /// Use this to directly load WWW by Callback or Coroutine, pass a full URL.
     /// A wrapper of Unity's WWW class.
     /// </summary>
-    public CWWWLoader(string url, Action<bool, WWW, object[]> callback = null, params object[] callbackArgs)
+    public static CWWWLoader Load(string url, CLoaderDelgate callback = null)
     {
-        IsError = false;
-        CResourceModule.Instance.StartCoroutine(CoLoad(url, callback, callbackArgs));//开启协程加载Assetbundle，执行Callback
+        var wwwLoader = AutoNew<CWWWLoader>(url, callback);
+        return wwwLoader;
     }
 
-    /// <summary>
-	/// 协和加载Assetbundle，加载完后执行callback
-	/// </summary>
-	/// <param name="url">资源的url</param>
-	/// <param name="callback"></param>
-	/// <param name="callbackArgs"></param>
-	/// <returns></returns>
-    IEnumerator CoLoad(string url, Action<bool, WWW, object[]> callback = null, params object[] callbackArgs)
+    protected override void Init(string url)
     {
-        if (CResourceModule.LoadByQueue)
-        {
-            while (Loaded.Count != 0)
-                yield return null;
-        }
+        base.Init(url);
+        WWWLoadersStack.Push(this);  // 不执行开始加载，由www监控器协程控制
 
+        if (CachedWWWLoaderMonitorCoroutine == null)
+        {
+            CachedWWWLoaderMonitorCoroutine = WWWLoaderMonitorCoroutine();
+            CResourceModule.Instance.StartCoroutine(CachedWWWLoaderMonitorCoroutine);
+        }
+    }
+
+    protected void StartLoad()
+    {
+        CResourceModule.Instance.StartCoroutine(CoLoad(Url));//开启协程加载Assetbundle，执行Callback
+    }
+    /// <summary>
+    /// 协和加载Assetbundle，加载完后执行callback
+    /// </summary>
+    /// <param name="url">资源的url</param>
+    /// <param name="callback"></param>
+    /// <param name="callbackArgs"></param>
+    /// <returns></returns>
+    IEnumerator CoLoad(string url)
+    {
         CResourceModule.LogRequest("WWW", url);
 
-        CLoadingCache cache = null;
+        System.DateTime beginTime = System.DateTime.Now;
+        Www = new WWW(url);
+        WWWLoadingCount++;
 
-        if (!Loaded.TryGetValue(url, out cache))
+        //设置AssetBundle解压缩线程的优先级
+        Www.threadPriority = Application.backgroundLoadingPriority;  // 取用全局的加载优先速度
+        while (!Www.isDone)
         {
-            cache = new CLoadingCache(url);
-            Loaded.Add(url, cache);
-            System.DateTime beginTime = System.DateTime.Now;
-            WWW www = new WWW(url);
+            Progress = Www.progress;
+            yield return null;
+        }
 
-			//设置AssetBundle解压缩线程的优先级
-            www.threadPriority = Application.backgroundLoadingPriority;  // 取用全局的加载优先速度
-            while (!www.isDone)
+        yield return Www;
+        WWWLoadingCount--;
+		Progress = 1;
+		
+        if (!string.IsNullOrEmpty(Www.error))
+        {
+            string fileProtocol = CResourceModule.GetFileProtocol();
+            if (url.StartsWith(fileProtocol))
             {
-                Progress = www.progress;
-                yield return null;
+                string fileRealPath = url.Replace(fileProtocol, "");
+                CDebug.LogError("File {0} Exist State: {1}", fileRealPath, System.IO.File.Exists(fileRealPath));
+
             }
+            CDebug.LogError("[CWWWLoader:Error]" + Www.error + " " + url);
 
-            yield return www;
-
-            if (!string.IsNullOrEmpty(www.error))
-            {
-                IsError = true;
-                string fileProtocol = CResourceModule.GetFileProtocol();
-                if (url.StartsWith(fileProtocol))
-                {
-                    string fileRealPath = url.Replace(fileProtocol, "");
-                    CDebug.LogError("File {0} Exist State: {1}", fileRealPath, System.IO.File.Exists(fileRealPath));
-
-                }
-                CDebug.LogError(www.error + " " + url);
-                if (callback != null)
-                    callback(false, null, null); // 失败callback
-                yield break;
-            }
-            else
-            {
-                CResourceModule.LogLoadTime("WWW", url, beginTime);
-
-                cache.Www = www;
-
-                if (WWWFinishCallback != null)
-                    WWWFinishCallback(url);
-            }
-
+            OnFinish(null);
+            yield break;
         }
         else
         {
-            //if (cache.Www != null)
-            //    yield return null;  // 确保每一次异步读取资源都延迟一帧
+            CResourceModule.LogLoadTime("WWW", url, beginTime);
+            if (WWWFinishCallback != null)
+                WWWFinishCallback(url);
 
-            while (cache.Www == null)  // 加载中，但未加载完
-                yield return null;
+            OnFinish(Www);
         }
 
-        
-        Progress = cache.Www.progress;
-        WwwCache = cache;
+#if UNITY_EDITOR  // 预防WWW加载器永不反初始化
+        while (GetCount<CWWWLoader>() > 0)
+            yield return null;
 
-        if (callback != null)
-            callback(true, WwwCache.Www, callbackArgs);
+        yield return new WaitForSeconds(5f);
 
+        while (Debug.isDebugBuild && !IsDisposed)
+        {
+            CDebug.LogError("[CWWWLoader]Not Disposed Yet! : {0}", this.Url);
+            yield return null;
+        }
+#endif
     }
-    
-    /// <summary>
-    /// 手动释放该部分内存
-    /// </summary>
-    public void Dispose()
+
+    protected override void DoDispose()
     {
-        if (WwwCache != null)
-        {
-            WwwCache.Www.Dispose();
-            Loaded.Remove(WwwCache.Url);
-        }
-        else
-            CDebug.LogError("[CWWWLoader:Release]无缓存的WWW");
+        base.DoDispose();
+
+        Www.Dispose();
+        Www = null;
     }
+
+
+
+
+    /// <summary>
+    /// 监视器协程
+    /// 超过最大WWWLoader时，挂起~
+    /// 
+    /// 后来的新loader会被优先加载
+    /// </summary>
+    /// <returns></returns>
+    protected static IEnumerator WWWLoaderMonitorCoroutine()
+    {
+        //yield return new WaitForEndOfFrame(); // 第一次等待本帧结束
+        yield return null;
+
+        while (WWWLoadersStack.Count > 0)
+        {
+            if (CResourceModule.LoadByQueue)
+            {
+                while (GetCount<CWWWLoader>() != 0)
+                    yield return null;
+            }
+            while (WWWLoadingCount >= MAX_WWW_COUNT)
+            {
+                yield return null;
+            }
+
+            var wwwLoader = WWWLoadersStack.Pop();
+            wwwLoader.StartLoad();
+        }
+
+        CResourceModule.Instance.StopCoroutine(CachedWWWLoaderMonitorCoroutine);
+        CachedWWWLoaderMonitorCoroutine = null;
+    }
+
 }

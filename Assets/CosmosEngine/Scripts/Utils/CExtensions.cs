@@ -28,6 +28,11 @@ public static class CExtensions
 	{
 		t.position = new Vector3(t.position.x, newY, t.position.z);
 	}
+
+    public static void SetLocalPositionX(this Transform t, float newX)
+    {
+        t.localPosition = new Vector3(newX, t.localPosition.y, t.localPosition.z);
+    }
     public static void SetLocalPositionY(this Transform t, float newY)
     {
         t.localPosition = new Vector3(t.localPosition.x, newY, t.localPosition.z);
@@ -78,14 +83,13 @@ public static class CExtensions
 
 	public static int ToInt32(this string val)
 	{
-		return Convert.ToInt32(val);
+	    return string.IsNullOrEmpty(val) ? 0 : Convert.ToInt32(val);
 	}
 
-	public static float ToFloat(this string val)
-	{
-	    if (val == null || val.Equals("")) return 0f;
-		return Convert.ToSingle(val);
-	}
+    public static float ToFloat(this string val)
+    {
+        return string.IsNullOrEmpty(val) ? 0f : Convert.ToSingle(val);
+    }
 
     /// <summary>
     /// Get from object Array

@@ -57,7 +57,7 @@ public class CResourceModule : MonoBehaviour, ICModule
     public static string DocumentResourcesPathWithOutFileStart;
     private static string DocumentResourcesPath;
 
-    public static CResourceManagerPathType ResourcePathType = CResourceManagerPathType.StreamingAssetsPathPriority;  // 是否優先找下載的資源?還是app本身資源優先
+    public static CResourceManagerPathType ResourcePathType = CResourceManagerPathType.PersistentDataPathPriority;  // 是否優先找下載的資源?還是app本身資源優先
 
     public static System.Func<string, string> CustomGetResourcesPath; // 自定义资源路径。。。
 
@@ -72,21 +72,29 @@ public class CResourceModule : MonoBehaviour, ICModule
         return string.Format(path + CCosmosEngine.GetConfig("AssetBundleExt"), formats);
     }
 
+    // 检查资源是否存在
+    public static bool ContainsResourceUrl(string resourceUrl)
+    {
+        string fullPath;
+        return GetResourceFullPath(resourceUrl, out fullPath, false);
+    }
+
     /// <summary>
     /// 完整路径，www加载
     /// </summary>
     /// <param name="url"></param>
+    /// <param name="isLog"></param>
     /// <returns></returns>
-    public static string GetResourceFullPath(string url)
+    public static string GetResourceFullPath(string url, bool isLog = true)
     {
         string fullPath;
-        if (GetResourceFullPath(url, out fullPath))
+        if (GetResourceFullPath(url, out fullPath, isLog))
             return fullPath;
 
         return null;
     }
 
-    public static bool GetResourceFullPath(string url, out string fullPath)
+    public static bool GetResourceFullPath(string url, out string fullPath, bool isLog = true)
     {
         if (string.IsNullOrEmpty(url))
             CDebug.LogError("尝试获取一个空的资源路径！");
@@ -95,7 +103,7 @@ public class CResourceModule : MonoBehaviour, ICModule
         bool hasDocUrl = TryGetDocumentResourceUrl(url, out docUrl);
 
         string inAppUrl;
-        bool hasInAppUrl = TryGetInAppResourceUrl(url, out inAppUrl);
+        bool hasInAppUrl = TryGetInAppResourceUrl(url, out inAppUrl, isLog);
 
         if (ResourcePathType == CResourceManagerPathType.PersistentDataPathPriority)  // 優先下載資源模式
         {
@@ -111,7 +119,8 @@ public class CResourceModule : MonoBehaviour, ICModule
 
         if (!hasInAppUrl) // 连本地资源都没有，直接失败吧 ？？ 沒有本地資源但又遠程資源？竟然！!?
         {
-            CDebug.LogError("找不到InApp的資源: {0}", url);
+            if (isLog)
+                CDebug.LogError("找不到InApp的資源: {0}", url);
             fullPath = null;
             return false;
         }
@@ -139,14 +148,15 @@ public class CResourceModule : MonoBehaviour, ICModule
     }
 
     // (not android ) only! Android资源不在目录！
-    public static bool TryGetInAppResourceUrl(string url, out string newUrl)
+    public static bool TryGetInAppResourceUrl(string url, out string newUrl, bool isLog = true)
     {
         newUrl = ResourcesPath + url;
 
         // 注意，StreamingAssetsPath在Android平台時，壓縮在apk里面，不要做文件檢查了
         if (Application.platform != RuntimePlatform.Android && !File.Exists(ResourcesPathWithOutFileProtocol + url))
         {
-            CDebug.LogError("[GetResourcePath:InAppUrl]Not Exist File: {0}", newUrl);
+            if (isLog)
+                CDebug.LogError("[GetResourcePath:InAppUrl]Not Exist File: {0}", newUrl);
             return false;
         }
 

@@ -18,10 +18,10 @@ using System.Reflection;
 
 public abstract class CBuild_Base
 {
-	public virtual void BeginExport() { }
+	public virtual void BeforeExport() { }
     public abstract void Export(string path);
 
-	public virtual void EndExport() { }
+	public virtual void AfterExport() { }
 
 	public abstract string GetDirectory();
 	public abstract string GetExtention();
@@ -37,21 +37,21 @@ public partial class CAutoResourceBuilder
         if (ext.StartsWith("dir:"))  // 目錄下的所有文件，包括子文件夾
         {
             string newExt = ext.Replace("dir:", "");
-            itemArray = Directory.GetFiles("Assets/_ResourcesBuild_/" + export.GetDirectory(), newExt, SearchOption.AllDirectories);
+            itemArray = Directory.GetFiles("Assets/" + CCosmosEngineDef.ResourcesBuildDir + "/" + export.GetDirectory(), newExt, SearchOption.AllDirectories);
         }
         else if (ext == "dir")
-            itemArray = Directory.GetDirectories("Assets/_ResourcesBuild_/" + export.GetDirectory());
+            itemArray = Directory.GetDirectories("Assets/" + CCosmosEngineDef.ResourcesBuildDir + "/" + export.GetDirectory());
         else if (ext == "")
             itemArray = new string[0];
         else
-            itemArray = Directory.GetFiles("Assets/_ResourcesBuild_/" + export.GetDirectory(), export.GetExtention());  // 不包括子文件夾
+            itemArray = Directory.GetFiles("Assets/" + CCosmosEngineDef.ResourcesBuildDir + "/" + export.GetDirectory(), export.GetExtention());  // 不包括子文件夾
 
-        export.BeginExport();
+        export.BeforeExport();
         foreach (string item in itemArray)
         {
             export.Export(item.Replace('\\', '/'));
         }
-        export.EndExport();
+        export.AfterExport();
     }
 
 }

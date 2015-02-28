@@ -57,6 +57,10 @@ public class CGameSettings : ICModule
         LoadTab(typeof (T), lazyLoad, tabPaths);
     }
 
+    /// <summary>
+    /// 确保读取完
+    /// </summary>
+    /// <param name="type"></param>
     private void EnsureLoad(Type type)
     {
         CDebug.Assert(typeof(CBaseInfo).IsAssignableFrom(type));
@@ -74,7 +78,22 @@ public class CGameSettings : ICModule
         EnsureLoad(type);
     }
 
-    private void DoLoadTab(Type type, string[] tabPaths)
+    /// <summary>
+    /// 外部人工手动读取
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="tabPaths"></param>
+    public void ForceLoadTab(Type type, params string[] tabPaths)
+    {
+        DoLoadTab(type, tabPaths);
+    }
+
+    /// <summary>
+    /// 真正进行读取
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="tabPaths"></param>
+    private void DoLoadTab(Type type, IEnumerable<string> tabPaths)
     {
         CDebug.Assert(typeof(CBaseInfo).IsAssignableFrom(type));
 
@@ -94,24 +113,26 @@ public class CGameSettings : ICModule
                     dict = new Dictionary<string, CBaseInfo>();
 
                 const int rowStart = 1;
-                for (int i = rowStart; i < tabFile.GetHeight(); i++)
+                for (int row = rowStart; row < tabFile.GetHeight(); row++)
                 {
                     // 先读取ID， 获取是否之前已经读取过配置，
                     // 如果已经读取过，那么获取原配置对象，并重新赋值 (因为游戏中其它地方已经存在它的引用了，直接替换内存泄露)
-                    string id = tabFile.GetString(i, "Id"); // 获取ID是否存在, 如果已经存在，那么替换其属性，不new一个
+                    string id = tabFile.GetString(row, "Id"); // 获取ID是否存在, 如果已经存在，那么替换其属性，不new一个
                     CBaseInfo existOne;
                     if (dict.TryGetValue(id, out existOne))
                     {
                         if (FoundDuplicatedIdEvent != null)
-                            FoundDuplicatedIdEvent(tabPath, i, id);
+                            FoundDuplicatedIdEvent(tabPath, row, id);
 
-                        CBaseInfo existT = existOne;
-                        CBaseInfo.LoadFromTab(type, ref existT, tabFile, i); // 修改原对象，不new
-                        (existT as CBaseInfo).Parse();
+                        CBaseInfo existInfo = existOne;
+                        CBaseInfo.ReadFromTab(type, ref existInfo, tabFile, row); // 修改原对象，不new
+                        existInfo.CustomReadLine(tabFile, row);
+                        (existInfo as CBaseInfo).Parse();
                     }
                     else
                     {
-                        CBaseInfo pInfo = CBaseInfo.LoadFromTab(type, tabFile, i);
+                        CBaseInfo pInfo = CBaseInfo.NewFromTab(type, tabFile, row);
+                        pInfo.CustomReadLine(tabFile, row);
                         pInfo.Parse();
                         dict[pInfo.Id] = pInfo; // 不存在，直接new
                     }
@@ -127,7 +148,7 @@ public class CGameSettings : ICModule
         DoLoadTab(typeof (T), tabPaths);
     }
 
-    public List<T> GetInfos<T>() where T : CBaseInfo
+    public List<T> GetInfos<T>(Func<T, bool> filter = null) where T : CBaseInfo
     {
         EnsureLoad<T>();
 
@@ -138,7 +159,9 @@ public class CGameSettings : ICModule
             List<T> list = new List<T>();
             foreach (CBaseInfo item in dict.Values)
             {
-                list.Add((T)item);
+                var getItem = (T) item;
+                if (filter == null || filter(getItem))
+                    list.Add(getItem);
             }
             return list;
         }
@@ -226,11 +249,21 @@ public class CBaseInfo
 
     }
 
-    public static void LoadFromTab(Type type, ref CBaseInfo newT, ICTabReadble tabFile, int row)
+    /// <summary>
+    /// 可自定义对表进行附加解释.... 在Parse执行前...
+    /// tabFile后边会被释放掉
+    /// </summary>
+    /// <param name="tabFile"></param>
+    public virtual void CustomReadLine(ICTabReadble tabFile, int row)
+    {
+        
+    }
+
+    public static void ReadFromTab(Type type, ref CBaseInfo newT, ICTabReadble tabFile, int row)
     {
         CDebug.Assert(typeof(CBaseInfo).IsAssignableFrom(type));
 
-        FieldInfo[] fields = type.GetFields();
+        FieldInfo[] fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public );//| BindingFlags.GetField);
         foreach (FieldInfo field in fields)
         {
             if (!tabFile.HasColumn(field.Name))
@@ -361,10 +394,10 @@ public class CBaseInfo
 
     }
 
-    public static CBaseInfo LoadFromTab(Type type, ICTabReadble tabFile, int row)
+    public static CBaseInfo NewFromTab(Type type, ICTabReadble tabFile, int row)
     {
         CBaseInfo newT = Activator.CreateInstance(type) as CBaseInfo;
-        LoadFromTab(type, ref newT, tabFile, row);
+        ReadFromTab(type, ref newT, tabFile, row);
         return newT;
     }
 }
