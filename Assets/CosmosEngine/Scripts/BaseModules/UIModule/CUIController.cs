@@ -10,9 +10,6 @@
 //------------------------------------------------------------------------------
 using UnityEngine;
 using System;
-using System.Reflection;
-using System.Collections;
-using System.Collections.Generic;
 
 /// <summary>
 /// Abstract class of all UI Script
@@ -22,8 +19,15 @@ public abstract class CUIController : MonoBehaviour
     public string UITemplateName = "";
     public string UIName = "";
     public bool HasBackBtn = true; // 是否有返回按钮
+    
+    protected Transform CachedTransform;
+    protected GameObject CacheGameObject;
 
-    public virtual void OnInit() { }
+    public virtual void OnInit()
+    {
+        CachedTransform = transform;
+        CacheGameObject = gameObject;
+    }
 
     public virtual void OnOpen(params object[] args) { }
 
@@ -147,4 +151,8 @@ public abstract class CUIController : MonoBehaviour
         return openArgs.Get<T>(offset, isLog);
     }
 
+    public static void CallUI<T>(Action<T> callback) where T : CUIController
+    {
+        CUIModule.Instance.CallUI<T>(callback);
+    }
 }

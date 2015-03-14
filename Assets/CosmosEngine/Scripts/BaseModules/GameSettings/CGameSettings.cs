@@ -125,7 +125,7 @@ public class CGameSettings : ICModule
                             FoundDuplicatedIdEvent(tabPath, row, id);
 
                         CBaseInfo existInfo = existOne;
-                        CBaseInfo.ReadFromTab(type, ref existInfo, tabFile, row); // 修改原对象，不new
+                        existInfo.ReadFromTab(type, ref existInfo, tabFile, row); // 修改原对象，不new
                         existInfo.CustomReadLine(tabFile, row);
                         (existInfo as CBaseInfo).Parse();
                     }
@@ -202,11 +202,13 @@ public class CGameSettings : ICModule
     {
         return GetInfo<T>(id.ToString(), printLog);
     }
-
 }
 
-public class CBaseInfo
+public class CBaseInfo : ICloneable
 {
+    // 把Fields缓存起来，避开反射的GetFields性能问题  Type => ( FieldName -> Type )
+    private static readonly Dictionary<Type, LinkedList<FieldInfo>> CacheTypeFields = new Dictionary<Type, LinkedList<FieldInfo>>();
+
     public string Id;
 
     private int? _CacheIntId;
@@ -259,56 +261,76 @@ public class CBaseInfo
         
     }
 
-    public static void ReadFromTab(Type type, ref CBaseInfo newT, ICTabReadble tabFile, int row)
+    public void ReadFromTab(Type type, ref CBaseInfo newT, ICTabReadble tabFile, int row)
     {
-        CDebug.Assert(typeof(CBaseInfo).IsAssignableFrom(type));
+        if (Debug.isDebugBuild)
+            CDebug.Assert(typeof(CBaseInfo).IsAssignableFrom(type));
 
-        FieldInfo[] fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public );//| BindingFlags.GetField);
-        foreach (FieldInfo field in fields)
+        // 缓存字段Field, 每个Type只反射一次！
+        LinkedList<FieldInfo> okFields;
+        if (!CacheTypeFields.TryGetValue(type, out okFields))
         {
-            if (!tabFile.HasColumn(field.Name))
+            okFields = CacheTypeFields[type] = new LinkedList<FieldInfo>();
+            var allFields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            foreach (FieldInfo field in allFields)
             {
-                CDebug.LogError("表{0} 找不到表头{1}", type.Name, field.Name);
-                continue;
+                if (field.Name.StartsWith("_"))  // 筛掉
+                    continue;
+
+                if (!tabFile.HasColumn(field.Name))
+                {
+                    if (Debug.isDebugBuild)
+                        CDebug.LogError("表{0} 找不到表头{1}", type.Name, field.Name);
+                    continue;
+                }
+                okFields.AddLast(field);
             }
+        }
+
+        // 读字段
+        foreach (var field in okFields)
+        {
+            var fieldName = field.Name;
+            var fieldType = field.FieldType;
+
             object value;
-            if (field.FieldType == typeof(int))
+            if (fieldType == typeof(int))
             {
-                value = tabFile.GetInteger(row, field.Name);
+                value = tabFile.GetInteger(row, fieldName);
             }
-            else if (field.FieldType == typeof(long))
+            else if (fieldType == typeof(long))
             {
-                value = (long)tabFile.GetInteger(row, field.Name);
+                value = (long)tabFile.GetInteger(row, fieldName);
             }
-            else if (field.FieldType == typeof(string))
+            else if (fieldType == typeof(string))
             {
-                value = tabFile.GetString(row, field.Name);
+                value = tabFile.GetString(row, fieldName);
             }
-            else if (field.FieldType == typeof(float))
+            else if (fieldType == typeof(float))
             {
-                value = tabFile.GetFloat(row, field.Name);
+                value = tabFile.GetFloat(row, fieldName);
             }
-            else if (field.FieldType == typeof(bool))
+            else if (fieldType == typeof(bool))
             {
-                value = tabFile.GetBool(row, field.Name);
+                value = tabFile.GetBool(row, fieldName);
             }
-            else if (field.FieldType == typeof(double))
+            else if (fieldType == typeof(double))
             {
-                value = tabFile.GetDouble(row, field.Name);
+                value = tabFile.GetDouble(row, fieldName);
             }
-            else if (field.FieldType == typeof(uint))
+            else if (fieldType == typeof(uint))
             {
-                value = tabFile.GetUInteger(row, field.Name);
+                value = tabFile.GetUInteger(row, fieldName);
             }
-            else if (field.FieldType == typeof(List<string>))
+            else if (fieldType == typeof(List<string>))
             {
-                string sz = tabFile.GetString(row, field.Name);
+                string sz = tabFile.GetString(row, fieldName);
                 value = CTool.Split<string>(sz, '|');
             }
-            else if (field.FieldType == typeof(List<int>))
+            else if (fieldType == typeof(List<int>))
             {
                 List<int> retInt = new List<int>();
-                string szArr = tabFile.GetString(row, field.Name);
+                string szArr = tabFile.GetString(row, fieldName);
                 if (!string.IsNullOrEmpty(szArr))
                 {
                     string[] szIntArr = szArr.Split('|');
@@ -324,9 +346,9 @@ public class CBaseInfo
                 else
                     value = new List<int>();
             }
-            else if (field.FieldType == typeof(List<List<string>>))
+            else if (fieldType == typeof(List<List<string>>))
             {
-                string sz = tabFile.GetString(row, field.Name);
+                string sz = tabFile.GetString(row, fieldName);
                 if (!string.IsNullOrEmpty(sz))
                 {
                     var szOneList = new List<List<string>>();
@@ -341,9 +363,9 @@ public class CBaseInfo
                 else
                     value = new List<List<string>>();
             }
-            else if (field.FieldType == typeof(List<List<int>>))
+            else if (fieldType == typeof(List<List<int>>))
             {
-                string sz = tabFile.GetString(row, field.Name);
+                string sz = tabFile.GetString(row, fieldName);
                 if (!string.IsNullOrEmpty(sz))
                 {
                     var zsOneIntList = new List<List<int>>();
@@ -368,11 +390,11 @@ public class CBaseInfo
             }
             else
             {
-                CDebug.LogWarning("未知类型: {0}", field.Name);
+                CDebug.LogWarning("未知类型: {0}", fieldName);
                 value = null;
             }
 
-            if (field.Name == "Id")  // 如果是Id主键，确保数字成整数！
+            if (fieldName == "Id")  // 如果是Id主键，确保数字成整数！
             {
                 int fValue;
                 if (int.TryParse((string)value, out fValue))
@@ -396,8 +418,13 @@ public class CBaseInfo
 
     public static CBaseInfo NewFromTab(Type type, ICTabReadble tabFile, int row)
     {
-        CBaseInfo newT = Activator.CreateInstance(type) as CBaseInfo;
-        ReadFromTab(type, ref newT, tabFile, row);
+        var newT = Activator.CreateInstance(type) as CBaseInfo;
+        newT.ReadFromTab(type, ref newT, tabFile, row);
         return newT;
+    }
+
+    public object Clone()
+    {
+        return MemberwiseClone();
     }
 }

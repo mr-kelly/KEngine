@@ -49,9 +49,13 @@ public partial class CAutoResourceBuilder
         export.BeforeExport();
         foreach (string item in itemArray)
         {
+            EditorUtility.DisplayCancelableProgressBar("[ProductExport]", item, .5f);
             export.Export(item.Replace('\\', '/'));
+            EditorUtility.ClearProgressBar();
         }
         export.AfterExport();
+
+        GC.Collect();
     }
 
 }

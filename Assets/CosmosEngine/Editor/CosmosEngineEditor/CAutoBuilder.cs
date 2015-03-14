@@ -115,62 +115,31 @@ public class CAutoBuilder
     }
 
     /// <summary>
-    /// 將svn的版本號寫入Resources目錄 TODO: 从cosmosengine移除
+    /// 增加Program版本
     /// </summary>
     [MenuItem("CosmosEngine/AutoBuilder/Refresh Program Version")]
     public static void RefreshProgramVersion()
     {
-        string cmd = string.Format("{0}/GetSvnInfo.bat", Application.dataPath);
+        string programVersionFile = string.Format("{0}/Resources/ProgramVersion.txt", Application.dataPath);
 
-        var p = new Process();
-        var si = new ProcessStartInfo();
-        var path = Environment.SystemDirectory;
+        var oldVersion = 1;
+        if (File.Exists(programVersionFile))
+            oldVersion = File.ReadAllText(programVersionFile).ToInt32();
 
-		if (EditorUserBuildSettings.activeBuildTarget == BuildTarget.iPhone)
-			path = Path.Combine(path, @"sh");
-		else
-        	path = Path.Combine(path, @"cmd.exe");
+        var newVersion = oldVersion + 1;
 
-        si.FileName = path;
-        if (!cmd.StartsWith(@"/")) cmd = @"/c " + cmd;
-        si.Arguments = cmd;
-        si.UseShellExecute = false;
-        si.CreateNoWindow = true;
-        si.RedirectStandardOutput = true;
-        si.RedirectStandardError = true;
-        p.StartInfo = si;
-
-        p.Start();
-        p.WaitForExit();
-
-        var str = p.StandardOutput.ReadToEnd();
-        if (!string.IsNullOrEmpty(str))
+        using (FileStream fs = new FileStream(programVersionFile, FileMode.Create))
         {
-            string programVersionFile = string.Format("{0}/Resources/ProgramVersion.txt", Application.dataPath);
-
-            Regex regex = new Regex(@"Revision: (\d+)");  // 截取svn版本号
-            Match match = regex.Match(str);
-
-            string szRevision = match.Groups[1].ToString();
-            int nRevision = szRevision.ToInt32();
-            using (FileStream fs = new FileStream(programVersionFile, FileMode.Create))
+            using (StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8))
             {
-                using (StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8))
-                {
-                    sw.Write(nRevision.ToString());
-                }
+                sw.Write(newVersion.ToString());
             }
-
-
-            CDebug.Log("Refresh ProgramVersion.txt!! SVN Version: {0}", nRevision);
         }
-        else
-            CDebug.LogError("Error Read svn Revision!");
 
 
-        str = p.StandardError.ReadToEnd();
-        if (!string.IsNullOrEmpty(str))
-            CDebug.LogError(str);
+        CDebug.Log("Add ProgramVersion.txt!! SVN Version: {0}", newVersion);
+
+        AssetDatabase.Refresh();
     }
 
     [MenuItem("CosmosEngine/AutoBuilder/WindowsX86D")]  // 注意，PC版本放在不一样的目录的！

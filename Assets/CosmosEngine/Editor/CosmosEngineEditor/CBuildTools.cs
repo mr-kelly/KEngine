@@ -134,53 +134,84 @@ public partial class CBuildTools
         
 		string tmpPrefabPath = string.Format("Assets/{0}.prefab", asset.name);
 		PrefabType prefabType = PrefabUtility.GetPrefabType(asset);
-		GameObject tmpObj = null;
-		Object tmpPrefab = null;
 
-        string relativePath = path;
+	    string relativePath = path;
 		path = MakeSureExportPath(path, buildTarget);
 
-	    if (asset is Texture)
+        uint crc = 0;
+	    if (asset is Texture2D)
 	    {
-            //asset = asset; // Texutre不复制拷贝一份
+	        var assetPath = AssetDatabase.GetAssetPath(asset);
+	        if (!string.IsNullOrEmpty(assetPath))  // Assets内的纹理
+	        {// Texutre不复制拷贝一份
+                _DoBuild(out crc, asset, path, relativePath, buildTarget);
+	        }
+	        else
+	        {
+                // 内存的图片~临时创建Asset, 纯正的图片， 使用Sprite吧
+                var tex = asset as Texture2D;
+
+	            var tmpTexPath = "Assets/tmpTexture.png";
+                File.WriteAllBytes(tmpTexPath, tex.EncodeToPNG());
+
+                AssetDatabase.ImportAsset(tmpTexPath, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport);
+                var importer = (TextureImporter)TextureImporter.GetAtPath(tmpTexPath);
+	            importer.textureType = TextureImporterType.Sprite;
+	            importer.maxTextureSize = 4096;
+                importer.mipmapEnabled = false;
+	            importer.textureFormat = TextureImporterFormat.AutomaticCompressed;
+                AssetDatabase.ImportAsset(tmpTexPath, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport);
+
+                asset = AssetDatabase.LoadAssetAtPath("Assets/tmpTexture.png", typeof(Texture));
+	            asset.name = tex.name;
+                _DoBuild(out crc, asset, path, relativePath, buildTarget);
+
+                File.Delete(tmpTexPath);
+	        }
 	    }
 		else if ((prefabType == PrefabType.None && AssetDatabase.GetAssetPath(asset) == string.Empty) ||
-			(prefabType == PrefabType.ModelPrefabInstance))
+			(prefabType == PrefabType.ModelPrefabInstance))  // 非prefab对象
 		{
-			tmpObj = (GameObject)GameObject.Instantiate(asset);
-			tmpPrefab = PrefabUtility.CreatePrefab(tmpPrefabPath, tmpObj, ReplacePrefabOptions.ConnectToPrefab);
+			Object tmpInsObj = (GameObject)GameObject.Instantiate(asset);  // 拷出来创建Prefab
+			Object tmpPrefab = PrefabUtility.CreatePrefab(tmpPrefabPath, (GameObject)tmpInsObj, ReplacePrefabOptions.ConnectToPrefab);
 			asset = tmpPrefab;
+
+            _DoBuild(out crc, asset, path, relativePath, buildTarget);
+
+            GameObject.DestroyImmediate(tmpInsObj);
+            AssetDatabase.DeleteAsset(tmpPrefabPath);
 		}
 		else if (prefabType == PrefabType.PrefabInstance)
 		{
-			asset = PrefabUtility.GetPrefabParent(asset);
+		    var prefabParent = PrefabUtility.GetPrefabParent(asset);
+		    _DoBuild(out crc, prefabParent, path, relativePath, buildTarget);
 		}
-
-	    if (BeforeBuildAssetBundleEvent != null)
-	        BeforeBuildAssetBundleEvent(asset, path, relativePath);
-
-		uint crc;
-		BuildPipeline.BuildAssetBundle(
-			asset,
-			null,
-			path,
-			out crc,
-			BuildAssetBundleOptions.CollectDependencies | BuildAssetBundleOptions.CompleteAssets | BuildAssetBundleOptions.DeterministicAssetBundle,
-			buildTarget);
-
-		if (tmpObj != null)
+		else
 		{
-			GameObject.DestroyImmediate(tmpObj);
-			AssetDatabase.DeleteAsset(tmpPrefabPath);
+            //CDebug.LogError("[Wrong asse Type] {0}", asset.GetType());
+            _DoBuild(out crc, asset, path, relativePath, buildTarget);
 		}
+		return crc;
+	}
 
-		CDebug.Log("生成文件： {0}", path);
+    private static void _DoBuild(out uint crc, Object asset, string path, string relativePath, BuildTarget buildTarget)
+    {
+        if (BeforeBuildAssetBundleEvent != null)
+            BeforeBuildAssetBundleEvent(asset, path, relativePath);
+
+        BuildPipeline.BuildAssetBundle(
+            asset,
+            null,
+            path,
+            out crc,
+            BuildAssetBundleOptions.CollectDependencies | BuildAssetBundleOptions.CompleteAssets | BuildAssetBundleOptions.DeterministicAssetBundle,
+            buildTarget);
+
+        CDebug.Log("生成文件： {0}", path);
         BuildCount++;
         if (AfterBuildAssetBundleEvent != null)
             AfterBuildAssetBundleEvent(asset, path, relativePath);
-
-		return crc;
-	}
+    }
 
 	public static uint BuildScriptableObject<T>(T scriptObject, string path) where T : ScriptableObject
 	{
@@ -423,18 +454,22 @@ public partial class CBuildTools
 
         foreach (string file in sourceFiles)
         {
-            if (DoCheckNeedBuild(file) || DoCheckNeedBuild(file + ".meta"))
+            if (DoCheckNeedBuild(file, true) || DoCheckNeedBuild(file + ".meta"))
                 return true;
         }
 
         return false;
     }
 
-    private static bool DoCheckNeedBuild(string filePath)
+    private static bool DoCheckNeedBuild(string filePath, bool log = false)
     {
         BuildRecord assetMd5;
         if (!File.Exists(filePath))
+        {
+            if (log)
+                CDebug.LogError("[DoCheckNeedBuild]无法找到文件 {0}", filePath);
             return false;
+        }
         if (!BuildVersion.TryGetValue(filePath, out assetMd5))
             return true;
 

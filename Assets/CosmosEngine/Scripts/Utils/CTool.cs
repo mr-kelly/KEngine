@@ -32,7 +32,7 @@ public class CTool
     static string[] RecordKey = new string[10];
     static int RecordPos = 0;
 
-    static Dictionary<string, Shader> CacheShaders = new Dictionary<string, Shader>(); // Shader.Find是一个非常消耗的函数，因此尽量缓存起来
+    static readonly Dictionary<string, Shader> CacheShaders = new Dictionary<string, Shader>(); // Shader.Find是一个非常消耗的函数，因此尽量缓存起来
 
     /// <summary>
     /// Whether In Wifi or Cable Network
@@ -43,11 +43,48 @@ public class CTool
         return Application.internetReachability == NetworkReachability.ReachableViaLocalAreaNetwork;
     }
 
+    /// <summary>
+    /// 判断一个数是否2的次方
+    /// </summary>
+    /// <param name="num"></param>
+    /// <returns></returns>
+    public static bool CheckPow2(int num)
+    {
+        int i = 1;
+        while (true)
+        {
+            if (i > num)
+                return false;
+            if (i == num)
+                return true;
+            i = i * 2;
+        }
+    }
+
     // 需要StartCoroutine
     public static IEnumerator TimeCallback(float time, Action callback)
     {
         yield return new WaitForSeconds(time);
         callback();
+    }
+
+    public static Coroutine WaitCallback(Action<Action> func)
+    {
+        return CCosmosEngine.EngineInstance.StartCoroutine(CoWaitCallback(func));
+    }
+
+    private static IEnumerator CoWaitCallback(Action<Action> func)
+    {
+        bool wait = true;
+        func(() =>
+        {
+            wait = false;
+        });
+        // ReSharper disable once LoopVariableIsNeverChangedInsideLoop
+        while (wait)
+        {
+            yield return null;
+        }
     }
 
     /// <summary>
@@ -131,19 +168,19 @@ public class CTool
                 if (!string.IsNullOrEmpty(trimS))
                 {
                     string[] strs2 = trimS.Split(delimeter2);
-                    K val2 = default(K);
-                    T val1 = default(T);
+                    K valK = default(K);
+                    T valT = default(T);
                     if (strs2.Length > 0)
                     {
-                        val1 = (T)Convert.ChangeType(strs2[0], typeof(T));
+                        valT = (T)Convert.ChangeType(strs2[0], typeof(T));
                     }
                     if (strs2.Length == 2)
                     {
                         
-                        val2 = (K)Convert.ChangeType(strs2[1], typeof(K));
+                        valK = (K)Convert.ChangeType(strs2[1], typeof(K));
                         
                     }
-                    dict[val1] = val2;
+                    dict[valT] = valK;
                 }
             }
         }
@@ -159,7 +196,7 @@ public class CTool
     /// <returns></returns>
     public static List<T> Split<T>(string str, params char[] args)
     {
-        List<T> retList = new List<T>();
+        var retList = new List<T>();
         if (!string.IsNullOrEmpty(str))
         {
             string[] strs = str.Split(args);
@@ -178,10 +215,30 @@ public class CTool
 
             }
         }
-
         return retList;
     }
 
+    /// <summary>
+    /// 获取波浪随机数,   即填“1”或填“1~2”这样的字符串中返回一个数！
+    /// 
+    /// 如填"1"，直接返回1
+    /// 如果填"1~10"这样的，那么随机返回1~10中间一个数
+    /// </summary>
+    /// <param name="waveNumberStr"></param>
+    /// <returns></returns>
+    public static float GetWaveRandomNumber(string waveNumberStr)
+    {
+        if (string.IsNullOrEmpty(waveNumberStr))
+            return 0;
+
+        var strs = waveNumberStr.Split('-', '~');
+        if (strs.Length == 1)
+        {
+            return waveNumberStr.ToFloat();
+        }
+
+        return UnityEngine.Random.Range(strs[0].ToFloat(), strs[1].ToFloat());
+    }
     public static Shader FindShader(string shaderName)
     {
         Shader shader;
@@ -438,12 +495,12 @@ public class CTool
     }
 
     // 添加性能观察, 使用C#内置
-    public static void AddWatch(Action del)
+    public static void WatchPerformance(Action del)
     {
-        AddWatch("执行耗费时间: {0}s", del);
+        WatchPerformance("执行耗费时间: {0}s", del);
     }
 
-    public static void AddWatch(string outputStr, Action del)
+    public static void WatchPerformance(string outputStr, Action del)
     {
         System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
         stopwatch.Start(); //  开始监视代码运行时间
@@ -1092,6 +1149,21 @@ public class CTool
         }
         var pattern = @"^\d*$";
         return  Regex.IsMatch(str, pattern);  
+    }
+
+
+    /// <summary>
+    /// 获取椭圆上的某一点，相对坐标
+    /// </summary>
+    /// <param name="长半轴即目标距离"></param>
+    /// <param name="短半轴"></param>
+    /// <param name="angle"></param>
+    /// <returns></returns>
+    public static Vector2 GetRelativePositionOfEllipse(float 长半轴即目标距离, float 短半轴, float angle)
+    {
+        var rad = angle * Mathf.Deg2Rad; // 弧度
+        var newPos = new Vector2(长半轴即目标距离 * Mathf.Cos(rad), 短半轴 * Mathf.Sin(rad));
+        return newPos;
     }
 }
 

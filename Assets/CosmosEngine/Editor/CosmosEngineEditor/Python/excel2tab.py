@@ -61,17 +61,17 @@ def DirWalker(arg, dirname, filenames):
 
 		if (szExt == '.bytes'): # 纯拷贝
 			shutil.copy(szSrcPath, szExportPath)
-			print u'复制纯文本 从 %s 到 %s' % (szSrcPath.decode('gbk').encode('utf-8'), szExportPath.decode('gbk').encode('utf-8'))
+			print u'【Copied Pure Text File】 From %s To %s' % (szSrcPath.decode('gbk').encode('utf-8'), szExportPath.decode('gbk').encode('utf-8'))
 		elif (szExt == '.xls' or szExt == '.xlsx'):  # 编译
 
 			str_list = []
 			
-			print u'转换Excel表: %s' % szSrcPath.decode('gbk').encode('utf-8')
+			print u'【Compiling Excel】: %s' % szSrcPath.decode('gbk').encode('utf-8')
 
 			data = xlrd.open_workbook(szSrcPath)
 			table = data.sheet_by_index(0) #通过索引顺序获取
 			if table == None:
-				print u'Error: 找不到表 %s' % szSrcPath
+				print u'【Error】: Not Found File %s' % szSrcPath
 			else:
 				# 找到表
 				arrIgnoreCols = [] # 忽略的列
@@ -106,6 +106,8 @@ def DirWalker(arg, dirname, filenames):
 							# 	except:  # 可能是字符串key,无法转int, 用原字符串吧
 							# 		szRow.append(unicode(s))
 							else:
+								if isinstance(s, str):
+									s = s.strip() # 干掉空格
 								if isinstance(s, float):
 									if str(s).endswith('.0'): # .0结尾的浮点，转整形
 										s = int(float(s))
@@ -123,7 +125,7 @@ def DirWalker(arg, dirname, filenames):
 				file_w = open(szExportPath, 'w')
 				file_w.write(strOutput)
 
-				print u'导出Tab表: %s' % szExportPath.decode('gbk').encode('utf-8')
+				print u'【Compiled Success Tab File】: %s' % szExportPath.decode('gbk').encode('utf-8')
 
 
 if __name__ == '__main__':
@@ -133,5 +135,5 @@ if __name__ == '__main__':
 	for dir in DIRS:
 		os.path.walk(INPUT_PATH + dir, DirWalker, ())
 
-	print u'成功, 3秒后关闭'
+	print u'【All OK!】Wait 3s to Close.....'
 	time.sleep(3)

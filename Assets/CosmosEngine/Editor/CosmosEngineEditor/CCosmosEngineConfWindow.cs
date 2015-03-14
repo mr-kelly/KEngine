@@ -83,7 +83,7 @@ public class CCosmosEngineWindow : EditorWindow
 
     string GetConfValue(string key)
     {
-        foreach (CTabFile.CTabRow row in ConfFile)
+        foreach (CTabFile.RowInterator row in ConfFile)
         {
             string key2 = row.GetString("Key");
             if (key == key2)
@@ -98,7 +98,7 @@ public class CCosmosEngineWindow : EditorWindow
 
     void SetConfValue(string key, string value)
     {
-        foreach (CTabFile.CTabRow row in ConfFile)
+        foreach (CTabFile.RowInterator row in ConfFile)
         {
             string key2 = row.GetString("Key");
             if (key == key2)
@@ -118,7 +118,7 @@ public class CCosmosEngineWindow : EditorWindow
 
         EditorGUILayout.LabelField("== Advanced Setting ==");
         bool tabDirty = false;
-        foreach (CTabFile.CTabRow row in ConfFile)
+        foreach (CTabFile.RowInterator row in ConfFile)
         {
             string value = row.GetString("Value");
             string newValue = EditorGUILayout.TextField(row.GetString("Key"), value);

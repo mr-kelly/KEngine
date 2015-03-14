@@ -13,7 +13,7 @@ using System.Collections;
 using UnityEngine.EventSystems;
 
 /// <summary>
-/// Unity原生UI桥接器 TODO:
+/// Unity原生UI桥接器
 /// </summary>
 public class CUGUIBridge : ICUIBridge
 {
@@ -32,5 +32,5 @@ public class CUGUIBridge : ICUIBridge
         return null;
     }
 
-    public void UIObjectFilter(GameObject uiObject) { }
+    public void UIObjectFilter(CUIController ui, GameObject uiObject) { }
 }

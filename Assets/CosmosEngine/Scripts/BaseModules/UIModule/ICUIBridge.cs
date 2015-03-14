@@ -19,5 +19,5 @@ public interface ICUIBridge
     // Get a component inside the UI Bridge
     object GetUIComponent(string comName);
 
-    void UIObjectFilter(GameObject uiObject);
+    void UIObjectFilter(CUIController controller, GameObject uiObject);
 }

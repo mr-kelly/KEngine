@@ -12,7 +12,6 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
 
 /// <summary>
 /// UI Module
@@ -76,12 +75,6 @@ public class CUIModule : ICModule
         if (!UIWindows.TryGetValue(name, out uiState))
         {
             LoadWindow(name, true, args);
-            return;
-        }
-
-        if (uiState.IsLoading)
-        {
-            uiState.OpenWhenFinish = true;
             return;
         }
 
@@ -155,7 +148,7 @@ public class CUIModule : ICModule
 
         uiObj.name = name;
 
-        UiBridge.UIObjectFilter(uiObj);
+        UiBridge.UIObjectFilter(_ui, uiObj);
 
         CUIController uiBase = uiObj.GetComponent<CUIController>();
         uiBase.UITemplateName = template;
@@ -171,8 +164,6 @@ public class CUIModule : ICModule
             originArgs[i - 2] = _args[i];
 
         InitWindow(_instanceUIState, uiBase, _instanceUIState.OpenWhenFinish, originArgs);
-        OnUIWindowLoadedCallbacks(_instanceUIState, uiBase);
-        
     }
 
     public void CloseWindow(Type t)
@@ -296,7 +287,9 @@ public class CUIModule : ICModule
     public CUILoadState LoadWindow(string windowTemplateName, bool openWhenFinish, params object[] args)
     {
         if (UIWindows.ContainsKey(windowTemplateName))
+        {
             CDebug.LogError("[LoadWindow]多次重复LoadWindow: {0}", windowTemplateName);
+        }
         CDebug.Assert(!UIWindows.ContainsKey(windowTemplateName));
 
         string path = string.Format("UI/{0}_UI{1}", windowTemplateName, CCosmosEngine.GetConfig("AssetBundleExt"));
@@ -327,15 +320,14 @@ public class CUIModule : ICModule
         uiObj.SetActive(false);
         uiObj.name = openState.TemplateName;
 
-        UiBridge.UIObjectFilter(uiObj);
-        
         CUIController uiBase = (CUIController)uiObj.AddComponent(openState.UIType);
 
+        UiBridge.UIObjectFilter(uiBase, uiObj);
+        
         openState.UIWindow = uiBase;
 
         uiBase.UIName = uiBase.UITemplateName = openState.TemplateName;
         InitWindow(openState, uiBase, openState.OpenWhenFinish, openState.OpenArgs);
-        OnUIWindowLoadedCallbacks(openState, uiBase);
     }
 
     public void DestroyWindow(string name)
@@ -371,7 +363,7 @@ public class CUIModule : ICModule
         CUILoadState uiState;
         if (!UIWindows.TryGetValue(uiTemplateName, out uiState))
         {
-            uiState = LoadWindow(uiTemplateName, false);  // 加载，这样就有UIState了
+            uiState = LoadWindow(uiTemplateName, false);  // 加载，这样就有UIState了, 但注意因为没参数，不要随意执行OnOpen
         }
 
         CUILoadState openState = UIWindows[uiTemplateName];
@@ -417,6 +409,13 @@ public class CUIModule : ICModule
 
     void OnOpen(CUILoadState uiState, params object[] args)
     {
+        if (uiState.IsLoading)
+        {
+            uiState.OpenWhenFinish = true;
+            uiState.OpenArgs = args;
+            return;
+        }
+
         CUIController uiBase = uiState.UIWindow;
         
         Action doOpenAction = () =>
@@ -460,6 +459,8 @@ public class CUIModule : ICModule
                 uiBase.gameObject.SetActive(false);
             }
         }
+
+        OnUIWindowLoadedCallbacks(uiState, uiBase);
     }
     void OnUIWindowLoadedCallbacks(CUILoadState uiState, CUIController uiBase)
     {

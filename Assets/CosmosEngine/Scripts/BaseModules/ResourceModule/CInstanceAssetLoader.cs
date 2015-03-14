@@ -32,7 +32,11 @@ public class CInstanceAssetLoader : CBaseResourceLoader
     {
         get
         {
-            CDebug.Assert(ResultObject);
+            if (ResultObject == null)
+            {
+                CDebug.LogError("[CInstanceAssetLoader:TheAsset] Null Load Asset: {0}", this.Url);
+                CDebug.Assert(false);
+            }
             return GameObject.Instantiate(ResultObject as UnityEngine.Object);
         }
     }

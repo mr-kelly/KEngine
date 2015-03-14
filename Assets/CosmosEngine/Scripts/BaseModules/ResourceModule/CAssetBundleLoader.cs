@@ -40,7 +40,8 @@ public class CAssetBundleLoader : CBaseResourceLoader
         }
         else
         {
-            CDebug.LogError("[CAssetBundleLoader]Error Path: {0}", url);
+            if (Debug.isDebugBuild)
+                CDebug.LogError("[CAssetBundleLoader]Error Path: {0}", url);
             OnFinish(null);
         }
     }

@@ -77,6 +77,12 @@ public class CDebug
 #endif
     }
 
+    public static void DevLog(string log, params object[] args)
+    {
+        if (UnityEngine.Debug.isDebugBuild)
+            DoLog(string.Format(log, args), LogType.WARNING);
+    }
+
     public static void Log(string log)
     {
         DoLog(log, LogType.NORMAL);

@@ -11,7 +11,6 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
 using System.IO;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -103,14 +102,14 @@ public class CResourceModule : MonoBehaviour, ICModule
         bool hasDocUrl = TryGetDocumentResourceUrl(url, out docUrl);
 
         string inAppUrl;
-        bool hasInAppUrl = TryGetInAppResourceUrl(url, out inAppUrl, isLog);
+        bool hasInAppUrl = TryGetInAppResourceUrl(url, out inAppUrl);
 
         if (ResourcePathType == CResourceManagerPathType.PersistentDataPathPriority)  // 優先下載資源模式
         {
             if (hasDocUrl)
             {
                 if (Application.isEditor)
-                    CDebug.LogWarning("使用外部资源 {0}", docUrl);
+                    CDebug.LogWarning("[Use PersistentDataPath] {0}", docUrl);
                 fullPath = docUrl;
                 return true;
             }
@@ -120,7 +119,7 @@ public class CResourceModule : MonoBehaviour, ICModule
         if (!hasInAppUrl) // 连本地资源都没有，直接失败吧 ？？ 沒有本地資源但又遠程資源？竟然！!?
         {
             if (isLog)
-                CDebug.LogError("找不到InApp的資源: {0}", url);
+                CDebug.LogError("[Not Found] InApp Url Resource: {0}", url);
             fullPath = null;
             return false;
         }
@@ -136,6 +135,7 @@ public class CResourceModule : MonoBehaviour, ICModule
     /// <returns></returns>
     public static string GetAppDataPath()
     {
+        // Windows 时使用特定的目录，避免中文User的存在
         if (Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsWebPlayer)
         {
             string dataPath = Application.dataPath + "/../Temp/UnityWinPersistentDataPath";
@@ -148,15 +148,13 @@ public class CResourceModule : MonoBehaviour, ICModule
     }
 
     // (not android ) only! Android资源不在目录！
-    public static bool TryGetInAppResourceUrl(string url, out string newUrl, bool isLog = true)
+    public static bool TryGetInAppResourceUrl(string url, out string newUrl)
     {
         newUrl = ResourcesPath + url;
 
         // 注意，StreamingAssetsPath在Android平台時，壓縮在apk里面，不要做文件檢查了
         if (Application.platform != RuntimePlatform.Android && !File.Exists(ResourcesPathWithOutFileProtocol + url))
         {
-            if (isLog)
-                CDebug.LogError("[GetResourcePath:InAppUrl]Not Exist File: {0}", newUrl);
             return false;
         }
 

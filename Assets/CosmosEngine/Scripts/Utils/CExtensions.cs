@@ -19,6 +19,18 @@ using System.Collections.Generic;
 /// </summary>
 public static class CExtensions
 {
+    public static void SetWidth(this RectTransform rectTrans, float width)
+    {
+        var size = rectTrans.sizeDelta;
+        size.x = width;
+        rectTrans.sizeDelta = size;
+    }
+    public static void SetHeight(this RectTransform rectTrans, float height)
+    {
+        var size = rectTrans.sizeDelta;
+        size.y = height;
+        rectTrans.sizeDelta = size;
+    }
 	public static void SetPositionX(this Transform t, float newX)
 	{
 		t.position = new Vector3(newX, t.position.y, t.position.z);
