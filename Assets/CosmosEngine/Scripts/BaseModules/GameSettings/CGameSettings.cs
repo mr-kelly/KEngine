@@ -8,12 +8,13 @@
 //              https://github.com/mr-kelly/CosmosEngine
 //
 //------------------------------------------------------------------------------
+
+using CosmosEngine;
 using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-
 
 [CDependencyClass(typeof(CResourceModule))]
 [CDependencyClass(typeof(CSettingManager))]
@@ -113,7 +114,7 @@ public class CGameSettings : ICModule
                     dict = new Dictionary<string, CBaseInfo>();
 
                 const int rowStart = 1;
-                for (int row = rowStart; row < tabFile.GetHeight(); row++)
+                for (int row = rowStart; row <= tabFile.GetHeight(); row++)
                 {
                     // 先读取ID， 获取是否之前已经读取过配置，
                     // 如果已经读取过，那么获取原配置对象，并重新赋值 (因为游戏中其它地方已经存在它的引用了，直接替换内存泄露)
@@ -204,7 +205,7 @@ public class CGameSettings : ICModule
     }
 }
 
-public class CBaseInfo : ICloneable
+public partial class CBaseInfo : ICloneable
 {
     // 把Fields缓存起来，避开反射的GetFields性能问题  Type => ( FieldName -> Type )
     private static readonly Dictionary<Type, LinkedList<FieldInfo>> CacheTypeFields = new Dictionary<Type, LinkedList<FieldInfo>>();
@@ -355,7 +356,7 @@ public class CBaseInfo : ICloneable
                     string[] szArr = sz.Split('|');
                     foreach (string szOne in szArr)
                     {
-                        string[] szOneArr = szOne.Split('-');
+                        string[] szOneArr = szOne.Split('-', ':');
                         szOneList.Add(new List<string>(szOneArr));
                     }
                     value = szOneList;
@@ -373,7 +374,7 @@ public class CBaseInfo : ICloneable
                     foreach (string szOne in szArr)
                     {
                         List<int> retInts = new List<int>();
-                        string[] szOneArr = szOne.Split('-');
+                        string[] szOneArr = szOne.Split('-', ':');
                         foreach (string szOneInt in szOneArr)
                         {
                             float parseFloat;

@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 
 using System;
+using CosmosEngine;
 using UnityEngine;
 using UnityEditor;
 using System.Collections;
@@ -375,7 +376,6 @@ public partial class CBuildTools
     {
         string path = GetBuildVersionTab();// MakeSureExportPath(VerCtrlInfo.VerFile, EditorUserBuildSettings.activeBuildTarget);
         CTabFile tabFile = new CTabFile();
-        tabFile.NewRow();
         tabFile.NewColumn("AssetPath");
         tabFile.NewColumn("AssetMD5");
         tabFile.NewColumn("AssetDateTime");
@@ -405,13 +405,13 @@ public partial class CBuildTools
             {
                 tabFile = CTabFile.LoadFromFile(verFile);
 
-                for (int i = 1; i < tabFile.GetHeight(); ++i)
+                foreach(CTabFile.RowInterator row in tabFile)
                 {
-                    BuildVersion[tabFile.GetString(i, "AssetPath")] =
+                    BuildVersion[row.GetString("AssetPath")] =
                         new BuildRecord(
-                            tabFile.GetString(i, "AssetMD5"),
-                            tabFile.GetString(i, "AssetDateTime"),
-                            tabFile.GetInteger(i, "ChangeCount"));
+                            row.GetString("AssetMD5"),
+                            row.GetString("AssetDateTime"),
+                            row.GetInteger("ChangeCount"));
                 }
             }
         }

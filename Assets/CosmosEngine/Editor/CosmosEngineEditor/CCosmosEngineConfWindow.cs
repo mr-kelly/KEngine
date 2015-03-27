@@ -8,12 +8,37 @@
 //              https://github.com/mr-kelly/CosmosEngine
 //
 //------------------------------------------------------------------------------
+
+using CosmosEngine;
 using UnityEngine;
 using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+
+namespace CosmosEngine
+{
+    [CustomEditor(typeof(CCosmosEngine))]
+    public class CCosmosEngineInspector : Editor
+    {
+        static CCosmosEngineInspector()
+        {
+            SceneView.onSceneGUIDelegate -= OnSceneViewGUI;
+            SceneView.onSceneGUIDelegate += OnSceneViewGUI;
+        }
+
+        static void OnSceneViewGUI(SceneView view)
+        {
+            // 检查编译中，立刻暂停游戏！
+            if (EditorApplication.isCompiling)
+            {
+                EditorApplication.isPlaying = false;
+            }
+
+        }
+    }   
+}
 
 public class CCosmosEngineWindow : EditorWindow
 {
@@ -59,7 +84,6 @@ public class CCosmosEngineWindow : EditorWindow
         if (!File.Exists(ConfFilePath))
         {
             CTabFile confFile = new CTabFile();
-            confFile.NewRow();
             confFile.NewColumn("Key");
             confFile.NewColumn("Value");
             confFile.NewColumn("Comment");

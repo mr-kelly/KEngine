@@ -73,6 +73,20 @@ public static class CExtensions
 		return t.position.z;
 	}
 
+    public static float GetLocalPositionX(this Transform t)
+    {
+        return t.localPosition.x;
+    }
+
+    public static float GetLocalPositionY(this Transform t)
+    {
+        return t.localPosition.y;
+    }
+
+    public static float GetLocalPositionZ(this Transform t)
+    {
+        return t.localPosition.z;
+    }
 	public static bool HasRigidbody(this GameObject gobj)
 	{
 		return (gobj.rigidbody != null);
@@ -120,7 +134,24 @@ public static class CExtensions
             if (arrElement == null)
                 ret = default(T);
             else
-                ret = (T)Convert.ChangeType(arrElement, typeof(T));
+            {
+                try
+                {
+           
+                        ret = (T) Convert.ChangeType(arrElement, typeof (T));
+                }
+                catch (Exception e)
+                {
+                    if (arrElement is string && string.IsNullOrEmpty(arrElement as string))
+                        ret = default(T);
+                    else
+                    {
+                        CDebug.LogError("[Error get from object[],  '{0}' change to type {1}", arrElement, typeof (T));
+                        ret = default(T);
+                    }
+                }
+                
+            }
         }
         else
         {

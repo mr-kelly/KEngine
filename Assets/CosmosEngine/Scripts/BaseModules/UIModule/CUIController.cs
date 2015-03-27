@@ -14,19 +14,14 @@ using System;
 /// <summary>
 /// Abstract class of all UI Script
 /// </summary>
-public abstract class CUIController : MonoBehaviour
+public abstract class CUIController : CBehaviour
 {
     public string UITemplateName = "";
     public string UIName = "";
     public bool HasBackBtn = true; // 是否有返回按钮
-    
-    protected Transform CachedTransform;
-    protected GameObject CacheGameObject;
 
     public virtual void OnInit()
     {
-        CachedTransform = transform;
-        CacheGameObject = gameObject;
     }
 
     public virtual void OnOpen(params object[] args) { }
@@ -51,7 +46,7 @@ public abstract class CUIController : MonoBehaviour
         if (trans == null)
         {
             if (isLog)
-                CDebug.LogError("Get UI Control Error: " + uri);
+                CDebug.LogError("Get UI<{0}> Control Error: " + uri, this);
             return null;
         }
 

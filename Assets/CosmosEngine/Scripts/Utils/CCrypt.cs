@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using CosmosEngine;
+using UnityEngine;
 using System.Collections;
 using System.Security.Cryptography;
 using System;
@@ -10,8 +11,8 @@ using System.IO;
 /// </summary>
 public class CCrypt
 {
-    public static byte[] CustomKeys = null;
-    private static readonly byte[] DefaultKeys = { 0x00, 0x01, 0x02, 0x03, 0xAB, 0xCD, 0xEF, 0x05 };
+    public byte[] CustomKeys = null;
+    private readonly byte[] DefaultKeys = { 0x00, 0x01, 0x02, 0x03, 0xAB, 0xCD, 0xEF, 0x05 };
 
     public CCrypt(byte[] keys)
     {

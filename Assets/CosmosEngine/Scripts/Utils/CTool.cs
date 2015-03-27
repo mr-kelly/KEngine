@@ -22,7 +22,6 @@ using UnityEditor;
 using UnityEngine;
 using System.IO;
 
-
 /// <summary>
 /// Some tool function for time, bytes, MD5, or something...
 /// </summary>
@@ -58,32 +57,6 @@ public class CTool
             if (i == num)
                 return true;
             i = i * 2;
-        }
-    }
-
-    // 需要StartCoroutine
-    public static IEnumerator TimeCallback(float time, Action callback)
-    {
-        yield return new WaitForSeconds(time);
-        callback();
-    }
-
-    public static Coroutine WaitCallback(Action<Action> func)
-    {
-        return CCosmosEngine.EngineInstance.StartCoroutine(CoWaitCallback(func));
-    }
-
-    private static IEnumerator CoWaitCallback(Action<Action> func)
-    {
-        bool wait = true;
-        func(() =>
-        {
-            wait = false;
-        });
-        // ReSharper disable once LoopVariableIsNeverChangedInsideLoop
-        while (wait)
-        {
-            yield return null;
         }
     }
 
@@ -196,6 +169,11 @@ public class CTool
     /// <returns></returns>
     public static List<T> Split<T>(string str, params char[] args)
     {
+        if (args.Length == 0)
+        {
+            args = new char[] {'|'}; // 默认
+        }
+
         var retList = new List<T>();
         if (!string.IsNullOrEmpty(str))
         {
@@ -709,22 +687,23 @@ public class CTool
         return obj;
     }
 
-    public static void SetChild(GameObject child, GameObject parent, bool ignoreRotation = false, bool ignoreScale = false)
+    public static void SetChild(GameObject child, GameObject parent, bool selfRotation = false, bool selfScale = false)
     {
-        SetChild(child.transform, parent.transform, ignoreRotation, ignoreScale);
+        SetChild(child.transform, parent.transform, selfRotation, selfScale);
     }
-    public static void SetChild(Transform child, Transform parent, bool ignoreRotation = false, bool ignoreScale = false)
+    public static void SetChild(Transform child, Transform parent, bool selfRotation = false, bool selfScale = false)
     {
         child.parent = parent;
-        ResetTransform(child, ignoreRotation, ignoreScale);
+        ResetTransform(child, selfRotation, selfScale);
     }
-    public static void ResetTransform(UnityEngine.Transform transform, bool ignoreRotation = false, bool ignoreScale = false)
+    public static void ResetTransform(UnityEngine.Transform transform, bool selfRotation = false, bool selfScale = false)
     {
         transform.localPosition = UnityEngine.Vector3.zero;
-        if (!ignoreScale)
-            transform.localScale = UnityEngine.Vector3.one;
-        if (!ignoreRotation)
+        if (!selfRotation)
             transform.localEulerAngles = UnityEngine.Vector3.zero;
+
+        if (!selfScale)
+            transform.localScale = UnityEngine.Vector3.one;
     }
 
     // 获取指定流的MD5

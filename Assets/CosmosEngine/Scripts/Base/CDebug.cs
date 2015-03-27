@@ -39,32 +39,29 @@ public class CDebug
 	{
 		if (result)
 			return;
+        
 		LogErrorWithStack("Assertion Failed!", 2);
+
+#if UNITY_EDITOR
+        System.Diagnostics.Debug.Assert(result);
+#endif
+
 		throw new Exception("Assert"); // 中断当前调用
 	}
 
 	public static void Assert(int result)
 	{
-		if (result != 0)
-			return;
-		LogErrorWithStack("Assertion Failed!", 2);
-		throw new Exception("Assert"); // 中断当前调用
+	    Assert(result != 0);
 	}
 
 	public static void Assert(Int64 result)
 	{
-		if (result != 0)
-			return;
-		LogErrorWithStack("Assertion Failed!", 2);
-		throw new Exception("Assert"); // 中断当前调用
+	    Assert(result != 0);
 	}
 
 	public static void Assert(object obj)
 	{
-		if (obj != null)
-			return;
-		LogErrorWithStack("Assertion Failed!", 2);
-		throw new Exception("Assert"); // 中断当前调用
+	    Assert(obj != null);
 	}
 
     // 这个使用系统的log，这个很特别，它可以再多线程里用，其它都不能再多线程内用！！！

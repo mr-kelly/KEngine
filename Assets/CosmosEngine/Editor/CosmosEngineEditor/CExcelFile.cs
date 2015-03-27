@@ -54,7 +54,8 @@ class CExcelFile
                     // 可能是空字符串的格子，忽略！
                     continue;
                 }
-                ColName2Index[cell.ToString()] = columnIndex;
+                var headerName = cell.ToString().Split('|', '[', ':', ']')[0]; // 去掉参数定义
+                ColName2Index[headerName] = columnIndex;
             }
         }
         

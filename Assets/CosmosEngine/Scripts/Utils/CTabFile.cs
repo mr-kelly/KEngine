@@ -30,7 +30,32 @@ public class CTabFile : IDisposable, ICTabReadble, IEnumerable<CTabFile.RowInter
     }
 
     private int ColCount;  // 列数
-    protected Dictionary<string, int> ColIndex = new Dictionary<string, int>();
+
+    /// <summary>
+    /// 表头信息
+    /// </summary>
+    public class HeaderInfo
+    {
+        public int ColumnIndex;
+        public string HeaderName;
+        public string HeaderDef;
+
+        /// <summary>
+        ///  列名
+        /// </summary>
+        /// <returns></returns>
+        //public string ToColumnString()
+        //{
+        //    var retStr = HeaderName;
+        //    if (HeaderDef != null)
+        //    {
+        //        retStr += "|" + string.Join("|", HeaderDef);    
+        //    }
+        //    return retStr;
+        //}
+    }
+
+    protected Dictionary<string, HeaderInfo> ColIndex = new Dictionary<string, HeaderInfo>();
     protected Dictionary<int, string[]> TabInfo = new Dictionary<int, string[]>();
 
     // 直接从字符串分析
@@ -76,23 +101,35 @@ public class CTabFile : IDisposable, ICTabReadble, IEnumerable<CTabFile.RowInter
 
     protected bool ParseReader(TextReader oReader)
     {
-        string sLine = "";
-        int indexLine = 0; // 0 是行头
-        sLine = oReader.ReadLine(); // 首行
-        if (sLine == null)
-        {
-            return true;
-        }
+        // 首行
+        var headLine = oReader.ReadLine();
+        CDebug.Assert(headLine != null);
+        var defLine = oReader.ReadLine(); // 声明行
+        CDebug.Assert(defLine != null);
+        var defLineArr = defLine.Split(CTabFileDef.Separators, StringSplitOptions.None);
 
-        string[] firstLineSplitString = sLine.Split(CTabFileDef.Separators, StringSplitOptions.None);  // don't remove RemoveEmptyEntries!
+        string[] firstLineSplitString = headLine.Split(CTabFileDef.Separators, StringSplitOptions.None);  // don't remove RemoveEmptyEntries!
+        string[] firstLineDef = new string[firstLineSplitString.Length];
+        Array.Copy(defLineArr, 0, firstLineDef, 0, defLineArr.Length);  // 拷贝，确保不会超出表头的
+
         for (int i = 1; i <= firstLineSplitString.Length; i++)
         {
-            ColIndex[firstLineSplitString[i - 1].Trim()] = i;
+            var headerString = firstLineSplitString[i - 1];
+
+            var headerInfo = new HeaderInfo
+            {
+                ColumnIndex = i,
+                HeaderName = headerString,
+                HeaderDef = firstLineDef[i -1],
+            };
+
+            ColIndex[headerInfo.HeaderName] = headerInfo;
         }
         ColCount = firstLineSplitString.Length;  // 標題
 
-        TabInfo[indexLine] = firstLineSplitString;
-        indexLine++;
+        // 读取内容
+        string sLine = "";
+        int rowIndex = 1; // 从第1行开始
         while (sLine != null)
         {
             sLine = oReader.ReadLine();
@@ -100,8 +137,8 @@ public class CTabFile : IDisposable, ICTabReadble, IEnumerable<CTabFile.RowInter
             {
                 string[] splitString1 = sLine.Split(CTabFileDef.Separators, StringSplitOptions.None);
 
-                TabInfo[indexLine] = splitString1;
-                indexLine++;
+                TabInfo[rowIndex] = splitString1;
+                rowIndex++;
             }
         }
         return true;
@@ -122,23 +159,23 @@ public class CTabFile : IDisposable, ICTabReadble, IEnumerable<CTabFile.RowInter
     {
         bool result = false;
         StringBuilder sb = new StringBuilder();
+
+        foreach (var header in ColIndex.Values)
+            sb.Append(string.Format("{0}\t", header.HeaderName));
+        sb.Append("\r\n");
+        
+        foreach (var header in ColIndex.Values)
+            sb.Append(string.Format("{0}\t", header.HeaderDef));
+        sb.Append("\r\n");
+
         foreach (KeyValuePair<int, string[]> item in TabInfo)
         {
-            int i = 0;
             foreach (string str in item.Value)
             {
-                i++;
                 sb.Append(str);
-                if (i != item.Value.Length)
-                {
-                    sb.Append('\t');
-                }
-                else
-                {
-                    sb.Append('\r');
-                    sb.Append('\n');
-                }
+                sb.Append('\t');
             }
+            sb.Append("\r\n");
         }
 
         try
@@ -179,11 +216,11 @@ public class CTabFile : IDisposable, ICTabReadble, IEnumerable<CTabFile.RowInter
 
     public string GetString(int row, string columnName)
     {
-        int column;
-        if (!ColIndex.TryGetValue(columnName, out column))
+        HeaderInfo headerInfo;
+        if (!ColIndex.TryGetValue(columnName, out headerInfo))
             return string.Empty;
 
-        return GetString(row, column);
+        return GetString(row, headerInfo.ColumnIndex);
     }
 
     public int GetInteger(int row, int column)
@@ -306,32 +343,42 @@ public class CTabFile : IDisposable, ICTabReadble, IEnumerable<CTabFile.RowInter
         return ColIndex.ContainsKey(colName);
     }
 
-    public int NewColumn(string colName = "")
+    public int NewColumn(string colName, string defineStr = "")
     {
-        if (!string.IsNullOrEmpty(colName))  // 无列命，不保存字符索引
-            ColIndex.Add(colName, ColIndex.Count + 1);
+        CDebug.Assert(!string.IsNullOrEmpty(colName));
+
+        var newHeader = new HeaderInfo
+        {
+            ColumnIndex = ColIndex.Count + 1,
+            HeaderName = colName,
+            HeaderDef = defineStr,
+        };
+
+        ColIndex.Add(colName, newHeader);
         ColCount++;
 
-        string[] rowStrs;
-        if (TabInfo.TryGetValue(0, out rowStrs))
-        {
-            // 已经存在，进行修改
-            var oldCol = rowStrs;
-            var newCol = TabInfo[0] = new string[ColCount]; // 0 行是行头
-            oldCol.CopyTo(newCol, 0);
-            newCol[newCol.Length - 1] = colName;
-        }
-        else
-        {
-            TabInfo[0] = new string[ColCount]; // 0 行是行头   
-        }
+        //string[] rowStrs;
+        //if (TabInfo.TryGetValue(0, out rowStrs))
+        //{
+        //    // 已经存在，进行修改
+        //    var oldCol = rowStrs;
+        //    var newColRow = TabInfo[0] = new string[ColCount]; // 0 行是行头
+        //    oldCol.CopyTo(newColRow, 0);
+        //    newColRow[newColRow.Length - 1] = newHeader.ToColumnString();
+        //}
+        //else
+        //{
+        //    TabInfo[0] = new string[ColCount]; // 0 行是行头  
+        //    TabInfo[0][ColCount - 1] = newHeader.ToColumnString();
+        //}
+
         return ColCount;
     }
 
     public int NewRow()
     {
         string[] list = new string[ColCount];
-        int rowId = TabInfo.Count;
+        int rowId = TabInfo.Count + 1;
         TabInfo.Add(rowId, list);
         return rowId;
     }
@@ -355,17 +402,18 @@ public class CTabFile : IDisposable, ICTabReadble, IEnumerable<CTabFile.RowInter
     {
         if (row > TabInfo.Count || column > ColCount || row <= 0 || column <= 0)  //  || column > ColIndex.Count
         {
+            CDebug.LogError("Wrong row-{0} or column-{1}", row, column);
             return false;
         }
         string content = Convert.ToString(value);
         if (row == 0)
         {
-            foreach (KeyValuePair<string, int> item in ColIndex)
+            foreach (var kv in ColIndex)
             {
-                if (item.Value == column)
+                if (kv.Value.ColumnIndex == column)
                 {
-                    ColIndex.Remove(item.Key);
-                    ColIndex[content] = item.Value;
+                    ColIndex.Remove(kv.Key);
+                    ColIndex[content] = kv.Value;
                     break;
                 }
             }
@@ -383,17 +431,17 @@ public class CTabFile : IDisposable, ICTabReadble, IEnumerable<CTabFile.RowInter
 
     public bool SetValue<T>(int row, string columnName, T value)
     {
-        int column;
-        if (!ColIndex.TryGetValue(columnName, out column))
+        HeaderInfo headerInfo;
+        if (!ColIndex.TryGetValue(columnName, out headerInfo))
             return false;
 
-        return SetValue(row, column, value);
+        return SetValue(row, headerInfo.ColumnIndex, value);
     }
 
     IEnumerator<RowInterator> IEnumerable<RowInterator>.GetEnumerator()
     {
         int rowStart = 1;
-        for (int i = rowStart; i < GetHeight(); i++)
+        for (int i = rowStart; i <= GetHeight(); i++)
         {
             _rowInteratorCache.Row = i;
             yield return _rowInteratorCache;
@@ -403,7 +451,7 @@ public class CTabFile : IDisposable, ICTabReadble, IEnumerable<CTabFile.RowInter
     public IEnumerator GetEnumerator()
     {
         int rowStart = 1;
-        for (int i = rowStart; i < GetHeight(); i++)
+        for (int i = rowStart; i <= GetHeight(); i++)
         {
             _rowInteratorCache.Row = i;
             yield return _rowInteratorCache;

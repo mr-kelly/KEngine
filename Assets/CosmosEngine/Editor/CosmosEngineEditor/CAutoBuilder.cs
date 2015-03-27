@@ -8,6 +8,8 @@
 //              https://github.com/mr-kelly/CosmosEngine
 //
 //------------------------------------------------------------------------------
+
+using CosmosEngine;
 using UnityEngine;
 using UnityEditor;
 using System;

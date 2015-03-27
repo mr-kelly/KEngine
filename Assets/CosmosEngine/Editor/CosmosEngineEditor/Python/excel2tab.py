@@ -13,6 +13,7 @@ import xlrd
 import time
 import sys 
 import shutil
+import re
 
 # print 'ok'
 # output_tab = None
@@ -62,7 +63,7 @@ def DirWalker(arg, dirname, filenames):
 		if (szExt == '.bytes'): # 纯拷贝
 			shutil.copy(szSrcPath, szExportPath)
 			print u'【Copied Pure Text File】 From %s To %s' % (szSrcPath.decode('gbk').encode('utf-8'), szExportPath.decode('gbk').encode('utf-8'))
-		elif (szExt == '.xls' or szExt == '.xlsx'):  # 编译
+		elif (szExt == '.xls' or szExt == '.xlsx'):  # 下面开始编译~
 
 			str_list = []
 			
@@ -76,49 +77,110 @@ def DirWalker(arg, dirname, filenames):
 				# 找到表
 				arrIgnoreCols = [] # 忽略的列
 				nIdCol = None  # ID列索引编号
-				for i in range(table.nrows):
-					if i == 1:  # 忽略第二行，第二行为行头解释
-						pass
-					else:
-						row = table.row_values(i)
+				
+				bCommentRow = 1 # 默认注释行是第二行，如果第二行是带[xxx]，则注释行改成第3行
 
-						#if i == 0: # 第一行，读取Comment列位
-						col = 1 # 计列
-						szRow = []
-						for s in row:
-							if i == 0: # i = 0 时表头
-								# 去掉多语言表示{xxx}
-								if s.startswith("{") and s.endswith("}"):
-									s = s[1:-1]
-								if ("Comment" in s):
-									arrIgnoreCols.append(col)
-								if ("" == s): # 空白字符列
-									arrIgnoreCols.append(col)
-								if ("Id" in s):
-									nIdCol = col
+				rePattern = re.compile('\[(.*)\]')
 
-							if col in arrIgnoreCols: # 注释列忽略！
-								pass
-							# elif col == nIdCol and i != 0: # ID列整数！非表头
-							# 	try:
-							# 		toInt = int(s)
-							# 		szRow.append(toInt)
-							# 	except:  # 可能是字符串key,无法转int, 用原字符串吧
-							# 		szRow.append(unicode(s))
-							else:
-								if isinstance(s, str):
-									s = s.strip() # 干掉空格
-								if isinstance(s, float):
-									if str(s).endswith('.0'): # .0结尾的浮点，转整形
-										s = int(float(s))
-								szRow.append(unicode(s))
+				for rowIndex in range(table.nrows):
 
-							col = col + 1
+					row = table.row_values(rowIndex)
 
-						_new_line = '\t'.join(unicode(s) for s in szRow)
-						# print _new_line
-						if _new_line.strip() != '':
-							str_list.append(_new_line)
+					# 行的第一个格以#开头，忽略整行！
+					if rowIndex != 1 and len(row) > 0 and str(row[0]).startswith("#"):
+						continue
+
+					if rowIndex == 1:  
+						# 判断是否是声明行~如果是就编译这样，忽略下一行
+						bHasDefRow = False # 是否拥有声明行
+						for cell_ in row:
+							if rePattern.search(str(cell_)):
+								bCommentRow = 2
+								bHasDefRow = True
+								print u'[带有定义行]: %s' % szExportPath.decode('gbk').encode('utf-8')
+								break
+						if not bHasDefRow:
+							# 不拥有声明行,强制添加空行
+							str_list.append('[string]\t')
+
+
+
+					# 忽略行头解释
+					if rowIndex == bCommentRow:
+						continue
+
+
+					#if rowIndex == 0: # 第一行，读取Comment列位
+					col = 0 # 计列
+					szRow = []
+					for cell_ in row:
+
+						cellVal = cell_
+						if rowIndex == 0: # rowIndex = 0 时表头
+							if (cellVal.startswith("#")):
+								arrIgnoreCols.append(col)
+							if ("Comment" in cellVal):
+								arrIgnoreCols.append(col)
+							if ("" == cellVal): # 空白字符列
+								arrIgnoreCols.append(col)
+							if ("Id" in cellVal):
+								nIdCol = col
+
+							# 去掉多语言表示{xxx}
+							if cellVal.startswith("{") and cellVal.endswith("}"):
+								cellVal = cellVal[1:-1]
+								# szType = 'l10n'
+							"""
+							commentRow = table.row_values(1) # 获取第二行，注释行
+							
+							commentCell = commentRow[col]
+							# 获取特殊属性声明列~[string:abc]  类型和默认值
+							reSearchComment = rePattern.search(commentCell, re.MULTILINE)
+							szType = None
+							szDefault = ''
+							if (reSearchComment): # 搜索注释列，带有类型声明
+								splitMatch = reSearchComment.group(1).split(':')
+								szType = splitMatch[0]
+								if len(splitMatch) > 1:
+									szDefault = splitMatch[1]
+
+
+							reSearchHeader = rePattern.search(cellVal, re.MULTILINE) # 表头声明解析
+							if (reSearchHeader):
+								splitMatch = reSearchHeader.group(1).split(':')
+								szType = splitMatch[0]
+								if len(splitMatch) > 1:
+									szDefault = splitMatch[1]
+								cellVal = cellVal.replace(reSearchHeader.group(0), "") # 替换掉匹配的
+
+							if (szType): # 带有类型，那么作处理
+								cellVal = '%s|%s|%s' % (cellVal, szType, szDefault)
+							"""
+
+						if col in arrIgnoreCols: # 注释列忽略！
+							pass
+						# elif col == nIdCol and rowIndex != 0: # ID列整数！非表头
+						# 	try:
+						# 		toInt = int(cellVal)
+						# 		szRow.append(toInt)
+						# 	except:  # 可能是字符串key,无法转int, 用原字符串吧
+						# 		szRow.append(unicode(cellVal))
+						else:
+							if isinstance(cellVal, str) or isinstance(cellVal, unicode):
+								cellVal = cellVal.strip() # 干掉空格
+								cellVal = cellVal.replace('\n', '').replace('\r', '') # 确保去掉换行符
+
+							if isinstance(cellVal, float):
+								if str(cellVal).endswith('.0'): # .0结尾的浮点，转整形
+									cellVal = int(float(cellVal))
+							szRow.append(unicode(cellVal))
+
+						col = col + 1
+
+					_new_line = '\t'.join(unicode(cellVal) for cellVal in szRow)
+					# print _new_line
+					if _new_line.strip() != '':
+						str_list.append(_new_line)
 
 				strOutput = '\n'.join(str_list).encode('utf-8')
 				

@@ -30,7 +30,7 @@ public class CPrefs
             PlayerPrefs.DeleteKey(key);
         else
             PlayerPrefs.SetString(key, crypt ? Crypter.EncryptDES(content) : content);
-
+        
         PlayerPrefs.Save();
     }
 

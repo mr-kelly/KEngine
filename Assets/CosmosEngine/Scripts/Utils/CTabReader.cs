@@ -8,6 +8,7 @@ using System.Text;
 /// <summary>
 /// 性能更好，不能写入的Tab读取器
 /// </summary>
+[System.Obsolete("不支持行头定义类型！暂时不用了！")]
 public class CTabReader : ICTabReadble, IDisposable
 {
     Stream m_tableStream;
