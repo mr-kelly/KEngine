@@ -58,6 +58,14 @@ public static class CExtensions
         t.localPosition = new Vector3(t.localPosition.x, t.localPosition.y, newZ);
     }
 
+    public static void SetLocalScale(this Transform t, Vector3 newScale)
+    {
+        t.localScale = newScale;
+    }
+    public static void SetLocalScaleZero(this Transform t)
+    {
+        t.localScale = Vector3.zero;
+    }
 	public static float GetPositionX(this Transform t)
 	{
 		return t.position.x;

@@ -117,7 +117,7 @@ public abstract class CBaseResourceLoader
             {
                 if (ResultObject == null)
                     CDebug.LogWarning("Null ResultAsset {0}", Url);
-                callback(true, ResultObject);
+                callback(ResultObject != null, ResultObject);
             }
             else
                 Callbacks.Add(callback);

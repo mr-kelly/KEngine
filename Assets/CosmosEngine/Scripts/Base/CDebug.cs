@@ -18,14 +18,15 @@ public class CDebug
 {
     static bool IsLogFile = true; // 是否輸出到日誌
 
-    static bool IsDebugBuild;
+    //static bool IsDebugBuild;
 
     public static event Action<string> LogErrorEvent;
 
     static CDebug()
     {
         // isDebugBuild先预存起来，因为它是一个get_属性, 在非Unity主线程里不能用，导致多线程网络打印log时报错
-        IsDebugBuild = UnityEngine.Debug.isDebugBuild;
+
+        //IsDebugBuild = UnityEngine.Debug.isDebugBuild;
     }
 
     enum LogType
@@ -156,7 +157,7 @@ public class CDebug
     // 是否写过log file
     public static bool HasLogFile(string logFile)
     {
-        if (IsDebugBuild && IsLogFile)
+        if (IsLogFile)
         {
             string fullPath = GetLogPath() + logFile;
             if (File.Exists(fullPath))
@@ -175,7 +176,7 @@ public class CDebug
     // 写log文件
     public static void LogToFile(string logFile, string szMsg, bool append)
     {
-        if (IsDebugBuild && IsLogFile)  //  开发者模式true:写log IO文件+响应服务器log
+        if (IsLogFile)  //  开发者模式true:写log IO文件+响应服务器log
         {
             string fullPath = GetLogPath() + logFile;
             string dir = Path.GetDirectoryName(fullPath);
