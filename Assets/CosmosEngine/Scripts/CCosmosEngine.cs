@@ -109,9 +109,9 @@ namespace CosmosEngine
         IEnumerator DoInit()
         {
             var baseModules = new ICModule[] {  // 基础三件套
-            CResourceModule.Instance, 
-            CUIModule.Instance, 
-        };
+                CResourceModule.Instance, 
+                CUIModule.Instance, 
+            };
 
             var startInitTime = 0f;
             foreach (ICModule mod in baseModules)

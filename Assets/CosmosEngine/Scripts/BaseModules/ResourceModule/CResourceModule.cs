@@ -50,12 +50,24 @@ public class CResourceModule : MonoBehaviour, ICModule
     }
     public static bool LoadByQueue = false;
     public static int LogLevel = (int)LoadingLogLevel.None;
-    public static string BuildPlatformName;
+    public static string BuildPlatformName { get { return GetBuildPlatformName(); } }
+    public static string FileProtocol { get { return GetFileProtocol(); } }  // for WWW...with file:///xxx
+
+    /// <summary>
+    /// Product Folder's Relative Path   -  Default: ../Product,   which means Assets/../Product
+    /// </summary>
+    public static string ProductRelPath { get { return CCosmosEngine.GetConfig("ProductRelPath"); } }
+
+    /// <summary>
+    /// Product Folder Full Path , Default: C:\xxxxx\xxxx\../Product
+    /// </summary>
+    public static string ProductFullPath { get { return Path.Combine(Application.dataPath, ProductRelPath); } }
+
     public static string ResourcesPath;
-    public static string ResourcesPathWithOutFileProtocol;
+    public static string ResourcesPathWithoutFileProtocol;
     public static string ApplicationPath;
-    public static string DocumentResourcesPathWithOutFileStart;
-    private static string DocumentResourcesPath;
+    public static string DocumentResourcesPathWithoutFileProtocol;
+    public static string DocumentResourcesPath;
 
     public static CResourceManagerPathType ResourcePathType = CResourceManagerPathType.PersistentDataPathPriority;  // 是否優先找下載的資源?還是app本身資源優先
 
@@ -154,7 +166,7 @@ public class CResourceModule : MonoBehaviour, ICModule
         newUrl = ResourcesPath + url;
 
         // 注意，StreamingAssetsPath在Android平台時，壓縮在apk里面，不要做文件檢查了
-        if (Application.platform != RuntimePlatform.Android && !File.Exists(ResourcesPathWithOutFileProtocol + url))
+        if (Application.platform != RuntimePlatform.Android && !File.Exists(ResourcesPathWithoutFileProtocol + url))
         {
             return false;
         }
@@ -165,7 +177,7 @@ public class CResourceModule : MonoBehaviour, ICModule
     public static bool TryGetDocumentResourceUrl(string url, out string newUrl)
     {
         newUrl = DocumentResourcesPath + url;
-        if (File.Exists(DocumentResourcesPathWithOutFileStart + url))
+        if (File.Exists(DocumentResourcesPathWithoutFileProtocol + url))
         {
             return true;
         }
@@ -297,25 +309,21 @@ public class CResourceModule : MonoBehaviour, ICModule
     /// <returns></returns>
     public static void InitResourcePath()
     {
-        string productPath = Path.Combine(Application.dataPath, CCosmosEngine.GetConfig("ProductRelPath"));
+        string productPath = ProductFullPath;
         string assetBundlePath = Path.Combine(Application.dataPath, CCosmosEngine.GetConfig("AssetBundleRelPath"));
         string resourceDirName = Path.GetFileName(CCosmosEngine.GetConfig("AssetBundleRelPath"));
 
-        BuildPlatformName = GetBuildPlatformName();
-
-        string fileProtocol = GetFileProtocol();
-
-        DocumentResourcesPathWithOutFileStart = string.Format("{0}/{1}/{2}/", GetAppDataPath(), resourceDirName, GetBuildPlatformName());  // 各平台通用
-        DocumentResourcesPath = fileProtocol + DocumentResourcesPathWithOutFileStart;
+        DocumentResourcesPathWithoutFileProtocol = string.Format("{0}/{1}/{2}/", GetAppDataPath(), resourceDirName, GetBuildPlatformName());  // 各平台通用
+        DocumentResourcesPath = FileProtocol + DocumentResourcesPathWithoutFileProtocol;
 
         switch (Application.platform)
         {
             case RuntimePlatform.WindowsEditor:
             case RuntimePlatform.OSXEditor:
                 {
-                    ApplicationPath = string.Format("{0}{1}/", fileProtocol, productPath);
-                    ResourcesPath = fileProtocol + assetBundlePath + "/" + BuildPlatformName + "/";
-                    ResourcesPathWithOutFileProtocol = assetBundlePath + "/" + BuildPlatformName + "/";
+                    ApplicationPath = string.Format("{0}{1}/", GetFileProtocol(), productPath);
+                    ResourcesPath = GetFileProtocol() + assetBundlePath + "/" + BuildPlatformName + "/";
+                    ResourcesPathWithoutFileProtocol = assetBundlePath + "/" + BuildPlatformName + "/";
 
                 }
                 break;
@@ -324,25 +332,25 @@ public class CResourceModule : MonoBehaviour, ICModule
                 {
                     string path = Application.dataPath.Replace('\\', '/');
                     path = path.Substring(0, path.LastIndexOf('/') + 1);
-                    ApplicationPath = string.Format("{0}{1}/", fileProtocol, path);
-                    ResourcesPath = string.Format("{0}{1}{2}/{3}/", fileProtocol, path, resourceDirName, GetBuildPlatformName());
-                    ResourcesPathWithOutFileProtocol = string.Format("{0}{1}/{2}/", path, resourceDirName, GetBuildPlatformName());
+                    ApplicationPath = string.Format("{0}{1}/", GetFileProtocol(), path);
+                    ResourcesPath = string.Format("{0}{1}{2}/{3}/", GetFileProtocol(), path, resourceDirName, GetBuildPlatformName());
+                    ResourcesPathWithoutFileProtocol = string.Format("{0}{1}/{2}/", path, resourceDirName, GetBuildPlatformName());
 
                 }
                 break;
             case RuntimePlatform.Android:
                 {
-                    ApplicationPath = string.Concat("jar:", fileProtocol, Application.dataPath, "!/assets/");
+                    ApplicationPath = string.Concat("jar:", GetFileProtocol(), Application.dataPath, "!/assets/");
 
                     ResourcesPath = string.Concat(ApplicationPath, GetBuildPlatformName(), "/");
-                    ResourcesPathWithOutFileProtocol = string.Concat(Application.dataPath, "!/assets/", GetBuildPlatformName() + "/");  // 注意，StramingAsset在Android平台中，是在壓縮的apk里，不做文件檢查
+                    ResourcesPathWithoutFileProtocol = string.Concat(Application.dataPath, "!/assets/", GetBuildPlatformName() + "/");  // 注意，StramingAsset在Android平台中，是在壓縮的apk里，不做文件檢查
                 }
                 break;
             case RuntimePlatform.IPhonePlayer:
                 {
-                    ApplicationPath = System.Uri.EscapeUriString(fileProtocol + Application.streamingAssetsPath + "/");  // MacOSX下，带空格的文件夹，空格字符需要转义成%20
+                    ApplicationPath = System.Uri.EscapeUriString(GetFileProtocol() + Application.streamingAssetsPath + "/");  // MacOSX下，带空格的文件夹，空格字符需要转义成%20
                     ResourcesPath = string.Format("{0}{1}/", ApplicationPath, GetBuildPlatformName());  // only iPhone need to Escape the fucking Url!!! other platform works without it!!! Keng Die!
-                    ResourcesPathWithOutFileProtocol = Application.streamingAssetsPath + "/" + GetBuildPlatformName() + "/";
+                    ResourcesPathWithoutFileProtocol = Application.streamingAssetsPath + "/" + GetBuildPlatformName() + "/";
                 }
                 break;
             default:
