@@ -43,3 +43,4 @@ _gsdata_
 /UnityVS.CosmosEngineBootstrap.CSharp.Editor.Plugins.csproj
 /UnityVS.CosmosEngineBootstrap.v11.suo
 /logs
+*.suo

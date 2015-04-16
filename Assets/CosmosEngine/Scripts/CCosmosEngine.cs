@@ -12,6 +12,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using CosmosTable;
 
 namespace CosmosEngine
 {
@@ -36,7 +37,7 @@ namespace CosmosEngine
         /// <summary>
         /// Read Tab file (CEngineConfig.txt), cache to here
         /// </summary>
-        static Dictionary<string, string> ConfigMap = null;// 遊戲配置，讀取Resources目錄里
+        //static Dictionary<string, string> ConfigMap = null;// 遊戲配置，讀取Resources目錄里
 
         /// <summary>
         /// Modules passed from the CosmosEngine.New function. All your custom game logic modules 
@@ -157,28 +158,31 @@ namespace CosmosEngine
             }
         }
 
+        private static TableFile<CCosmosEngineConfig> Confs;
+
         /// <summary>
         /// Ensure the CEngineConfig file loaded.
         /// </summary>
         static void EnsureConfigTab()
         {
-            if (ConfigMap == null)
+            if (Confs == null)
             {
                 TextAsset textAsset;
                 textAsset = Resources.Load<TextAsset>("CEngineConfig");
 
                 CDebug.Assert(textAsset);
-
-                using (CTabFile configTab = CTabFile.LoadFromString(textAsset.text))
+                Confs = new TableFile<CCosmosEngineConfig>(new TableFileConfig
                 {
-                    ConfigMap = new Dictionary<string, string>();
-                    foreach (CTabFile.RowInterator row in configTab)
+                    Content = textAsset.text,
+                    OnExceptionEvent = (ex, args) =>
                     {
-                        string key = row.GetString("Key");
-                        string value = row.GetString("Value");
-                        ConfigMap[key] = value;
-                    }
-                }
+                        if (ex != TableFileExceptionType.DuplicatedKey)
+                        {
+                            throw new Exception(ex.ToString());
+                        }
+                    },
+
+                });
             }
         }
 
@@ -189,12 +193,13 @@ namespace CosmosEngine
         {
             EnsureConfigTab();
 
-            string getValue;
-            if (!ConfigMap.TryGetValue(key, out getValue))
+            var conf = Confs.FindByPrimaryKey(key);
+            if (conf == null)
             {
                 CDebug.LogError("Cannot get CosmosConfig: {0}", key);
+                return null;
             }
-            return getValue;
+            return conf.Value;
         }
 
     }
@@ -215,5 +220,28 @@ namespace CosmosEngine
             Value = Value * Sensitivity + value * (1f - Sensitivity);
             return string.Format(format, Value);
         }
+    }
+}
+
+/// <summary>
+/// Engine Config
+/// </summary>
+public class CCosmosEngineConfig : TabRow
+{
+    [TabColumn]
+    public string Key;
+    [TabColumn]
+    public string Value;
+
+    public override object PrimaryKey
+    {
+        get { return Key; }
+    }
+
+    public CCosmosEngineConfig() { }
+
+    public override bool IsAutoParse
+    {
+        get { return true; }
     }
 }
