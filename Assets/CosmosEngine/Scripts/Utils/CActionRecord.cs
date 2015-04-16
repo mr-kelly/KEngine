@@ -22,13 +22,11 @@ public class CActionRecords : CBehaviour
         {
             if (_instance == null)
             {
-#if UNITY_EDITOR
-                if (IsApplicationQuited || !UnityEditor.EditorApplication.isPlaying)
+                if (IsApplicationQuited || !Application.isPlaying)
                 {
                     CDebug.LogErrorWithStack("[错误埋点]Error Instance Action Recods!  请查看堆栈, 尽快修复！！！");
                     return null;
                 }
-#endif
                 _instance = (new GameObject("__ActionRecorder__")).AddComponent<CActionRecords>();
                 _instance.Init();
             }
