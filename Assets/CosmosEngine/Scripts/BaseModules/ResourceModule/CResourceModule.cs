@@ -9,14 +9,13 @@
 //
 //------------------------------------------------------------------------------
 
+using System;
 using CosmosEngine;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
+using Object = UnityEngine.Object;
 
 public enum CResourceManagerPathType
 {
@@ -61,7 +60,7 @@ public class CResourceModule : MonoBehaviour, ICModule
     public static CResourceManagerPathType ResourcePathType = CResourceManagerPathType.PersistentDataPathPriority;  // 是否優先找下載的資源?還是app本身資源優先
 
     public static System.Func<string, string> CustomGetResourcesPath; // 自定义资源路径。。。
-
+    
     /// <summary>
     /// 统一在字符串后加上.box, 取决于配置的AssetBundle后缀
     /// </summary>
@@ -178,8 +177,14 @@ public class CResourceModule : MonoBehaviour, ICModule
     {
         if (_Instance != null)
             CDebug.Assert(_Instance == this);
+
+        //InvokeRepeating("CheckGcCollect", 0f, 3f);
     }
 
+    void Update()
+    {
+        CBaseResourceLoader.CheckGcCollect();
+    }
     public IEnumerator Init()
     {
         InitResourcePath();
@@ -204,16 +209,16 @@ public class CResourceModule : MonoBehaviour, ICModule
 #if UNITY_EDITOR
         // 根据编辑器的当前编译环境, 来确定读取哪个资源目录
         // 因为美术库是根据编译环境来编译资源的，这样可以在Unity编辑器上， 快速验证其资源是否正确再放到手机上
-        switch (EditorUserBuildSettings.activeBuildTarget)
+        switch (UnityEditor.EditorUserBuildSettings.activeBuildTarget)
         {
-            case BuildTarget.StandaloneWindows:
-            case BuildTarget.StandaloneWindows64:
+            case UnityEditor.BuildTarget.StandaloneWindows:
+            case UnityEditor.BuildTarget.StandaloneWindows64:
                 buildPlatformName = "Win32";
                 break;
-            case BuildTarget.Android:
+            case UnityEditor.BuildTarget.Android:
                 buildPlatformName = "Android";
                 break;
-            case BuildTarget.iPhone:
+            case UnityEditor.BuildTarget.iPhone:
                 buildPlatformName = "IOS";
                 break;
         }
@@ -341,5 +346,4 @@ public class CResourceModule : MonoBehaviour, ICModule
         Resources.UnloadUnusedAssets();
         System.GC.Collect();
     }
-
 }

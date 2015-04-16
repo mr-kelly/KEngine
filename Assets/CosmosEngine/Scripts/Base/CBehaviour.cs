@@ -14,7 +14,7 @@ using System.Collections;
 /// <summary>
 /// Without Update, With some cache
 /// </summary>
-public class CBehaviour : MonoBehaviour
+public abstract class CBehaviour : MonoBehaviour
 {
     private Transform _cachedTransform;
     public Transform CachedTransform { get { return _cachedTransform ?? (_cachedTransform = transform); } }
@@ -22,13 +22,14 @@ public class CBehaviour : MonoBehaviour
     private GameObject _cacheGameObject;
     public GameObject CachedGameObject { get { return _cacheGameObject ?? (_cacheGameObject = gameObject); } }
 
-    public Transform _Transform {get { return CachedTransform; }}
+    [System.Obsolete]
     public GameObject _GameObject {get { return CachedGameObject; }}
 
     protected bool IsDestroyed = false;
+    public event System.Action<CBehaviour> DestroyEvent;
 
-    static bool _IsApplicationQuited = false;  // 全局标记, 程序是否退出状态
-    public static bool IsApplicationQuited {get { return _IsApplicationQuited; }}
+    static bool _isApplicationQuited = false;  // 全局标记, 程序是否退出状态
+    public static bool IsApplicationQuited {get { return _isApplicationQuited; }}
 
     public static System.Action ApplicationQuitEvent;
 
@@ -59,14 +60,16 @@ public class CBehaviour : MonoBehaviour
     protected virtual void OnDestroy()
     {
         IsDestroyed = true;
+        if (DestroyEvent != null)
+            DestroyEvent(this);
     }
 
     private void OnApplicationQuit()
     {
-        if (!_IsApplicationQuited)
+        if (!_isApplicationQuited)
             CDebug.Log("OnApplicationQuit!");
 
-        _IsApplicationQuited = true;
+        _isApplicationQuited = true;
 
         if (ApplicationQuitEvent != null)
             ApplicationQuitEvent();

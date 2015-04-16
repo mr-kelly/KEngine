@@ -9,6 +9,7 @@
 //
 //------------------------------------------------------------------------------
 
+using System.Text.RegularExpressions;
 using CosmosEngine;
 using UnityEngine;
 using System;
@@ -25,11 +26,11 @@ public class CGameSettings : ICModule
 
     public Dictionary<Type, Dictionary<string, CBaseInfo>> SettingInfos = new Dictionary<Type, Dictionary<string, CBaseInfo>>();
 
-    private Dictionary<Type, string[]> LazyLoad = new Dictionary<Type, string[]>();
+    private Dictionary<Type, Func<string>[]> LazyLoad = new Dictionary<Type, Func<string>[]>();
 
     public Action InitAction; // Init時調用的委託、函數指針
-    
-    public static event Action<string, int, string> FoundDuplicatedIdEvent;
+
+    public static event Action<Type, int, string> FoundDuplicatedIdEvent;
 
     public IEnumerator Init()
     {
@@ -44,18 +45,22 @@ public class CGameSettings : ICModule
     {
         yield break;
     }
-    public void LoadTab(Type type, bool lazyLoad, params string[] tabPaths)
+
+    public void LazyLoadTab(Type type, params Func<string>[] getTabContentFuncs)
     {
         CDebug.Assert(typeof(CBaseInfo).IsAssignableFrom(type));
 
-        LazyLoad[type] = tabPaths;
-        if (!lazyLoad)
-            EnsureLoad(type);
+        LazyLoad[type] = getTabContentFuncs;
+    }
+    public void LoadTab(Type type, params string[] contents)
+    {
+        CDebug.Assert(typeof(CBaseInfo).IsAssignableFrom(type));
+        DoLoadTab(type, contents);
     }
 
-    public void LoadTab<T>(bool lazyLoad, string[] tabPaths) where T : CBaseInfo
+    public void LoadTab<T>(string[] contents) where T : CBaseInfo
     {
-        LoadTab(typeof (T), lazyLoad, tabPaths);
+        LoadTab(typeof(T), contents);
     }
 
     /// <summary>
@@ -66,16 +71,18 @@ public class CGameSettings : ICModule
     {
         CDebug.Assert(typeof(CBaseInfo).IsAssignableFrom(type));
 
-        string[] loadFilePaths;
-        if (LazyLoad.TryGetValue(type, out loadFilePaths))
+        Func<string>[] getContentFuncs;
+        if (LazyLoad.TryGetValue(type, out getContentFuncs))
         {
-            DoLoadTab(type, loadFilePaths);
+            foreach (var func in getContentFuncs)
+                DoLoadTab(type, new[] { func() });
+
             LazyLoad.Remove(type);
         }
     }
     private void EnsureLoad<T>() where T : CBaseInfo
     {
-        Type type = typeof (T);
+        Type type = typeof(T);
         EnsureLoad(type);
     }
 
@@ -83,32 +90,24 @@ public class CGameSettings : ICModule
     /// 外部人工手动读取
     /// </summary>
     /// <param name="type"></param>
-    /// <param name="tabPaths"></param>
-    public void ForceLoadTab(Type type, params string[] tabPaths)
+    /// <param name="contents"></param>
+    public void ForceLoadTab(Type type, params string[] contents)
     {
-        DoLoadTab(type, tabPaths);
+        DoLoadTab(type, contents);
     }
 
     /// <summary>
     /// 真正进行读取
     /// </summary>
     /// <param name="type"></param>
-    /// <param name="tabPaths"></param>
-    private void DoLoadTab(Type type, IEnumerable<string> tabPaths)
+    /// <param name="contents"></param>
+    private void DoLoadTab(Type type, IEnumerable<string> contents)
     {
         CDebug.Assert(typeof(CBaseInfo).IsAssignableFrom(type));
-
-        foreach (string tabPath in tabPaths)
+        foreach (string content in contents)
         {
-#if GAME_CLIENT
-            using (CTabFile tabFile = CTabFile.LoadFromString(CSettingManager.Instance.LoadSetting(tabPath)))
-#else 
-    // Editor Only
-        string p1 = System.IO.Path.GetFullPath("Assets/" + CCosmosEngine.GetConfig("ProductRelPath") + "/") + tabPath;
-        using (CTabFile tabFile = CTabFile.LoadFromString(System.IO.File.ReadAllText(p1)))
-#endif
+            using (CTabFile tabFile = CTabFile.LoadFromString(content))
             {
-
                 Dictionary<string, CBaseInfo> dict;
                 if (!SettingInfos.TryGetValue(type, out dict))  // 如果没有才添加
                     dict = new Dictionary<string, CBaseInfo>();
@@ -123,7 +122,7 @@ public class CGameSettings : ICModule
                     if (dict.TryGetValue(id, out existOne))
                     {
                         if (FoundDuplicatedIdEvent != null)
-                            FoundDuplicatedIdEvent(tabPath, row, id);
+                            FoundDuplicatedIdEvent(type, row, id);
 
                         CBaseInfo existInfo = existOne;
                         existInfo.ReadFromTab(type, ref existInfo, tabFile, row); // 修改原对象，不new
@@ -144,9 +143,9 @@ public class CGameSettings : ICModule
         }
     }
 
-    private void DoLoadTab<T>(string[] tabPaths) where T : CBaseInfo
+    private void DoLoadTab<T>(string[] contents) where T : CBaseInfo
     {
-        DoLoadTab(typeof (T), tabPaths);
+        DoLoadTab(typeof(T), contents);
     }
 
     public List<T> GetInfos<T>(Func<T, bool> filter = null) where T : CBaseInfo
@@ -160,7 +159,7 @@ public class CGameSettings : ICModule
             List<T> list = new List<T>();
             foreach (CBaseInfo item in dict.Values)
             {
-                var getItem = (T) item;
+                var getItem = (T)item;
                 if (filter == null || filter(getItem))
                     list.Add(getItem);
             }
@@ -177,23 +176,23 @@ public class CGameSettings : ICModule
         EnsureLoad<T>();
 
         Dictionary<string, CBaseInfo> dict;
-        if (SettingInfos.TryGetValue(typeof (T), out dict))
+        if (SettingInfos.TryGetValue(typeof(T), out dict))
         {
             CBaseInfo tabInfo;
             if (dict.TryGetValue(id, out tabInfo))
             {
-                return (T) tabInfo;
+                return (T)tabInfo;
             }
             else
             {
                 if (printLog)
-                    CDebug.LogError("找不到类型{0} Id为{1}的配置对象, 类型表里共有对象{2}", typeof (T).Name, id, dict.Count);
+                    CDebug.LogError("找不到类型{0} Id为{1}的配置对象, 类型表里共有对象{2}", typeof(T).Name, id, dict.Count);
             }
         }
         else
         {
             if (printLog)
-                CDebug.LogError("嘗試Id {0}, 找不到类型配置{1}, 总类型数{2}", id, typeof (T).Name, SettingInfos.Count);
+                CDebug.LogError("嘗試Id {0}, 找不到类型配置{1}, 总类型数{2}", id, typeof(T).Name, SettingInfos.Count);
         }
 
         return null;
@@ -205,7 +204,7 @@ public class CGameSettings : ICModule
     }
 }
 
-public partial class CBaseInfo : ICloneable
+public partial class CBaseInfo : CObject, ICloneable
 {
     // 把Fields缓存起来，避开反射的GetFields性能问题  Type => ( FieldName -> Type )
     private static readonly Dictionary<Type, LinkedList<FieldInfo>> CacheTypeFields = new Dictionary<Type, LinkedList<FieldInfo>>();
@@ -227,7 +226,7 @@ public partial class CBaseInfo : ICloneable
             int tryInt;
             if (!int.TryParse(Id, out tryInt))
             {
-                CDebug.LogError("錯誤解析Int Id");
+                CDebug.LogError("錯誤解析Int Id - {0}", GetType());
             }
 
             _CacheIntId = tryInt;
@@ -259,7 +258,7 @@ public partial class CBaseInfo : ICloneable
     /// <param name="tabFile"></param>
     public virtual void CustomReadLine(ICTabReadble tabFile, int row)
     {
-        
+
     }
 
     public void ReadFromTab(Type type, ref CBaseInfo newT, ICTabReadble tabFile, int row)
@@ -323,6 +322,11 @@ public partial class CBaseInfo : ICloneable
             {
                 value = tabFile.GetUInteger(row, fieldName);
             }
+            else if (fieldType == typeof(Regex))
+            {
+                var str = tabFile.GetString(row, fieldName);
+                value = string.IsNullOrEmpty(str) ? null : new Regex(str);
+            }
             else if (fieldType == typeof(List<string>))
             {
                 string sz = tabFile.GetString(row, fieldName);
@@ -330,22 +334,23 @@ public partial class CBaseInfo : ICloneable
             }
             else if (fieldType == typeof(List<int>))
             {
-                List<int> retInt = new List<int>();
+                //List<int> retInt = new List<int>();
                 string szArr = tabFile.GetString(row, fieldName);
-                if (!string.IsNullOrEmpty(szArr))
-                {
-                    string[] szIntArr = szArr.Split('|');
-                    foreach (string szInt in szIntArr)
-                    {
-                        float parseFloat;
-                        float.TryParse(szInt, out parseFloat);
-                        int parseInt_ = (int)parseFloat;
-                        retInt.Add(parseInt_);
-                    }
-                    value = retInt;
-                }
-                else
-                    value = new List<int>();
+                value = CTool.Split<int>(szArr, '|');
+                //if (!string.IsNullOrEmpty(szArr))
+                //{
+                //    string[] szIntArr = szArr.Split('|');
+                //    foreach (string szInt in szIntArr)
+                //    {
+                //        float parseFloat;
+                //        float.TryParse(szInt, out parseFloat);
+                //        int parseInt_ = (int)parseFloat;
+                //        retInt.Add(parseInt_);
+                //    }
+
+                //}
+                //else
+                //    value = new List<int>();
             }
             else if (fieldType == typeof(List<List<string>>))
             {
@@ -427,5 +432,10 @@ public partial class CBaseInfo : ICloneable
     public object Clone()
     {
         return MemberwiseClone();
+    }
+
+    public override string ToString()
+    {
+        return string.Format("{0}-{1}", GetType(), Id);
     }
 }

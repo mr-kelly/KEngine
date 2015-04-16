@@ -11,14 +11,16 @@
 using System;
 using System.IO;
 using System.Diagnostics;
+using UnityEngine;
 
 /// Frequent Used,
 /// A File logger + Debug Tools
 public class CDebug
 {
-    static bool IsLogFile = true; // 是否輸出到日誌
+    public static bool IsLogFile = false; // 是否輸出到日誌
 
-    //static bool IsDebugBuild;
+    static readonly bool IsDebugBuild = false;
+    public static readonly bool IsEditor = false;
 
     public static event Action<string> LogErrorEvent;
 
@@ -26,58 +28,62 @@ public class CDebug
     {
         // isDebugBuild先预存起来，因为它是一个get_属性, 在非Unity主线程里不能用，导致多线程网络打印log时报错
 
-        //IsDebugBuild = UnityEngine.Debug.isDebugBuild;
+        try
+        {
+            IsDebugBuild = UnityEngine.Debug.isDebugBuild;
+            IsEditor = Application.isEditor;
+        }
+        catch (Exception e)
+        {
+            CDebug.LogConsole_MultiThread("CDebug Static Constructor Failed!");
+            CDebug.LogConsole_MultiThread(e.Message + " , " + e.StackTrace);
+        }
     }
 
     enum LogType
     {
         NORMAL,
-        WARNING, 
+        WARNING,
         ERROR,
     }
 
-	public static void Assert(bool result)
-	{
-		if (result)
-			return;
-        
-		LogErrorWithStack("Assertion Failed!", 2);
+    public static void Assert(bool result)
+    {
+        if (result)
+            return;
 
-#if UNITY_EDITOR
-        System.Diagnostics.Debug.Assert(result);
-#endif
+        LogErrorWithStack("Assertion Failed!", 2);
 
-		throw new Exception("Assert"); // 中断当前调用
-	}
+        throw new Exception("Assert"); // 中断当前调用
+    }
 
-	public static void Assert(int result)
-	{
-	    Assert(result != 0);
-	}
+    public static void Assert(int result)
+    {
+        Assert(result != 0);
+    }
 
-	public static void Assert(Int64 result)
-	{
-	    Assert(result != 0);
-	}
+    public static void Assert(Int64 result)
+    {
+        Assert(result != 0);
+    }
 
-	public static void Assert(object obj)
-	{
-	    Assert(obj != null);
-	}
+    public static void Assert(object obj)
+    {
+        Assert(obj != null);
+    }
 
     // 这个使用系统的log，这个很特别，它可以再多线程里用，其它都不能再多线程内用！！！
     public static void LogConsole_MultiThread(string log, params object[] args)
     {
-#if UNITY_EDITOR || UNITY_STANDLONE
-        Log(log, args);
-#else
-        Console.WriteLine(log, args);
-#endif
+        if (IsEditor)
+            Log(log, args);
+        else
+            Console.WriteLine(log, args);
     }
 
     public static void DevLog(string log, params object[] args)
     {
-        if (UnityEngine.Debug.isDebugBuild)
+        if (IsDebugBuild)
             DoLog(string.Format(log, args), LogType.WARNING);
     }
 
@@ -85,49 +91,53 @@ public class CDebug
     {
         DoLog(log, LogType.NORMAL);
     }
-	public static void Log(string log, params object[] args)
-	{
+    public static void Log(string log, params object[] args)
+    {
         DoLog(string.Format(log, args), LogType.NORMAL);
-	}
-	
-	public static void Logs(params object[] logs)
-	{
-		System.Text.StringBuilder sb = new System.Text.StringBuilder();
-		for (int i = 0; i < logs.Length; ++i)
-		{
-			sb.Append(logs[i].ToString());
-			sb.Append(", ");
-		}
-		Log(sb.ToString());
-	}
+    }
 
-	public static void LogErrorWithStack(string err = "", int stack = 1)
-	{
-		StackFrame[] stackFrames = new StackTrace(true).GetFrames(); ;
-		StackFrame sf = stackFrames[stack];
-		string log = string.Format("[ERROR]{0}\n\n{1}:{2}\t{3}", err, sf.GetFileName(), sf.GetFileLineNumber(), sf.GetMethod());
-		Console.Write(log);
+    public static void Logs(params object[] logs)
+    {
+        System.Text.StringBuilder sb = new System.Text.StringBuilder();
+        for (int i = 0; i < logs.Length; ++i)
+        {
+            sb.Append(logs[i].ToString());
+            sb.Append(", ");
+        }
+        Log(sb.ToString());
+    }
+
+    public static void LogException(Exception e)
+    {
+        LogErrorWithStack(e.Message + " , " + e.StackTrace);
+    }
+    public static void LogErrorWithStack(string err = "", int stack = 1)
+    {
+        StackFrame[] stackFrames = new StackTrace(true).GetFrames(); ;
+        StackFrame sf = stackFrames[stack];
+        string log = string.Format("[ERROR]{0}\n\n{1}:{2}\t{3}", err, sf.GetFileName(), sf.GetFileLineNumber(), sf.GetMethod());
+        Console.Write(log);
         DoLog(log, LogType.ERROR);
 
         if (LogErrorEvent != null)
             LogErrorEvent(err);
-	}
+    }
 
-	public static void LogError(string err, params object[] args)
-	{
-		LogErrorWithStack(string.Format(err, args), 2);
-	}
+    public static void LogError(string err, params object[] args)
+    {
+        LogErrorWithStack(string.Format(err, args), 2);
+    }
 
-	public static void LogWarning(string err, params object[] args)
-	{
-		string log = string.Format(err, args);
+    public static void LogWarning(string err, params object[] args)
+    {
+        string log = string.Format(err, args);
         DoLog(log, LogType.WARNING);
-	}
+    }
 
-	public static void Pause()
-	{
-		UnityEngine.Debug.Break();
-	}
+    public static void Pause()
+    {
+        UnityEngine.Debug.Break();
+    }
 
     private static void DoLog(string szMsg, LogType emType)
     {
@@ -183,12 +193,12 @@ public class CDebug
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
 
-			using (FileStream fileStream = new FileStream(fullPath, append ? FileMode.Append : FileMode.CreateNew, FileAccess.Write, FileShare.ReadWrite))  // 不会锁死, 允许其它程序打开
+            using (FileStream fileStream = new FileStream(fullPath, append ? FileMode.Append : FileMode.CreateNew, FileAccess.Write, FileShare.ReadWrite))  // 不会锁死, 允许其它程序打开
             {
-				StreamWriter writer = new StreamWriter(fileStream);  // Append
+                StreamWriter writer = new StreamWriter(fileStream);  // Append
                 writer.Write(szMsg);
-				writer.Flush();
-				writer.Close();
+                writer.Flush();
+                writer.Close();
             }
         }
     }
@@ -196,11 +206,13 @@ public class CDebug
     // 用于写日志的可写目录
     public static string GetLogPath()
     {
-#if UNITY_EDITOR || UNITY_STANDALONE
-        string logPath = "logs/";
-#else
-		string logPath = UnityEngine.Application.persistentDataPath + "/" + "logs/";
-#endif
+        string logPath;
+
+        if (IsEditor)
+            logPath = "logs/";
+        else
+		    logPath = UnityEngine.Application.persistentDataPath + "/" + "logs/";
+
         return logPath;
     }
 }

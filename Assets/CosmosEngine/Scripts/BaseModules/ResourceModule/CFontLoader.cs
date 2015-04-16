@@ -16,12 +16,12 @@ using System.Collections.Generic;
 
 public class CFontLoader : CBaseResourceLoader
 {
-    private CAssetFileLoader Bridge;
+    private CAssetFileLoader _bridge;
     public override float Progress
     {
         get
         {
-            return Bridge.Progress;
+            return _bridge.Progress;
         }
     }
 
@@ -39,7 +39,7 @@ public class CFontLoader : CBaseResourceLoader
     {
         base.Init(url);
 
-        Bridge = CAssetFileLoader.Load(Url, (_isOk, _obj) =>
+        _bridge = CAssetFileLoader.Load(Url, (_isOk, _obj) =>
         {
             OnFinish(_obj);
         });
@@ -47,6 +47,6 @@ public class CFontLoader : CBaseResourceLoader
     protected override void DoDispose()
     {
         base.DoDispose();
-        Bridge.Release();
+        _bridge.Release();
     }
 }

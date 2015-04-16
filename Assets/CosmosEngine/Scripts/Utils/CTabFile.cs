@@ -170,10 +170,28 @@ public class CTabFile : IDisposable, ICTabReadble, IEnumerable<CTabFile.RowInter
 
         foreach (KeyValuePair<int, string[]> item in TabInfo)
         {
+            int nullStrCount = 0;
+            foreach (var str in item.Value)
+            {
+                if (string.IsNullOrEmpty(str))
+                    nullStrCount++;
+            }
+            if (nullStrCount == item.Value.Length)
+            {
+                continue; // 砍掉空行!
+            }
+
+            int colIndex = 0;
             foreach (string str in item.Value)
             {
+                if (colIndex >= ColIndex.Count) // 确保不会太多列！
+                {
+                    continue;
+                }
+
                 sb.Append(str);
                 sb.Append('\t');
+                colIndex++;
             }
             sb.Append("\r\n");
         }

@@ -114,7 +114,10 @@ public static class CExtensions
 	{
 		return new Vector2(vec.x, vec.y);
 	}
-
+    public static byte ToByte(this string val)
+    {
+        return string.IsNullOrEmpty(val) ? (byte)0 : Convert.ToByte(val);
+    }
 	public static int ToInt32(this string val)
 	{
 	    return string.IsNullOrEmpty(val) ? 0 : Convert.ToInt32(val);
@@ -148,7 +151,7 @@ public static class CExtensions
            
                         ret = (T) Convert.ChangeType(arrElement, typeof (T));
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     if (arrElement is string && string.IsNullOrEmpty(arrElement as string))
                         ret = default(T);

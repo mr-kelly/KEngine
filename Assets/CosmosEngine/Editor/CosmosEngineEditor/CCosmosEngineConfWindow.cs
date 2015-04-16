@@ -15,12 +15,11 @@ using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
-namespace CosmosEngine
+namespace CosmosEngine.Editor
 {
     [CustomEditor(typeof(CCosmosEngine))]
-    public class CCosmosEngineInspector : Editor
+    public class CCosmosEngineInspector : UnityEditor.Editor
     {
         static CCosmosEngineInspector()
         {
@@ -37,128 +36,127 @@ namespace CosmosEngine
             }
 
         }
-    }   
-}
-
-public class CCosmosEngineWindow : EditorWindow
-{
-    static CCosmosEngineWindow()
-    {
-        CheckConfigFile();
     }
-
-    enum CUIBridgeType
+    public class CCosmosEngineWindow : EditorWindow
     {
-        NO_UI,
-        NGUI,
-    }
-    static string ConfFilePath = "Assets/Resources/CEngineConfig.txt";
+        static CCosmosEngineWindow()
+        {
+            CheckConfigFile();
+        }
 
-    // 默認的配置文件內容
-    static string[][] DefaultConfigFileContent = new string[][]{
+        enum CUIBridgeType
+        {
+            NO_UI,
+            NGUI,
+        }
+        static string ConfFilePath = "Assets/Resources/CEngineConfig.txt";
+
+        // 默認的配置文件內容
+        static string[][] DefaultConfigFileContent = new string[][]{
         new string[] {"ProductRelPath", "BuildProduct/", ""},
         new string[] {"AssetBundleRelPath", "StreamingAssets/", "The Relative path to build assetbundles"},
        new string[] { "AssetBundleExt", ".unity3d", "Asset bundle file extension"},
        new string[] { "IsLoadAssetBundle", "1", "Asset bundle or in resources?"},
     };
 
-    static CCosmosEngineWindow Instance;
+        static CCosmosEngineWindow Instance;
 
-    static CTabFile ConfFile;
+        static CTabFile ConfFile;
 
-    [MenuItem("CosmosEngine/Configuration")]
-    static void Init()
-    {
-        // Get existing open window or if none, make a new one:		
-        CheckConfigFile();
-
-        if (Instance == null)
+        [MenuItem("CosmosEngine/Configuration")]
+        static void Init()
         {
-            Instance = ScriptableObject.CreateInstance<CCosmosEngineWindow>();
-        }
-        Instance.Show();
-    }
+            // Get existing open window or if none, make a new one:		
+            CheckConfigFile();
 
-    static void CheckConfigFile()
-    {
-        if (!File.Exists(ConfFilePath))
-        {
-            CTabFile confFile = new CTabFile();
-            confFile.NewColumn("Key");
-            confFile.NewColumn("Value");
-            confFile.NewColumn("Comment");
-
-
-            foreach (string[] strArr in DefaultConfigFileContent)
+            if (Instance == null)
             {
-                int row = confFile.NewRow();
-                confFile.SetValue<string>(row, "Key", strArr[0]);
-                confFile.SetValue<string>(row, "Value", strArr[1]);
-                confFile.SetValue<string>(row, "Comment", strArr[2]);
+                Instance = ScriptableObject.CreateInstance<CCosmosEngineWindow>();
             }
-            confFile.Save(ConfFilePath);
-
-            CDebug.Log("新建CosmosEngine配置文件: {0}", ConfFilePath);
-            AssetDatabase.Refresh();
+            Instance.Show();
         }
 
-        ConfFile = CTabFile.LoadFromFile(ConfFilePath);
-    }
-
-    string GetConfValue(string key)
-    {
-        foreach (CTabFile.RowInterator row in ConfFile)
+        static void CheckConfigFile()
         {
-            string key2 = row.GetString("Key");
-            if (key == key2)
+            if (!File.Exists(ConfFilePath))
             {
-                string value = row.GetString("Value");
-                return value;
+                CTabFile confFile = new CTabFile();
+                confFile.NewColumn("Key");
+                confFile.NewColumn("Value");
+                confFile.NewColumn("Comment");
+
+
+                foreach (string[] strArr in DefaultConfigFileContent)
+                {
+                    int row = confFile.NewRow();
+                    confFile.SetValue<string>(row, "Key", strArr[0]);
+                    confFile.SetValue<string>(row, "Value", strArr[1]);
+                    confFile.SetValue<string>(row, "Comment", strArr[2]);
+                }
+                confFile.Save(ConfFilePath);
+
+                CDebug.Log("新建CosmosEngine配置文件: {0}", ConfFilePath);
+                AssetDatabase.Refresh();
             }
+
+            ConfFile = CTabFile.LoadFromFile(ConfFilePath);
         }
 
-        return null;
-    }
-
-    void SetConfValue(string key, string value)
-    {
-        foreach (CTabFile.RowInterator row in ConfFile)
+        string GetConfValue(string key)
         {
-            string key2 = row.GetString("Key");
-            if (key == key2)
+            foreach (CTabFile.RowInterator row in ConfFile)
             {
-                ConfFile.SetValue<string>(row.Row, "Value", value);
+                string key2 = row.GetString("Key");
+                if (key == key2)
+                {
+                    string value = row.GetString("Value");
+                    return value;
+                }
             }
+
+            return null;
         }
-        ConfFile.Save(ConfFilePath);
-        AssetDatabase.Refresh();
-    }
 
-    void OnGUI()
-    {
-        EditorGUILayout.LabelField("== Configure the CosmosEngine ==");
-
-        EditorGUILayout.Space();
-
-        EditorGUILayout.LabelField("== Advanced Setting ==");
-        bool tabDirty = false;
-        foreach (CTabFile.RowInterator row in ConfFile)
+        void SetConfValue(string key, string value)
         {
-            string value = row.GetString("Value");
-            string newValue = EditorGUILayout.TextField(row.GetString("Key"), value);
-            if (value != newValue)
+            foreach (CTabFile.RowInterator row in ConfFile)
             {
-                ConfFile.SetValue<string>(row.Row, "Value", newValue);
-                tabDirty = true;
+                string key2 = row.GetString("Key");
+                if (key == key2)
+                {
+                    ConfFile.SetValue<string>(row.Row, "Value", value);
+                }
             }
-        }
-
-        if (tabDirty)
-        {
             ConfFile.Save(ConfFilePath);
             AssetDatabase.Refresh();
         }
 
+        void OnGUI()
+        {
+            EditorGUILayout.LabelField("== Configure the CosmosEngine ==");
 
+            EditorGUILayout.Space();
+
+            EditorGUILayout.LabelField("== Advanced Setting ==");
+            bool tabDirty = false;
+            foreach (CTabFile.RowInterator row in ConfFile)
+            {
+                string value = row.GetString("Value");
+                string newValue = EditorGUILayout.TextField(row.GetString("Key"), value);
+                if (value != newValue)
+                {
+                    ConfFile.SetValue<string>(row.Row, "Value", newValue);
+                    tabDirty = true;
+                }
+            }
+
+            if (tabDirty)
+            {
+                ConfFile.Save(ConfFilePath);
+                AssetDatabase.Refresh();
+            }
+
+
+        }
     }
 }

@@ -39,17 +39,19 @@ public class CAudioLoader : CBaseResourceLoader
 
         AssetFileBridge = CAssetFileLoader.Load(url, (bool isOk, UnityEngine.Object obj) =>
         {
-            ResultObject = obj;
-            if (ResultObject == null)
-                CDebug.LogError("Null Audio Clip!!!: {0}", url);
-            IsFinished = true;
-            DoCallback(ResultAudioClip != null, ResultAudioClip);
+            OnFinish(obj);
         });
     }
 
     public override void Release()
     {
         base.Release();
+        
+    }
+
+    protected override void Dispose()
+    {
+        base.Dispose();
         AssetFileBridge.Release();
     }
 }

@@ -274,6 +274,12 @@ public class CUIModule : ICModule
         return null;
     }
 
+    public bool IsOpen<T>() where T : CUIController
+    {
+        string uiName = typeof(T).Name.Remove(0, 3); // 去掉"CUI"
+        return IsOpen(uiName);
+    }
+
     public bool IsOpen(string name)
     {
         CUIController uiBase = GetUIBase(name);

@@ -85,7 +85,7 @@ public class CAssetBundleLoader : CBaseResourceLoader
             BundleParser = new CAssetBundleParser(RelativeResourceUrl, cloneBytes);
             while (!BundleParser.IsFinished)
             {
-                if (IsDisposed)  // 中途释放
+                if (IsReadyDisposed)  // 中途释放
                 {
                     OnFinish(null);
                     yield break;
@@ -94,7 +94,6 @@ public class CAssetBundleLoader : CBaseResourceLoader
                 yield return null;
             }
             var assetBundle = BundleParser.Bundle;
-
             if (assetBundle == null)
                 CDebug.LogError("WWW.assetBundle is NULL: {0}", FullUrl);
 

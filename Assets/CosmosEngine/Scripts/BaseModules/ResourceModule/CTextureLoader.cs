@@ -12,6 +12,7 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 
 [CDependencyClass(typeof(CAssetFileLoader))]
 public class CTextureLoader : CBaseResourceLoader
@@ -49,7 +50,18 @@ public class CTextureLoader : CBaseResourceLoader
 
     void OnAssetLoaded(bool isOk, UnityEngine.Object obj)
     {
+        if (!isOk)
+        {
+            CDebug.LogError("[CTextureLoader:OnAssetLoaded]Is not OK: {0}", this.Url);
+        }
+
         OnFinish(obj);
+
+        if (isOk)
+        {
+            string format = Asset is Texture2D ? (Asset as Texture2D).format.ToString() : "";
+            Desc = string.Format("{0}*{1}={2}px-{3}", Asset.width, Asset.height, Asset.width*Asset.height, format);
+        }
     }
 
     protected override void DoDispose()

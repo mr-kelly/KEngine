@@ -9,9 +9,9 @@ using System.Collections;
 /// 
 /// 为了性能，5秒保存一次(或特殊情况)
 /// </summary>
-public class CActionRecords : MonoBehaviour
+public class CActionRecords : CBehaviour
 {
-    private readonly CPrefs _prefs = new CPrefs(123456789);
+    private static readonly CPrefs Prefs = new CPrefs(123456789);
 
     private bool _isDirty = false;
 
@@ -22,7 +22,14 @@ public class CActionRecords : MonoBehaviour
         {
             if (_instance == null)
             {
-                _instance = new GameObject("__ActionRecorder__").AddComponent<CActionRecords>();
+#if UNITY_EDITOR
+                if (IsApplicationQuited || !UnityEditor.EditorApplication.isPlaying)
+                {
+                    CDebug.LogErrorWithStack("[错误埋点]Error Instance Action Recods!  请查看堆栈, 尽快修复！！！");
+                    return null;
+                }
+#endif
+                _instance = (new GameObject("__ActionRecorder__")).AddComponent<CActionRecords>();
                 _instance.Init();
             }
             return _instance;
@@ -72,14 +79,19 @@ public class CActionRecords : MonoBehaviour
 
     private void Init()
     {
-        var str = _prefs.GetKey("ActionRecords") ?? "";
+        var str = Prefs.GetKey("ActionRecords") ?? "";
         _records = CTool.SplitToDict<string, int>(str);
     }
 
     private void Save()
     {
-        _prefs.SetKey("ActionRecords", CTool.DictToSplitStr(_records));
+        Prefs.SetKey("ActionRecords", CTool.DictToSplitStr(_records));
         _isDirty = false;
+    }
+
+    public static void Reset()
+    {
+        Prefs.SetKey("ActionRecords", "");
     }
 
     private void Update()
@@ -108,6 +120,11 @@ public class CActionRecords : MonoBehaviour
 
     public static void AddListener(Enum type, string subType, WaitCallbackDelegate waitCallback)
     {
+        if (waitCallback == null)
+        {
+            CDebug.LogError("[AddListener]waitCallback Cannnot null!");
+            return;
+        }
         var key = MakeKey(type, subType);
         HashSet<WaitCallbackDelegate> emGentors;
         if (!Instance._actionRecordWaitCallback.TryGetValue(key, out emGentors))
@@ -123,6 +140,11 @@ public class CActionRecords : MonoBehaviour
     }
     public static void AddListener(Enum type, string subType, GenCoroutineDelegate emGentor)
     {
+        if (emGentor == null)
+        {
+            CDebug.LogError("[AddListener]emGentor Cannnot null!");
+            return;
+        }
         var key = MakeKey(type, subType);
         HashSet<GenCoroutineDelegate> emGentors;
         if (!Instance._actionRecordCoroutine.TryGetValue(key, out emGentors))
@@ -152,7 +174,7 @@ public class CActionRecords : MonoBehaviour
     /// <returns></returns>
     public static Coroutine Event(Enum type, string subType, int extraArg = -1)
     {
-        return Instance.StartCoroutine(CoTriggerEventFuncs(type, subType, extraArg));
+        return IsApplicationQuited ? null : Instance.StartCoroutine(CoTriggerEventFuncs(type, subType, extraArg));
     }
 
     public static Coroutine Event(Enum type, int count = -1)
@@ -234,7 +256,8 @@ public class CActionRecords : MonoBehaviour
         foreach (var emGentor in new HashSet<GenCoroutineDelegate>(emGentors)) // TODO: Clone不好吧
         {
             var enumtor = emGentor(type, subType, count);
-            yield return Instance.StartCoroutine(enumtor);
+            if (enumtor != null)
+                yield return Instance.StartCoroutine(enumtor);
         }
 
         HashSet<WaitCallbackDelegate> emCallbacks;

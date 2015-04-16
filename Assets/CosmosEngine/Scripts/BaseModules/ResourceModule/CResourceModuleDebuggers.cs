@@ -3,12 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-#if UNITY_EDITOR
-
 /// <summary>
 /// 专门用于资源Debugger用到的父对象自动生成
+/// 
+/// DebuggerObject - 用于管理虚拟对象（只用于显示调试信息的对象）
 /// </summary>
-public class CDebuggerParentTool
+public class CDebuggerObjectTool
 {
     private static readonly Dictionary<string, Transform> Parents = new Dictionary<string, Transform>();
     private static readonly Dictionary<string, int> Counts = new Dictionary<string, int>(); // 数量统计...
@@ -91,11 +91,16 @@ public class CResourceLoaderDebugger : MonoBehaviour
     {
         const string bigType = "ResourceLoaders";
 
-        var newHelpGameObject = new GameObject(string.Format("{0}-{1}", type, url));
-        CDebuggerParentTool.SetParent(bigType, type, newHelpGameObject);
+        Func<string> getName = () => string.Format("{0}-{1}-{2}", type, loader.Desc, url);
+
+        var newHelpGameObject = new GameObject(getName());
+        CDebuggerObjectTool.SetParent(bigType, type, newHelpGameObject);
         var newHelp = newHelpGameObject.AddComponent<CResourceLoaderDebugger>();
         newHelp.TheLoader = loader;
-        loader.DisposeEvent += () => CDebuggerParentTool.RemoveFromParent(bigType, type, newHelpGameObject);
+
+        loader.DisposeEvent += () => CDebuggerObjectTool.RemoveFromParent(bigType, type, newHelpGameObject);
+        loader.SetDescEvent += (newDesc) => newHelpGameObject.name = getName();
+
         return newHelp;
     }
 
@@ -114,7 +119,7 @@ public class CResourceLoadObjectDebugger : MonoBehaviour
     public static CResourceLoadObjectDebugger Create(string type, string url, UnityEngine.Object theObject)
     {
         var newHelpGameObject = new GameObject(string.Format("LoadedObject-{0}-{1}", type, url));
-        CDebuggerParentTool.SetParent(bigType, type, newHelpGameObject);
+        CDebuggerObjectTool.SetParent(bigType, type, newHelpGameObject);
 
         var newHelp = newHelpGameObject.AddComponent<CResourceLoadObjectDebugger>();
         newHelp.Type = type;
@@ -126,7 +131,7 @@ public class CResourceLoadObjectDebugger : MonoBehaviour
     {
         if (TheObject == null && !IsRemoveFromParent)
         {
-            CDebuggerParentTool.RemoveFromParent(bigType, Type, gameObject);
+            CDebuggerObjectTool.RemoveFromParent(bigType, Type, gameObject);
             IsRemoveFromParent = true;
         }
     }
@@ -135,11 +140,9 @@ public class CResourceLoadObjectDebugger : MonoBehaviour
     {
         if (!IsRemoveFromParent)
         {
-            CDebuggerParentTool.RemoveFromParent(bigType, Type, gameObject);
+            CDebuggerObjectTool.RemoveFromParent(bigType, Type, gameObject);
             IsRemoveFromParent = true;
         }
 
     }
 }
-
-#endif

@@ -25,9 +25,9 @@ public class CWWWLoader : CBaseResourceLoader
     const int MAX_WWW_COUNT = 5;
     private static int WWWLoadingCount = 0; // 有多少个WWW正在运作, 有上限的
     private static readonly Stack<CWWWLoader> WWWLoadersStack = new Stack<CWWWLoader>();  // WWWLoader的加载是后进先出! 有一个协程全局自我管理. 后来涌入的优先加载！
-    
+
     public static event Action<string> WWWFinishCallback;
-    
+
     public WWW Www;
 
     /// <summary>
@@ -66,9 +66,11 @@ public class CWWWLoader : CBaseResourceLoader
     IEnumerator CoLoad(string url)
     {
         CResourceModule.LogRequest("WWW", url);
-
         System.DateTime beginTime = System.DateTime.Now;
+
+        // 潜规则：不用LoadFromCache~它只能用在.assetBundle
         Www = new WWW(url);
+
         WWWLoadingCount++;
 
         //设置AssetBundle解压缩线程的优先级
@@ -81,8 +83,13 @@ public class CWWWLoader : CBaseResourceLoader
 
         yield return Www;
         WWWLoadingCount--;
-		Progress = 1;
-		
+        Progress = 1;
+        if (IsReadyDisposed)
+        {
+            CDebug.LogError("[CWWWLoader]Too early release: {0}", url);
+            OnFinish(null);
+            yield break;
+        }
         if (!string.IsNullOrEmpty(Www.error))
         {
             string fileProtocol = CResourceModule.GetFileProtocol();
@@ -103,21 +110,24 @@ public class CWWWLoader : CBaseResourceLoader
             if (WWWFinishCallback != null)
                 WWWFinishCallback(url);
 
+            Desc = string.Format("{0}K", Www.bytes.Length/1024f);
             OnFinish(Www);
         }
 
-#if UNITY_EDITOR  // 预防WWW加载器永不反初始化
-        while (GetCount<CWWWLoader>() > 0)
-            yield return null;
-
-        yield return new WaitForSeconds(5f);
-
-        while (Debug.isDebugBuild && !IsDisposed)
+        // 预防WWW加载器永不反初始化, 造成内存泄露~
+        if (Application.isEditor)
         {
-            CDebug.LogError("[CWWWLoader]Not Disposed Yet! : {0}", this.Url);
-            yield return null;
+            while (GetCount<CWWWLoader>() > 0)
+                yield return null;
+
+            yield return new WaitForSeconds(5f);
+
+            while (Debug.isDebugBuild && !IsReadyDisposed)
+            {
+                CDebug.LogError("[CWWWLoader]Not Disposed Yet! : {0}", this.Url);
+                yield return null;
+            }
         }
-#endif
     }
 
     protected override void DoDispose()

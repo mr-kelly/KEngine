@@ -16,9 +16,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 using UnityEngine;
 using System.IO;
 
@@ -92,11 +89,9 @@ public class CTool
         {
             var child = tran.GetChild(0);
             child.parent = null; // 清空父, 因为.Destroy非同步的
-#if UNITY_EDITOR
-            if (!EditorApplication.isPlaying)
+            if (Application.isEditor && !Application.isPlaying)
                 GameObject.DestroyImmediate(child.gameObject);
             else
-#endif
                 GameObject.Destroy(child.gameObject);
         }
     }
@@ -964,7 +959,7 @@ public class CTool
     }
 
     // 概率，百分比, // 注意，0的时候当是100%
-    public static bool Probability(int chancePercent)
+    public static bool Probability(byte chancePercent)
     {
         int chance = UnityEngine.Random.Range(1, 101);
 

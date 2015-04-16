@@ -23,12 +23,12 @@ using Object = UnityEngine.Object;
 public class CStaticAssetLoader : CBaseResourceLoader
 {
     public UnityEngine.Object TheAsset; // Copy
-    private CAssetFileLoader BridgeLoader;
+    private CAssetFileLoader _assetFileLoader;
     public override float Progress
     {
         get
         {
-            return BridgeLoader.Progress;
+            return _assetFileLoader.Progress;
         }
     }
     public static CStaticAssetLoader Load(string url, CAssetFileLoader.CAssetFileBridgeDelegate callback = null)
@@ -48,22 +48,29 @@ public class CStaticAssetLoader : CBaseResourceLoader
         if (string.IsNullOrEmpty(path))
             CDebug.LogError("XStaticAssetLoader 空资源路径!");
 
-        BridgeLoader = CAssetFileLoader.Load(path, (_isOk, _obj) =>
+        _assetFileLoader = CAssetFileLoader.Load(path, (_isOk, _obj) =>
         {
+
+            if (IsReadyDisposed)
+            {
+                OnFinish(null);
+                return;
+            }
+
             TheAsset = Object.Instantiate(_obj);
             OnFinish(TheAsset);
-#if UNITY_EDITOR
-            if (TheAsset != null)
-                CResourceLoadObjectDebugger.Create("StaticAsset", path, TheAsset);
-#endif
+
+            if (Application.isEditor)
+                if (TheAsset != null)
+                    CResourceLoadObjectDebugger.Create("StaticAsset", path, TheAsset);
         });
     }
 
     protected override void DoDispose()
     {
         base.DoDispose();
-        
+
         GameObject.Destroy(TheAsset);
-        BridgeLoader.Release();
+        _assetFileLoader.Release();
     }
 }
