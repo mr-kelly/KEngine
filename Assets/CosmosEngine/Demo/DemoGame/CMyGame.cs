@@ -8,6 +8,8 @@
 //              https://github.com/mr-kelly/CosmosEngine
 //
 //------------------------------------------------------------------------------
+
+using System;
 using UnityEngine;
 using System.Collections;
 using CosmosEngine;
@@ -27,7 +29,6 @@ public class CMyGame : MonoBehaviour
             null,
             null);
 
-        
         CUIModule.Instance.OpenWindow<CUIDemoHome>();
     }
 
