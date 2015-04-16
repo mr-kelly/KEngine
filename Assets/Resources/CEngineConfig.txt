@@ -1,4 +1,5 @@
 ﻿Key	Value	Comment
+[string]	[string]	[string]
 ProductRelPath	../Product	
 AssetBundleRelPath	StreamingAssets	
 AssetBundleExt	.unity3d	base

@@ -32,6 +32,7 @@ public class CGameSettings : ICModule
 
     public static event Action<Type, int, string> FoundDuplicatedIdEvent;
 
+    
     public IEnumerator Init()
     {
         if (this.InitAction == null)
@@ -57,8 +58,7 @@ public class CGameSettings : ICModule
         CDebug.Assert(typeof(CBaseInfo).IsAssignableFrom(type));
         DoLoadTab(type, contents);
     }
-
-    public void LoadTab<T>(string[] contents) where T : CBaseInfo
+    public void LoadTab<T>(params string[] contents) where T : CBaseInfo
     {
         LoadTab(typeof(T), contents);
     }
