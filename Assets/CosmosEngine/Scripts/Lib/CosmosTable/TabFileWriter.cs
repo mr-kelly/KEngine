@@ -8,7 +8,7 @@ namespace CosmosTable
     /// Write the TabFile!
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class TabFileWriter<T> : IDisposable where T : TabRow, new()
+    public class TabFileWriter<T> : IDisposable where T : TableRowInfo, new()
     {
         protected readonly TableFile<T> TabFile;
 

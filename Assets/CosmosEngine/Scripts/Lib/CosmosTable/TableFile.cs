@@ -38,7 +38,7 @@ namespace CosmosTable
         public TableFileExceptionDelegate OnExceptionEvent;
     }
 
-    public class TableFile : TableFile<DefaultTabRow>
+    public class TableFile : TableFile<DefaultTableRowInfo>
     {
         public TableFile(string content)
             : base(content)
@@ -51,7 +51,7 @@ namespace CosmosTable
         }
     }
 
-    public partial class TableFile<T> : IDisposable where T : TabRow, new()
+    public partial class TableFile<T> : IDisposable where T : TableRowInfo, new()
     {
         private readonly TableFileConfig _config;
 
@@ -235,9 +235,9 @@ namespace CosmosTable
             }
         }
 
-        protected void AutoParse(TabRow tabRow, string[] cellStrs)
+        protected void AutoParse(TableRowInfo tableRowInfo, string[] cellStrs)
         {
-            var type = tabRow.GetType();
+            var type = tableRowInfo.GetType();
             var okFields = new List<FieldInfo>();
 
             foreach (FieldInfo field in TabFields)
@@ -260,7 +260,7 @@ namespace CosmosTable
                 {
                     // 找寻FieldName所在索引
                     int index = Headers[fieldName].ColumnIndex;
-                    field.SetValue(tabRow, method.Invoke(tabRow, new object[]
+                    field.SetValue(tableRowInfo, method.Invoke(tableRowInfo, new object[]
                     {
                        cellStrs[index-1] , null
                     }));

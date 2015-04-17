@@ -226,7 +226,7 @@ namespace CosmosEngine
 /// <summary>
 /// Engine Config
 /// </summary>
-public class CCosmosEngineConfig : TabRow
+public class CCosmosEngineConfig : TableRowInfo
 {
     [TabColumn]
     public string Key;

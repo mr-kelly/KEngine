@@ -1,13 +1,13 @@
 ﻿namespace CosmosTable
 {
-    public class TabRow
+    public class TableRowInfo
     {
         public virtual bool IsAutoParse
         {
             get { return true; }
         }
         public int RowNumber;
-        protected TabRow()
+        protected TableRowInfo()
         {
         }
 
@@ -62,7 +62,7 @@
     /// Default Tab Row
     /// Store All column Values
     /// </summary>
-    public class DefaultTabRow : TabRow
+    public class DefaultTableRowInfo : TableRowInfo
     {
         public string[] Values;
 
