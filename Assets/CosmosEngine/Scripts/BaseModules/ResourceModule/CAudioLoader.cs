@@ -43,15 +43,10 @@ public class CAudioLoader : CBaseResourceLoader
         });
     }
 
-    public override void Release()
+    protected override void DoDispose()
     {
-        base.Release();
-        
-    }
+        base.DoDispose();
 
-    protected override void Dispose()
-    {
-        base.Dispose();
         AssetFileBridge.Release();
     }
 }

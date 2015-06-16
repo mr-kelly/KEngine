@@ -21,8 +21,22 @@ using System.Collections.Generic;
 [CDependencyClass(typeof(CResourceModule))]
 public class CUIModule : ICModule
 {
-    class _InstanceClass {public static CUIModule _Instance = new CUIModule();}
+    class _InstanceClass { public static CUIModule _Instance = new CUIModule();}
     public static CUIModule Instance { get { return _InstanceClass._Instance; } }
+
+    /// <summary>
+    /// 正在加载的UI统计
+    /// </summary>
+    private int _loadingUICount = 0;
+    public int LoadingUICount
+    {
+        get { return _loadingUICount; }
+        set
+        {
+            _loadingUICount = value;
+            if (_loadingUICount < 0) CDebug.LogError("Error ---- LoadingUICount < 0");
+        }
+    }
 
     /// <summary>
     /// A bridge for different UI System, for instance, you can use NGUI or EZGUI or etc.. UI Plugin through UIBridge
@@ -32,6 +46,7 @@ public class CUIModule : ICModule
     public bool UIRootLoaded = false;
 
     public static event Action<CUIController> OnInitEvent;
+
     public static event Action<CUIController> OnOpenEvent;
     public static event Action<CUIController> OnCloseEvent;
 
@@ -73,14 +88,19 @@ public class CUIModule : ICModule
     // 打开窗口（非复制）
     public void OpenWindow(string name, params object[] args)
     {
-        CUILoadState uiState;
-        if (!UIWindows.TryGetValue(name, out uiState))
+        Action doOpen = () =>
         {
-            LoadWindow(name, true, args);
-            return;
-        }
+            CUILoadState uiState;
+            if (!UIWindows.TryGetValue(name, out uiState))
+            {
+                LoadWindow(name, true, args);
+                return;
+            }
 
-        OnOpen(uiState, args);
+            OnOpen(uiState, args);
+        };
+
+        doOpen();
     }
 
     // 隐藏时打开，打开时隐藏
@@ -101,13 +121,13 @@ public class CUIModule : ICModule
         }
     }
 
-    
+
     /// <summary>
     /// // Dynamic动态窗口，复制基准面板
     /// </summary>
-    public CUILoadState OpenDynamicWindow(string template, string name, params object[] args)
+    public CUILoadState OpenDynamicWindow(string template, string instanceName, params object[] args)
     {
-        CUILoadState uiState = _GetUIState(name);
+        CUILoadState uiState = _GetUIState(instanceName);
         if (uiState != null)
         {
             OnOpen(uiState, args);
@@ -115,24 +135,25 @@ public class CUIModule : ICModule
         }
 
         CUILoadState uiInstanceState;
-        if (!UIWindows.TryGetValue(name, out uiInstanceState)) // 实例创建
+        if (!UIWindows.TryGetValue(instanceName, out uiInstanceState)) // 实例创建
         {
-            uiInstanceState = new CUILoadState(template);
+            uiInstanceState = new CUILoadState(template, instanceName);
             uiInstanceState.IsStaticUI = false;
             uiInstanceState.IsLoading = true;
             uiInstanceState.UIWindow = null;
             uiInstanceState.OpenWhenFinish = true;
-            UIWindows[name] = uiInstanceState;
+            UIWindows[instanceName] = uiInstanceState;
         }
 
-        CallUI(template, (_ui, _args) => {  // _args useless
-            
+        CallUI(template, (_ui, _args) =>
+        {  // _args useless
+
             CUILoadState uiTemplateState = _GetUIState(template);
 
             // 组合template和name的参数 和args外部参数
             object[] totalArgs = new object[args.Length + 2];
             totalArgs[0] = template;
-            totalArgs[1] = name;
+            totalArgs[1] = instanceName;
             args.CopyTo(totalArgs, 2);
 
             OnDynamicWindowCallback(uiTemplateState.UIWindow, totalArgs);
@@ -152,20 +173,19 @@ public class CUIModule : ICModule
 
         UiBridge.UIObjectFilter(_ui, uiObj);
 
+        CUILoadState instanceUIState = UIWindows[name];
+        instanceUIState.IsLoading = false;
+
         CUIController uiBase = uiObj.GetComponent<CUIController>();
         uiBase.UITemplateName = template;
         uiBase.UIName = name;
 
-        CUILoadState _instanceUIState = UIWindows[name];
-
-        _instanceUIState.IsLoading = false;
-        _instanceUIState.UIWindow = uiBase;
+        instanceUIState.UIWindow = uiBase;
 
         object[] originArgs = new object[_args.Length - 2];  // 去除前2个参数
         for (int i = 2; i < _args.Length; i++)
             originArgs[i - 2] = _args[i];
-
-        InitWindow(_instanceUIState, uiBase, _instanceUIState.OpenWhenFinish, originArgs);
+        InitWindow(instanceUIState, uiBase, instanceUIState.OpenWhenFinish, originArgs);
     }
 
     public void CloseWindow(Type t)
@@ -303,9 +323,11 @@ public class CUIModule : ICModule
 
         string path = string.Format("UI/{0}_UI{1}", windowTemplateName, CCosmosEngine.GetConfig("AssetBundleExt"));
 
-        CUILoadState openState = new CUILoadState(windowTemplateName);
+        CUILoadState openState = new CUILoadState(windowTemplateName, windowTemplateName);
         openState.IsStaticUI = true;
         openState.OpenArgs = args;
+
+        //if (openState.IsLoading)
         openState.OpenWhenFinish = openWhenFinish;
 
         CResourceModule.Instance.StartCoroutine(LoadUIAssetBundle(path, windowTemplateName, openState));
@@ -317,6 +339,7 @@ public class CUIModule : ICModule
 
     IEnumerator LoadUIAssetBundle(string path, string name, CUILoadState openState)
     {
+        LoadingUICount++;
         var assetLoader = CStaticAssetLoader.Load(path);
         openState.UIResourceLoader = assetLoader;  // 基本不用手工释放的
         while (!assetLoader.IsFinished)
@@ -324,19 +347,20 @@ public class CUIModule : ICModule
 
         GameObject uiObj = (GameObject)assetLoader.TheAsset;
 
-        openState.IsLoading = false;  // Load完
-
         uiObj.SetActive(false);
         uiObj.name = openState.TemplateName;
 
         CUIController uiBase = (CUIController)uiObj.AddComponent(openState.UIType);
 
-        UiBridge.UIObjectFilter(uiBase, uiObj);
-        
         openState.UIWindow = uiBase;
 
         uiBase.UIName = uiBase.UITemplateName = openState.TemplateName;
+
+        UiBridge.UIObjectFilter(uiBase, uiObj);
+
+        openState.IsLoading = false;  // Load完
         InitWindow(openState, uiBase, openState.OpenWhenFinish, openState.OpenArgs);
+        LoadingUICount--;
     }
 
     public void DestroyWindow(string name)
@@ -375,8 +399,7 @@ public class CUIModule : ICModule
             uiState = LoadWindow(uiTemplateName, false);  // 加载，这样就有UIState了, 但注意因为没参数，不要随意执行OnOpen
         }
 
-        CUILoadState openState = UIWindows[uiTemplateName];
-        openState.DoCallback(callback, args);
+        uiState.DoCallback(callback, args);
     }
 
     /// <summary>
@@ -426,7 +449,7 @@ public class CUIModule : ICModule
         }
 
         CUIController uiBase = uiState.UIWindow;
-        
+
         Action doOpenAction = () =>
         {
             if (uiBase.gameObject.activeSelf)
@@ -434,13 +457,15 @@ public class CUIModule : ICModule
                 uiBase.OnClose();
             }
 
-            uiBase.gameObject.SetActive(true);
+            uiBase.BeforeOpen(() =>
+            {
+                uiBase.gameObject.SetActive(true);
 
-            uiBase.OnOpen(args);
+                uiBase.OnOpen(args);
 
-            if (OnOpenEvent != null)
-                OnOpenEvent(uiBase);
-
+                if (OnOpenEvent != null)
+                    OnOpenEvent(uiBase);
+            });
         };
 
         doOpenAction();
@@ -455,13 +480,15 @@ public class CUIModule : ICModule
         if (open)
         {
             OnOpen(uiState, args);
-            uiBase.gameObject.SetActive(true);
+
         }
-        else
+
+        if (!open)
         {
             if (!uiState.IsStaticUI)
             {
                 CloseWindow(uiBase.UIName); // Destroy
+                return;
             }
             else
             {
@@ -469,19 +496,9 @@ public class CUIModule : ICModule
             }
         }
 
-        OnUIWindowLoadedCallbacks(uiState, uiBase);
-    }
-    void OnUIWindowLoadedCallbacks(CUILoadState uiState, CUIController uiBase)
-    {
-        //if (openState.OpenWhenFinish)  // 加载完打开 模式下，打开时执行回调
-        {
-            while (uiState.CallbacksWhenFinish.Count > 0)
-            {
-                Action<CUIController, object[]> callback = uiState.CallbacksWhenFinish.Dequeue();
-                object[] _args = uiState.CallbacksArgsWhenFinish.Dequeue();
-                callback(uiBase, _args);
-            }
-        }
+        uiState.OnUIWindowLoadedCallbacks(uiState, uiBase);
+
+
     }
 }
 
@@ -491,6 +508,7 @@ public class CUIModule : ICModule
 public class CUILoadState
 {
     public string TemplateName;
+    public string InstanceName;
     public CUIController UIWindow;
     public string UIType;
     public bool IsLoading;
@@ -503,9 +521,10 @@ public class CUILoadState
     internal Queue<object[]> CallbacksArgsWhenFinish;
     public CBaseResourceLoader UIResourceLoader; // 加载器，用于手动释放资源
 
-    public CUILoadState(string uiTypeTemplateName)
+    public CUILoadState(string uiTypeTemplateName, string uiInstanceName)
     {
         TemplateName = uiTypeTemplateName;
+        InstanceName = uiInstanceName;
         UIWindow = null;
         UIType = "CUI" + uiTypeTemplateName;
 
@@ -516,6 +535,8 @@ public class CUILoadState
         CallbacksWhenFinish = new Queue<Action<CUIController, object[]>>();
         CallbacksArgsWhenFinish = new Queue<object[]>();
     }
+
+    
 
     /// <summary>
     /// 确保加载完成后的回调
@@ -536,5 +557,20 @@ public class CUILoadState
 
         // 立即执行即可
         callback(UIWindow, args);
+    }
+
+    internal void OnUIWindowLoadedCallbacks(CUILoadState uiState, CUIController uiObject)
+    {
+        //if (openState.OpenWhenFinish)  // 加载完打开 模式下，打开时执行回调
+        {
+            while (uiState.CallbacksWhenFinish.Count > 0)
+            {
+                Action<CUIController, object[]> callback = uiState.CallbacksWhenFinish.Dequeue();
+                object[] _args = uiState.CallbacksArgsWhenFinish.Dequeue();
+                //callback(uiBase, _args);
+
+                DoCallback(callback, _args);
+            }
+        }
     }
 }

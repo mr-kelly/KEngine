@@ -17,6 +17,15 @@ using System.Collections.Generic;
 using System.IO;
 using Object = UnityEngine.Object;
 
+public enum CResourceQuality
+{
+    Sd = 2,
+
+    Hd = 1,
+    
+    Ld = 4,
+}
+
 public enum CResourceManagerPathType
 {
     StreamingAssetsPathPriority, // 忽略PersitentDataPath
@@ -31,7 +40,12 @@ public class CResourceModule : MonoBehaviour, ICModule
         ShowTime,
         ShowDetail,
     }
+    public static CResourceQuality Quality = CResourceQuality.Sd;
 
+    public static float TextureScale
+    {
+        get { return 1f/(float)Quality; }
+    }
     private static CResourceModule _Instance;
     public static CResourceModule Instance
     {
@@ -50,13 +64,13 @@ public class CResourceModule : MonoBehaviour, ICModule
     }
     public static bool LoadByQueue = false;
     public static int LogLevel = (int)LoadingLogLevel.None;
-    public static string BuildPlatformName { get { return GetBuildPlatformName(); } }
+    public static string BuildPlatformName { get { return GetBuildPlatformName(); } }  // ex: IOS, Android, AndroidLD
     public static string FileProtocol { get { return GetFileProtocol(); } }  // for WWW...with file:///xxx
 
     /// <summary>
     /// Product Folder's Relative Path   -  Default: ../Product,   which means Assets/../Product
     /// </summary>
-    public static string ProductRelPath { get { return CCosmosEngine.GetConfig("ProductRelPath"); } }
+    public static string ProductRelPath { get { return CCosmosEngine.GetConfig(CCosmosEngineDefaultConfig.ProductRelPath); } }
 
     /// <summary>
     /// Product Folder Full Path , Default: C:\xxxxx\xxxx\../Product
@@ -201,6 +215,13 @@ public class CResourceModule : MonoBehaviour, ICModule
     {
         InitResourcePath();
 
+        if (Debug.isDebugBuild)
+        {
+            CDebug.Log("ResourceManager ApplicationPath: {0}", ApplicationPath);
+            CDebug.Log("ResourceManager ResourcesPath: {0}", ResourcesPath);
+            CDebug.Log("ResourceManager DocumentResourcesPath: {0}", DocumentResourcesPath);
+            CDebug.Log("================================================================================");
+        }
         yield break;
     }
 
@@ -242,7 +263,7 @@ public class CResourceModule : MonoBehaviour, ICModule
     /// Here, get Platform name that represent the AssetBundles Folder.
     /// </summary>
     /// <returns>Platform folder Name</returns>
-    public static string GetBuildPlatformName()
+    private static string GetBuildPlatformName()
     {
         string buildPlatformName = "Win32"; // default
         if (Application.isEditor)
@@ -286,7 +307,8 @@ public class CResourceModule : MonoBehaviour, ICModule
                     break;
             }
         }
-
+        if (Quality != CResourceQuality.Sd)  // SD no need add
+            buildPlatformName += Quality.ToString().ToUpper();
         return buildPlatformName;
     }
 
@@ -310,8 +332,8 @@ public class CResourceModule : MonoBehaviour, ICModule
     public static void InitResourcePath()
     {
         string productPath = ProductFullPath;
-        string assetBundlePath = Path.Combine(Application.dataPath, CCosmosEngine.GetConfig("AssetBundleRelPath"));
-        string resourceDirName = Path.GetFileName(CCosmosEngine.GetConfig("AssetBundleRelPath"));
+        string assetBundlePath = Path.Combine(Application.dataPath, CCosmosEngine.GetConfig(CCosmosEngineDefaultConfig.AssetBundleBuildRelPath));
+        string resourceDirName = Path.GetFileName(CCosmosEngine.GetConfig(CCosmosEngineDefaultConfig.AssetBundleBuildRelPath));
 
         DocumentResourcesPathWithoutFileProtocol = string.Format("{0}/{1}/{2}/", GetAppDataPath(), resourceDirName, GetBuildPlatformName());  // 各平台通用
         DocumentResourcesPath = FileProtocol + DocumentResourcesPathWithoutFileProtocol;
@@ -333,24 +355,24 @@ public class CResourceModule : MonoBehaviour, ICModule
                     string path = Application.dataPath.Replace('\\', '/');
                     path = path.Substring(0, path.LastIndexOf('/') + 1);
                     ApplicationPath = string.Format("{0}{1}/", GetFileProtocol(), path);
-                    ResourcesPath = string.Format("{0}{1}{2}/{3}/", GetFileProtocol(), path, resourceDirName, GetBuildPlatformName());
-                    ResourcesPathWithoutFileProtocol = string.Format("{0}{1}/{2}/", path, resourceDirName, GetBuildPlatformName());
+                    ResourcesPath = string.Format("{0}{1}{2}/Bundles/{3}/", GetFileProtocol(), path, resourceDirName, GetBuildPlatformName());
+                    ResourcesPathWithoutFileProtocol = string.Format("{0}{1}/Bundles/{2}/", path, resourceDirName, GetBuildPlatformName());
 
                 }
                 break;
             case RuntimePlatform.Android:
                 {
-                    ApplicationPath = string.Concat("jar:", GetFileProtocol(), Application.dataPath, "!/assets/");
+                    ApplicationPath = string.Concat("jar:", GetFileProtocol(), Application.dataPath, "!/assets/Bundles/");
 
                     ResourcesPath = string.Concat(ApplicationPath, GetBuildPlatformName(), "/");
-                    ResourcesPathWithoutFileProtocol = string.Concat(Application.dataPath, "!/assets/", GetBuildPlatformName() + "/");  // 注意，StramingAsset在Android平台中，是在壓縮的apk里，不做文件檢查
+                    ResourcesPathWithoutFileProtocol = string.Concat(Application.dataPath, "!/assets/Bundles/", GetBuildPlatformName() + "/");  // 注意，StramingAsset在Android平台中，是在壓縮的apk里，不做文件檢查
                 }
                 break;
             case RuntimePlatform.IPhonePlayer:
                 {
-                    ApplicationPath = System.Uri.EscapeUriString(GetFileProtocol() + Application.streamingAssetsPath + "/");  // MacOSX下，带空格的文件夹，空格字符需要转义成%20
+                    ApplicationPath = System.Uri.EscapeUriString(GetFileProtocol() + Application.streamingAssetsPath + "/Bundles/");  // MacOSX下，带空格的文件夹，空格字符需要转义成%20
                     ResourcesPath = string.Format("{0}{1}/", ApplicationPath, GetBuildPlatformName());  // only iPhone need to Escape the fucking Url!!! other platform works without it!!! Keng Die!
-                    ResourcesPathWithoutFileProtocol = Application.streamingAssetsPath + "/" + GetBuildPlatformName() + "/";
+                    ResourcesPathWithoutFileProtocol = Application.streamingAssetsPath + "/Bundles/" + GetBuildPlatformName() + "/";
                 }
                 break;
             default:
@@ -358,14 +380,6 @@ public class CResourceModule : MonoBehaviour, ICModule
                     CDebug.Assert(false);
                 }
                 break;
-        }
-
-        if (Debug.isDebugBuild)
-        {
-            CDebug.Log("ResourceManager ApplicationPath: {0}", ApplicationPath);
-            CDebug.Log("ResourceManager ResourcesPath: {0}", ResourcesPath);
-            CDebug.Log("ResourceManager DocumentResourcesPath: {0}", DocumentResourcesPath);
-            CDebug.Log("================================================================================");
         }
     }
 

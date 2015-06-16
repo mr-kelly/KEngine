@@ -14,10 +14,6 @@ namespace CosmosTable
         NotFoundHeader,
         NotFoundGetMethod
     }
-    public class TabColumnAttribute : Attribute
-    {
-           
-    }
 
     /// <summary>
     /// 表头信息
@@ -85,12 +81,12 @@ namespace CosmosTable
         /// <summary>
         /// Row Id to Rows , start from 1
         /// </summary>
-        protected internal Dictionary<int, T> Rows = new Dictionary<int, T>();
+        protected internal Dictionary<int, object> Rows = new Dictionary<int, object>();  // iOS不支持 Dict<int, T>
 
         /// <summary>
         /// Store the Primary Key to Rows
         /// </summary>
-        protected Dictionary<object, T> PrimaryKey2Row = new Dictionary<object, T>();
+        protected Dictionary<object, object> PrimaryKey2Row = new Dictionary<object, object>();
 
         public Dictionary<string, HeaderInfo>.KeyCollection HeaderNames
         {
@@ -158,8 +154,6 @@ namespace CosmosTable
 
             // 读取行内容
 
-            T cachedNewObj = null;
-
             string sLine = "";
             int rowIndex = 1; // 从第1行开始
             while (sLine != null)
@@ -171,7 +165,7 @@ namespace CosmosTable
 
                     TabInfo[rowIndex] = splitString1;
 
-                    var newT = cachedNewObj ?? (cachedNewObj = new T());  // the New Object may not be used this time, so cache it!
+                    T newT = new T();  // the New Object may not be used this time, so cache it!
                     newT.RowNumber = rowIndex;
                     
                     if (!newT.IsAutoParse)
@@ -181,17 +175,17 @@ namespace CosmosTable
 
                     if (newT.PrimaryKey != null)
                     {
-                        T oldT;
+                        object oldT;
                         if (!PrimaryKey2Row.TryGetValue(newT.PrimaryKey, out oldT))  // 原本不存在，使用new的，释放cacheNew，下次直接new
                         {
                             PrimaryKey2Row[newT.PrimaryKey] = newT;
-                            cachedNewObj = null; // release the Cache!
                         }
                         else  // 原本存在，使用old的， cachedNewObj(newT)因此残留, 留待下回合使用
                         {
+                            T toT = (T) oldT;
                             // Check Duplicated Primary Key, 使用原来的，不使用新new出来的, 下回合直接用_cachedNewObj
-                            OnExeption(TableFileExceptionType.DuplicatedKey, oldT.PrimaryKey);
-                            newT = oldT;
+                            OnExeption(TableFileExceptionType.DuplicatedKey, toT.PrimaryKey);
+                            newT = toT;
                         }
                     }
 
@@ -203,44 +197,36 @@ namespace CosmosTable
             return true;
         }
 
-        internal FieldInfo[] TabFields
+        internal FieldInfo[] AutoTabFields
         {
             get
             {
-                List<FieldInfo> fields = new List<FieldInfo>();
-                foreach (var fieldInfo in typeof (T).GetFields())
-                {
-                    if (fieldInfo.GetCustomAttributes(typeof (TabColumnAttribute), true).Length > 0)
-                    {
-                        fields.Add(fieldInfo);
-                    }
-                }
-                return fields.ToArray();
+                return typeof(T).GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             }
         }
 
-        internal PropertyInfo[] TabProperties
-        {
-            get
-            {
-                List<PropertyInfo> props = new List<PropertyInfo>();
-                foreach (var fieldInfo in typeof(T).GetProperties())
-                {
-                    if (fieldInfo.GetCustomAttributes(typeof(TabColumnAttribute), true).Length > 0)
-                    {
-                        props.Add(fieldInfo);
-                    }
-                }
-                return props.ToArray();
-            }
-        }
+        //internal PropertyInfo[] TabProperties
+        //{
+        //    get
+        //    {
+        //        List<PropertyInfo> props = new List<PropertyInfo>();
+        //        foreach (var fieldInfo in typeof(T).GetProperties())
+        //        {
+        //            if (fieldInfo.GetCustomAttributes(typeof(TabColumnAttribute), true).Length > 0)
+        //            {
+        //                props.Add(fieldInfo);
+        //            }
+        //        }
+        //        return props.ToArray();
+        //    }
+        //}
 
         protected void AutoParse(TableRowInfo tableRowInfo, string[] cellStrs)
         {
             var type = tableRowInfo.GetType();
             var okFields = new List<FieldInfo>();
 
-            foreach (FieldInfo field in TabFields)
+            foreach (FieldInfo field in AutoTabFields)
             {
                 if (!HasColumn(field.Name))
                 {
@@ -260,9 +246,20 @@ namespace CosmosTable
                 {
                     // 找寻FieldName所在索引
                     int index = Headers[fieldName].ColumnIndex;
+                    // default value
+                    //string szType = "string";
+                    string defaultValue = "";
+                    var headerDef = Headers[fieldName].HeaderDef;
+                    if (!string.IsNullOrEmpty(headerDef))
+                    {
+                        var defs = headerDef.Split(new []{'[', ']', ':'}, StringSplitOptions.RemoveEmptyEntries);
+                        //if (defs.Length >= 1) szType = defs[0];
+                        if (defs.Length >= 2) defaultValue = defs[1];
+                    }
+
                     field.SetValue(tableRowInfo, method.Invoke(tableRowInfo, new object[]
                     {
-                       cellStrs[index-1] , null
+                       cellStrs[index-1] , defaultValue
                     }));
                 }
                 else
@@ -314,13 +311,23 @@ namespace CosmosTable
 
         public T GetRow(int row)
         {
-            T rowT;
+            object rowT;
             if (!Rows.TryGetValue(row, out rowT))
             {
                 rowT = Rows[row] = new T();
             }
 
-            return rowT;
+            return (T)rowT;
+        }
+
+        public List<T> GetAll()
+        {
+            List<T> l = new List<T>();
+            foreach (var item in Rows.Values)
+            {
+                l.Add((T)item);
+            }
+            return l;
         }
 
         //public bool SetValue<T>(int row, int column, T value) where T : TabRow, 
@@ -403,8 +410,10 @@ namespace CosmosTable
 
         public T FindByPrimaryKey(object primaryKey)
         {
-            T ret;
-            return PrimaryKey2Row.TryGetValue(primaryKey, out ret) ? ret : default(T);
+            object ret;
+            var retT = PrimaryKey2Row.TryGetValue(primaryKey, out ret) ? ret : default(T);
+
+            return (T) retT;
         }
     }
 }

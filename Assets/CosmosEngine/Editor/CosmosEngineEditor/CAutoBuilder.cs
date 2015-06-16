@@ -99,6 +99,7 @@ public class CAutoBuilder
 
     static void PerformBuild(string outputpath, BuildTarget tag, BuildOptions opt)
     {
+        CSymbolLinkHelper.SymbolLinkResource();
         RefreshProgramVersion();
 
         EditorUserBuildSettings.SwitchActiveBuildTarget(tag);
@@ -112,7 +113,7 @@ public class CAutoBuilder
         if (!Directory.Exists(fullDir))
             Directory.CreateDirectory(fullDir);
 
-        CDebug.Log("Build Client {0} to: {1}", tag, outputpath);
+        CDebug.Log("Build Client {0} to: {1}", tag, fullPath);
         BuildPipeline.BuildPlayer(GetScenePaths(), fullPath, tag, opt);
     }
 
@@ -165,16 +166,17 @@ public class CAutoBuilder
     [MenuItem("CosmosEngine/AutoBuilder/Android")]
     public static void PerformAndroidBuild()
     {
-        PerformAndroidBuild("Client");
+        PerformAndroidBuild("StrikeHero_Dev", "Dev");
     }
-    public static void PerformAndroidBuild(string apkName, bool isDevelopment = true)
+    public static void PerformAndroidBuild(string apkName, string channelName = null, bool isDevelopment = true)
     {
         BuildOptions opt = isDevelopment
             ? (BuildOptions.Development | BuildOptions.AllowDebugging | BuildOptions.ConnectWithProfiler)
             : BuildOptions.None;
-        PerformBuild(
-            string.Format("Apps/{0}.apk", apkName),
-            BuildTarget.Android, opt);
+        var path = string.Format("Apps/{2}/{0}_{1:MM-dd_HH}.apk", apkName, DateTime.Now, "Android");
+//        var path = string.IsNullOrEmpty(channelName)? string.Format("Apps/{0}_{1:MMddHH}.apk", apkName, DateTime.Now)
+//                                                    : string.Format("Apps/{2}/{0}_{1:MMddHH}.apk", apkName, DateTime.Now, channelName);
+        PerformBuild(path, BuildTarget.Android, opt);
     }
 
     [MenuItem("CosmosEngine/Clear PC PersitentDataPath")]
@@ -200,4 +202,75 @@ public class CAutoBuilder
         CBuildTools.ShowDialog("Prefs Cleared!");
     }
 
+}
+
+public class CSymbolLinkHelper
+{
+
+    public const string AssetBundlesLinkPath = "Assets/StreamingAssets/Bundles/"; // hold asset bundles
+    public static string GetLinkPath()
+    {
+        if (!Directory.Exists(AssetBundlesLinkPath))
+            Directory.CreateDirectory(AssetBundlesLinkPath);
+        return AssetBundlesLinkPath + CResourceModule.BuildPlatformName + "/";
+    }
+
+    public static string GetResourceExportPath()
+    {
+        var resourcePath = CBuildTools.GetExportPath(EditorUserBuildSettings.activeBuildTarget, CResourceModule.Quality);
+        return resourcePath;
+    }
+
+    [MenuItem("CosmosEngine/Symbol Link Builded Resource to StreamingAssets")]
+    public static void SymbolLinkResource()
+    {
+        CSymbolLinkHelper.DeleteAllLinks(CSymbolLinkHelper.AssetBundlesLinkPath);
+        var exportPath = GetResourceExportPath();
+        var linkPath = GetLinkPath();
+
+        CBuildTools.SymbolLinkFolder(exportPath, linkPath);
+        AssetDatabase.Refresh();
+    }
+
+    /// <summary>
+    /// 删除指定目录所有链接
+    /// </summary>
+    /// <param name="assetBundlesLinkPath"></param>
+    private static void DeleteAllLinks(string assetBundlesLinkPath)
+    {
+        if (Directory.Exists(assetBundlesLinkPath))
+        {
+            foreach (var dirPath in Directory.GetDirectories(assetBundlesLinkPath))
+            {
+                CBuildTools.DeleteLink(dirPath);
+            }
+        }
+  
+    }
+
+    /// <summary>
+    /// 如果不存在，创建link，并执行callback，完成后删掉link
+    /// 如果存在，执行callback，完成后不删
+    /// </summary>
+    
+    public static void SymbolLinkResourceAndDoAction(Action doAction = null)
+    {
+        var resourcePath = GetResourceExportPath();
+        var linkPath = GetLinkPath();
+        if (!Directory.Exists(linkPath))
+        {
+            SymbolLinkResource();
+
+            if (doAction != null)
+                doAction();
+            CBuildTools.DeleteLink(linkPath);
+        }
+        else
+        {
+            if (doAction != null)
+                doAction();
+
+            CDebug.LogWarning("[SymbolLinkTest]Exist so not link: {0}", resourcePath);
+        }
+    }
 }

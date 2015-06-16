@@ -22,13 +22,15 @@ public class CWWWLoader : CBaseResourceLoader
 {
     // 前几项用于监控器
     private static IEnumerator CachedWWWLoaderMonitorCoroutine; // 专门监控WWW的协程
-    const int MAX_WWW_COUNT = 5;
+    const int MAX_WWW_COUNT = 15; // 同时进行的最大Www加载个数，超过的排队等待
     private static int WWWLoadingCount = 0; // 有多少个WWW正在运作, 有上限的
     private static readonly Stack<CWWWLoader> WWWLoadersStack = new Stack<CWWWLoader>();  // WWWLoader的加载是后进先出! 有一个协程全局自我管理. 后来涌入的优先加载！
 
     public static event Action<string> WWWFinishCallback;
 
     public WWW Www;
+    public int Size { get { return Www.size; } }
+    public int DownloadedSize { get { return Www != null ? Www.bytesDownloaded : 0; } }
 
     /// <summary>
     /// Use this to directly load WWW by Callback or Coroutine, pass a full URL.
@@ -99,7 +101,7 @@ public class CWWWLoader : CBaseResourceLoader
                 CDebug.LogError("File {0} Exist State: {1}", fileRealPath, System.IO.File.Exists(fileRealPath));
 
             }
-            CDebug.LogError("[CWWWLoader:Error]" + Www.error + " " + url);
+            CDebug.LogError("[CWWWLoader:Error]{0} {1}", Www.error, url);
 
             OnFinish(null);
             yield break;

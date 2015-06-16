@@ -57,6 +57,9 @@ public partial class CAutoResourceBuilder
                 EditorUtility.DisplayCancelableProgressBar("[ProductExport]", item, .5f);
                 export.Export(item.Replace('\\', '/'));
                 EditorUtility.ClearProgressBar();
+
+                GC.Collect();
+                Resources.UnloadUnusedAssets();
             }
             export.AfterExport();
 

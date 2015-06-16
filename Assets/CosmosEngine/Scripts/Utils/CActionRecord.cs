@@ -175,9 +175,10 @@ public class CActionRecords : CBehaviour
         return IsApplicationQuited ? null : Instance.StartCoroutine(CoTriggerEventFuncs(type, subType, extraArg));
     }
 
-    public static Coroutine Event(Enum type, int count = -1)
+    public static Coroutine Event(Enum type, int extraArg = -1)
     {
-        return Event(type, null, count);
+        var subType = extraArg == -1 ? null : extraArg.ToString();
+        return Event(type, subType, extraArg);
     }
     private static string MakeKey(Enum type, string subType)
     {

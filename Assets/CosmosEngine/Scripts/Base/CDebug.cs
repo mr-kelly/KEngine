@@ -11,13 +11,34 @@
 using System;
 using System.IO;
 using System.Diagnostics;
+using System.Text;
 using UnityEngine;
 
 /// Frequent Used,
 /// A File logger + Debug Tools
 public class CDebug
 {
-    public static bool IsLogFile = false; // 是否輸出到日誌
+    private static bool _isLogFile = false; // 是否輸出到日誌，跨线程
+    public static bool IsLogFile
+    {
+        get { return _isLogFile; }
+        set
+        {
+            _isLogFile = value;
+            if (_isLogFile)
+            {
+                Application.RegisterLogCallbackThreaded((szMsg, trace, type) =>
+                {
+                    LogToFile(szMsg + trace + "\n\n");
+                });
+            }
+            else
+            {
+                Application.RegisterLogCallbackThreaded(null);
+            }
+
+        }
+    }
 
     static readonly bool IsDebugBuild = false;
     public static readonly bool IsEditor = false;
@@ -45,6 +66,24 @@ public class CDebug
         NORMAL,
         WARNING,
         ERROR,
+    }
+
+    /// <summary>
+    /// Check if a object null
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <param name="formatStr"></param>
+    /// <param name="args"></param>
+    /// <returns></returns>
+    public static bool Check(object obj, string formatStr = null, params object[] args)
+    {
+        if (obj != null) return true;
+
+        if (string.IsNullOrEmpty(formatStr))
+            formatStr = "[Check Null] Failed!";
+
+        LogError("[!!!]" + formatStr, args);
+        return false;
     }
 
     public static void Assert(bool result)
@@ -109,8 +148,14 @@ public class CDebug
 
     public static void LogException(Exception e)
     {
-        LogErrorWithStack(e.Message + " , " + e.StackTrace);
+        var sb = new StringBuilder();
+        sb.AppendFormat("Exception: {0}", e.Message);
+        if (e.InnerException != null)
+            sb.AppendFormat(" InnerException: {0}", e.InnerException.Message);
+
+        LogErrorWithStack(sb.ToString() + " , " + e.StackTrace);
     }
+
     public static void LogErrorWithStack(string err = "", int stack = 1)
     {
         StackFrame[] stackFrames = new StackTrace(true).GetFrames(); ;
@@ -141,7 +186,7 @@ public class CDebug
 
     private static void DoLog(string szMsg, LogType emType)
     {
-        szMsg = string.Format("[{0}]{1}\n\n=================================================================", DateTime.Now.ToString("HH:mm:ss.ffff"), szMsg);
+        szMsg = string.Format("[{0}]{1}\n\n=================================================================\n\n", DateTime.Now.ToString("HH:mm:ss.ffff"), szMsg);
 
         switch (emType)
         {
@@ -156,50 +201,34 @@ public class CDebug
                 break;
         }
 
-        LogToFile("game.log", szMsg);
     }
 
-    public static void LogToFile(string logPath, string szMsg)
+    public static void LogToFile(string szMsg)
     {
-        LogToFile(logPath, szMsg, true); // 默认追加模式
+        LogToFile(szMsg, true); // 默认追加模式
     }
 
     // 是否写过log file
-    public static bool HasLogFile(string logFile)
+    public static bool HasLogFile()
     {
-        if (IsLogFile)
-        {
-            string fullPath = GetLogPath() + logFile;
-            if (File.Exists(fullPath))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        return false;
+        string fullPath = GetLogPath();
+        return File.Exists(fullPath);
     }
 
     // 写log文件
-    public static void LogToFile(string logFile, string szMsg, bool append)
+    public static void LogToFile(string szMsg, bool append)
     {
-        if (IsLogFile)  //  开发者模式true:写log IO文件+响应服务器log
-        {
-            string fullPath = GetLogPath() + logFile;
-            string dir = Path.GetDirectoryName(fullPath);
-            if (!Directory.Exists(dir))
-                Directory.CreateDirectory(dir);
+        string fullPath = GetLogPath();
+        string dir = Path.GetDirectoryName(fullPath);
+        if (!Directory.Exists(dir))
+            Directory.CreateDirectory(dir);
 
-            using (FileStream fileStream = new FileStream(fullPath, append ? FileMode.Append : FileMode.CreateNew, FileAccess.Write, FileShare.ReadWrite))  // 不会锁死, 允许其它程序打开
-            {
-                StreamWriter writer = new StreamWriter(fileStream);  // Append
-                writer.Write(szMsg);
-                writer.Flush();
-                writer.Close();
-            }
+        using (FileStream fileStream = new FileStream(fullPath, append ? FileMode.Append : FileMode.CreateNew, FileAccess.Write, FileShare.ReadWrite))  // 不会锁死, 允许其它程序打开
+        {
+            StreamWriter writer = new StreamWriter(fileStream);  // Append
+            writer.Write(szMsg);
+            writer.Flush();
+            writer.Close();
         }
     }
 
@@ -211,8 +240,61 @@ public class CDebug
         if (IsEditor)
             logPath = "logs/";
         else
-		    logPath = UnityEngine.Application.persistentDataPath + "/" + "logs/";
+            logPath = UnityEngine.Application.persistentDataPath + "/" + "logs/";
 
-        return logPath;
+        var now = DateTime.Now;
+        var logName = string.Format("game_{0}_{1}_{2}.log", now.Year, now.Month, now.Day);
+
+        return logPath + logName;
     }
+
+    #region Record Time
+    static float[] RecordTime = new float[10];
+    static string[] RecordKey = new string[10];
+    static int RecordPos = 0;
+
+    public static void BeginRecordTime(string key)
+    {
+        RecordTime[RecordPos] = UnityEngine.Time.realtimeSinceStartup;
+        RecordKey[RecordPos] = key;
+        RecordPos++;
+    }
+
+    public static string EndRecordTime(bool printLog = true)
+    {
+        RecordPos--;
+        double s = (UnityEngine.Time.realtimeSinceStartup - RecordTime[RecordPos]);
+        if (printLog)
+        {
+            CDebug.Log("[RecordTime] {0} use {1}s", RecordKey[RecordPos], s);
+        }
+        return string.Format("[RecordTime] {0} use {1}s.", RecordKey[RecordPos], s);
+    }
+
+    // 添加性能观察, 使用C#内置
+    public static void WatchPerformance(Action del)
+    {
+        WatchPerformance("执行耗费时间: {0}s", del);
+    }
+
+    public static void WatchPerformance(string outputStr, Action del)
+    {
+        System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+        stopwatch.Start(); //  开始监视代码运行时间
+
+        if (del != null)
+        {
+            del();
+        }
+
+        stopwatch.Stop(); //  停止监视
+        TimeSpan timespan = stopwatch.Elapsed; //  获取当前实例测量得出的总时间
+        //double seconds = timespan.TotalSeconds;  //  总秒数
+        double millseconds = timespan.TotalMilliseconds;
+        decimal seconds = (decimal)millseconds / 1000m;
+
+        CDebug.LogWarning(outputStr, seconds.ToString("F7")); // 7位精度
+    }
+    #endregion
+
 }

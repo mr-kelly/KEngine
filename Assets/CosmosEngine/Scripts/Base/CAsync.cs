@@ -4,6 +4,39 @@ using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 
+#region 管理器~用于开启协程，执行主线程回调等
+class CAsyncManager : CBehaviour
+{
+    private static CAsyncManager _instance;
+    public static CAsyncManager Instance
+    {
+        get
+        {
+            if (!Application.isPlaying || IsApplicationQuited)
+                return null;
+
+            if (_instance != null) return _instance;
+
+            const string name = "[AsyncManager]";
+            var findObj = new GameObject(name);
+            _instance = findObj.GetComponent<CAsyncManager>() ?? findObj.AddComponent<CAsyncManager>();
+
+            return _instance;
+        }
+    }
+    public readonly List<Action> _mainThreadCallbacks = new List<Action>();  // 主線程調用Unity類，如StartCoroutine
+
+    void Update()
+    {
+        foreach (var i in _mainThreadCallbacks)
+        {
+            i();
+        }
+        _mainThreadCallbacks.Clear();
+    }
+}
+#endregion
+
 /// <summary>
 /// 链式操作，结合协程和DOTween, 并且支持真线程（用于密集运算，无法调用Unity大部分函数）
 /// 
@@ -24,27 +57,6 @@ using UnityEngine;
 /// </summary>
 public class CAsync
 {
-    #region 管理器~用于开启协程，执行主线程回调等
-    private class CAsyncManager : MonoBehaviour
-    {
-        private static CAsyncManager _instance;
-        public static CAsyncManager Instance
-        {
-            get { return _instance ?? (_instance = new GameObject("[AsyncManager]").AddComponent<CAsyncManager>()); }
-        }
-        public readonly List<Action> _mainThreadCallbacks = new List<Action>();  // 主線程調用Unity類，如StartCoroutine
-
-        void Update()
-        {
-            foreach (var i in _mainThreadCallbacks)
-            {
-                i();
-            }
-            _mainThreadCallbacks.Clear();
-        }
-    }
-    #endregion
-
     #region 核心调度
     private Queue<AsyncWaitNextDelegate> _cacheCallbacks;
     private bool _canNext;

@@ -21,13 +21,13 @@ using Object = UnityEngine.Object;
 
 public partial class CBuildTools
 {
-	static int PushedAssetCount = 0;
+    static int PushedAssetCount = 0;
 
     public static int BuildCount = 0;  // 累计Build了多少次，用于版本控制时用的
 
     public static event Action<UnityEngine.Object, string, string> BeforeBuildAssetBundleEvent;
     public static event Action<UnityEngine.Object, string, string> AfterBuildAssetBundleEvent;
-    
+
     #region 打包功能
     /// <summary>
     /// 获取完整的打包路径，并确保目录存在
@@ -35,55 +35,66 @@ public partial class CBuildTools
     /// <param name="path"></param>
     /// <param name="buildTarget"></param>
     /// <returns></returns>
-	public static string MakeSureExportPath(string path, BuildTarget buildTarget)
-	{
-		path = CBuildTools.GetExportPath(buildTarget) + path;
-        
-		string exportDirectory = path.Substring(0, path.LastIndexOf('/'));
+    public static string MakeSureExportPath(string path, BuildTarget buildTarget, CResourceQuality quality)
+    {
+        path = CBuildTools.GetExportPath(buildTarget, quality) + path;
 
-		if (!System.IO.Directory.Exists(exportDirectory))
-			System.IO.Directory.CreateDirectory(exportDirectory);
+        string exportDirectory = path.Substring(0, path.LastIndexOf('/'));
 
-		return path;
-	}
+        if (!System.IO.Directory.Exists(exportDirectory))
+            System.IO.Directory.CreateDirectory(exportDirectory);
 
-	public static string GetExportPath(BuildTarget platfrom)
-	{
-        string basePath = Path.GetFullPath(Application.dataPath + "/" + CCosmosEngine.GetConfig("AssetBundleRelPath") + "/");
+        return path;
+    }
 
-		if (!Directory.Exists(basePath))
-		{
-			CBuildTools.ShowDialog("路径配置错误: " + basePath);
-			throw new System.Exception("路径配置错误");
-		}
 
-		string path = null;
-		switch (platfrom)
-		{
-			case BuildTarget.Android:
-			case BuildTarget.iPhone:
-			case BuildTarget.StandaloneWindows:
-                path = basePath + CResourceModule.GetBuildPlatformName() + "/";
-				break;
-			default:
-				CBuildTools.ShowDialog("构建平台配置错误");
-				throw new System.Exception("构建平台配置错误");
-		}
-		return path;
-	}
+    /// <summary>
+    /// Extra Flag ->   ex:  Android/  AndroidSD/  AndroidHD/
+    /// </summary>
+    /// <param name="platfrom"></param>
+    /// <param name="quality"></param>
+    /// <returns></returns>
+    public static string GetExportPath(BuildTarget platfrom, CResourceQuality quality)
+    {
+        string basePath = Path.GetFullPath(Application.dataPath + "/" + CCosmosEngine.GetConfig(CCosmosEngineDefaultConfig.AssetBundleBuildRelPath) + "/");
 
-	public static void ClearConsole()
-	{
-		Assembly assembly = Assembly.GetAssembly(typeof(SceneView));
-		System.Type type = assembly.GetType("UnityEditorInternal.LogEntries");
-		MethodInfo method = type.GetMethod("Clear");
-		method.Invoke(null, null);
-	}
+        if (!Directory.Exists(basePath))
+        {
+            CBuildTools.ShowDialog("路径配置错误: " + basePath);
+            throw new System.Exception("路径配置错误");
+        }
 
-	public static bool ShowDialog(string msg, string title = "提示", string button = "确定")
-	{
-		return EditorUtility.DisplayDialog(title, msg, button);
-	}
+        string path = null;
+        switch (platfrom)
+        {
+            case BuildTarget.Android:
+            case BuildTarget.iPhone:
+            case BuildTarget.StandaloneWindows:
+                var platformName = CResourceModule.BuildPlatformName;
+                if (quality != CResourceQuality.Sd)  // SD no need add
+                    platformName += quality.ToString().ToUpper();
+
+                path = basePath + platformName + "/";
+                break;
+            default:
+                CBuildTools.ShowDialog("构建平台配置错误");
+                throw new System.Exception("构建平台配置错误");
+        }
+        return path;
+    }
+
+    public static void ClearConsole()
+    {
+        Assembly assembly = Assembly.GetAssembly(typeof(SceneView));
+        System.Type type = assembly.GetType("UnityEditorInternal.LogEntries");
+        MethodInfo method = type.GetMethod("Clear");
+        method.Invoke(null, null);
+    }
+
+    public static bool ShowDialog(string msg, string title = "提示", string button = "确定")
+    {
+        return EditorUtility.DisplayDialog(title, msg, button);
+    }
     public static void ShowDialogSelection(string msg, Action yesCallback)
     {
         if (EditorUtility.DisplayDialog("确定吗", msg, "是!", "不！"))
@@ -92,20 +103,20 @@ public partial class CBuildTools
         }
     }
     public static void PushAssetBundle(Object asset, string path)
-	{
-		BuildPipeline.PushAssetDependencies();
-		BuildAssetBundle(asset, path);
-		PushedAssetCount++;
-	}
+    {
+        BuildPipeline.PushAssetDependencies();
+        BuildAssetBundle(asset, path);
+        PushedAssetCount++;
+    }
 
-	public static void PopAllAssetBundle()
-	{
-		for (int i = 0; i < PushedAssetCount; ++i)
-		{
-			BuildPipeline.PopAssetDependencies();
-		}
-		PushedAssetCount = 0;
-	}
+    public static void PopAllAssetBundle()
+    {
+        for (int i = 0; i < PushedAssetCount; ++i)
+        {
+            BuildPipeline.PopAssetDependencies();
+        }
+        PushedAssetCount = 0;
+    }
 
     public static void PopAssetBundle()
     {
@@ -115,98 +126,96 @@ public partial class CBuildTools
     #endregion
 
     public static void BuildError(string fmt, params string[] args)
-	{
-		fmt = "[BuildError]" + fmt;
-		Debug.LogError(string.Format(fmt, args));
-	}
+    {
+        fmt = "[BuildError]" + fmt;
+        Debug.LogError(string.Format(fmt, args));
+    }
 
-	public static uint BuildAssetBundle(Object asset, string path)
-	{
-		return BuildAssetBundle(asset, path, EditorUserBuildSettings.activeBuildTarget);
-	}
+    public static uint BuildAssetBundle(Object asset, string path)
+    {
+        return BuildAssetBundle(asset, path, EditorUserBuildSettings.activeBuildTarget, CResourceModule.Quality);
+    }
 
-	public static uint BuildAssetBundle(Object asset, string path, BuildTarget buildTarget)
-	{
-		if (asset == null || string.IsNullOrEmpty(path)) 
-		{
-			BuildError("BuildAssetBundle: {0}", path);
-			return 0;
-		}
+    public static uint BuildAssetBundle(Object asset, string path, BuildTarget buildTarget, CResourceQuality quality)
+    {
+        if (asset == null || string.IsNullOrEmpty(path))
+        {
+            BuildError("BuildAssetBundle: {0}", path);
+            return 0;
+        }
 
         var assetNameWithoutDir = asset.name.Replace("/", "").Replace("\\", ""); // 防止多重目录...
-        string tmpPrefabPath = string.Format("Assets/{0}.prefab", assetNameWithoutDir);  
+        string tmpPrefabPath = string.Format("Assets/{0}.prefab", assetNameWithoutDir);
 
-		PrefabType prefabType = PrefabUtility.GetPrefabType(asset);
+        PrefabType prefabType = PrefabUtility.GetPrefabType(asset);
 
-	    string relativePath = path;
-		path = MakeSureExportPath(path, buildTarget);
+        string relativePath = path;
+        path = MakeSureExportPath(path, buildTarget, quality);
 
         uint crc = 0;
-	    if (asset is Texture2D)
-	    {
-	        var assetPath = AssetDatabase.GetAssetPath(asset);
-	        if (!string.IsNullOrEmpty(assetPath))  // Assets内的纹理
-	        {// Texutre不复制拷贝一份
+        if (asset is Texture2D)
+        {
+            var assetPath = AssetDatabase.GetAssetPath(asset);
+            if (!string.IsNullOrEmpty(assetPath))  // Assets内的纹理
+            {// Texutre不复制拷贝一份
                 _DoBuild(out crc, asset, null, path, relativePath, buildTarget);
-	        }
-	        else
-	        {
+            }
+            else
+            {
+
                 // 内存的图片~临时创建Asset, 纯正的图片， 使用Sprite吧
                 var memoryTexture = asset as Texture2D;
-	            var memTexName = memoryTexture.name;
+                var memTexName = memoryTexture.name;
 
-	            var tmpTexPath = string.Format("Assets/Tex_{0}_{1}.png", memoryTexture.name, Path.GetRandomFileName());
+                var tmpTexPath = string.Format("Assets/Tex_{0}_{1}.png", memoryTexture.name, Path.GetRandomFileName());
+
+                CDebug.LogWarning("【BuildAssetBundle】Build一个非Asset 的Texture: {0}", memoryTexture.name);
+
                 File.WriteAllBytes(tmpTexPath, memoryTexture.EncodeToPNG());
-
                 AssetDatabase.ImportAsset(tmpTexPath, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport);
-                var importer = (TextureImporter)TextureImporter.GetAtPath(tmpTexPath);
-	            importer.textureType = TextureImporterType.Sprite;
-	            importer.maxTextureSize = 4096;
-                importer.mipmapEnabled = false;
-	            importer.textureFormat = TextureImporterFormat.AutomaticTruecolor;
-                AssetDatabase.ImportAsset(tmpTexPath, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport);
+                var tmpTex = (Texture2D)AssetDatabase.LoadAssetAtPath(tmpTexPath, typeof(Texture2D));
 
-                asset = AssetDatabase.LoadAssetAtPath(tmpTexPath, typeof(Texture));
-	            try
-	            {
+                asset = tmpTex;
+                try
+                {
                     asset.name = memTexName;
 
                     _DoBuild(out crc, asset, null, path, relativePath, buildTarget);
-	            }
-	            catch (Exception e)
-	            {
+                }
+                catch (Exception e)
+                {
                     CDebug.LogException(e);
-	            }
+                }
 
                 File.Delete(tmpTexPath);
                 if (File.Exists(tmpTexPath + ".meta"))
                     File.Delete(tmpTexPath + ".meta");
-	        }
-	    }
-		else if ((prefabType == PrefabType.None && AssetDatabase.GetAssetPath(asset) == string.Empty) ||
-			(prefabType == PrefabType.ModelPrefabInstance))  // 非prefab对象
-		{
-			Object tmpInsObj = (GameObject)GameObject.Instantiate(asset);  // 拷出来创建Prefab
-			Object tmpPrefab = PrefabUtility.CreatePrefab(tmpPrefabPath, (GameObject)tmpInsObj, ReplacePrefabOptions.ConnectToPrefab);
-			asset = tmpPrefab;
+            }
+        }
+        else if ((prefabType == PrefabType.None && AssetDatabase.GetAssetPath(asset) == string.Empty) ||
+            (prefabType == PrefabType.ModelPrefabInstance))  // 非prefab对象
+        {
+            Object tmpInsObj = (GameObject)GameObject.Instantiate(asset);  // 拷出来创建Prefab
+            Object tmpPrefab = PrefabUtility.CreatePrefab(tmpPrefabPath, (GameObject)tmpInsObj, ReplacePrefabOptions.ConnectToPrefab);
+            asset = tmpPrefab;
 
             _DoBuild(out crc, asset, null, path, relativePath, buildTarget);
 
             GameObject.DestroyImmediate(tmpInsObj);
             AssetDatabase.DeleteAsset(tmpPrefabPath);
-		}
-		else if (prefabType == PrefabType.PrefabInstance)
-		{
-		    var prefabParent = PrefabUtility.GetPrefabParent(asset);
+        }
+        else if (prefabType == PrefabType.PrefabInstance)
+        {
+            var prefabParent = PrefabUtility.GetPrefabParent(asset);
             _DoBuild(out crc, prefabParent, null, path, relativePath, buildTarget);
-		}
-		else
-		{
+        }
+        else
+        {
             //CDebug.LogError("[Wrong asse Type] {0}", asset.GetType());
             _DoBuild(out crc, asset, null, path, relativePath, buildTarget);
-		}
-		return crc;
-	}
+        }
+        return crc;
+    }
 
     private static void _DoBuild(out uint crc, Object asset, Object[] subAssets, string path, string relativePath, BuildTarget buildTarget)
     {
@@ -215,7 +224,7 @@ public partial class CBuildTools
 
         if (subAssets == null)
         {
-            subAssets = new[] {asset};
+            subAssets = new[] { asset };
         }
         else
         {
@@ -241,49 +250,49 @@ public partial class CBuildTools
             AfterBuildAssetBundleEvent(asset, path, relativePath);
     }
 
-	public static uint BuildScriptableObject<T>(T scriptObject, string path) where T : ScriptableObject
-	{
-		return BuildScriptableObject(scriptObject, path, EditorUserBuildSettings.activeBuildTarget);
-	}
+    public static uint BuildScriptableObject<T>(T scriptObject, string path) where T : ScriptableObject
+    {
+        return BuildScriptableObject(scriptObject, path, EditorUserBuildSettings.activeBuildTarget, CResourceModule.Quality);
+    }
 
-	public static uint BuildScriptableObject<T>(T scriptObject, string path, BuildTarget buildTarget) where T : ScriptableObject
-	{
-		const string tempAssetPath = "Assets/~Temp.asset";
-		AssetDatabase.CreateAsset(scriptObject, tempAssetPath);
-		T tempObj = (T)AssetDatabase.LoadAssetAtPath(tempAssetPath, typeof(T));
+    public static uint BuildScriptableObject<T>(T scriptObject, string path, BuildTarget buildTarget, CResourceQuality quality) where T : ScriptableObject
+    {
+        const string tempAssetPath = "Assets/~Temp.asset";
+        AssetDatabase.CreateAsset(scriptObject, tempAssetPath);
+        T tempObj = (T)AssetDatabase.LoadAssetAtPath(tempAssetPath, typeof(T));
 
-		if (tempObj == null)
-		{
-			throw new System.Exception();
-		}
+        if (tempObj == null)
+        {
+            throw new System.Exception();
+        }
 
-		uint crc = CBuildTools.BuildAssetBundle(tempObj, path, buildTarget);
-		AssetDatabase.DeleteAsset(tempAssetPath);
+        uint crc = CBuildTools.BuildAssetBundle(tempObj, path, buildTarget, quality);
+        AssetDatabase.DeleteAsset(tempAssetPath);
 
-		return crc;
-	}
+        return crc;
+    }
 
-	public static void CopyFolder(string sPath, string dPath)
-	{
-		if (!Directory.Exists(dPath))
-		{
-			Directory.CreateDirectory(dPath);
-		}
+    public static void CopyFolder(string sPath, string dPath)
+    {
+        if (!Directory.Exists(dPath))
+        {
+            Directory.CreateDirectory(dPath);
+        }
 
-		DirectoryInfo sDir = new DirectoryInfo(sPath);
-		FileInfo[] fileArray = sDir.GetFiles();
-		foreach (FileInfo file in fileArray)
-		{
-			if (file.Extension != ".meta")
-				file.CopyTo(dPath + "/" + file.Name, true);
-		}
+        DirectoryInfo sDir = new DirectoryInfo(sPath);
+        FileInfo[] fileArray = sDir.GetFiles();
+        foreach (FileInfo file in fileArray)
+        {
+            if (file.Extension != ".meta")
+                file.CopyTo(dPath + "/" + file.Name, true);
+        }
 
-		DirectoryInfo[] subDirArray = sDir.GetDirectories();
-		foreach (DirectoryInfo subDir in subDirArray)
-		{
-			CopyFolder(subDir.FullName, dPath + "/" + subDir.Name);
-		}
-	}
+        DirectoryInfo[] subDirArray = sDir.GetDirectories();
+        foreach (DirectoryInfo subDir in subDirArray)
+        {
+            CopyFolder(subDir.FullName, dPath + "/" + subDir.Name);
+        }
+    }
 
     /// <summary>
     /// 是否有指定宏呢
@@ -369,6 +378,45 @@ public partial class CBuildTools
         return null;
     }
 
+    public static void DeleteLink(string linkPath)
+    {
+        var os = Environment.OSVersion;
+        if (os.ToString().Contains("Windows"))
+        {
+            CFolderSyncTool.ExecuteCommand(string.Format("rmdir \"{0}\"", linkPath));
+        }
+        else if (os.ToString().Contains("Unix"))
+        {
+            CFolderSyncTool.ExecuteCommand(string.Format("rm \"{0}\"", linkPath));
+        }
+        else
+        {
+            CDebug.LogError("[SymbolLinkFolder]Error on OS: {0}", os.ToString());
+        }
+    }
+
+    public static void SymbolLinkFolder(string srcFolderPath, string targetPath)
+    {
+        var os = Environment.OSVersion;
+        if (os.ToString().Contains("Windows"))
+        {
+            CFolderSyncTool.ExecuteCommand(string.Format("mklink /J \"{0}\" \"{1}\"", targetPath, srcFolderPath));
+        }
+        else if (os.ToString().Contains("Unix"))
+        {
+            var fullPath = Path.GetFullPath(targetPath);
+            if (fullPath.EndsWith("/"))
+            {
+                fullPath = fullPath.Substring(0, fullPath.Length - 1);
+                fullPath = Path.GetDirectoryName(fullPath);
+            }
+            CFolderSyncTool.ExecuteCommand(string.Format("ln -s {0} {1}", Path.GetFullPath(srcFolderPath), fullPath));
+        }
+        else
+        {
+            CDebug.LogError("[SymbolLinkFolder]Error on OS: {0}", os.ToString());
+        }
+    }
     #region 资源版本管理相关
     class BuildRecord
     {
@@ -432,7 +480,7 @@ public partial class CBuildTools
             {
                 tabFile = CTabFile.LoadFromFile(verFile);
 
-                foreach(CTabFile.RowInterator row in tabFile)
+                foreach (CTabFile.RowInterator row in tabFile)
                 {
                     BuildVersion[row.GetString("AssetPath")] =
                         new BuildRecord(
@@ -471,7 +519,7 @@ public partial class CBuildTools
     // Prefab Asset打包版本號記錄
     public static string GetBuildVersionTab()
     {
-        return Application.dataPath + "/" + CCosmosEngineDef.ResourcesBuildInfosDir + "/ArtBuildResource_" + CResourceModule.GetBuildPlatformName() + ".txt";
+        return Application.dataPath + "/" + CCosmosEngineDef.ResourcesBuildInfosDir + "/ArtBuildResource_" + CResourceModule.BuildPlatformName + ".txt";
     }
 
     public static bool CheckNeedBuild(params string[] sourceFiles)
@@ -531,7 +579,7 @@ public partial class CBuildTools
                     theRecord.Mark(nowMd5);
                 }
             }
-            
+
 
             string metaFile = file + ".meta";
             if (File.Exists(metaFile))
@@ -546,9 +594,9 @@ public partial class CBuildTools
                 else
                 {
                     if (nowMetaMd5 != theMetaRecord.MD5)
-                        theMetaRecord.Mark(nowMetaMd5);    
+                        theMetaRecord.Mark(nowMetaMd5);
                 }
-                
+
             }
         }
     }

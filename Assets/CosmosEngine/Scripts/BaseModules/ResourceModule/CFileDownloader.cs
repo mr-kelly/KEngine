@@ -22,17 +22,20 @@ public class CWWWDownloader
 
     CWWWLoader WWWLoader;
 
-    float TIME_OUT_DEF = 5f; // 5秒延遲
+    float TIME_OUT_DEF = 10f; // 5秒延遲
 
     private bool FinishedFlag = false;
     public bool IsFinished { get { return ErrorFlag || FinishedFlag; } }
 	private bool ErrorFlag = false;
     public bool IsError { get { return ErrorFlag; } }
-    
+
     private bool UseCache;
+    private int ExpireDays = 1; // 过期时间, 默认1天
 
     public WWW Www { get { return WWWLoader.Www; } }
     public float Progress { get {return WWWLoader.Progress;}} // 進度
+    public int Size { get { return WWWLoader.Size; } }
+    public int DownloadedSize { get { return WWWLoader.DownloadedSize; } }
 
     /// <summary>
     /// 
@@ -40,12 +43,24 @@ public class CWWWDownloader
     /// <param name="fullUrl"></param>
     /// <param name="toPath"></param>
     /// <param name="useCache">如果存在则不下载了！</param>
-    public CWWWDownloader(string fullUrl, string toPath, bool useCache = false)
+    /// <param name="expireDays"></param>
+    public CWWWDownloader(string fullUrl, string toPath, bool useCache = false, int expireDays = 1)
     {
         ToPath = toPath;
         _SavePath = CResourceModule.GetAppDataPath() + "/" + ToPath;
         UseCache = useCache;
+        ExpireDays = expireDays;
         CResourceModule.Instance.StartCoroutine(StartDownload(fullUrl));
+    }
+
+    public static CWWWDownloader Load(string fullUrl, string toPath, bool useCache = false)
+    {
+        return new CWWWDownloader(fullUrl, toPath, useCache);
+    }
+
+    public static CWWWDownloader Load(string fullUrl, string toPath, int expireDays)
+    {
+        return new CWWWDownloader(fullUrl, toPath, true, expireDays);
     }
 
     IEnumerator StartDownload(string fullUrl)
@@ -53,9 +68,17 @@ public class CWWWDownloader
         float startTime = Time.time;
         if (UseCache && File.Exists(_SavePath))
         {
-            FinishedFlag = true;
-            ErrorFlag = false;
-            yield break;
+            var lastWriteTime = File.GetLastWriteTimeUtc(_SavePath);
+            CDebug.Log("缓存文件: {0}, 最后修改时间: {1}", _SavePath, lastWriteTime);
+            var deltaDays = CTool.GetDeltaDay(lastWriteTime);
+            // 文件未过期
+            if (deltaDays < ExpireDays)
+            {
+                CDebug.Log("缓存文件未过期 {0}", _SavePath);
+                FinishedFlag = true;
+                ErrorFlag = false;
+                yield break;
+            }
         }
 
         WWWLoader = CWWWLoader.Load(fullUrl);

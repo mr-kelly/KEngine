@@ -34,6 +34,8 @@ namespace CosmosEngine
 
         public static CCosmosEngine EngineInstance { get; private set; }
 
+        private static TableFile<CCosmosEngineInfo> _configsTable;
+
         /// <summary>
         /// Read Tab file (CEngineConfig.txt), cache to here
         /// </summary>
@@ -132,6 +134,7 @@ namespace CosmosEngine
             yield return StartCoroutine(DoInitModules());
             if (AfterInitModules != null)
                 yield return StartCoroutine(AfterInitModules());
+
         }
 
         IEnumerator DoInitModules()
@@ -158,20 +161,18 @@ namespace CosmosEngine
             }
         }
 
-        private static TableFile<CCosmosEngineConfig> Confs;
-
         /// <summary>
         /// Ensure the CEngineConfig file loaded.
         /// </summary>
-        static void EnsureConfigTab()
+        public static TableFile<CCosmosEngineInfo> EnsureConfigTab()
         {
-            if (Confs == null)
+            if (_configsTable == null)
             {
                 TextAsset textAsset;
                 textAsset = Resources.Load<TextAsset>("CEngineConfig");
 
                 CDebug.Assert(textAsset);
-                Confs = new TableFile<CCosmosEngineConfig>(new TableFileConfig
+                _configsTable = new TableFile<CCosmosEngineInfo>(new TableFileConfig
                 {
                     Content = textAsset.text,
                     OnExceptionEvent = (ex, args) =>
@@ -184,6 +185,7 @@ namespace CosmosEngine
 
                 });
             }
+            return _configsTable;
         }
 
         /// <summary>
@@ -193,7 +195,7 @@ namespace CosmosEngine
         {
             EnsureConfigTab();
 
-            var conf = Confs.FindByPrimaryKey(key);
+            var conf = _configsTable.FindByPrimaryKey(key);
             if (conf == null)
             {
                 CDebug.LogError("Cannot get CosmosConfig: {0}", key);
@@ -201,7 +203,20 @@ namespace CosmosEngine
             }
             return conf.Value;
         }
+        public static string GetConfig(CCosmosEngineDefaultConfig cfg)
+        {
+            return GetConfig(cfg.ToString());
+        }
+    }
 
+    public enum CCosmosEngineDefaultConfig
+    {
+        AssetBundleExt,
+        ProductRelPath,
+        AssetBundleBuildRelPath,  // FromRelPath
+
+        [System.Obsolete]
+        AssetBundleRelPath,  // FromRelPath
     }
 
     class CFpsWatcher
@@ -220,28 +235,31 @@ namespace CosmosEngine
             Value = Value * Sensitivity + value * (1f - Sensitivity);
             return string.Format(format, Value);
         }
+
+
     }
+
+
+    /// <summary>
+    /// Engine Config
+    /// </summary>
+    public class CCosmosEngineInfo : TableRowInfo
+    {
+        public string Key;
+        public string Value;
+
+        public override object PrimaryKey
+        {
+            get { return Key; }
+        }
+
+        public CCosmosEngineInfo() { }
+
+        public override bool IsAutoParse
+        {
+            get { return true; }
+        }
+    }
+
 }
 
-/// <summary>
-/// Engine Config
-/// </summary>
-public class CCosmosEngineConfig : TableRowInfo
-{
-    [TabColumn]
-    public string Key;
-    [TabColumn]
-    public string Value;
-
-    public override object PrimaryKey
-    {
-        get { return Key; }
-    }
-
-    public CCosmosEngineConfig() { }
-
-    public override bool IsAutoParse
-    {
-        get { return true; }
-    }
-}

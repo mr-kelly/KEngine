@@ -17,6 +17,8 @@ using System.Collections.Generic;
 public class CAssetBundleLoader : CBaseResourceLoader
 {
     public delegate void CAssetBundleLoaderDelegate(bool isOk, AssetBundle ab);
+    
+    public static Action<string> NewAssetBundleLoaderEvent;
 
     private CAssetBundleParser BundleParser;
     //private bool UnloadAllAssets; // Dispose时赋值
@@ -31,6 +33,9 @@ public class CAssetBundleLoader : CBaseResourceLoader
     protected override void Init(string url)
     {
         base.Init(url);
+        
+        if (NewAssetBundleLoaderEvent != null)
+            NewAssetBundleLoaderEvent(url);
 
         RelativeResourceUrl = url;
         if (CResourceModule.GetResourceFullPath(url, out FullUrl))
@@ -66,7 +71,9 @@ public class CAssetBundleLoader : CBaseResourceLoader
             Progress = wwwLoader.Progress / 2f;  // 最多50%， 要算上Parser的嘛
             yield return null;
         }
-        if (wwwLoader.IsError)
+        Progress = 1/2f;
+
+        if (!wwwLoader.IsOk)
         {
             CDebug.LogError("[CAssetBundleLoader]Error Load AssetBundle: {0}", relativeUrl);
             OnFinish(null);
@@ -90,9 +97,10 @@ public class CAssetBundleLoader : CBaseResourceLoader
                     OnFinish(null);
                     yield break;
                 }
-                Progress = BundleParser.Progress + 1/2f;  // 最多50%， 要算上WWWLoader的嘛
+                Progress = BundleParser.Progress / 2f + 1/2f;  // 最多50%， 要算上WWWLoader的嘛
                 yield return null;
             }
+            Progress = 1f;
             var assetBundle = BundleParser.Bundle;
             if (assetBundle == null)
                 CDebug.LogError("WWW.assetBundle is NULL: {0}", FullUrl);

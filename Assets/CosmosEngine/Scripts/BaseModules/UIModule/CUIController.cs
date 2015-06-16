@@ -24,6 +24,11 @@ public abstract class CUIController : CBehaviour
     {
     }
 
+    public virtual void BeforeOpen(Action doOpen)
+    {
+        doOpen();
+    }
+
     public virtual void OnOpen(params object[] args) { }
 
     public virtual void OnClose() { }

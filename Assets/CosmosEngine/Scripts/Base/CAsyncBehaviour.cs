@@ -18,6 +18,8 @@ public abstract class CAsyncBehaviour : CBehaviour
 {
     private List<System.Action> _callbacks;
 
+    private bool _firstTouchCanAsyncCalled = false; // 第一次设置CanAsyncCall时，开启超时检查
+
     private bool _canAsyncCall = false;
     public virtual bool CanAsyncCall
     {
@@ -31,6 +33,13 @@ public abstract class CAsyncBehaviour : CBehaviour
                 {
                     call();
                 }
+                _callbacks.Clear();
+            }
+
+            if (Debug.isDebugBuild && !_firstTouchCanAsyncCalled)
+            {
+                _firstTouchCanAsyncCalled = true;
+                DoCheckAsyncCall();
             }
         }
     }
@@ -57,15 +66,11 @@ public abstract class CAsyncBehaviour : CBehaviour
 
     }
 
-    protected virtual void Awake()
+    private void DoCheckAsyncCall()
     {
-        if (UnityEngine.Debug.isDebugBuild)
-        {
-            // 调试模式下，防止永远没设置AsyncCall的程序bug
-            CCosmosEngine.EngineInstance.StartCoroutine(DebuggerForCheckAsyncCall());
-        }
+        // 调试模式下，防止永远没设置AsyncCall的程序bug
+        CCosmosEngine.EngineInstance.StartCoroutine(DebuggerForCheckAsyncCall());
     }
-    
 
     IEnumerator DebuggerForCheckAsyncCall()
     {
@@ -74,10 +79,10 @@ public abstract class CAsyncBehaviour : CBehaviour
 
         if (!CanAsyncCall)
         {
-            yield return new WaitForSeconds(10f); // 10秒检测
+            yield return new WaitForSeconds(20f); // 20秒检测
             if (!CanAsyncCall)
             {
-                CDebug.LogError("[CAsyncBehaviour]超过10秒，组件还是不能CanAsyncCall!是否程序有错？");
+                Debug.LogError(string.Format("[CAsyncBehaviour]超过10秒，组件还是不能CanAsyncCall!是否程序有错？ {0}", this.gameObject.name), gameObject);
             }
         }
     }

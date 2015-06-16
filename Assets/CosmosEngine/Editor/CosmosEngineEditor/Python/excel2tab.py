@@ -101,7 +101,7 @@ def DirWalker(arg, dirname, filenames):
 								break
 						if not bHasDefRow:
 							# 不拥有声明行,强制添加空行
-							str_list.append('[string]\t')
+							str_list.append('[string]')
 
 
 

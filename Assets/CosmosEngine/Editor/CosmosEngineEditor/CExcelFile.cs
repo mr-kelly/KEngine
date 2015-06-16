@@ -129,7 +129,13 @@ class CExcelFile
         var cell = theRow.GetCell(ColName2Index[columnName]);
         if (cell == null)
             cell = theRow.CreateCell(ColName2Index[columnName]);
+
+        if (value.Length > (1 << 14))  // if too long
+        {
+            value = value.Substring(0, 1 << 14);
+        }
         cell.SetCellValue(value);
+        
     }
 
     public void Save()

@@ -87,6 +87,8 @@ public class CResourceLoaderDebugger : MonoBehaviour
 {
     public CBaseResourceLoader TheLoader;
     public int RefCount;
+    public float FinishUsedTime; // 参考，完成所需时间
+
     public static CResourceLoaderDebugger Create(string type, string url, CBaseResourceLoader loader)
     {
         const string bigType = "ResourceLoaders";
@@ -98,8 +100,9 @@ public class CResourceLoaderDebugger : MonoBehaviour
         var newHelp = newHelpGameObject.AddComponent<CResourceLoaderDebugger>();
         newHelp.TheLoader = loader;
 
-        loader.DisposeEvent += () => CDebuggerObjectTool.RemoveFromParent(bigType, type, newHelpGameObject);
         loader.SetDescEvent += (newDesc) => newHelpGameObject.name = getName();
+        loader.DisposeEvent += () => CDebuggerObjectTool.RemoveFromParent(bigType, type, newHelpGameObject);
+        
 
         return newHelp;
     }
@@ -107,6 +110,7 @@ public class CResourceLoaderDebugger : MonoBehaviour
     void Update()
     {
         RefCount = TheLoader.RefCount;
+        FinishUsedTime = TheLoader.FinishUsedTime;
     }
 }
 

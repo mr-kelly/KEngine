@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿//#define MEMORY_DEBUG
+
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System;
@@ -9,6 +11,11 @@ using System;
 /// </summary>
 public abstract class CBaseResourceLoader
 {
+    static CBaseResourceLoader()
+    {
+        GcIntervalTime = Debug.isDebugBuild ? 1f : 5f;
+    }
+
     public delegate void CLoaderDelgate(bool isOk, object resultObject);
     private static readonly Dictionary<Type, Dictionary<string, CBaseResourceLoader>> Caches = new Dictionary<Type, Dictionary<string, CBaseResourceLoader>>();
     private readonly List<CLoaderDelgate> _afterFinishedCallbacks = new List<CLoaderDelgate>();
@@ -16,14 +23,14 @@ public abstract class CBaseResourceLoader
     #region 垃圾回收 Garbage Collect
 
     /// <summary>
-    /// AutoNew时，清理超过5秒无引用的资源
+    /// Loader延迟Dispose
     /// </summary>
     private const float LoaderDisposeTime = 0;
 
     /// <summary>
     /// 间隔多少秒做一次GC(在AutoNew时)
     /// </summary>
-    private const float DoGcInterval = 1f;
+    public static float GcIntervalTime = 1f;
 
     /// <summary>
     /// 上次做GC的时间
@@ -58,6 +65,18 @@ public abstract class CBaseResourceLoader
     public bool IsError { get; private set; }
 
     /// <summary>
+    /// 是否可用
+    /// </summary>
+    public bool IsOk
+    {
+        get { return !IsError && ResultObject != null && !IsReadyDisposed; }
+    }
+
+    /// <summary>
+    /// ForceNew的，非AutoNew
+    /// </summary>
+    protected bool IsForceNew;
+    /// <summary>
     /// RefCount 为 0，进入预备状态
     /// </summary>
     protected bool IsReadyDisposed { get; private set; }
@@ -66,7 +85,27 @@ public abstract class CBaseResourceLoader
     /// </summary>
     public event Action DisposeEvent;
 
+    [System.NonSerialized]
+    public float InitTiming = -1;
+    [System.NonSerialized]
+    public float FinishTiming = -1;
+    
+    /// <summary>
+    /// 用时
+    /// </summary>
+    public float FinishUsedTime
+    {
+        get
+        {
+            if (!IsFinished) return -1;
+            return FinishTiming - InitTiming;
+        }
+    }
+    /// <summary>
+    /// 引用计数
+    /// </summary>
     public int RefCount { get; private set; }
+
     public string Url { get; private set; }
 
     /// <summary>
@@ -91,15 +130,6 @@ public abstract class CBaseResourceLoader
             if (SetDescEvent != null)
                 SetDescEvent(_desc);
         }
-    }
-
-    protected CBaseResourceLoader()
-    {
-        ResultObject = null;
-        IsReadyDisposed = false;
-        IsError = false;
-        IsFinished = false;
-        RefCount = 0;
     }
 
     protected static int GetCount<T>()
@@ -128,10 +158,8 @@ public abstract class CBaseResourceLoader
         return 0;
     }
 
-    protected static T AutoNew<T>(string url, CLoaderDelgate callback = null) where T : CBaseResourceLoader, new()
+    protected static T AutoNew<T>(string url, CLoaderDelgate callback = null, bool forceCreateNew = false) where T : CBaseResourceLoader, new()
     {
-        //CheckGcCollect();
-
         Dictionary<string, CBaseResourceLoader> typesDict = GetTypeDict(typeof(T));
         CBaseResourceLoader loader;
         if (string.IsNullOrEmpty(url))
@@ -139,9 +167,15 @@ public abstract class CBaseResourceLoader
             CDebug.LogError("[{0}:AutoNew]url为空", typeof(T));
         }
 
-        if (!typesDict.TryGetValue(url, out loader))
+        if (forceCreateNew || !typesDict.TryGetValue(url, out loader))
         {
-            loader = typesDict[url] = new T();
+            loader = new T();
+            if (!forceCreateNew)
+            {
+                typesDict[url] = loader;
+            }
+
+            loader.IsForceNew = forceCreateNew;
             loader.Init(url);
 
             if (Application.isEditor)
@@ -160,14 +194,14 @@ public abstract class CBaseResourceLoader
 
         loader.RefCount++;
 
-        loader.AddCallback(callback);
-
         // RefCount++了，重新激活，在队列中准备清理的Loader
         if (UnUsesLoaders.ContainsKey(loader))
         {
             UnUsesLoaders.Remove(loader);
-            loader.IsReadyDisposed = false;
+            loader.Revive();
         }
+
+        loader.AddCallback(callback);
 
         return loader as T;
     }
@@ -177,7 +211,7 @@ public abstract class CBaseResourceLoader
     /// </summary>
     public static void CheckGcCollect()
     {
-        if (_lastGcTime.Equals(-1) || (Time.time - _lastGcTime) >= DoGcInterval)
+        if (_lastGcTime.Equals(-1) || (Time.time - _lastGcTime) >= GcIntervalTime)
         {
             DoGarbageCollect();
             _lastGcTime = Time.time;
@@ -215,27 +249,67 @@ public abstract class CBaseResourceLoader
         }
 
     }
-    protected virtual void Init(string url)
+
+    /// <summary>
+    /// 复活
+    /// </summary>
+    protected virtual void Revive()
     {
-        Url = url;
-        Progress = 0;
+        IsReadyDisposed = false;  // 复活！
     }
 
-    protected virtual bool OnFinish(object resultObj)
+    protected CBaseResourceLoader()
     {
-        Progress = 1;
-        IsFinished = true;
-        IsError = resultObj == null;
-        ResultObject = resultObj;
+        RefCount = 0;
+    }
+#if MEMORY_DEBUG
+    protected float MemoryOnStart;
+#endif
 
-        DoCallback(resultObj != null, ResultObject);
+    protected virtual void Init(string url)
+    {
+#if MEMORY_DEBUG
+        MemoryOnStart = GC.GetTotalMemory(true) / 1000f;
+#endif
+        InitTiming = Time.realtimeSinceStartup;
+        ResultObject = null;
+        IsReadyDisposed = false;
+        IsError = false;
+        IsFinished = false;
 
-        if (IsReadyDisposed)
+        Url = url;
+        Progress = 0;
+
+    }
+
+    protected virtual void OnFinish(object resultObj)
+    {
+        Action doFinish = () =>
         {
-            DoDispose();
-        }
+#if MEMORY_DEBUG
+        CDebug.Log("OnFinish {0}:{1} Memory Diff: {2}", this, Url, (GC.GetTotalMemory(true) / 1000f) - MemoryOnStart);
+#endif
+            // 如果ReadyDispose，无效！不用传入最终结果！
+            ResultObject = resultObj;
 
-        return !IsError;  // is success?
+            // 如果ReadyDisposed, 依然会保存ResultObject, 但在回调时会失败~无回调对象
+            var callbackObject = !IsReadyDisposed ? ResultObject : null;
+
+            FinishTiming = Time.realtimeSinceStartup;
+            Progress = 1;
+            IsError = callbackObject == null;
+
+            IsFinished = true;
+            DoCallback(IsOk, callbackObject);
+
+            if (IsReadyDisposed)
+            {
+                Dispose();
+                //CDebug.DevLog("[BaseResourceLoader:OnFinish]时，准备Disposed {0}", Url);
+            }
+        };
+
+        doFinish();
     }
 
     /// <summary>
@@ -259,14 +333,30 @@ public abstract class CBaseResourceLoader
 
     protected void DoCallback(bool isOk, object resultObj)
     {
-        foreach (var callback in _afterFinishedCallbacks)
-            callback(isOk, resultObj);
-        _afterFinishedCallbacks.Clear();
+        Action justDo = () =>
+        {
+            foreach (var callback in _afterFinishedCallbacks)
+                callback(isOk, resultObj);
+            _afterFinishedCallbacks.Clear();
+        };
+
+
+        {
+            justDo();
+        }
+
     }
 
     // 后边改变吧~~不叫Dispose!
     public virtual void Release()
     {
+#if UNITY_EDITOR
+        if (Url.Contains("Arial"))
+        {
+            CDebug.LogError("要释放Arial字体！！错啦！！:{0}", Url);
+            UnityEditor.EditorApplication.isPaused = true;
+        }
+#endif
         if (IsReadyDisposed && Debug.isDebugBuild)
         {
             CDebug.LogWarning("[{0}]Too many dipose! {1}, Count: {2}", GetType().Name, this.Url, RefCount);
@@ -280,19 +370,19 @@ public abstract class CBaseResourceLoader
             {
                 if (RefCount < 0)
                 {
-                    CDebug.LogError("[CBaseResourceLoader]RefCount< 0, {0} : {1}, NowRefCount: {2}, Will be fix to 0", GetType().Name, Url, RefCount);
+                    CDebug.LogError("[{3}]RefCount< 0, {0} : {1}, NowRefCount: {2}, Will be fix to 0", GetType().Name, Url, RefCount, GetType());
 
                     RefCount = Mathf.Max(0, RefCount);
                 }
 
                 if (UnUsesLoaders.ContainsKey(this))
                 {
-                    CDebug.LogError("[CBaseResourceLoader]UnUsesLoader exists: {0}", this);
+                    CDebug.LogError("[{1}]UnUsesLoader exists: {0}", this, GetType());
                 }
             }
 
             // 加入队列，准备Dispose
-            UnUsesLoaders.Add(this, Time.time);
+            UnUsesLoaders[this] = Time.time;
 
             IsReadyDisposed = true;
 
@@ -305,21 +395,24 @@ public abstract class CBaseResourceLoader
     /// <summary>
     /// Dispose是有引用检查的， DoDispose一般用于继承重写
     /// </summary>
-    protected virtual void Dispose()
+    private void Dispose()
     {
         //RealDisposed = true;
 
         if (DisposeEvent != null)
             DisposeEvent();
 
-        var type = GetType();
-        var typeDict = GetTypeDict(type);
-        //if (Url != null) // TODO: 以后去掉
+        if (!IsForceNew)
         {
-            var bRemove = typeDict.Remove(Url);
-            if (!bRemove)
+            var type = GetType();
+            var typeDict = GetTypeDict(type);
+            //if (Url != null) // TODO: 以后去掉
             {
-                CDebug.LogWarning("[{0}:Dispose]No Url: {1}", type.Name, Url);
+                var bRemove = typeDict.Remove(Url);
+                if (!bRemove)
+                {
+                    CDebug.LogWarning("[{0}:Dispose]No Url: {1}", type.Name, Url);
+                }
             }
         }
 
@@ -330,7 +423,6 @@ public abstract class CBaseResourceLoader
 
     protected virtual void DoDispose()
     {
-
     }
 
 }

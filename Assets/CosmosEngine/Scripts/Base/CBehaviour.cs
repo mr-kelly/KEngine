@@ -22,10 +22,8 @@ public abstract class CBehaviour : MonoBehaviour
     private GameObject _cacheGameObject;
     public GameObject CachedGameObject { get { return _cacheGameObject ?? (_cacheGameObject = gameObject); } }
 
-    [System.Obsolete]
-    public GameObject _GameObject {get { return CachedGameObject; }}
-
     protected bool IsDestroyed = false;
+    public static event System.Action<CBehaviour> StaticDestroyEvent;
     public event System.Action<CBehaviour> DestroyEvent;
 
     static bool _isApplicationQuited = false;  // 全局标记, 程序是否退出状态
@@ -40,13 +38,18 @@ public abstract class CBehaviour : MonoBehaviour
         set { _TimeScale = value; }
     }
 
+    public virtual void Delete()
+    {
+        Delete(0);
+    }
+
     /// <summary>
     /// GameObject.Destory对象
     /// </summary>
-    public virtual void Delete()
+    public virtual void Delete(float time)
     {
         if (!IsApplicationQuited)
-            UnityEngine.Object.Destroy(gameObject);
+            UnityEngine.Object.Destroy(gameObject, time);
     }
 
     // 只删除自己这个Component
@@ -62,6 +65,8 @@ public abstract class CBehaviour : MonoBehaviour
         IsDestroyed = true;
         if (DestroyEvent != null)
             DestroyEvent(this);
+        if (StaticDestroyEvent != null)
+            StaticDestroyEvent(this);
     }
 
     private void OnApplicationQuit()

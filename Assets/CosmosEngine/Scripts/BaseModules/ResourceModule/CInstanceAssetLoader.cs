@@ -22,6 +22,7 @@ public class CInstanceAssetLoader : CBaseResourceLoader
 {
     public delegate void CAssetLoaderDelegate(bool isOk, UnityEngine.Object asset, object[] args);
 
+    private Object _newCopyAsset = null;
     private CAssetFileLoader _assetFileBridge;  // 引用ResultObject
     public override float Progress
     {
@@ -31,69 +32,51 @@ public class CInstanceAssetLoader : CBaseResourceLoader
         }
     }
 
-    public List<UnityEngine.Object> CopyAssets = new List<Object>();
-
-    private UnityEngine.Object CopyAsset()
-    {
-        if (ResultObject == null)
-        {
-            CDebug.LogError("[CInstanceAssetLoader:TheAsset] Null Load Asset: {0}", this.Url);
-            return null;
-        }
-
-        Object copyAsset = null;
-        try
-        {
-            copyAsset = GameObject.Instantiate(ResultObject as UnityEngine.Object);
-        }
-        catch (Exception e)
-        {
-            CDebug.LogException(e);
-            return null;
-        }
-        
-
-        CopyAssets.Add(copyAsset);
-
-        return copyAsset;
-    }
-
     // TODO: 无视AssetName暂时！
     public static CInstanceAssetLoader Load(string url, CAssetFileLoader.CAssetFileBridgeDelegate callback = null)
     {
-        var loader = AutoNew<CInstanceAssetLoader>(url);
-
-        CResourceModule.Instance.StartCoroutine(CoLoad(loader, callback));
+        var loader = AutoNew<CInstanceAssetLoader>(url, (ok, resultObject) =>
+        {
+            if (callback != null)
+                callback(ok, resultObject as UnityEngine.Object);
+        }, true);
 
         return loader;
-    }
-
-    static IEnumerator CoLoad(CInstanceAssetLoader loader, CAssetFileLoader.CAssetFileBridgeDelegate callback)
-    {
-        while (!loader.IsFinished)
-            yield return null;
-        if (loader.IsReadyDisposed)
-        {
-            callback(false, null);
-        }
-        else
-        {
-            var newCopyAsset = loader.CopyAsset();
-            if (Application.isEditor)
-            {
-                CResourceLoadObjectDebugger.Create("AssetCopy", loader.Url, newCopyAsset);
-            }
-
-            callback(newCopyAsset != null, newCopyAsset);
-        }
     }
 
     protected override void Init(string url)
     {
         base.Init(url);
+
         _assetFileBridge = CAssetFileLoader.Load(url, (isOk, asset) =>
         {
-            OnFinish(asset);
+            if (IsReadyDisposed)  // 中途释放
+            {
+                OnFinish(null);
+                return;
+            }
+            if (!isOk)
+            {
+                OnFinish(null);
+                CDebug.LogError("[InstanceAssetLoader]Error on assetfilebridge loaded... {0}", url);
+                return;
+            }
+
+            try
+            {
+                _newCopyAsset = GameObject.Instantiate(asset as UnityEngine.Object);
+            }
+            catch (Exception e)
+            {
+                CDebug.LogException(e);
+            }
+
+            if (Application.isEditor)
+            {
+                CResourceLoadObjectDebugger.Create("AssetCopy", url, _newCopyAsset);
+            }
+
+            OnFinish(_newCopyAsset);
         });
     }
 
@@ -107,6 +90,19 @@ public class CInstanceAssetLoader : CBaseResourceLoader
         });
     }
 
+    protected override void DoDispose()
+    {
+        base.DoDispose();
+        
+        _assetFileBridge.Release();
+        if (_newCopyAsset != null)
+        {
+            Object.Destroy(_newCopyAsset);
+            _newCopyAsset = null;
+        }
+    }
+
+
     //仅仅是预加载，回调仅告知是否加载成功
     public static IEnumerator CoPreload(string path, System.Action<bool> callback = null)
     {
@@ -119,26 +115,4 @@ public class CInstanceAssetLoader : CBaseResourceLoader
             callback(!w.IsError);  // isOk?
     }
 
-    public override void Release()
-    {
-        base.Release();
-
-        // 立刻清理拷贝的对象, 但loader保留
-        if (RefCount <= 0)
-        {
-            // 确保复制品删除
-            foreach (var copyAsset in CopyAssets)
-            {
-                Object.Destroy(copyAsset);
-            }
-            CopyAssets.Clear();
-        }
-    }
-
-    protected override void DoDispose()
-    {
-        base.DoDispose();
-        _assetFileBridge.Release();
-
-    }
 }

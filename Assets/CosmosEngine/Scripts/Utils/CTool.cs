@@ -11,7 +11,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
@@ -24,10 +23,6 @@ using System.IO;
 /// </summary>
 public class CTool
 {
-    static float[] RecordTime = new float[10];
-    static string[] RecordKey = new string[10];
-    static int RecordPos = 0;
-
     static readonly Dictionary<string, Shader> CacheShaders = new Dictionary<string, Shader>(); // Shader.Find是一个非常消耗的函数，因此尽量缓存起来
 
     /// <summary>
@@ -39,6 +34,16 @@ public class CTool
         return Application.internetReachability == NetworkReachability.ReachableViaLocalAreaNetwork;
     }
 
+
+    /// <summary>
+    /// 获取最近的2次方
+    /// </summary>
+    /// <param name="num"></param>
+    /// <returns></returns>
+    public static int GetNearestPower2(int num)
+    {
+        return (int)(Mathf.Pow(2, Mathf.Ceil(Mathf.Log(num) / Mathf.Log(2))));
+    }
     /// <summary>
     /// 判断一个数是否2的次方
     /// </summary>
@@ -192,6 +197,16 @@ public class CTool
     }
 
     /// <summary>
+    /// 波浪随机数整数版
+    /// </summary>
+    /// <param name="waveNumberStr"></param>
+    /// <returns></returns>
+    public static int GetWaveRandomNumberInt(string waveNumberStr)
+    {
+        return Mathf.RoundToInt(GetWaveRandomNumber(waveNumberStr));
+    }
+
+    /// <summary>
     /// 获取波浪随机数,   即填“1”或填“1~2”这样的字符串中返回一个数！
     /// 
     /// 如填"1"，直接返回1
@@ -212,6 +227,27 @@ public class CTool
 
         return UnityEngine.Random.Range(strs[0].ToFloat(), strs[1].ToFloat());
     }
+    /// <summary>
+    /// 是否在波浪数之间
+    /// </summary>
+    /// <param name="waveNumberStr"></param>
+    /// <param name="testNumber"></param>
+    /// <returns></returns>
+    public static bool IsBetweenWave(string waveNumberStr, int testNumber)
+    {
+        if (string.IsNullOrEmpty(waveNumberStr))
+            return false;
+
+        var strs = waveNumberStr.Split('~');
+        if (strs.Length == 1)
+        {
+            return strs[0].ToInt32() == testNumber;
+        }
+        var min = strs[0].ToInt32();
+        var max = strs[1].ToInt32();
+        return testNumber >= min && testNumber <= max;
+    }
+
     public static Shader FindShader(string shaderName)
     {
         Shader shader;
@@ -357,6 +393,14 @@ public class CTool
         return span.Days;
     }
 
+    public static int GetDeltaMinutes(DateTime origin)
+    {
+        DateTime now = DateTime.UtcNow;
+        var span = now - origin;
+
+        return span.Minutes;
+    }
+
     public static int GetDeltaHours(DateTime origin)
     {
         DateTime now = DateTime.UtcNow;
@@ -449,49 +493,6 @@ public class CTool
         return number.ToString();
     }
 
-    public static void BeginRecordTime(string key)
-    {
-        RecordTime[RecordPos] = UnityEngine.Time.realtimeSinceStartup;
-        RecordKey[RecordPos] = key;
-        RecordPos++;
-    }
-
-    public static string EndRecordTime(bool printLog = true)
-    {
-        RecordPos--;
-        double s = (UnityEngine.Time.realtimeSinceStartup - RecordTime[RecordPos]);
-        if (printLog)
-        {
-            CDebug.Log("[RecordTime] {0} use {1}s", RecordKey[RecordPos], s);
-        }
-        return string.Format("[RecordTime] {0} use {1}s.", RecordKey[RecordPos], s);
-    }
-
-    // 添加性能观察, 使用C#内置
-    public static void WatchPerformance(Action del)
-    {
-        WatchPerformance("执行耗费时间: {0}s", del);
-    }
-
-    public static void WatchPerformance(string outputStr, Action del)
-    {
-        System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
-        stopwatch.Start(); //  开始监视代码运行时间
-
-        if (del != null)
-        {
-            del();
-        }
-
-        stopwatch.Stop(); //  停止监视
-        TimeSpan timespan = stopwatch.Elapsed; //  获取当前实例测量得出的总时间
-        //double seconds = timespan.TotalSeconds;  //  总秒数
-        double millseconds = timespan.TotalMilliseconds;
-        decimal seconds = (decimal)millseconds / 1000m;
-
-        CDebug.LogWarning(outputStr, seconds.ToString("F7")); // 7位精度
-    }
-
     // 仅用于捕获
     public static string[] Match(string find, string pattern)
     {
@@ -514,7 +515,7 @@ public class CTool
         return result;
     }
     /// <summary>
-    /// 模板获取
+    /// 模板生成
     /// </summary>
     /// <param name="source">模板内容</param>
     /// <param name="data">数据来源[对象]</param>
@@ -558,6 +559,27 @@ public class CTool
         }
 
         return result;
+    }
+    /// <summary>
+    /// 模板生成
+    /// </summary>
+    /// <param name="source">模板内容</param>
+    /// <param name="datas">模板键-值对应数组[key1,value1,key2,value2,...]</param>
+    /// <returns></returns>
+    public static string Template(string source, params object[] datas)
+    {
+        // 最少需要两个元素
+        if (datas.Length == 0 || datas.Length % 2 != 0)
+        {
+            CDebug.LogError("传入datas数量必须为偶数个!");
+            return source;
+        }
+        var json = new SimpleJson.JsonObject();
+        for(var i = 0; i<datas.Length; i+=2)
+        {
+            json[datas[i].ToString()] = datas[i+1];
+        }
+        return Template(source, json);
     }
     /// <summary>
     /// 混合模板
@@ -767,7 +789,7 @@ public class CTool
     public static void ScaleParticleSystem(GameObject gameObj, float scale)
     {
         var notFind = true;
-        foreach (ParticleSystem p in gameObj.GetComponentsInChildren<ParticleSystem>())
+        foreach (ParticleSystem p in gameObj.GetComponentsInChildren<ParticleSystem>(true))
         {
             notFind = false;
             p.startSize *= scale;
@@ -793,13 +815,16 @@ public class CTool
             if (child.GetComponent<ParticleSystem>() != null)
             {
                 var particleSystem = child.GetComponent<ParticleSystem>();
-                particleSystem.renderer.sharedMaterial.renderQueue = renderQueue;
+                if(particleSystem.renderer.sharedMaterial!=null)
+                        particleSystem.renderer.sharedMaterial.renderQueue = renderQueue;
             }
         }
         if (parent.GetComponent<ParticleSystem>() != null)
         {
             var particleSystem = parent.GetComponent<ParticleSystem>();
-            particleSystem.renderer.sharedMaterial.renderQueue = renderQueue;
+            //bug 当同一个窗口有多个使用相同的Material时，其它组件的Material在关闭后会被释放
+            if (particleSystem.renderer.sharedMaterial != null)
+                particleSystem.renderer.sharedMaterial.renderQueue = renderQueue;
         }
     }
     public static void MoveAllCollidersToGameObject(GameObject srcGameObject, GameObject targetGameObject)
@@ -818,7 +843,13 @@ public class CTool
         }
     }
 
-    public static void CopyCollider2DToGameObject(Collider2D collider2d, GameObject targetGameObject)
+    /// <summary>
+    /// return new Copy
+    /// </summary>
+    /// <param name="collider2d"></param>
+    /// <param name="targetGameObject"></param>
+    /// <returns></returns>
+    public static Collider2D CopyCollider2DToGameObject(Collider2D collider2d, GameObject targetGameObject)
     {
         if (collider2d is CircleCollider2D)
         {
@@ -829,6 +860,7 @@ public class CTool
 
             Vector3 realLocalPos = targetGameObject.transform.InverseTransformPoint(oldCircle.gameObject.transform.position);
             newCircle.center = oldCircle.center + (Vector2)realLocalPos;
+            return newCircle;
         }
         else if (collider2d is BoxCollider2D)
         {
@@ -839,7 +871,10 @@ public class CTool
             //newBox.center = oldBox.center;
             Vector3 realLocalPos = targetGameObject.transform.InverseTransformPoint(oldBox.gameObject.transform.position);
             newBox.center = oldBox.center + (Vector2)realLocalPos;
+            return newBox;
         }
+        CDebug.LogError("Error Collider: {0}", collider2d);
+        return null;
     }
     // 将3D碰撞强转2D
     public static void CopyColliderToGameObject(Collider collider, GameObject targetGameObject)
@@ -1195,6 +1230,68 @@ public static class XExtensions
             list[k] = list[n];
             list[n] = value;
         }
+    }
+    public static T CFirstOrDefault<T>(this IEnumerable<T> source)
+    {
+        if (source != null)
+        {
+            foreach (T item in source)
+            {
+                return item;
+            }
+        }
+
+        return default(T);
+    }
+    public static T CLastOrDefault<T>(this IEnumerable<T> source)
+    {
+        var result = default(T);
+        foreach (T item in source)
+        {
+            result = item;
+        }
+        return result;
+    }
+    public static T[] CToArray<T>(this IEnumerable<T> source)
+    {
+        var list = new List<T>();
+        foreach (T item in source)
+        {
+            list.Add(item);
+        }
+        return list.ToArray();
+    }
+    public static List<T> CToList<T>(this IEnumerable<T> source)
+    {
+        var list = new List<T>();
+        foreach (T item in source)
+        {
+            list.Add(item);
+        }
+        return list;
+    }
+    public static List<T> CUnion<T>(this List<T> first, List<T> second, IEqualityComparer<T> comparer)
+    {
+        var results = new List<T>();
+        var list = first.CToList();
+        list.AddRange(second);
+        foreach (T item in list)
+        {
+            var include = false;
+            foreach (T result in results)
+            {
+                if (comparer.Equals(result, item))
+                {
+                    include = true;
+                    break;
+                }
+            }
+            if (!include)
+            {
+                results.Add(item);
+            }
+        }
+        return list;
     }
 
     // by KK, 获取自动判断JSONObject的str，n

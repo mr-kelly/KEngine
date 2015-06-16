@@ -36,9 +36,15 @@ public class CSettingManager : ICModule
 	bool SettingOutPackage = true;
 
 	public bool LoadFinished = false;
-
 	public IEnumerator Init()
 	{
+	    if (LoadFinished)
+	    {
+            if (Debug.isDebugBuild)
+	            CDebug.LogWarning("[CSettingMananger]重新加载Settings");
+	        LoadFinished = false;
+	    }
+
         switch (Application.platform)
         {
             case RuntimePlatform.Android:
@@ -49,7 +55,9 @@ public class CSettingManager : ICModule
         }
 
 		CDebug.Log("Load setting out of package = {0}", SettingOutPackage.ToString());
-		yield return CResourceModule.Instance.StartCoroutine(InitSetting());
+
+        yield return CResourceModule.Instance.StartCoroutine(InitSetting());
+		
 	}
 
     public IEnumerator UnInit()
@@ -67,7 +75,7 @@ public class CSettingManager : ICModule
 
 		for (int i = 0; i < gameSetting.SettingFiles.Length; ++i)
 		{
-			GameSettings.Add(gameSetting.SettingFiles[i], gameSetting.SettingContents[i]);
+			GameSettings[gameSetting.SettingFiles[i]] = gameSetting.SettingContents[i];
 		}
 
 		CDebug.Log("{0} setting files loaded.", GameSettings.Count);

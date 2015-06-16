@@ -26,6 +26,18 @@ public class CAssetFileLoader : CBaseResourceLoader
     public UnityEngine.Object Asset { get { return ResultObject as UnityEngine.Object; } }
     private bool IsLoadAssetBundle;
 
+    public override float Progress
+    {
+        get
+        {
+            if (_bundleLoader != null)
+                return _bundleLoader.Progress;
+            return 0;
+        }
+    }
+
+    private CAssetBundleLoader _bundleLoader;
+
     public static CAssetFileLoader Load(string path, CAssetFileBridgeDelegate assetFileLoadedCallback = null)
     {
         CLoaderDelgate realcallback = null;
@@ -42,6 +54,7 @@ public class CAssetFileLoader : CBaseResourceLoader
         base.Init(url);
         CResourceModule.Instance.StartCoroutine(_Init(Url, null));
     }
+
     IEnumerator _Init(string path, string assetName)
     {
         IsLoadAssetBundle = CCosmosEngine.GetConfig("IsLoadAssetBundle").ToInt32() != 0;
@@ -62,20 +75,28 @@ public class CAssetFileLoader : CBaseResourceLoader
         }
         else
         {
-            var bundleLoader = CAssetBundleLoader.Load(path);
+            _bundleLoader = CAssetBundleLoader.Load(path);
 
-            while (!bundleLoader.IsFinished)
+            while (!_bundleLoader.IsFinished)
             {
                 if (IsReadyDisposed)   // 中途释放
                 {
-                    bundleLoader.Release();
+                    _bundleLoader.Release();
                     OnFinish(null);
                     yield break;
                 }
-                Progress = bundleLoader.Progress;
                 yield return null;
             }
-            var assetBundle = bundleLoader.Bundle;
+
+            if (!_bundleLoader.IsOk)
+            {
+                CDebug.LogError("[CAssetFileLoader]Load BundleLoader Failed(Error) when Finished: {0}", path);
+                _bundleLoader.Release();
+                OnFinish(null);
+                yield break;
+            }
+
+            var assetBundle = _bundleLoader.Bundle;
 
             System.DateTime beginTime = System.DateTime.Now;
             if (AssetInBundleName == null)
@@ -114,7 +135,7 @@ public class CAssetFileLoader : CBaseResourceLoader
                 CDebug.LogError("Asset is NULL: {0}", path);
             }
 
-            bundleLoader.Release();  // 释放Bundle(WebStream)
+            _bundleLoader.Release();  // 释放Bundle(WebStream)
         }
 
         if (Application.isEditor)

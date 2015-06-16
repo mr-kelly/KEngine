@@ -18,51 +18,109 @@ using System.Collections.Generic;
 /// </summary>
 public class CAssetBundleParser
 {
+    public enum CAssetBundleParserMode
+    {
+        Async,
+        Sync,
+    }
+    /// <summary>
+    /// 是异步解析，还是同步解析
+    /// </summary>
+    public static CAssetBundleParserMode Mode = CAssetBundleParserMode.Sync;
+
     private bool IsDisposed = false;
     private bool UnloadAllAssets; // Dispose时赋值
 
     readonly Action<AssetBundle> Callback;
     public bool IsFinished;
     public AssetBundle Bundle;
-    public static Func<string, byte[], AssetBundleCreateRequest> ParseFunc = null; // 可以放置資源加密函數
-    private static int AutoPriority = 1;
+
+    public static Func<string, byte[], byte[]> BundleBytesFilter = null; // 可以放置資源加密函數
+
+    private static int _autoPriority = 1;
+
     private readonly AssetBundleCreateRequest CreateRequest;
     public float Progress {get { return CreateRequest.progress; }}
+    public string RelativePath;
+
+    private readonly float _startTime = 0;
 
     public CAssetBundleParser(string relativePath, byte[] bytes, Action<AssetBundle> callback = null)
     {
-        Callback = callback;
-
-        var func = ParseFunc ?? DefaultParseAb;
-        CreateRequest = func(relativePath, bytes);
-        CreateRequest.priority = AutoPriority++; // 后进先出
-        CResourceModule.Instance.StartCoroutine(WaitCreateAssetBundle(CreateRequest));
-    }
-
-
-    IEnumerator WaitCreateAssetBundle(AssetBundleCreateRequest req)
-    {
-        while (!req.isDone)
+        if (Debug.isDebugBuild)
         {
-            yield return null;
+            _startTime = Time.realtimeSinceStartup;
         }
 
+        Callback = callback;
+        RelativePath = relativePath;
+
+        var func = BundleBytesFilter ?? DefaultParseAb;
+        var abBytes = func(relativePath, bytes);
+        switch (Mode)
+        {
+            case CAssetBundleParserMode.Async:
+                CreateRequest = AssetBundle.CreateFromMemory(abBytes);
+                CreateRequest.priority = _autoPriority++; // 后进先出, 一个一个来
+                CResourceModule.Instance.StartCoroutine(WaitCreateAssetBundle(CreateRequest));
+                break;
+            case CAssetBundleParserMode.Sync:
+                OnFinish(AssetBundle.CreateFromMemoryImmediate(abBytes));
+                break;
+            default:
+                throw new Exception("Error CAssetBundleParserMode: " + Mode);
+        }
+    }
+
+    void OnFinish(AssetBundle bundle)
+    {
         IsFinished = true;
-        Bundle = req.assetBundle;
+        Bundle = bundle;
 
         if (IsDisposed)
             DisposeBundle();
         else
         {
             if (Callback != null)
-                Callback(Bundle);    
+                Callback(Bundle);
         }
+
+        if (Debug.isDebugBuild)
+        {
+            var useTime = Time.realtimeSinceStartup - _startTime;
+            var timeLimit = Mode == CAssetBundleParserMode.Async ? 1f : .05f;
+            if (useTime > timeLimit) // 超过一帧时间肯定了
+            {
+                CDebug.LogWarning("[CAssetBundleParser] Parse Too long time: {0},  used time: {1}", RelativePath, useTime);
+            }
+        }
+        
+    }
+
+    IEnumerator WaitCreateAssetBundle(AssetBundleCreateRequest req)
+    {
+        float startTime = Time.time;
+        
+        while (!req.isDone)
+        {
+            yield return null;
+        }
+
+        if (Application.isEditor)
+        {
+            const float timeout = 5f;
+            if (Time.time - startTime > timeout)
+            {
+                CDebug.LogWarning("[CAssetBundlerParser]{0} 解压/读取Asset太久了! 花了{1}秒, 超过 {2}秒", RelativePath, Time.time - startTime, timeout);
+            }
+        }
+        OnFinish(req.assetBundle);
     }
 
 
-    static AssetBundleCreateRequest DefaultParseAb(string relativePath, byte[] bytes)
+    static byte[] DefaultParseAb(string relativePath, byte[] bytes)
     {
-        return AssetBundle.CreateFromMemory(bytes);
+        return bytes;
     }
 
     private void DisposeBundle()

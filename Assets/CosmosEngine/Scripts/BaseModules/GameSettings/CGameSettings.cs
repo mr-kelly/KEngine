@@ -26,7 +26,7 @@ public class CGameSettings : ICModule
 
     public Dictionary<Type, Dictionary<string, CBaseInfo>> SettingInfos = new Dictionary<Type, Dictionary<string, CBaseInfo>>();
 
-    private Dictionary<Type, Func<string>[]> LazyLoad = new Dictionary<Type, Func<string>[]>();
+    public Dictionary<Type, Func<string>[]> LazyLoad = new Dictionary<Type, Func<string>[]>();
 
     public Action InitAction; // Init時調用的委託、函數指針
 
@@ -38,8 +38,8 @@ public class CGameSettings : ICModule
         if (this.InitAction == null)
             CDebug.LogError("GameSettings沒有定義初始化行為！！！");
         else
-            this.InitAction();
-        yield break;
+            InitAction();
+        yield return new WaitForEndOfFrame();
     }
 
     public IEnumerator UnInit()
@@ -204,7 +204,7 @@ public class CGameSettings : ICModule
     }
 }
 
-public partial class CBaseInfo : CObject, ICloneable
+public partial class CBaseInfo : ICloneable
 {
     // 把Fields缓存起来，避开反射的GetFields性能问题  Type => ( FieldName -> Type )
     private static readonly Dictionary<Type, LinkedList<FieldInfo>> CacheTypeFields = new Dictionary<Type, LinkedList<FieldInfo>>();
@@ -304,7 +304,7 @@ public partial class CBaseInfo : CObject, ICloneable
             }
             else if (fieldType == typeof(string))
             {
-                value = tabFile.GetString(row, fieldName);
+                value = tabFile.GetString(row, fieldName).Replace("\\n", "\n");
             }
             else if (fieldType == typeof(float))
             {

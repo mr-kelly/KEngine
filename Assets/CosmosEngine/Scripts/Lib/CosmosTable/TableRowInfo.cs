@@ -1,12 +1,12 @@
 ﻿namespace CosmosTable
 {
-    public class TableRowInfo
+    public partial class TableRowInfo
     {
         public virtual bool IsAutoParse
         {
             get { return true; }
         }
-        public int RowNumber;
+        public int RowNumber { get; set; }
         protected TableRowInfo()
         {
         }
@@ -64,6 +64,11 @@
     /// </summary>
     public class DefaultTableRowInfo : TableRowInfo
     {
+        public override bool IsAutoParse
+        {
+            get { return false; }
+        }
+
         public string[] Values;
 
         public override void Parse(string[] cellStrs)

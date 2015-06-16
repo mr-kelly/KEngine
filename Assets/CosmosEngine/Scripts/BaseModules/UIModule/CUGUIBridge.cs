@@ -32,5 +32,7 @@ public class CUGUIBridge : ICUIBridge
         return null;
     }
 
-    public void UIObjectFilter(CUIController ui, GameObject uiObject) { }
+    public void UIObjectFilter(CUIController ui, GameObject uiObject)
+    {
+    }
 }

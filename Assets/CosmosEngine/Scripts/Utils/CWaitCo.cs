@@ -38,6 +38,18 @@ public class CWaitCo
         }
     }
 
+    public static Action After(int count, Action callback)
+    {
+        var callTimes = 0;
+        return () =>
+        {
+            callTimes++;
+            if (callTimes >= count)
+            {
+                callback();
+            }
+        };
+    }
 
     /// <summary>
     /// 等待回调返回true，再执行第二个回调

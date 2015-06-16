@@ -22,7 +22,11 @@ using Object = UnityEngine.Object;
 /// </summary>
 public class CStaticAssetLoader : CBaseResourceLoader
 {
-    public UnityEngine.Object TheAsset; // Copy
+    public UnityEngine.Object TheAsset // Copy
+    {
+        get { return (UnityEngine.Object) ResultObject; }
+    }
+        
     private CAssetFileLoader _assetFileLoader;
     public override float Progress
     {
@@ -50,20 +54,20 @@ public class CStaticAssetLoader : CBaseResourceLoader
 
         _assetFileLoader = CAssetFileLoader.Load(path, (_isOk, _obj) =>
         {
-
-            if (IsReadyDisposed)
-            {
-                OnFinish(null);
-                return;
-            }
-
-            TheAsset = Object.Instantiate(_obj);
-            OnFinish(TheAsset);
+            OnFinish(_obj);
 
             if (Application.isEditor)
                 if (TheAsset != null)
                     CResourceLoadObjectDebugger.Create("StaticAsset", path, TheAsset);
         });
+    }
+
+    protected override void OnFinish(object resultObj)
+    {
+        // 拷一份
+        var copyAsset = Object.Instantiate(resultObj as UnityEngine.Object);
+
+        base.OnFinish(copyAsset);
     }
 
     protected override void DoDispose()

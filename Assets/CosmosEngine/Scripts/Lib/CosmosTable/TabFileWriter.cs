@@ -20,17 +20,7 @@ namespace CosmosTable
 
         void CheckHeaders()
         {
-            // 确保表头！
-            foreach (var prop in TabFile.TabProperties)
-            {
-                HeaderInfo headerInfo;
-                if (!TabFile.Headers.TryGetValue(prop.Name, out headerInfo))
-                {
-                    NewColumn(prop.Name);
-                }
-            }
-
-            foreach (var field in TabFile.TabFields)
+            foreach (var field in TabFile.AutoTabFields)
             {
                 HeaderInfo headerInfo;
                 if (!TabFile.Headers.TryGetValue(field.Name, out headerInfo))
@@ -43,6 +33,7 @@ namespace CosmosTable
         public TabFileWriter(TableFile<T> tabFile)
         {
             TabFile = tabFile;
+            CheckHeaders();
         }
 
         // 将当前保存成文件
@@ -63,13 +54,7 @@ namespace CosmosTable
             foreach (var kv in TabFile.Rows)
             {
                 var rowT = kv.Value;
-                foreach (var prop in TabFile.TabProperties)
-                {
-                    var retVal = prop.GetGetMethod().Invoke(rowT, new object[]{});
-                    sb.Append(retVal);
-                    sb.Append('\t');
-                }
-                foreach (var field in TabFile.TabFields)
+                foreach (var field in TabFile.AutoTabFields)
                 {
                     var retVal = field.GetValue(rowT);
                     sb.Append(retVal);
@@ -109,12 +94,16 @@ namespace CosmosTable
             return newRow;
         }
 
+        public bool RemoveRow(int row)
+        {
+            return TabFile.Rows.Remove(row);
+        }
         public T GetRow(int row)
         {
-            T rowT;
+            object rowT;
             if (TabFile.Rows.TryGetValue(row, out rowT))
             {
-                return rowT;
+                return (T)rowT;
             }
 
             return null;

@@ -122,7 +122,10 @@ public static class CExtensions
 	{
 	    return string.IsNullOrEmpty(val) ? 0 : Convert.ToInt32(val);
 	}
-
+    public static long ToInt64(this string val)
+    {
+        return string.IsNullOrEmpty(val) ? 0 : Convert.ToInt64(val);
+    }
     public static float ToFloat(this string val)
     {
         return string.IsNullOrEmpty(val) ? 0f : Convert.ToSingle(val);
