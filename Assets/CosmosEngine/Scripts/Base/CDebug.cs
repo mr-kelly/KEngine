@@ -12,35 +12,54 @@ using System;
 using System.IO;
 using System.Diagnostics;
 using System.Text;
+using System.Threading;
 using UnityEngine;
+
+public enum CLogLevel
+{
+    All = 0,
+    Trace,
+    Debug,
+    Info, // Info, default
+    Warning,
+    Error,
+}
 
 /// Frequent Used,
 /// A File logger + Debug Tools
 public class CDebug
 {
-    private static bool _isLogFile = false; // 是否輸出到日誌，跨线程
-    public static bool IsLogFile
-    {
-        get { return _isLogFile; }
-        set
-        {
-            _isLogFile = value;
-            if (_isLogFile)
-            {
-                Application.RegisterLogCallbackThreaded((szMsg, trace, type) =>
-                {
-                    LogToFile(szMsg + trace + "\n\n");
-                });
-            }
-            else
-            {
-                Application.RegisterLogCallbackThreaded(null);
-            }
+    public static CLogLevel LogLevel = CLogLevel.Info;
+    static event Application.LogCallback LogCallbackEvent;
+    private static bool _hasRegisterLogCallback = false;
 
+    /// <summary>
+    /// 第一次使用时注册，之所以不放到静态构造器，因为多线程问题
+    /// </summary>
+    /// <param name="callback"></param>
+    public static void AddLogCallback(Application.LogCallback callback)
+    {
+        if (!_hasRegisterLogCallback)
+        {
+            Application.RegisterLogCallbackThreaded(OnLogCallback);
+            _hasRegisterLogCallback = true;
         }
+        LogCallbackEvent += callback;
+
+    }
+    public static void RemoveLogCallback(Application.LogCallback callback)
+    {
+        if (!_hasRegisterLogCallback)
+        {
+            Application.RegisterLogCallbackThreaded(OnLogCallback);
+            _hasRegisterLogCallback = true;
+        }
+        LogCallbackEvent -= callback;
+
     }
 
-    static readonly bool IsDebugBuild = false;
+
+    //static readonly bool IsDebugBuild = false;
     public static readonly bool IsEditor = false;
 
     public static event Action<string> LogErrorEvent;
@@ -51,7 +70,7 @@ public class CDebug
 
         try
         {
-            IsDebugBuild = UnityEngine.Debug.isDebugBuild;
+            //IsDebugBuild = UnityEngine.Debug.isDebugBuild;
             IsEditor = Application.isEditor;
         }
         catch (Exception e)
@@ -61,11 +80,37 @@ public class CDebug
         }
     }
 
-    enum LogType
+    private static bool _isLogFile = false; // 是否輸出到日誌，跨线程
+    public static bool IsLogFile
     {
-        NORMAL,
-        WARNING,
-        ERROR,
+        get { return _isLogFile; }
+        set
+        {
+            _isLogFile = value;
+            if (_isLogFile)
+            {
+                AddLogCallback(DefaultCallbackLogFile);
+            }
+            else
+            {
+                RemoveLogCallback(DefaultCallbackLogFile);
+            }
+
+        }
+    }
+
+    private static void DefaultCallbackLogFile(string condition, string stacktrace, UnityEngine.LogType type)
+    {
+        if (type == LogType.Log)
+            LogToFile(condition + "\n\n");
+        else
+            LogToFile(condition + stacktrace + "\n\n");
+    }
+
+    private static void OnLogCallback(string condition, string stacktrace, UnityEngine.LogType type)
+    {
+        if (LogCallbackEvent != null)
+            LogCallbackEvent(condition, stacktrace, type);
     }
 
     /// <summary>
@@ -120,19 +165,29 @@ public class CDebug
             Console.WriteLine(log, args);
     }
 
-    public static void DevLog(string log, params object[] args)
+    public static void Trace(string log, params object[] args)
     {
-        if (IsDebugBuild)
-            DoLog(string.Format(log, args), LogType.WARNING);
+        DoLog(string.Format(log, args), CLogLevel.Trace);
     }
+
+    public static void Debug(string log, params object[] args)
+    {
+        DoLog(string.Format(log, args), CLogLevel.Debug);
+    }
+
+    //[Obsolete]
+    //public static void Trace(string log, params object[] args)
+    //{
+    //    DoLog(string.Format(log, args), CLogLevel.Debug);
+    //}
 
     public static void Log(string log)
     {
-        DoLog(log, LogType.NORMAL);
+        DoLog(log, CLogLevel.Info);
     }
     public static void Log(string log, params object[] args)
     {
-        DoLog(string.Format(log, args), LogType.NORMAL);
+        DoLog(string.Format(log, args), CLogLevel.Info);
     }
 
     public static void Logs(params object[] logs)
@@ -156,16 +211,23 @@ public class CDebug
         LogErrorWithStack(sb.ToString() + " , " + e.StackTrace);
     }
 
-    public static void LogErrorWithStack(string err = "", int stack = 1)
+    public static void LogErrorWithStack(string err = "", int stack = 2)
     {
-        StackFrame[] stackFrames = new StackTrace(true).GetFrames(); ;
-        StackFrame sf = stackFrames[stack];
+        StackFrame sf = GetTopStack(stack);
         string log = string.Format("[ERROR]{0}\n\n{1}:{2}\t{3}", err, sf.GetFileName(), sf.GetFileLineNumber(), sf.GetMethod());
         Console.Write(log);
-        DoLog(log, LogType.ERROR);
+        DoLog(log, CLogLevel.Error);
 
         if (LogErrorEvent != null)
             LogErrorEvent(err);
+    }
+
+
+    public static StackFrame GetTopStack(int stack = 2)
+    {
+        StackFrame[] stackFrames = new StackTrace(true).GetFrames(); ;
+        StackFrame sf = stackFrames[Mathf.Min(stack, stackFrames.Length - 1)];
+        return sf;
     }
 
     public static void LogError(string err, params object[] args)
@@ -176,7 +238,7 @@ public class CDebug
     public static void LogWarning(string err, params object[] args)
     {
         string log = string.Format(err, args);
-        DoLog(log, LogType.WARNING);
+        DoLog(log, CLogLevel.Warning);
     }
 
     public static void Pause()
@@ -184,20 +246,23 @@ public class CDebug
         UnityEngine.Debug.Break();
     }
 
-    private static void DoLog(string szMsg, LogType emType)
+    private static void DoLog(string szMsg, CLogLevel emLevel)
     {
+        if (LogLevel > emLevel)
+            return;
         szMsg = string.Format("[{0}]{1}\n\n=================================================================\n\n", DateTime.Now.ToString("HH:mm:ss.ffff"), szMsg);
 
-        switch (emType)
+        switch (emLevel)
         {
-            case LogType.NORMAL:
-                UnityEngine.Debug.Log(szMsg);
-                break;
-            case LogType.WARNING:
+            case CLogLevel.Warning:
+            case CLogLevel.Trace:
                 UnityEngine.Debug.LogWarning(szMsg);
                 break;
-            case LogType.ERROR:
+            case CLogLevel.Error:
                 UnityEngine.Debug.LogError(szMsg);
+                break;
+            default:
+                UnityEngine.Debug.Log(szMsg);
                 break;
         }
 
@@ -225,10 +290,13 @@ public class CDebug
 
         using (FileStream fileStream = new FileStream(fullPath, append ? FileMode.Append : FileMode.CreateNew, FileAccess.Write, FileShare.ReadWrite))  // 不会锁死, 允许其它程序打开
         {
-            StreamWriter writer = new StreamWriter(fileStream);  // Append
-            writer.Write(szMsg);
-            writer.Flush();
-            writer.Close();
+            lock (fileStream)
+            {
+                StreamWriter writer = new StreamWriter(fileStream);  // Append
+                writer.Write(szMsg);
+                writer.Flush();
+                writer.Close();
+            }
         }
     }
 

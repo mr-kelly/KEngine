@@ -25,6 +25,6 @@ public class CDependencyClass : Attribute
 {
     public CDependencyClass(Type dependencyType)
     {
-
+          
     }
 }

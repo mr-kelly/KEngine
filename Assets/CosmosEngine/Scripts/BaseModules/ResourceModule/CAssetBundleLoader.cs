@@ -19,6 +19,7 @@ public class CAssetBundleLoader : CBaseResourceLoader
     public delegate void CAssetBundleLoaderDelegate(bool isOk, AssetBundle ab);
     
     public static Action<string> NewAssetBundleLoaderEvent;
+    public static Action<CAssetBundleLoader> AssetBundlerLoaderErrorEvent;
 
     private CAssetBundleParser BundleParser;
     //private bool UnloadAllAssets; // Dispose时赋值
@@ -29,7 +30,6 @@ public class CAssetBundleLoader : CBaseResourceLoader
 
     string RelativeResourceUrl;
     string FullUrl;
-
     protected override void Init(string url)
     {
         base.Init(url);
@@ -50,6 +50,7 @@ public class CAssetBundleLoader : CBaseResourceLoader
             OnFinish(null);
         }
     }
+
     public static CAssetBundleLoader Load(string url, CAssetBundleLoaderDelegate callback = null)
     {
         CLoaderDelgate newCallback = null;
@@ -75,6 +76,10 @@ public class CAssetBundleLoader : CBaseResourceLoader
 
         if (!wwwLoader.IsOk)
         {
+            if (AssetBundlerLoaderErrorEvent != null)
+            {
+                AssetBundlerLoaderErrorEvent(this);
+            }
             CDebug.LogError("[CAssetBundleLoader]Error Load AssetBundle: {0}", relativeUrl);
             OnFinish(null);
             wwwLoader.Release();
@@ -120,6 +125,19 @@ public class CAssetBundleLoader : CBaseResourceLoader
 
         if (BundleParser != null)
             BundleParser.Dispose(false);
+    }
+
+    public override void Release()
+    {
+
+#if UNITY_EDITOR
+        if (Url.Contains("Arial"))
+        {
+            CDebug.LogError("要释放Arial字体！！错啦！！:{0}", Url);
+            UnityEditor.EditorApplication.isPaused = true;
+        }
+#endif
+        base.Release();
     }
 
     /// 舊的tips~忽略

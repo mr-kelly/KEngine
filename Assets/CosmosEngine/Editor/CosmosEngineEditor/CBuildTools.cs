@@ -44,6 +44,8 @@ public partial class CBuildTools
         if (!System.IO.Directory.Exists(exportDirectory))
             System.IO.Directory.CreateDirectory(exportDirectory);
 
+        path = path.Replace("/", @"\");
+
         return path;
     }
 
@@ -54,7 +56,7 @@ public partial class CBuildTools
     /// <param name="platfrom"></param>
     /// <param name="quality"></param>
     /// <returns></returns>
-    public static string GetExportPath(BuildTarget platfrom, CResourceQuality quality)
+    public static string GetExportPath(BuildTarget platfrom, CResourceQuality quality = CResourceQuality.Sd)
     {
         string basePath = Path.GetFullPath(Application.dataPath + "/" + CCosmosEngine.GetConfig(CCosmosEngineDefaultConfig.AssetBundleBuildRelPath) + "/");
 
@@ -342,40 +344,74 @@ public partial class CBuildTools
         }
     }
 
+    public static bool IsWin32
+    {
+        get
+        {
+            var os = Environment.OSVersion;
+            return os.ToString().Contains("Windows");
+        }
+
+    }
 
     // 执行Python文件！获取返回值
     public static string ExecutePyFile(string pyFileFullPath, string arguments)
     {
-        var guids = AssetDatabase.FindAssets("py");
-        foreach (var guid in guids)
+        string pythonExe = null;
+        if (IsWin32)
         {
-            var assetPath = AssetDatabase.GUIDToAssetPath(guid);
-            if (Path.GetFileName(assetPath) == "py.exe")
+            var guids = AssetDatabase.FindAssets("py");
+            foreach (var guid in guids)
             {
-                string pythonExe = assetPath;  // Python地址
+                var assetPath = AssetDatabase.GUIDToAssetPath(guid);
 
-                string allOutput = null;
-                using (var process = new System.Diagnostics.Process())
+                if (Path.GetFileName(assetPath) == "py.exe")
                 {
-                    process.StartInfo.FileName = pythonExe;
-                    process.StartInfo.Arguments = pyFileFullPath + " " + arguments;
-                    process.StartInfo.UseShellExecute = false;
-                    //process.StartInfo.CreateNoWindow = true;
-                    process.StartInfo.RedirectStandardOutput = true;
-                    process.Start();
-
-                    allOutput = process.StandardOutput.ReadToEnd();
-
-                    process.WaitForExit();
-
+                    pythonExe = assetPath;  // Python地址
+                    break;
                 }
-
-                return allOutput;
             }
-
         }
-        CDebug.LogError("无法找到py.exe或执行失败");
-        return null;
+        else
+        {
+            pythonExe = "python"; // linux or mac
+        }
+
+
+        if (string.IsNullOrEmpty(pythonExe))
+        {
+            CDebug.LogError("无法找到py.exe, 或python指令");
+            return "Error: Not found python";
+        }
+        
+        string allOutput = null;
+        using (var process = new System.Diagnostics.Process())
+        {
+            process.StartInfo.FileName = pythonExe;
+            process.StartInfo.Arguments = pyFileFullPath + " " + arguments;
+            //process.StartInfo.UseShellExecute = false;
+            ////process.StartInfo.CreateNoWindow = true;
+            //process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.CreateNoWindow = true;
+            process.StartInfo.RedirectStandardOutput = true;
+
+            var tips = string.Format("ExecutePython: {0} {1}", process.StartInfo.FileName, process.StartInfo.Arguments);
+            CDebug.Log(tips);
+            EditorUtility.DisplayProgressBar("Python...", tips, .5f);
+
+            process.Start();
+
+            allOutput = process.StandardOutput.ReadToEnd();
+
+            process.WaitForExit();
+
+            CDebug.Log("PyExecuteResult: {0}", allOutput);
+
+            EditorUtility.ClearProgressBar();
+
+            return allOutput;
+        }
     }
 
     public static void DeleteLink(string linkPath)
@@ -387,7 +423,7 @@ public partial class CBuildTools
         }
         else if (os.ToString().Contains("Unix"))
         {
-            CFolderSyncTool.ExecuteCommand(string.Format("rm \"{0}\"", linkPath));
+            CFolderSyncTool.ExecuteCommand(string.Format("rm -Rf \"{0}\"", linkPath));
         }
         else
         {
@@ -542,7 +578,12 @@ public partial class CBuildTools
         if (!File.Exists(filePath))
         {
             if (log)
-                CDebug.LogError("[DoCheckNeedBuild]无法找到文件 {0}", filePath);
+                CDebug.LogError("[DoCheckNeedBuild]Not Found 无法找到文件 {0}", filePath);
+
+            if (filePath.Contains("unity_builtin_extra"))
+            {
+                CDebug.LogError("[DoCheckNeedBuild]Find unity_builtin_extra resource to build!! Please check it! current scene: {0}", EditorApplication.currentScene);
+            }
             return false;
         }
         if (!BuildVersion.TryGetValue(filePath, out assetMd5))

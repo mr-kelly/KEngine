@@ -66,9 +66,9 @@ public partial class CAutoResourceBuilder
         }
         catch (Exception e)
         {
-            CDebug.LogError("[Fail] Auto Build... {0}, Exception: {1}, Used Time: {2}", 
+            CDebug.LogError("[Fail] Auto Build... {0}, Exception: {1}, Used Time: {2}, CurrentScene: {3}", 
                 export.GetType().Name, 
-                e.Message + "," + (e.InnerException != null ? e.InnerException.Message : ""), DateTime.Now - time);
+                e.Message + "," + (e.InnerException != null ? e.InnerException.Message : ""), DateTime.Now - time, EditorApplication.currentScene);
         }
 
         GC.Collect();

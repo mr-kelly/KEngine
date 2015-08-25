@@ -42,7 +42,6 @@ public class CSpriteLoader : CBaseResourceLoader
     protected override void Init(string url)
     {
         base.Init(url);
-
         Path = url;
         AssetFileBridge = CAssetFileLoader.Load(Path, OnAssetLoaded);
     }

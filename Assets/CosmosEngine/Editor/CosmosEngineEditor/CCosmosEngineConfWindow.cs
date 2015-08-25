@@ -44,11 +44,6 @@ namespace CosmosEngine.Editor
             CheckConfigFile();
         }
 
-        enum CUIBridgeType
-        {
-            NO_UI,
-            NGUI,
-        }
         static string ConfFilePath = "Assets/Resources/CEngineConfig.txt";
 
         // 默認的配置文件內容

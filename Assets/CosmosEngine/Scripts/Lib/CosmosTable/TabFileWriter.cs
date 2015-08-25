@@ -10,7 +10,7 @@ namespace CosmosTable
     /// <typeparam name="T"></typeparam>
     public class TabFileWriter<T> : IDisposable where T : TableRowInfo, new()
     {
-        protected readonly TableFile<T> TabFile;
+        public readonly TableFile<T> TabFile;
 
         public TabFileWriter()
         {
@@ -36,10 +36,8 @@ namespace CosmosTable
             CheckHeaders();
         }
 
-        // 将当前保存成文件
-        public bool Save(string fileName)
+        public override string ToString()
         {
-            bool result = false;
             StringBuilder sb = new StringBuilder();
 
             foreach (var header in TabFile.Headers.Values)
@@ -62,26 +60,35 @@ namespace CosmosTable
                 }
                 sb.Append("\r\n");
             }
+            return sb.ToString();
+        }
 
-            try
+        // 将当前保存成文件
+        public bool Save(string fileName)
+        {
+            lock (this)
             {
-                //using (FileStream fs = )
+                bool result = false;
+                try
                 {
-                    using (StreamWriter sw = new StreamWriter(new FileStream(fileName, FileMode.Create), System.Text.Encoding.UTF8))
+                    //using (FileStream fs = )
                     {
-                        sw.Write(sb);
+                        using (StreamWriter sw = new StreamWriter(new FileStream(fileName, FileMode.Create), System.Text.Encoding.UTF8))
+                        {
+                            sw.Write(ToString());
 
-                        result = true;
+                            result = true;
+                        }
                     }
                 }
-            }
-            catch (IOException e)
-            {
-				result = false;
-                throw new Exception("可能文件正在被Excel打开?" + e.Message);
-            }
+                catch (IOException e)
+                {
+                    result = false;
+                    throw new Exception("可能文件正在被Excel打开?" + e.Message);
+                }
 
-            return result;
+                return result;
+            }
         }
 
         public T NewRow()

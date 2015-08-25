@@ -1,8 +1,9 @@
-﻿using UnityEngine;
+﻿//#define COBJECT_DEBUGGER
+
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System;
-using System.Reflection;
 using CosmosEngine;
 
 /// <summary>
@@ -20,6 +21,7 @@ public class CObject : IDisposable
         this.StopWatch();
     }
 }
+
 /// <summary>
 /// 手动打开或关闭，用于任何object
 /// </summary>
@@ -51,6 +53,7 @@ public class CObjectDebugger : CBehaviour
 
     public static void StopWatch(object obj)
     {
+#if COBJECT_DEBUGGER
         if (!CDebug.IsEditor || !Application.isPlaying || IsApplicationQuited)
             return;
 
@@ -72,10 +75,12 @@ public class CObjectDebugger : CBehaviour
             }
  
         });
+#endif
     }
 
     public static void StartWatch(object obj)
     {
+#if COBJECT_DEBUGGER
         if (!CDebug.IsEditor || !Application.isPlaying || IsApplicationQuited)
             return;
 
@@ -97,6 +102,7 @@ public class CObjectDebugger : CBehaviour
             }
 
         });
+#endif
     }
 
     void Awake()

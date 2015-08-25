@@ -7,13 +7,17 @@ using System.Text;
 using System.IO;
 
 /// <summary>
-/// 加密解密，依赖表CosmosEngineConfig
+/// 加密解密，依赖表CosmosEngineConfig DEC
 /// </summary>
 public class CCrypt
 {
     public byte[] CustomKeys = null;
     private readonly byte[] DefaultKeys = { 0x00, 0x01, 0x02, 0x03, 0xAB, 0xCD, 0xEF, 0x05 };
 
+    public CCrypt()
+    {
+        CustomKeys = DefaultKeys;
+    }
     public CCrypt(byte[] keys)
     {
         CustomKeys = keys;

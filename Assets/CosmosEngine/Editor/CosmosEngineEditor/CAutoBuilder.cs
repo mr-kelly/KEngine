@@ -97,11 +97,15 @@ public class CAutoBuilder
         }
     }
 
-    static void PerformBuild(string outputpath, BuildTarget tag, BuildOptions opt)
+    /// <summary>
+    /// return full path or build
+    /// </summary>
+    /// <param name="outputpath"></param>
+    /// <param name="tag"></param>
+    /// <param name="opt"></param>
+    /// <returns></returns>
+    static string PerformBuild(string outputpath, BuildTarget tag, BuildOptions opt)
     {
-        CSymbolLinkHelper.SymbolLinkResource();
-        RefreshProgramVersion();
-
         EditorUserBuildSettings.SwitchActiveBuildTarget(tag);
 
         ParseArgs(ref opt, ref outputpath);
@@ -115,35 +119,24 @@ public class CAutoBuilder
 
         CDebug.Log("Build Client {0} to: {1}", tag, fullPath);
         BuildPipeline.BuildPlayer(GetScenePaths(), fullPath, tag, opt);
+
+        return fullPath;
     }
 
-    /// <summary>
-    /// 增加Program版本
-    /// </summary>
-    [MenuItem("CosmosEngine/AutoBuilder/Refresh Program Version")]
-    public static void RefreshProgramVersion()
-    {
-        string programVersionFile = string.Format("{0}/Resources/ProgramVersion.txt", Application.dataPath);
+    //public static int GetProgramVersion()
+    //{
+    //    var oldVersion = 0;
+    //    if (File.Exists(GetProgramVersionFullPath()))
+    //        oldVersion = File.ReadAllText(GetProgramVersionFullPath()).ToInt32();
 
-        var oldVersion = 1;
-        if (File.Exists(programVersionFile))
-            oldVersion = File.ReadAllText(programVersionFile).ToInt32();
+    //    return oldVersion;
+    //}
 
-        var newVersion = oldVersion + 1;
-
-        using (FileStream fs = new FileStream(programVersionFile, FileMode.Create))
-        {
-            using (StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8))
-            {
-                sw.Write(newVersion.ToString());
-            }
-        }
-
-
-        CDebug.Log("Add ProgramVersion.txt!! SVN Version: {0}", newVersion);
-
-        AssetDatabase.Refresh();
-    }
+    //public static string GetProgramVersionFullPath()
+    //{
+    //    string programVersionFile = string.Format("{0}/Resources/ProgramVersion.txt", Application.dataPath);
+    //    return programVersionFile;
+    //}
 
     [MenuItem("CosmosEngine/AutoBuilder/WindowsX86D")]  // 注意，PC版本放在不一样的目录的！
     public static void PerformWinBuild()
@@ -160,23 +153,30 @@ public class CAutoBuilder
     [MenuItem("CosmosEngine/AutoBuilder/iOS")]
     public static void PerformiOSBuild()
     {
-        PerformBuild("Apps/ClientIOSProject", BuildTarget.iPhone, BuildOptions.Development | BuildOptions.ConnectWithProfiler);
+        PerformiOSBuild("App");        
+    }
+
+    public static string PerformiOSBuild(string ipaName, bool isDevelopment = true)
+    {
+        BuildOptions opt = isDevelopment
+            ? (BuildOptions.Development | BuildOptions.AllowDebugging | BuildOptions.ConnectWithProfiler)
+            : BuildOptions.None;
+        return PerformBuild("Apps/IOSProjects/" + ipaName, BuildTarget.iPhone, opt);
     }
 
     [MenuItem("CosmosEngine/AutoBuilder/Android")]
     public static void PerformAndroidBuild()
     {
-        PerformAndroidBuild("StrikeHero_Dev", "Dev");
+        PerformAndroidBuild("StrikeHero");
     }
-    public static void PerformAndroidBuild(string apkName, string channelName = null, bool isDevelopment = true)
+
+    public static string PerformAndroidBuild(string apkName, bool isDevelopment = true)
     {
         BuildOptions opt = isDevelopment
             ? (BuildOptions.Development | BuildOptions.AllowDebugging | BuildOptions.ConnectWithProfiler)
             : BuildOptions.None;
-        var path = string.Format("Apps/{2}/{0}_{1:MM-dd_HH}.apk", apkName, DateTime.Now, "Android");
-//        var path = string.IsNullOrEmpty(channelName)? string.Format("Apps/{0}_{1:MMddHH}.apk", apkName, DateTime.Now)
-//                                                    : string.Format("Apps/{2}/{0}_{1:MMddHH}.apk", apkName, DateTime.Now, channelName);
-        PerformBuild(path, BuildTarget.Android, opt);
+        var path = string.Format("Apps/{0}/{1}.apk", "Android", apkName);
+        return PerformBuild(path, BuildTarget.Android, opt);
     }
 
     [MenuItem("CosmosEngine/Clear PC PersitentDataPath")]
@@ -186,7 +186,10 @@ public class CAutoBuilder
         {
             Directory.Delete(dir, true);
         }
-        
+        foreach (string file in Directory.GetFiles(CResourceModule.GetAppDataPath()))
+        {
+            File.Delete(file);
+        }
     }
     [MenuItem("CosmosEngine/Open PC PersitentDataPath Folder")]
     public static void OpenPersistentDataPath()
@@ -201,13 +204,12 @@ public class CAutoBuilder
         PlayerPrefs.Save();
         CBuildTools.ShowDialog("Prefs Cleared!");
     }
-
 }
 
 public class CSymbolLinkHelper
 {
 
-    public const string AssetBundlesLinkPath = "Assets/StreamingAssets/Bundles/"; // hold asset bundles
+    public static string AssetBundlesLinkPath = "Assets/StreamingAssets/" + CCosmosEngine.GetConfig(CCosmosEngineDefaultConfig.BundlesFolderName) + "/"; // hold asset bundles
     public static string GetLinkPath()
     {
         if (!Directory.Exists(AssetBundlesLinkPath))

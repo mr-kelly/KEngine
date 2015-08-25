@@ -1,4 +1,6 @@
-﻿namespace CosmosTable
+﻿using System;
+
+namespace CosmosTable
 {
     public partial class TableRowInfo
     {
@@ -17,10 +19,7 @@
 
         public virtual object PrimaryKey
         {
-            get
-            {
-                return null;
-            }
+            get { return null; }
         }
 
         protected string Get_String(string value, string defaultValue)
@@ -38,6 +37,16 @@
         protected int Get_Int32(string value, string defaultValue)
         {
             return Get_int(value, defaultValue);
+        }
+        protected bool Get_Boolean(string value, string defaultValue)
+        {
+            var str = Get_string(value, defaultValue);
+            bool result;
+            if (bool.TryParse(str, out result))
+            {
+                return result;
+            }
+            return Get_int(value, defaultValue) != 0;
         }
         protected int Get_int(string value, string defaultValue)
         {

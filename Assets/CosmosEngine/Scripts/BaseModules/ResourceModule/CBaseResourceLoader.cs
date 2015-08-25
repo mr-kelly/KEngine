@@ -13,7 +13,6 @@ public abstract class CBaseResourceLoader
 {
     static CBaseResourceLoader()
     {
-        GcIntervalTime = Debug.isDebugBuild ? 1f : 5f;
     }
 
     public delegate void CLoaderDelgate(bool isOk, object resultObject);
@@ -30,7 +29,17 @@ public abstract class CBaseResourceLoader
     /// <summary>
     /// 间隔多少秒做一次GC(在AutoNew时)
     /// </summary>
-    public static float GcIntervalTime = 1f;
+    public static float GcIntervalTime
+    {
+        get
+        {
+            if (Application.platform == RuntimePlatform.WindowsEditor ||
+                Application.platform == RuntimePlatform.OSXEditor)
+                return 1f;
+
+            return  Debug.isDebugBuild ? 1f : 4f;
+        }
+    }
 
     /// <summary>
     /// 上次做GC的时间
@@ -305,7 +314,7 @@ public abstract class CBaseResourceLoader
             if (IsReadyDisposed)
             {
                 Dispose();
-                //CDebug.DevLog("[BaseResourceLoader:OnFinish]时，准备Disposed {0}", Url);
+                //CDebug.Trace("[BaseResourceLoader:OnFinish]时，准备Disposed {0}", Url);
             }
         };
 
@@ -350,13 +359,6 @@ public abstract class CBaseResourceLoader
     // 后边改变吧~~不叫Dispose!
     public virtual void Release()
     {
-#if UNITY_EDITOR
-        if (Url.Contains("Arial"))
-        {
-            CDebug.LogError("要释放Arial字体！！错啦！！:{0}", Url);
-            UnityEditor.EditorApplication.isPaused = true;
-        }
-#endif
         if (IsReadyDisposed && Debug.isDebugBuild)
         {
             CDebug.LogWarning("[{0}]Too many dipose! {1}, Count: {2}", GetType().Name, this.Url, RefCount);

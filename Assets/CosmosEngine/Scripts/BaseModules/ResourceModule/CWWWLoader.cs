@@ -28,9 +28,21 @@ public class CWWWLoader : CBaseResourceLoader
 
     public static event Action<string> WWWFinishCallback;
 
+    public float BeginLoadTime;
+    public float FinishLoadTime;
     public WWW Www;
     public int Size { get { return Www.size; } }
-    public int DownloadedSize { get { return Www != null ? Www.bytesDownloaded : 0; } }
+
+    public float LoadSpeed
+    {
+        get
+        {
+            if (!IsFinished)
+                return 0;
+            return Size/(FinishLoadTime - BeginLoadTime);
+        }
+    }
+    //public int DownloadedSize { get { return Www != null ? Www.bytesDownloaded : 0; } }
 
     /// <summary>
     /// Use this to directly load WWW by Callback or Coroutine, pass a full URL.
@@ -72,7 +84,7 @@ public class CWWWLoader : CBaseResourceLoader
 
         // 潜规则：不用LoadFromCache~它只能用在.assetBundle
         Www = new WWW(url);
-
+        BeginLoadTime = Time.time;
         WWWLoadingCount++;
 
         //设置AssetBundle解压缩线程的优先级
@@ -94,6 +106,11 @@ public class CWWWLoader : CBaseResourceLoader
         }
         if (!string.IsNullOrEmpty(Www.error))
         {
+            if (Application.platform == RuntimePlatform.Android)
+            {
+                // TODO: Android下的错误可能是因为文件不存在!
+            }
+
             string fileProtocol = CResourceModule.GetFileProtocol();
             if (url.StartsWith(fileProtocol))
             {
@@ -130,6 +147,12 @@ public class CWWWLoader : CBaseResourceLoader
                 yield return null;
             }
         }
+    }
+
+    protected override void OnFinish(object resultObj)
+    {
+        FinishLoadTime = Time.time;
+        base.OnFinish(resultObj);
     }
 
     protected override void DoDispose()

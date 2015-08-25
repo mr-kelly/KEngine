@@ -85,10 +85,10 @@ public class CAssetBundleParser
                 Callback(Bundle);
         }
 
-        if (Debug.isDebugBuild)
+        if (Application.isEditor && Debug.isDebugBuild)
         {
             var useTime = Time.realtimeSinceStartup - _startTime;
-            var timeLimit = Mode == CAssetBundleParserMode.Async ? 1f : .05f;
+            var timeLimit = Mode == CAssetBundleParserMode.Async ? 1f : .3f;
             if (useTime > timeLimit) // 超过一帧时间肯定了
             {
                 CDebug.LogWarning("[CAssetBundleParser] Parse Too long time: {0},  used time: {1}", RelativePath, useTime);

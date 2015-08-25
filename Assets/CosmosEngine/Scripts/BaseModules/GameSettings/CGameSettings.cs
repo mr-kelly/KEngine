@@ -11,6 +11,7 @@
 
 using System.Text.RegularExpressions;
 using CosmosEngine;
+using SimpleJson;
 using UnityEngine;
 using System;
 using System.Collections;
@@ -274,9 +275,8 @@ public partial class CBaseInfo : ICloneable
             var allFields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             foreach (FieldInfo field in allFields)
             {
-                if (field.Name.StartsWith("_"))  // 筛掉
+                if (field.Name.StartsWith("_") || field.IsInitOnly)  // 筛掉_ 和 readonly
                     continue;
-
                 if (!tabFile.HasColumn(field.Name))
                 {
                     if (Debug.isDebugBuild)
@@ -393,6 +393,11 @@ public partial class CBaseInfo : ICloneable
                 }
                 else
                     value = new List<List<int>>();
+            }
+            else if (fieldType == typeof(JsonObject))
+            {
+                string sz = tabFile.GetString(row, fieldName);
+                value = string.IsNullOrEmpty(sz) ? new JsonObject() : CTool.SplitToJson(sz);
             }
             else
             {

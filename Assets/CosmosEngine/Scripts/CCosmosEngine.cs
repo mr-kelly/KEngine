@@ -22,6 +22,7 @@ namespace CosmosEngine
     /// </summary>
     public class CCosmosEngine : MonoBehaviour
     {
+        public static bool ShowFps = Debug.isDebugBuild;
         /// <summary>
         /// To Display FPS in the Debug Mode (Debug.isDebugBuild is true)
         /// </summary>
@@ -84,7 +85,7 @@ namespace CosmosEngine
         {
             IsRootUser = CTool.HasWriteAccessToFolder(Application.dataPath);  // Root User运行时，能穿越沙盒写DataPath, 以此为依据
 
-            if (Debug.isDebugBuild)
+            if (ShowFps)
             {
                 RenderWatcher = new CFpsWatcher(0.95f);
             }
@@ -152,7 +153,7 @@ namespace CosmosEngine
         }
         void OnGUI()
         {
-            if (Debug.isDebugBuild)
+            if (ShowFps)
             {
                 GUILayout.BeginVertical(GUILayout.Width(300));
                 GUILayout.Label(string.Format("CodeMemory: {0}KB", GC.GetTotalMemory(false) / 1000f));
@@ -164,9 +165,9 @@ namespace CosmosEngine
         /// <summary>
         /// Ensure the CEngineConfig file loaded.
         /// </summary>
-        public static TableFile<CCosmosEngineInfo> EnsureConfigTab()
+        public static TableFile<CCosmosEngineInfo> EnsureConfigTab(bool reload = false)
         {
-            if (_configsTable == null)
+            if (_configsTable == null || reload)
             {
                 TextAsset textAsset;
                 textAsset = Resources.Load<TextAsset>("CEngineConfig");
@@ -215,8 +216,7 @@ namespace CosmosEngine
         ProductRelPath,
         AssetBundleBuildRelPath,  // FromRelPath
 
-        [System.Obsolete]
-        AssetBundleRelPath,  // FromRelPath
+        BundlesFolderName, // StreamingAssets inner folder name
     }
 
     class CFpsWatcher
@@ -247,6 +247,7 @@ namespace CosmosEngine
     {
         public string Key;
         public string Value;
+        public string Desc;
 
         public override object PrimaryKey
         {

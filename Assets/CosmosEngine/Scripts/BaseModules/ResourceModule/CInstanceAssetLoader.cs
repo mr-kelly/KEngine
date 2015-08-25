@@ -22,7 +22,7 @@ public class CInstanceAssetLoader : CBaseResourceLoader
 {
     public delegate void CAssetLoaderDelegate(bool isOk, UnityEngine.Object asset, object[] args);
 
-    private Object _newCopyAsset = null;
+    public GameObject InstanceAsset { get; private set; }
     private CAssetFileLoader _assetFileBridge;  // 引用ResultObject
     public override float Progress
     {
@@ -64,7 +64,7 @@ public class CInstanceAssetLoader : CBaseResourceLoader
 
             try
             {
-                _newCopyAsset = GameObject.Instantiate(asset as UnityEngine.Object);
+                InstanceAsset = (GameObject)GameObject.Instantiate(asset as UnityEngine.GameObject);
             }
             catch (Exception e)
             {
@@ -73,10 +73,10 @@ public class CInstanceAssetLoader : CBaseResourceLoader
 
             if (Application.isEditor)
             {
-                CResourceLoadObjectDebugger.Create("AssetCopy", url, _newCopyAsset);
+                CResourceLoadObjectDebugger.Create("AssetCopy", url, InstanceAsset);
             }
 
-            OnFinish(_newCopyAsset);
+            OnFinish(InstanceAsset);
         });
     }
 
@@ -95,10 +95,10 @@ public class CInstanceAssetLoader : CBaseResourceLoader
         base.DoDispose();
         
         _assetFileBridge.Release();
-        if (_newCopyAsset != null)
+        if (InstanceAsset != null)
         {
-            Object.Destroy(_newCopyAsset);
-            _newCopyAsset = null;
+            Object.Destroy(InstanceAsset);
+            InstanceAsset = null;
         }
     }
 

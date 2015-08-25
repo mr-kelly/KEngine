@@ -15,8 +15,12 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+using SimpleJson;
 using UnityEngine;
 using System.IO;
+using System.Net;
+using System.Net.Sockets;
+using System.Threading;
 
 /// <summary>
 /// Some tool function for time, bytes, MD5, or something...
@@ -90,7 +94,7 @@ public class CTool
     {
         var tran = go.transform;
 
-        while(tran.childCount > 0)
+        while (tran.childCount > 0)
         {
             var child = tran.GetChild(0);
             child.parent = null; // 清空父, 因为.Destroy非同步的
@@ -110,7 +114,7 @@ public class CTool
     /// <param name="delimeter1"></param>
     /// <param name="delimeter2"></param>
     /// <returns></returns>
-    public static string  DictToSplitStr<T, K>(Dictionary<T, K> dict, char delimeter1 = '|', char delimeter2 = ':')
+    public static string DictToSplitStr<T, K>(Dictionary<T, K> dict, char delimeter1 = '|', char delimeter2 = ':')
     {
         var sb = new StringBuilder();
         foreach (var kv in dict)
@@ -149,15 +153,26 @@ public class CTool
                     }
                     if (strs2.Length == 2)
                     {
-                        
+
                         valK = (K)Convert.ChangeType(strs2[1], typeof(K));
-                        
+
                     }
                     dict[valT] = valK;
                 }
             }
         }
         return dict;
+    }
+
+    public static JsonObject SplitToJson(string str, char delimeter1 = '|', char delimeter2 = ':')
+    {
+        var json = new JsonObject();
+        var dic = SplitToDict<string, object>(str, delimeter1, delimeter2);
+        foreach (KeyValuePair<string, object> pair in dic)
+        {
+            json[pair.Key] = pair.Value;
+        }
+        return json;
     }
 
     /// <summary>
@@ -171,7 +186,7 @@ public class CTool
     {
         if (args.Length == 0)
         {
-            args = new char[] {'|'}; // 默认
+            args = new[] { '|' }; // 默认
         }
 
         var retList = new List<T>();
@@ -194,6 +209,20 @@ public class CTool
             }
         }
         return retList;
+    }
+
+    /// <summary>
+    /// 从一个List中随机获取
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="list"></param>
+    /// <returns></returns>
+    public static T GetRandomItemFromList<T>(IList<T> list)
+    {
+        if (list.Count == 0)
+            return default(T);
+
+        return list[UnityEngine.Random.Range(0, list.Count)];
     }
 
     /// <summary>
@@ -575,9 +604,9 @@ public class CTool
             return source;
         }
         var json = new SimpleJson.JsonObject();
-        for(var i = 0; i<datas.Length; i+=2)
+        for (var i = 0; i < datas.Length; i += 2)
         {
-            json[datas[i].ToString()] = datas[i+1];
+            json[datas[i].ToString()] = datas[i + 1];
         }
         return Template(source, json);
     }
@@ -588,9 +617,14 @@ public class CTool
     /// <param name="data">数据来源[对象]</param>
     /// <param name="args">数据来源[数组]</param>
     /// <returns></returns>
-    public static string Template(string source, object data, string[] args)
+    public static string Template(string source, object data, object[] args)
     {
-        return Format(Template(source, data), args);
+        return FormatArgs(Template(source, data), args);
+    }
+
+    public static string Format(string source, params object[] args)
+    {
+        return FormatArgs(source, args);
     }
 
     /// <summary>
@@ -599,7 +633,7 @@ public class CTool
     /// <param name="source">模板内容</param>
     /// <param name="args">数据来源[数组]</param>
     /// <returns></returns>
-    public static string Format(string source, string[] args)
+    public static string FormatArgs(string source, object[] args)
     {
         if (args == null) return source;
         var result = source;
@@ -614,7 +648,7 @@ public class CTool
                 var index = paramKey.ToInt32();
                 if (args.Length > index)
                 {
-                    var paramValue = args[index];
+                    var paramValue = args[index].ToString();
                     result = result.Replace(paramRex, paramValue);
                 }
             }
@@ -666,6 +700,8 @@ public class CTool
 
     public static T GetChildComponent<T>(string uri, Transform findTrans, bool isLog = true) where T : Component
     {
+        if (findTrans == null)
+            return default(T);
         Transform trans = findTrans.Find(uri);
         if (trans == null)
         {
@@ -694,7 +730,7 @@ public class CTool
     }
     public static GameObject GetGameObject(string name, Transform findTrans, bool isLog = true)
     {
-        GameObject obj = DFSFindObject(findTrans,name );
+        GameObject obj = DFSFindObject(findTrans, name);
         if (obj == null)
         {
             CDebug.LogError("Find GemeObject Error: " + name);
@@ -815,8 +851,8 @@ public class CTool
             if (child.GetComponent<ParticleSystem>() != null)
             {
                 var particleSystem = child.GetComponent<ParticleSystem>();
-                if(particleSystem.renderer.sharedMaterial!=null)
-                        particleSystem.renderer.sharedMaterial.renderQueue = renderQueue;
+                if (particleSystem.renderer.sharedMaterial != null)
+                    particleSystem.renderer.sharedMaterial.renderQueue = renderQueue;
             }
         }
         if (parent.GetComponent<ParticleSystem>() != null)
@@ -906,6 +942,12 @@ public class CTool
         newRigidbody.isKinematic = oldRigidbody.isKinematic;
     }
 
+    public static void CopyTransformToTarget(Transform sourceTrans, Transform targetTrans)
+    {
+        targetTrans.localPosition = sourceTrans.localPosition;
+        targetTrans.localRotation = sourceTrans.localRotation;
+        targetTrans.localScale = sourceTrans.localScale;
+    }
     // 测试有无写权限
     public static bool HasWriteAccessToFolder(string folderPath)
     {
@@ -994,12 +1036,21 @@ public class CTool
     }
 
     // 概率，百分比, // 注意，0的时候当是100%
+    public static bool Probability(float chancePercent)
+    {
+        var chance = UnityEngine.Random.Range(0f, 100f);
+
+        if (chance <= chancePercent)  // 概率
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     public static bool Probability(byte chancePercent)
     {
         int chance = UnityEngine.Random.Range(1, 101);
-
-        if (chancePercent <= 0)
-            chancePercent = 100; // 必中概率
 
         if (chance <= chancePercent)  // 概率
         {
@@ -1115,8 +1166,8 @@ public class CTool
         }
         return targetPos;
     }
-	
-	// 两线交点（忽略长度）
+
+    // 两线交点（忽略长度）
     public static bool LineIntersectionPoint(out Vector2 intersectPoint, Vector2 ps1, Vector2 pe1, Vector2 ps2,
         Vector2 pe2)
     {
@@ -1157,7 +1208,7 @@ public class CTool
             return false;
         }
         var pattern = @"^\d*$";
-        return  Regex.IsMatch(str, pattern);  
+        return Regex.IsMatch(str, pattern);
     }
 
 
@@ -1173,6 +1224,68 @@ public class CTool
         var rad = angle * Mathf.Deg2Rad; // 弧度
         var newPos = new Vector2(长半轴即目标距离 * Mathf.Cos(rad), 短半轴 * Mathf.Sin(rad));
         return newPos;
+    }
+
+    public static float Angle(Vector2 from, Vector2 to)
+    {
+        return Quaternion.FromToRotation(from.normalized, to.normalized).eulerAngles.z;
+    }
+
+    /// <summary>
+    /// 把数字格式化成三位 , 分隔
+    /// </summary>
+    public static string NumberFormatTo3(Int64 num)
+    {
+        return num.ToString("##,###", System.Globalization.CultureInfo.InvariantCulture);
+    }
+
+    /// <summary>
+    /// Get IPAdress from IpHostEntry,  配合GetIpAddress
+    /// </summary>
+    /// <param name="ipHostEntry"></param>
+    /// <returns></returns>
+    public static IPAddress GetIpAddressFromIpHostEntry(IPHostEntry ipHostEntry)
+    {
+
+        var addresses = ipHostEntry.AddressList;
+
+        foreach (var item in addresses)
+        {
+            if (item.AddressFamily == AddressFamily.InterNetwork)
+            {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Async Get IPAdress
+    /// </summary>
+    /// <param name="host"></param>
+    /// <param name="callback"></param>
+    public static void GetIpAddress(string host, Action<IPAddress> callback = null)
+    {
+        IPAddress ipAddress = null;
+        if (!IPAddress.TryParse(host, out ipAddress))
+        {
+            Dns.BeginGetHostAddresses(host, new AsyncCallback((asyncResult) =>
+            {
+                if (callback != null)
+                {
+                    var ipHostEntry = (IPHostEntry)asyncResult.AsyncState;
+                    ipAddress = GetIpAddressFromIpHostEntry(ipHostEntry);
+
+                    callback(ipAddress);
+                }
+
+                Dns.EndGetHostAddresses(asyncResult);
+            }), null);
+
+        }
+
+        if (callback != null)
+            callback(ipAddress);
     }
 }
 
@@ -1243,6 +1356,24 @@ public static class XExtensions
 
         return default(T);
     }
+    public static List<T> CFirst<T>(this IEnumerable<T> source, int num)
+    {
+        var count = 0;
+        var items = new List<T>();
+        if (source != null)
+        {
+            foreach (T item in source)
+            {
+                if (++count > num)
+                {
+                    break;
+                }
+                items.Add(item);
+            }
+        }
+
+        return items;
+    }
     public static T CLastOrDefault<T>(this IEnumerable<T> source)
     {
         var result = default(T);
@@ -1251,6 +1382,26 @@ public static class XExtensions
             result = item;
         }
         return result;
+    }
+    public static List<T> CLast<T>(this IEnumerable<T> source, int num)
+    {
+        // 开始读取的位置
+        var startIndex = Math.Max(0, source.CToList().Count - num);
+        var index = 0;
+        var items = new List<T>();
+        if (source != null)
+        {
+            foreach (T item in source)
+            {
+                if (index < startIndex)
+                {
+                    continue;
+                }
+                items.Add(item);
+            }
+        }
+
+        return items;
     }
     public static T[] CToArray<T>(this IEnumerable<T> source)
     {
@@ -1292,6 +1443,22 @@ public static class XExtensions
             }
         }
         return list;
+    }
+    public static string CJoin<T>(this IEnumerable<T> source, string sp)
+    {
+        var result = new StringBuilder();
+        foreach (T item in source)
+        {
+            if (result.Length == 0)
+            {
+                result.Append(item);
+            }
+            else
+            {
+                result.Append(sp).Append(item);
+            }
+        }
+        return result.ToString();
     }
 
     // by KK, 获取自动判断JSONObject的str，n

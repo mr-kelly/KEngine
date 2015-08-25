@@ -12,7 +12,8 @@ namespace CosmosTable
         HeadLineNull,
         StamentLineNull, // 第二行
         NotFoundHeader,
-        NotFoundGetMethod
+        NotFoundGetMethod,
+        NotFoundPrimaryKey,
     }
 
     /// <summary>
@@ -25,7 +26,12 @@ namespace CosmosTable
         public string HeaderDef;
     }
 
-    public delegate void TableFileExceptionDelegate(TableFileExceptionType exceptionType, object[] args);
+    public delegate void TableFileExceptionDelegate(TableFileExceptionType exceptionType, string[] args);
+
+    public class TableFileStaticConfig
+    {
+        public static TableFileExceptionDelegate GlobalExceptionEvent;
+    }
     public class TableFileConfig
     {
         public string Content;
@@ -97,7 +103,6 @@ namespace CosmosTable
         public static TableFile<T> LoadFromString(string content)
         {
             TableFile<T> tabFile = new TableFile<T>(content);
-            tabFile.ParseString(content);
 
             return tabFile;
         }
@@ -167,7 +172,7 @@ namespace CosmosTable
 
                     T newT = new T();  // the New Object may not be used this time, so cache it!
                     newT.RowNumber = rowIndex;
-                    
+
                     if (!newT.IsAutoParse)
                         newT.Parse(splitString1);
                     else
@@ -182,9 +187,9 @@ namespace CosmosTable
                         }
                         else  // 原本存在，使用old的， cachedNewObj(newT)因此残留, 留待下回合使用
                         {
-                            T toT = (T) oldT;
+                            T toT = (T)oldT;
                             // Check Duplicated Primary Key, 使用原来的，不使用新new出来的, 下回合直接用_cachedNewObj
-                            OnExeption(TableFileExceptionType.DuplicatedKey, toT.PrimaryKey);
+                            OnExeption(TableFileExceptionType.DuplicatedKey, toT.PrimaryKey.ToString());
                             newT = toT;
                         }
                     }
@@ -252,7 +257,7 @@ namespace CosmosTable
                     var headerDef = Headers[fieldName].HeaderDef;
                     if (!string.IsNullOrEmpty(headerDef))
                     {
-                        var defs = headerDef.Split(new []{'[', ']', ':'}, StringSplitOptions.RemoveEmptyEntries);
+                        var defs = headerDef.Split(new[] { '[', ']', ':' }, StringSplitOptions.RemoveEmptyEntries);
                         //if (defs.Length >= 1) szType = defs[0];
                         if (defs.Length >= 2) defaultValue = defs[1];
                     }
@@ -284,13 +289,28 @@ namespace CosmosTable
             return Headers.ContainsKey(colName);
         }
 
-        protected internal void OnExeption(TableFileExceptionType message, params object[] args)
+        protected internal void OnExeption(TableFileExceptionType message, params string[] args)
         {
-            if (_config.OnExceptionEvent == null)
-                throw new Exception(string.Format("{0} - {1}", message, args));
-            else
+            if (TableFileStaticConfig.GlobalExceptionEvent != null)
+            {
+                TableFileStaticConfig.GlobalExceptionEvent(message, args);
+            }
+
+            if (_config.OnExceptionEvent != null)
             {
                 _config.OnExceptionEvent(message, args);
+            }
+
+            if (TableFileStaticConfig.GlobalExceptionEvent == null && _config.OnExceptionEvent == null)
+            {
+                string[] argsStrs = new string[args.Length];
+                for (var i = 0; i < argsStrs.Length; i++)
+                {
+                    var arg = args[i];
+                    if (arg == null) continue;
+                    argsStrs[i] = arg.ToString();
+                }
+                throw new Exception(string.Format("{0} - {1}", message, string.Join("|", argsStrs)));
             }
         }
 
@@ -330,71 +350,6 @@ namespace CosmosTable
             return l;
         }
 
-        //public bool SetValue<T>(int row, int column, T value) where T : TabRow, 
-        //{
-        //    if (row > Rows.Count || column > _colCount || row <= 0 || column <= 0)  //  || column > ColIndex.Count
-        //    {
-        //        throw new Exception(string.Format("Wrong row-{0} or column-{1}", row, column));
-        //        return false;
-        //    }
-        //    string content = Convert.ToString(value);
-        //    if (row == 0)
-        //    {
-        //        foreach (var kv in Headers)
-        //        {
-        //            if (kv.Value.ColumnIndex == column)
-        //            {
-        //                Headers.Remove(kv.Key);
-        //                Headers[content] = kv.Value;
-        //                break;
-        //            }
-        //        }
-        //    }
-        //    T rowT;
-        //    if (!Rows.TryGetValue(row, out rowT))
-        //    {
-        //        //rowT = Rows[row] = new T();
-        //    }
-        //    var rowStrs = TabInfo[row];
-        //    if (column - 1 >= rowStrs.Length) // 超出, 扩充
-        //    {
-        //        var oldRowStrs = rowStrs;
-        //        rowStrs = TabInfo[row] = new string[column];
-        //        oldRowStrs.CopyTo(rowStrs, 0);
-        //    }
-        //    rowStrs[column - 1] = content;
-        //    return true;
-        //}
-
-        //public bool SetValue<T>(int row, string columnName, T value)
-        //{
-        //    HeaderInfo headerInfo;
-        //    if (!Headers.TryGetValue(columnName, out headerInfo))
-        //        return false;
-
-        //    return SetValue(row, headerInfo.ColumnIndex, value);
-        //}
-
-        //IEnumerator<TabRow3<T>> IEnumerable<TabRow3<T>>.GetEnumerator()
-        //{
-        //    int rowStart = 1;
-        //    for (int i = rowStart; i <= GetHeight(); i++)
-        //    {
-        //        _rowInteratorCache.Row = i;
-        //        yield return _rowInteratorCache;
-        //    }
-        //}
-
-        //public IEnumerator GetEnumerator()
-        //{
-        //    int rowStart = 1;
-        //    for (int i = rowStart; i <= GetHeight(); i++)
-        //    {
-        //        _rowInteratorCache.Row = i;
-        //        yield return _rowInteratorCache;
-        //    }
-        //}
-
         public void Dispose()
         {
             Headers.Clear();
@@ -411,9 +366,14 @@ namespace CosmosTable
         public T FindByPrimaryKey(object primaryKey)
         {
             object ret;
-            var retT = PrimaryKey2Row.TryGetValue(primaryKey, out ret) ? ret : default(T);
 
-            return (T) retT;
+            if (PrimaryKey2Row.TryGetValue(primaryKey, out ret))
+                return (T) ret;
+            else
+            {
+                OnExeption(TableFileExceptionType.NotFoundPrimaryKey, primaryKey.ToString());
+                return default(T);
+            }
         }
     }
 }

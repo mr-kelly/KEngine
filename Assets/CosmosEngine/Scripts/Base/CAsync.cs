@@ -25,7 +25,7 @@ class CAsyncManager : CBehaviour
         }
     }
     public readonly List<Action> _mainThreadCallbacks = new List<Action>();  // 主線程調用Unity類，如StartCoroutine
-
+    public readonly HashSet<Thread> _threads = new HashSet<Thread>();  // 主線程調用Unity類，如StartCoroutine
     void Update()
     {
         foreach (var i in _mainThreadCallbacks)
@@ -33,6 +33,29 @@ class CAsyncManager : CBehaviour
             i();
         }
         _mainThreadCallbacks.Clear();
+    }
+
+    void StopAllThreads()
+    {
+        foreach (var thread in _threads)
+        {
+            if (thread != null)
+            {
+                thread.Abort();
+            }
+        }
+
+        _threads.Clear();
+    }
+    void OnApplicationQuit()
+    {
+        StopAllThreads();
+    }
+    
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+        StopAllThreads();
     }
 }
 #endregion
@@ -66,6 +89,19 @@ public class CAsync
         _canNext = true;
     }
 
+    public bool IsFinished { get; private set; }
+
+    public Coroutine WaitFinish()
+    {
+        return CAsyncManager.Instance.StartCoroutine(EmWaitFinish());
+    }
+
+    IEnumerator EmWaitFinish()
+    {
+        while (!IsFinished)
+            yield return null;
+    }
+
     private delegate void AsyncWaitNextDelegate(Action nextFunc);
 
     private void WaitNext(AsyncWaitNextDelegate callback)
@@ -89,6 +125,8 @@ public class CAsync
         _canNext = true;
         if (_cacheCallbacks != null && _cacheCallbacks.Count > 0)
             WaitNext(_cacheCallbacks.Dequeue());
+        else
+            IsFinished = true;
     }
     #endregion
 
@@ -106,6 +144,7 @@ public class CAsync
         var async = new CAsync();
         return async;
     }
+
     public static CAsync Start(Action callback)
     {
         var async = new CAsync();
@@ -129,6 +168,7 @@ public class CAsync
         return this;
     }
 
+    public delegate void AsyncThreadDelegateFull(object param, Action next);
     public delegate void AsyncThreadDelegate(Action next);
     public delegate void AsyncThenDelegateEasy(Action next);
     public delegate void AsyncThenDelegate(Action next, Action kill);
@@ -144,24 +184,39 @@ public class CAsync
         return this;
     }
 
+    public CAsync Until(Func<bool> retBool, float timeout = 20)
+    {
+        return When(retBool, timeout);
+    }
+
     /// <summary>
     /// 等待条件成立
     /// </summary>
     /// <param name="retBool"></param>
     /// <returns></returns>
-    public CAsync When(Func<bool> retBool)
+    public CAsync When(Func<bool> retBool, float timeout = 20)
     {
         WaitNext((next) =>
         {
-            CAsyncManager.Instance.StartCoroutine(_CoWhen(retBool, next));
+            CAsyncManager.Instance.StartCoroutine(_CoWhen(retBool, timeout, next));
         });
         return this;
     }
 
-    private IEnumerator _CoWhen(Func<bool> retBool, Action next)
+    private IEnumerator _CoWhen(Func<bool> retBool, float timeout, Action next)
     {
+        var time = 0f;
         while (!(retBool()))
+        {
+            time += Time.deltaTime;
+            if (time > timeout)
+            {
+                CDebug.LogError("[CAsync:When]A WHEN Timeout!!!");
+                break;
+            }
             yield return null;
+        }
+            
         next();
     }
 
@@ -181,33 +236,46 @@ public class CAsync
     /// <returns></returns>
     public CAsync Thread(AsyncThreadDelegate threadCalAction)
     {
+        return Coroutine(_Thread((thread, next) =>
+        {
+            threadCalAction(next);
+        }));
+    }
+
+    public CAsync Thread(AsyncThreadDelegateFull threadCalAction, object param)
+    {
         return Coroutine(_Thread(threadCalAction));
     }
+
     public CAsync Thread(Action threadCalAction)
     {
-        return Coroutine(_Thread((next) =>
+        return Coroutine(_Thread((thread, next) =>
         {
             threadCalAction();
             next();
         }));
     }
-    
-    public IEnumerator _Thread(AsyncThreadDelegate threadCalAction)
+
+    public IEnumerator _Thread(AsyncThreadDelegateFull threadCalAction, object param = null)
     {
         bool waitThreadFinish = false;
+
         var thread = new Thread(() =>
         {
             Action customNext = () =>
             {
                 waitThreadFinish = true;
             };
-            threadCalAction(customNext);
+            threadCalAction(param, customNext);
 
         });
+
         thread.Start();
 
+        CAsyncManager.Instance._threads.Add(thread);
         while (!waitThreadFinish)
             yield return null;
+        CAsyncManager.Instance._threads.Remove(thread);
     }
     /// <summary>
     /// 开启并等待一个协程
@@ -306,4 +374,11 @@ public class CAsync
         yield return new WaitForEndOfFrame();
         next();
     }
+}
+
+// 用于协程内部返回信息传递
+public class CCoroutineState
+{
+    public bool IsOk = true;
+    public object Param;
 }
