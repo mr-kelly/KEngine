@@ -265,6 +265,8 @@ public class CResourceModule : MonoBehaviour, ICModule
         yield break;
     }
 
+
+    private static string _unityEditorEditorUserBuildSettingsActiveBuildTarget;
     /// <summary>
     /// UnityEditor.EditorUserBuildSettings.activeBuildTarget, Can Run in any platform~
     /// </summary>
@@ -272,6 +274,10 @@ public class CResourceModule : MonoBehaviour, ICModule
     {
         get
         {
+            if (Application.isPlaying && !string.IsNullOrEmpty(_unityEditorEditorUserBuildSettingsActiveBuildTarget))
+            {
+                return _unityEditorEditorUserBuildSettingsActiveBuildTarget;
+            }
             var assemblies = System.AppDomain.CurrentDomain.GetAssemblies();
             foreach (var a in assemblies)
             {
@@ -285,6 +291,7 @@ public class CResourceModule : MonoBehaviour, ICModule
                     var p = lockType.GetProperty("activeBuildTarget");
 
                     var em = p.GetGetMethod().Invoke(null, new object[] { }).ToString();
+                    _unityEditorEditorUserBuildSettingsActiveBuildTarget = em;
                     return em;
                 }
 
@@ -301,47 +308,43 @@ public class CResourceModule : MonoBehaviour, ICModule
     private static string GetBuildPlatformName()
     {
         string buildPlatformName = "Win32"; // default
-        if (Application.isEditor)
+
+#if UNITY_EDITOR
+        var buildTarget = UnityEditor_EditorUserBuildSettings_activeBuildTarget; //UnityEditor.EditorUserBuildSettings.activeBuildTarget;
+        switch (buildTarget)
         {
-            // 根据编辑器的当前编译环境, 来确定读取哪个资源目录
-            // 因为美术库是根据编译环境来编译资源的，这样可以在Unity编辑器上， 快速验证其资源是否正确再放到手机上
-            var buildTarget = UnityEditor_EditorUserBuildSettings_activeBuildTarget;
-            switch (buildTarget)
-            {
-                case "StandaloneWindows":
-                case "StandaloneWindows64":
-                    buildPlatformName = "Win32";
-                    break;
-                case "Android":
-                    buildPlatformName = "Android";
-                    break;
-                case "iPhone":
-                    buildPlatformName = "IOS";
-                    break;
-                default:
-                    CDebug.Assert(false);
-                    break;
-            }
+            case "StandaloneWindows":// UnityEditor.BuildTarget.StandaloneWindows:
+            case "StandaloneWindows64":// UnityEditor.BuildTarget.StandaloneWindows64:
+                buildPlatformName = "Win32";
+                break;
+            case "Android":// UnityEditor.BuildTarget.Android:
+                buildPlatformName = "Android";
+                break;
+            case "iPhone":// UnityEditor.BuildTarget.iPhone:
+                buildPlatformName = "IOS";
+                break;
+            default:
+                CDebug.Assert(false);
+                break;
         }
-        else
+#else
+        switch (Application.platform)
         {
-            switch (Application.platform)
-            {
-                case RuntimePlatform.Android:
-                    buildPlatformName = "Android";
-                    break;
-                case RuntimePlatform.IPhonePlayer:
-                    buildPlatformName = "IOS";
-                    break;
-                case RuntimePlatform.WindowsPlayer:
-                case RuntimePlatform.WindowsWebPlayer:
-                    buildPlatformName = "Win32";
-                    break;
-                default:
-                    CDebug.Assert(false);
-                    break;
-            }
+            case RuntimePlatform.Android:
+                buildPlatformName = "Android";
+                break;
+            case RuntimePlatform.IPhonePlayer:
+                buildPlatformName = "IOS";
+                break;
+            case RuntimePlatform.WindowsPlayer:
+            case RuntimePlatform.WindowsWebPlayer:
+                buildPlatformName = "Win32";
+                break;
+            default:
+                CDebug.Assert(false);
+                break;
         }
+#endif
         if (Quality != CResourceQuality.Sd)  // SD no need add
             buildPlatformName += Quality.ToString().ToUpper();
         return buildPlatformName;

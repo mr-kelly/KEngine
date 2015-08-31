@@ -11,6 +11,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
@@ -275,6 +276,22 @@ public class CTool
         var min = strs[0].ToInt32();
         var max = strs[1].ToInt32();
         return testNumber >= min && testNumber <= max;
+    }
+
+    /// <summary>
+    /// 是否包含在逗号数组内
+    /// </summary>
+    /// <param name="numberStr">数组字符串</param>
+    /// <param name="testValue">被测数值</param>
+    /// <param name="sp">数组分隔符</param>
+    /// <returns></returns>
+    public static bool IsContains(string numberStr, string testValue, char sp = ',')
+    {
+        if (string.IsNullOrEmpty(numberStr))
+            return false;
+
+        var strs = numberStr.Split(sp);
+        return  strs.CContains(testValue);
     }
 
     public static Shader FindShader(string shaderName)
@@ -1459,6 +1476,17 @@ public static class XExtensions
             }
         }
         return result.ToString();
+    }
+    public static bool CContains<TSource>(this IEnumerable<TSource> source, TSource value)
+    {
+        foreach (TSource item in source)
+        {
+            if (Equals(item, value))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     // by KK, 获取自动判断JSONObject的str，n

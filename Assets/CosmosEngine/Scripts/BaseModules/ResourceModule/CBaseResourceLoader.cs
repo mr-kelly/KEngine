@@ -37,7 +37,7 @@ public abstract class CBaseResourceLoader
                 Application.platform == RuntimePlatform.OSXEditor)
                 return 1f;
 
-            return  Debug.isDebugBuild ? 1f : 4f;
+            return Debug.isDebugBuild ? 1f : 4f;
         }
     }
 
@@ -98,7 +98,7 @@ public abstract class CBaseResourceLoader
     public float InitTiming = -1;
     [System.NonSerialized]
     public float FinishTiming = -1;
-    
+
     /// <summary>
     /// 用时
     /// </summary>
@@ -257,6 +257,10 @@ public abstract class CBaseResourceLoader
             }
         }
 
+        if (CacheLoaderToRemoveFromUnUsed.Count > 0)
+        {
+            CDebug.LogError("[DoGarbageCollect]CacheLoaderToRemoveFromUnUsed muse be empty!!");
+        }
     }
 
     /// <summary>
@@ -313,8 +317,8 @@ public abstract class CBaseResourceLoader
 
             if (IsReadyDisposed)
             {
-                Dispose();
-                //CDebug.Trace("[BaseResourceLoader:OnFinish]时，准备Disposed {0}", Url);
+                //Dispose();
+                CDebug.Trace("[BaseResourceLoader:OnFinish]时，准备Disposed {0}", Url);
             }
         };
 
@@ -413,7 +417,7 @@ public abstract class CBaseResourceLoader
                 var bRemove = typeDict.Remove(Url);
                 if (!bRemove)
                 {
-                    CDebug.LogWarning("[{0}:Dispose]No Url: {1}", type.Name, Url);
+                    CDebug.LogWarning("[{0}:Dispose]No Url: {1}, Cur RefCount: {2}", type.Name, Url, RefCount);
                 }
             }
         }

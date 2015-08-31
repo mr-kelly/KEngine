@@ -71,6 +71,8 @@ public class CFileCacheList : IDisposable
         }
         _appendStream = new FileStream(ioPath, FileMode.Append, FileAccess.Write, FileShare.Read);
         _writer = new StreamWriter(_appendStream);
+
+        _writer.AutoFlush = true; // 自动刷新, 每一次都是一个写入，会降低系统性能，但大大增加可靠性
     }
 
     public bool Add(string str)
@@ -101,6 +103,13 @@ public class CFileCacheList : IDisposable
         get { return _hashSet.Count; }
     }
 
+    /// <summary>
+    /// 主动刷新缓存区
+    /// </summary>
+    public void Flush()
+    {
+        _writer.Flush();
+    }
     public void Dispose()
     {
         _writer.Close();

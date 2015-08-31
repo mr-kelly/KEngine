@@ -14,11 +14,12 @@ using System.Collections;
 using System.IO;
 using System.Threading;
 
-public class CHttpDownloader : IDisposable
+public class CHttpDownloader : MonoBehaviour, IDisposable
 {
     string _SavePath;
     public string SavePath { get { return _SavePath; } }
 
+    public string Url { get; private set; }
     string ToPath;
 
     //CWWWLoader WWWLoader;
@@ -49,6 +50,8 @@ public class CHttpDownloader : IDisposable
     {
     }
 
+
+
     /// <summary>
     /// 
     /// </summary>
@@ -59,7 +62,7 @@ public class CHttpDownloader : IDisposable
     /// <param name="timeout"></param>
     public static CHttpDownloader Load(string fullUrl, string toPath, bool useCache = false, int expireDays = 1, int timeout = 5)
     {
-        var downloader = new CHttpDownloader();
+        var downloader = new GameObject("HttpDownlaoder+"+fullUrl).AddComponent<CHttpDownloader>();
         downloader.Init(fullUrl, toPath, useCache, expireDays, timeout);
 
         return downloader;
@@ -71,6 +74,7 @@ public class CHttpDownloader : IDisposable
     }
     private void Init(string fullUrl, string toPath, bool useCache = false, int expireDays = 1, int timeout = 5)
     {
+        Url = fullUrl;
         ToPath = toPath;
         _SavePath = GetFullSavePath(ToPath);
         UseCache = useCache;
@@ -132,13 +136,15 @@ public class CHttpDownloader : IDisposable
         downloadThread.Start();
 
         var timeCounter = 0f;
-        var MaxTime = 5f;
+        var MaxTime = TIME_OUT_DEF;
         while (!isThreadFinish && !isThreadError)
         {
             timeCounter += Time.deltaTime;
             if (timeCounter > MaxTime && !isThreadStart)
             {
-                //DownloadThread.Abort();
+//#if !UNITY_IPHONE  // TODO: 新的异步机制去暂停，Iphone 64不支持
+//                downloadThread.Abort();
+//#endif
                 CDebug.LogError("[CHttpDownloader]下载线程超时！: {0}", fullUrl);
                 isThreadError = true;
                 break;
@@ -151,14 +157,17 @@ public class CHttpDownloader : IDisposable
         {
             CDebug.LogError("Download WWW Error: {0}", fullUrl);
             ErrorFlag = true;
-            try
-            {
-                File.Delete(TmpDownloadPath); // delete temporary file
-            }
-            catch (Exception e)
-            {
-                CDebug.LogError(e.Message);
-            }
+
+            // TODO:
+            //try
+            //{
+            //    if (File.Exists(TmpDownloadPath))
+            //        File.Delete(TmpDownloadPath); // delete temporary file
+            //}
+            //catch (Exception e)
+            //{
+            //    CDebug.LogError(e.Message);
+            //}
 
             OnFinish();
             yield break;
@@ -182,25 +191,25 @@ public class CHttpDownloader : IDisposable
     {
         get { return _SavePath +  ".download"; }
     }
-
+    
     void ThreadableResumeDownload(string url, Action<int, int> stepCallback, Action errorCallback, Action successCallback)
     {
         //string tmpFullPath = TmpDownloadPath; //根据实际情况设置 
-
+        System.IO.FileStream downloadFileStream;
         //打开上次下载的文件或新建文件 
         long lStartPos = 0;
-        System.IO.FileStream fs;
+        
         if (System.IO.File.Exists(TmpDownloadPath))
         {
-            fs = System.IO.File.OpenWrite(TmpDownloadPath);
-            lStartPos = fs.Length;
-            fs.Seek(lStartPos, System.IO.SeekOrigin.Current); //移动文件流中的当前指针 
+            downloadFileStream = System.IO.File.OpenWrite(TmpDownloadPath);
+            lStartPos = downloadFileStream.Length;
+            downloadFileStream.Seek(lStartPos, System.IO.SeekOrigin.Current); //移动文件流中的当前指针 
 
             CDebug.LogConsole_MultiThread("Resume.... from {0}", lStartPos);
         }
         else
         {
-            fs = new System.IO.FileStream(TmpDownloadPath, System.IO.FileMode.Create);
+            downloadFileStream = new System.IO.FileStream(TmpDownloadPath, System.IO.FileMode.Create);
             lStartPos = 0;
         }
         System.Net.HttpWebRequest request = null;
@@ -215,8 +224,9 @@ public class CHttpDownloader : IDisposable
             CDebug.LogConsole_MultiThread("Getting Response : {0}", url);
 
             //向服务器请求，获得服务器回应数据流 
-            using (var response = request.GetResponse())
+            using (var response = request.GetResponse())  // TODO: Async Timeout
             {
+                CDebug.LogConsole_MultiThread("Getted Response : {0}", url);
                 if (IsFinished)
                 {
                     throw new Exception(string.Format("Get Response ok, but is finished , maybe timeout! : {0}", url));
@@ -240,14 +250,14 @@ public class CHttpDownloader : IDisposable
                         {
                             if (IsFinished)
                                 throw new Exception("When Reading Web stream but Downloder Finished!");
-                            fs.Write(nbytes, 0, nReadSize);
+                            downloadFileStream.Write(nbytes, 0, nReadSize);
                             downSize += nReadSize;
                             stepCallback(totalSize, downSize);
                         }
                         stepCallback(totalSize, totalSize);
 
                         request.Abort();
-                        fs.Close();
+                        downloadFileStream.Close();
                     }
                 }
             }
@@ -262,10 +272,20 @@ public class CHttpDownloader : IDisposable
         catch (Exception ex)
         {
             CDebug.LogConsole_MultiThread("下载过程中出现错误:" + ex.ToString());
-            fs.Close();
+            downloadFileStream.Close();
 
             if (request != null)
                 request.Abort();
+
+            try
+            {
+                if (File.Exists(TmpDownloadPath))
+                    File.Delete(TmpDownloadPath); // delete temporary file
+            }
+            catch (Exception e)
+            {
+                CDebug.LogConsole_MultiThread(e.Message);
+            }
 
             errorCallback();
         }
@@ -274,12 +294,16 @@ public class CHttpDownloader : IDisposable
 
     void OnDestroy()
     {
-        FinishedFlag = true;
-        ErrorFlag = true;
+        if (!FinishedFlag)
+        {
+            FinishedFlag = true;
+            ErrorFlag = true;
+            CDebug.LogError("[HttpDownloader]Not finish but destroy: {0}", Url);
+        }
     }
 
     public void Dispose()
     {
-        OnDestroy();
+        GameObject.Destroy(gameObject);
     }
 }

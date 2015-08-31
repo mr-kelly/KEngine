@@ -100,8 +100,16 @@ public class CResourceLoaderDebugger : MonoBehaviour
         var newHelp = newHelpGameObject.AddComponent<CResourceLoaderDebugger>();
         newHelp.TheLoader = loader;
 
-        loader.SetDescEvent += (newDesc) => newHelpGameObject.name = getName();
-        loader.DisposeEvent += () => CDebuggerObjectTool.RemoveFromParent(bigType, type, newHelpGameObject);
+        loader.SetDescEvent += (newDesc) =>
+        {
+            if (loader.RefCount > 0)
+                newHelpGameObject.name = getName();
+        };
+
+        loader.DisposeEvent += () =>
+        {
+            CDebuggerObjectTool.RemoveFromParent(bigType, type, newHelpGameObject);
+        };
         
 
         return newHelp;
