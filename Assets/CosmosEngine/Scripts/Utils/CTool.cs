@@ -98,11 +98,19 @@ public class CTool
         while (tran.childCount > 0)
         {
             var child = tran.GetChild(0);
-            child.parent = null; // 清空父, 因为.Destroy非同步的
+
             if (Application.isEditor && !Application.isPlaying)
+            {
+                child.parent = null; // 清空父, 因为.Destroy非同步的
                 GameObject.DestroyImmediate(child.gameObject);
+            }
             else
+            {
                 GameObject.Destroy(child.gameObject);
+                // 预防触发对象的OnEnable，先Destroy
+                child.parent = null; // 清空父, 因为.Destroy非同步的
+            }
+            
         }
     }
 
