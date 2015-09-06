@@ -1259,9 +1259,9 @@ public class CTool
     /// <summary>
     /// 把数字格式化成三位 , 分隔
     /// </summary>
-    public static string NumberFormatTo3(Int64 num)
+    public static string NumberFormatTo3(Int64 num, string sp = ",")
     {
-        return num.ToString("##,###", System.Globalization.CultureInfo.InvariantCulture);
+        return num.ToString("##" + sp + "###", System.Globalization.CultureInfo.InvariantCulture);
     }
 
     /// <summary>
