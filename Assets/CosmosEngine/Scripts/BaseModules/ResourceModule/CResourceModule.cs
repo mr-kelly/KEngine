@@ -172,7 +172,7 @@ public class CResourceModule : MonoBehaviour, ICModule
         // Windows 时使用特定的目录，避免中文User的存在
         if (Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsWebPlayer)
         {
-            string dataPath = Application.dataPath + "/../Temp/UnityWinPersistentDataPath";
+            string dataPath = Application.dataPath + "/../Library/UnityWinPersistentDataPath";
             if (!Directory.Exists(dataPath))
                 Directory.CreateDirectory(dataPath);
             return dataPath;
