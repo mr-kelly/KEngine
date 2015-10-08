@@ -265,6 +265,33 @@ public class CTool
 
         return UnityEngine.Random.Range(strs[0].ToFloat(), strs[1].ToFloat());
     }
+
+
+    public struct FromToNumber
+    {
+        public float From;
+        public float To;
+    }
+
+    /// <summary>
+    /// 获取波浪随机数的最大最小
+    /// </summary>
+    /// <param name="str"></param>
+    /// <returns></returns>
+    public static FromToNumber ParseMinMaxNumber(string str)
+    {
+        var rangeArr = CTool.Split<float>(str, '~', '-');
+        var number = new FromToNumber();
+        if (rangeArr.Count > 0)
+        {
+            number.From = rangeArr[0];
+        }
+        if (rangeArr.Count > 1)
+        {
+            number.To = rangeArr[1];
+        }
+        return number;
+    }
     /// <summary>
     /// 是否在波浪数之间
     /// </summary>
@@ -471,31 +498,41 @@ public class CTool
         return span.Days;
     }
 
-    public static DateTime GetDateTimeFromUTC(long utcTime)
+    /// <summary>
+    /// Utc毫秒转Utc时间
+    /// </summary>
+    /// <param name="utcTime"></param>
+    /// <param name="zone">默认0时区</param>
+    /// <returns></returns>
+    public static DateTime GetDateTimeByUtcMilliseconds(long utcTime, int zone = 0)
     {
         DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-        return origin.AddMilliseconds(utcTime);
+        return origin.AddMilliseconds(utcTime).AddHours(zone);
     }
-    public static DateTime GetDateTime(double unixTimeStamp)
+    /// <summary>
+    /// Utc秒转Utc时间
+    /// </summary>
+    /// <param name="unixTimeStamp"></param>
+    /// <param name="zone">默认0时区</param>
+    /// <returns></returns>
+    public static DateTime GetDateTimeByUtcSeconds(double unixTimeStamp, int zone = 0)
     {
         DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-        return origin.AddSeconds(unixTimeStamp);
+        return origin.AddSeconds(unixTimeStamp).AddHours(zone);
     }
     /// <summary>
     /// Unix時間總毫秒數
     /// </summary>
     /// <returns></returns>
-    public static double GetUTCMilliseconds()
+    public static double GetUtcMilliseconds()
     {
-        DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-        TimeSpan diff = DateTime.UtcNow - origin;
-        return diff.TotalMilliseconds;
+        return GetUtcMilliseconds(DateTime.UtcNow);
     }
     /// <summary>
     /// Unix時間總毫秒數
     /// </summary>
     /// <returns></returns>
-    public static double GetUTCMilliseconds(DateTime date)
+    public static double GetUtcMilliseconds(DateTime date)
     {
         DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
         TimeSpan diff = date - origin;
@@ -506,18 +543,34 @@ public class CTool
     /// Unix時間總秒數
     /// </summary>
     /// <returns></returns>
-    public static double GetUTCSeconds()
+    public static double GetUtcSeconds()
     {
-        DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-        TimeSpan diff = DateTime.UtcNow - origin;
-        return diff.TotalSeconds;
+        return GetUtcSeconds(DateTime.UtcNow);
     }
 
-    public static UInt64 GetTimeEx()
+    /// <summary>
+    /// Unix時間總秒數
+    /// </summary>
+    /// <returns></returns>
+    public static double GetUtcSeconds(DateTime date)
     {
         DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-        TimeSpan diff = DateTime.Now - origin;
-        return (UInt64)diff.TotalMilliseconds;
+        TimeSpan diff = date - origin;
+        return diff.TotalSeconds;
+    }
+    /// <summary>
+    /// 测试cron是否触发(精确到分钟)
+    /// </summary>
+    /// <returns></returns>
+    public static bool TestCron(string cron)
+    {
+        var nCron = NCrontab.CrontabSchedule.Parse(cron);
+        var now = DateTime.Now; // 这里涉及到手机本地时间, 不能使用UtcNow
+        var next = nCron.GetNextOccurrence(now, DateTime.Now.AddDays(1));
+        CDebug.Log("Cron:{0}, now: {1}, next: {2}", cron, now, next);
+        var span = next - now;
+        CDebug.Log(span.TotalMinutes.ToString());
+        return span.TotalMinutes < 1;
     }
 
     /// <summary>
@@ -784,6 +837,17 @@ public class CTool
             transform.localScale = UnityEngine.Vector3.one;
     }
 
+    //获取从父节点到自己的完整路径
+    public static string GetRootPathName(UnityEngine.Transform transform)
+    {
+        var pathName="/"+transform.name;
+        while (transform.parent != null)
+        {
+            transform = transform.parent;
+            pathName +="/"+ transform.name;
+        }
+        return pathName;
+    }
     // 获取指定流的MD5
     public static string MD5_Stream(Stream stream)
     {
@@ -1296,21 +1360,21 @@ public class CTool
         {
             Dns.BeginGetHostAddresses(host, new AsyncCallback((asyncResult) =>
             {
+                IPAddress[] addrs = Dns.EndGetHostAddresses(asyncResult);
                 if (callback != null)
                 {
-                    var ipHostEntry = (IPHostEntry)asyncResult.AsyncState;
-                    ipAddress = GetIpAddressFromIpHostEntry(ipHostEntry);
-
+                    if (addrs.Length > 0)
+                        ipAddress = addrs[0];
                     callback(ipAddress);
                 }
-
-                Dns.EndGetHostAddresses(asyncResult);
             }), null);
 
         }
-
-        if (callback != null)
-            callback(ipAddress);
+        else
+        {
+            if (callback != null)
+                callback(ipAddress);
+        }
     }
 }
 
@@ -1399,6 +1463,40 @@ public static class XExtensions
 
         return items;
     }
+    public delegate bool CFilterAction<T>(T t);
+    public static List<T> CFilter<T>(this IEnumerable<T> source, CFilterAction<T> testAction)
+    {
+        var items = new List<T>();
+        if (source != null)
+        {
+            foreach (T item in source)
+            {
+                if (testAction(item))
+                {
+                    items.Add(item);
+                }
+            }
+        }
+
+        return items;
+    }
+    public delegate bool CFilterAction<T, K>(T t, K k);
+    public static Dictionary<T, K> CFilter<T, K>(this IEnumerable<KeyValuePair<T, K>> source, CFilterAction<T, K> testAction)
+    {
+        var items = new Dictionary<T, K>();
+        if (source != null)
+        {
+            foreach (KeyValuePair<T, K> pair in source)
+            {
+                if (testAction(pair.Key, pair.Value))
+                {
+                    items.Add(pair.Key, pair.Value);
+                }
+            }
+        }
+
+        return items;
+    }
     public static T CLastOrDefault<T>(this IEnumerable<T> source)
     {
         var result = default(T);
@@ -1467,7 +1565,7 @@ public static class XExtensions
                 results.Add(item);
             }
         }
-        return list;
+        return results;
     }
     public static string CJoin<T>(this IEnumerable<T> source, string sp)
     {

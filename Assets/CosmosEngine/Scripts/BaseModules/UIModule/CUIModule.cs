@@ -74,33 +74,29 @@ public class CUIModule : ICModule
         yield break;
     }
 
-    public void OpenWindow(Type type, params object[] args)
+    public CUILoadState OpenWindow(Type type, params object[] args)
     {
         string uiName = type.Name.Remove(0, 3); // 去掉"CUI"
-        OpenWindow(uiName, args);
+        return OpenWindow(uiName, args);
     }
 
-    public void OpenWindow<T>(params object[] args) where T : CUIController
+    public CUILoadState OpenWindow<T>(params object[] args) where T : CUIController
     {
-        OpenWindow(typeof(T), args);
+        return OpenWindow(typeof(T), args);
     }
 
     // 打开窗口（非复制）
-    public void OpenWindow(string name, params object[] args)
+    public CUILoadState OpenWindow(string name, params object[] args)
     {
-        Action doOpen = () =>
+        CUILoadState uiState;
+        if (!UIWindows.TryGetValue(name, out uiState))
         {
-            CUILoadState uiState;
-            if (!UIWindows.TryGetValue(name, out uiState))
-            {
-                LoadWindow(name, true, args);
-                return;
-            }
+            uiState = LoadWindow(name, true, args);
+            return uiState;
+        }
 
-            OnOpen(uiState, args);
-        };
-
-        doOpen();
+        OnOpen(uiState, args);
+        return uiState;
     }
 
     // 隐藏时打开，打开时隐藏
@@ -457,7 +453,7 @@ public class CUIModule : ICModule
                 uiBase.OnClose();
             }
 
-            uiBase.BeforeOpen(() =>
+            uiBase.BeforeOpen(args, () =>
             {
                 uiBase.gameObject.SetActive(true);
 

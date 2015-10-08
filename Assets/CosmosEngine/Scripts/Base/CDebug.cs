@@ -80,37 +80,52 @@ public class CDebug
         }
     }
 
-    private static bool _isLogFile = false; // 是否輸出到日誌，跨线程
-    public static bool IsLogFile
+    //private static bool _isLogFile = false; // 是否輸出到日誌，跨线程
+    //public static bool IsLogFile
+    //{
+    //    get { return _isLogFile; }
+    //    set
+    //    {
+    //        _isLogFile = value;
+    //        if (_isLogFile)
+    //        {
+    //            AddLogCallback(DefaultCallbackLogFile);
+    //        }
+    //        else
+    //        {
+    //            RemoveLogCallback(DefaultCallbackLogFile);
+    //        }
+
+    //    }
+    //}
+
+    public static void LogFileCallbackHandler(string condition, string stacktrace, UnityEngine.LogType type)
     {
-        get { return _isLogFile; }
-        set
+        try
         {
-            _isLogFile = value;
-            if (_isLogFile)
-            {
-                AddLogCallback(DefaultCallbackLogFile);
-            }
+            if (type == LogType.Log)
+                LogToFile(condition + "\n\n");
             else
-            {
-                RemoveLogCallback(DefaultCallbackLogFile);
-            }
-
+                LogToFile(condition + stacktrace + "\n\n");
         }
-    }
+        catch (Exception e)
+        {
+            LogToFile(string.Format("LogFileError: {0}", condition));
+        }
 
-    private static void DefaultCallbackLogFile(string condition, string stacktrace, UnityEngine.LogType type)
-    {
-        if (type == LogType.Log)
-            LogToFile(condition + "\n\n");
-        else
-            LogToFile(condition + stacktrace + "\n\n");
     }
 
     private static void OnLogCallback(string condition, string stacktrace, UnityEngine.LogType type)
     {
         if (LogCallbackEvent != null)
-            LogCallbackEvent(condition, stacktrace, type);
+        {
+            lock (LogCallbackEvent)
+            {
+                LogCallbackEvent(condition, stacktrace, type);
+
+            }
+        }
+
     }
 
     /// <summary>

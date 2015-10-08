@@ -24,7 +24,7 @@ public abstract class CUIController : CBehaviour
     {
     }
 
-    public virtual void BeforeOpen(Action doOpen)
+    public virtual void BeforeOpen(object[] onOpenArgs, Action doOpen)
     {
         doOpen();
     }

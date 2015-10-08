@@ -15,7 +15,6 @@ using System.Collections.Generic;
 
 /// <summary>
 /// Load www, A wrapper of WWW.  
-/// Current version, loaded Resource will never release in memory
 /// </summary>
 [CDependencyClass(typeof(CResourceModule))]
 public class CWWWLoader : CBaseResourceLoader

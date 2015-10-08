@@ -36,11 +36,15 @@ public abstract class CAsyncBehaviour : CBehaviour
                 _callbacks.Clear();
             }
 
-            if (Debug.isDebugBuild && !_firstTouchCanAsyncCalled)
+            if (Debug.isDebugBuild)
             {
-                _firstTouchCanAsyncCalled = true;
-                DoCheckAsyncCall();
+                if (!_firstTouchCanAsyncCalled)
+                {
+                    _firstTouchCanAsyncCalled = true;
+                    DoCheckAsyncCall();
+                }
             }
+
         }
     }
 

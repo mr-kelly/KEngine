@@ -22,6 +22,7 @@ namespace CosmosEngine
     /// </summary>
     public class CCosmosEngine : MonoBehaviour
     {
+        public static bool IsDebugBuild { get; private set; }  // cache Debug.isDebugBuild for multi thread
         public static bool ShowFps = Debug.isDebugBuild;
         /// <summary>
         /// To Display FPS in the Debug Mode (Debug.isDebugBuild is true)
@@ -71,6 +72,8 @@ namespace CosmosEngine
 
         private void Awake()
         {
+            IsDebugBuild = Debug.isDebugBuild;
+
             if (EngineInstance != null)
             {
                 CDebug.LogError("Duplicated Instance CCosmosEngine!!!");
