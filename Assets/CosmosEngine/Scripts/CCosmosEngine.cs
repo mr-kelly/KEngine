@@ -119,15 +119,7 @@ namespace CosmosEngine
                 CUIModule.Instance, 
             };
 
-            var startInitTime = 0f;
-            foreach (ICModule mod in baseModules)
-            {
-                if (Debug.isDebugBuild)
-                    startInitTime = Time.time;
-                yield return StartCoroutine(mod.Init());
-                if (Debug.isDebugBuild)
-                    CDebug.Log("Init Module: #{0}# Time:{1}", mod.GetType().FullName, Time.time - startInitTime);
-            }
+            yield return StartCoroutine(DoInitModules(baseModules));
 
             CDebug.Log("Finish Init ResourceManager + UIManager!");
 
@@ -135,22 +127,30 @@ namespace CosmosEngine
                 yield return StartCoroutine(BeforeInitModules());
 
 
-            yield return StartCoroutine(DoInitModules());
+            yield return StartCoroutine(DoInitModules(GameModules));
             if (AfterInitModules != null)
                 yield return StartCoroutine(AfterInitModules());
 
         }
 
-        IEnumerator DoInitModules()
+        IEnumerator DoInitModules(IList<ICModule> modules)
         {
             var startInitTime = 0f;
-            foreach (ICModule initModule in GameModules)
+            var startMem = 0f;
+            foreach (ICModule initModule in modules)
             {
                 if (Debug.isDebugBuild)
+                {
                     startInitTime = Time.time;
+                    startMem = GC.GetTotalMemory(false);
+                }
                 yield return StartCoroutine(initModule.Init());
                 if (Debug.isDebugBuild)
-                    CDebug.Log("Init Module: #{0}# Time:{1}", initModule.GetType().FullName, Time.time - startInitTime);
+                {
+                    var nowMem = GC.GetTotalMemory(false);
+                    CDebug.Log("Init Module: #{0}# Time:{1}, UseMem:{2}, NowMem:{3}", initModule.GetType().FullName,
+                        Time.time - startInitTime, nowMem - startMem, nowMem);
+                }
             }
 
         }
