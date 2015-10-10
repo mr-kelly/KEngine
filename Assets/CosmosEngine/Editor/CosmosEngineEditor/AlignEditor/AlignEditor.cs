@@ -1,3 +1,13 @@
+ï»¿//------------------------------------------------------------------------------
+//
+//      CosmosEngine - The Lightweight Unity3D Game Develop Framework
+//
+//                     Version 0.9.1 (20151010)
+//                     Copyright Â© 2011-2015
+//                   MrKelly <23110388@qq.com>
+//              https://github.com/mr-kelly/CosmosEngine
+//
+//------------------------------------------------------------------------------
 using UnityEngine;
 using System.Collections;
 using UnityEditor;
@@ -6,9 +16,9 @@ using System.Collections.Generic;
 
 /*
 /// <summary>
-/// ¸ÃÀàÓÃÓÚUiÅÅ°æÊ±½øÐÐ¶ÔÆë, by KK
+/// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Uiï¿½Å°ï¿½Ê±ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½, by KK
 /// 
-/// ¸ù¾Ýx, y, zÊý×Ö½øÐÐµÈ¾àÅÅÁÐ
+/// ï¿½ï¿½ï¿½ï¿½x, y, zï¿½ï¿½ï¿½Ö½ï¿½ï¿½ÐµÈ¾ï¿½ï¿½ï¿½ï¿½ï¿½
 /// </summary>
 */
 public class AlignEditor : EditorWindow
@@ -31,26 +41,26 @@ public class AlignEditor : EditorWindow
         alignX = EditorGUILayout.TextField("X", alignX);
         alignY = EditorGUILayout.TextField("Y", alignY);
         alignZ = EditorGUILayout.TextField("Z", alignZ);
-        /* ¶ÔÆëÑ¡ÖÐ¶ÔÏó°´Å¥ */
+        /* ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½Ð¶ï¿½ï¿½ï¿½Å¥ */
         if (GUILayout.Button("Align Selection"))
         {
             GameObject[] gameObjects = this.getSortedGameObjects();
 
-            /* ¸ù¾ÝµÚÒ»¸ö¶ÔÏóËùÔÚÎ»ÖÃ£¬¾àÀëµÝÔöÅÅÁÐ */
-            Vector3 firstObjectVec = Vector3.zero; /* ³õÊ¼»¯ */
+            /* ï¿½ï¿½ï¿½Ýµï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½Ã£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+            Vector3 firstObjectVec = Vector3.zero; /* ï¿½ï¿½Ê¼ï¿½ï¿½ */
             for (int i = 0; i < gameObjects.Length; i++)
             {
-                /* Ñ­»·µÚÒ»¸ö¶ÔÏó£¬¸³±äÁ¿ */
+                /* Ñ­ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ó£¬¸ï¿½ï¿½ï¿½ï¿½ï¿½ */
                 if (i == 0)
                 {
                     firstObjectVec = gameObjects[i].transform.localPosition;
                     continue;
                 }
                 
-                /*Ñ­»·ÆäËü¶ÔÏó*/
+                /*Ñ­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
                 gameObjects[i].transform.localPosition = new Vector3(
                     firstObjectVec.x + Convert.ToSingle(alignX) * i,
-                    firstObjectVec.y + -Convert.ToSingle(alignY) * i,    /* Õý½»ÊÓ¾õ£¬ÏòÏÂÎªy¸ºÊý£¬ÏòÓÒÎªxÕýÊý£¬ ºöÂÔx */
+                    firstObjectVec.y + -Convert.ToSingle(alignY) * i,    /* ï¿½ï¿½ï¿½ï¿½ï¿½Ó¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªyï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªxï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½x */
                     firstObjectVec.z + Convert.ToSingle(alignZ) * i);
             }
         }
@@ -64,7 +74,7 @@ public class AlignEditor : EditorWindow
             this.PositionSelectionObjects(AlignType.LeftAlign);
         }
 
-        /* ¶¥¶ÔÆë, ËùÓÐ¶ÔÏóµÄyµÈÓÚµÚÒ»¸ö¶ÔÏó */
+        /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½yï¿½ï¿½ï¿½Úµï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
         if (GUILayout.Button("Top/Bottom Align"))
         {
             this.PositionSelectionObjects(AlignType.TopAlign);
@@ -85,18 +95,18 @@ public class AlignEditor : EditorWindow
 
     /*
     /// <summary>
-    /// ±È½ÏÓÎÏ·¶ÔÏóÃû³ÆÎ¯ÍÐ·½·¨
+    /// ï¿½È½ï¿½ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î¯ï¿½Ð·ï¿½ï¿½ï¿½
     /// </summary>
     /// <param name="x"></param>
     /// <param name="y"></param>
     */
     private int CompareGameObjectsByName(GameObject a, GameObject b)
     {
-        /* Ê¹ÓÃÏµÍ³µÄ×Ö·û´®±È½Ï */
+        /* Ê¹ï¿½ï¿½ÏµÍ³ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½È½ï¿½ */
 
         return a.name.CompareTo(b.name);
 
-        ///* ±È½ÏÓÎÏ·¶ÔÏóÃû³Æ×îºóÒ»Î» */
+        ///* ï¿½È½ï¿½ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»Î» */
         //char aLast = a[a.Length-1];
         //char bLast = b[b.Length - 1];
         //if (a == b)
@@ -110,7 +120,7 @@ public class AlignEditor : EditorWindow
     }
     /*
     /// <summary>
-    ///  »ñÈ¡¸ù¾ÝÃû×ÖÖØÐÂÅÅÐòµÄ ÒÑÑ¡ÓÎÏ·¶ÔÏó
+    ///  ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ñ¡ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ï¿½
     /// </summary>
     /// <returns></returns>
     */
@@ -118,14 +128,14 @@ public class AlignEditor : EditorWindow
     {
         List<GameObject> gameObjects = new List<GameObject>(Selection.gameObjects);
 
-        gameObjects.Sort(this.CompareGameObjectsByName);  /* ÅÅÐò Î¯ÍÐ*/
+        gameObjects.Sort(this.CompareGameObjectsByName);  /* ï¿½ï¿½ï¿½ï¿½ Î¯ï¿½ï¿½*/
 
         return gameObjects.ToArray();
         
     }
     /*
     /// <summary>
-    /// Í³Ò»¶¨Î»ËùÓÐÑ¡ÖÐµÄ¶ÔÏó
+    /// Í³Ò»ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ÐµÄ¶ï¿½ï¿½ï¿½
     /// </summary>
     /// <param name="x"></param>
     /// <param name="y"></param>
@@ -136,13 +146,13 @@ public class AlignEditor : EditorWindow
         GameObject[] gameObjects = this.getSortedGameObjects();
         
 
-        /* ¶ÔÆë¿ªÊ¼ */
+        /* ï¿½ï¿½ï¿½ë¿ªÊ¼ */
         if (gameObjects.Length > 0)
         {
-            /* »ñÈ¡µÚÒ»¸öÔªËØ£¬ÆäËüÔªËØ¸ù¾ÝËüÅÅÎ» */
+            /* ï¿½ï¿½È¡ï¿½ï¿½Ò»ï¿½ï¿½Ôªï¿½Ø£ï¿½ï¿½ï¿½ï¿½ï¿½Ôªï¿½Ø¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î» */
             if (alignType == AlignType.TopAlign)
             {
-                float firstY = gameObjects[0].transform.localPosition.y;  /*Í³Ò»y, ¶¥¶ÔÆë */
+                float firstY = gameObjects[0].transform.localPosition.y;  /*Í³Ò»y, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
 
                 foreach (GameObject obj in gameObjects)
                 {
@@ -152,7 +162,7 @@ public class AlignEditor : EditorWindow
                     obj.transform.localPosition = new Vector3(selfX, firstY, selfZ);
                 }
             }
-            else if (alignType == AlignType.LeftAlign)  /*×ó¶ÔÆë*/
+            else if (alignType == AlignType.LeftAlign)  /*ï¿½ï¿½ï¿½ï¿½ï¿½*/
             {
                 float fisrtX = gameObjects[0].transform.localPosition.x;
 
