@@ -458,7 +458,7 @@ public class CTool
         string timeStr = string.Format("{0}{1}{2}{3}",
             ts.Days == 0 ? "" : ts.Days + "天",
             ts.Hours == 0 ? "" : ts.Hours + "小时",
-            ts.Minutes == 0 ? "" : ts.Minutes + "分",
+            ts.Minutes == 0 ? "" : ts.Minutes + "分钟",
             ts.Seconds == 0 ? "" : ts.Seconds + "秒");
 
         return timeStr;
