@@ -412,7 +412,7 @@ public partial class CBuildTools
             return allOutput;
         }
     }
-
+/* TODO: CFolderSyncTool
     public static void DeleteLink(string linkPath)
     {
         var os = Environment.OSVersion;
@@ -452,6 +452,7 @@ public partial class CBuildTools
             CDebug.LogError("[SymbolLinkFolder]Error on OS: {0}", os.ToString());
         }
     }
+    */
     #region 资源版本管理相关
     class BuildRecord
     {

@@ -29,6 +29,12 @@ public class CMyGame : MonoBehaviour
             null);
 
         CUIModule.Instance.OpenWindow<CUIDemoHome>();
+
+        CUIModule.Instance.CallUI<CUIDemoHome>(ui => {
+            
+            // Do some UI stuff
+
+        });
     }
 
     void OnGameSettingsInit()

@@ -558,6 +558,8 @@ public class CTool
         TimeSpan diff = date - origin;
         return diff.TotalSeconds;
     }
+
+    /*  Need CronTab
     /// <summary>
     /// 测试cron是否触发(精确到分钟)
     /// </summary>
@@ -572,7 +574,7 @@ public class CTool
         CDebug.Log(span.TotalMinutes.ToString());
         return span.TotalMinutes < 1;
     }
-
+    */
     /// <summary>
     /// 人性化数字显示，百万，千万，亿
     /// </summary>
