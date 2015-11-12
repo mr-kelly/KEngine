@@ -22,6 +22,7 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using KFramework;
 
 /// <summary>
 /// Some tool function for time, bytes, MD5, or something...
@@ -629,67 +630,67 @@ public class CTool
     /// <param name="source">模板内容</param>
     /// <param name="data">数据来源[对象]</param>
     /// <returns></returns>
-    public static string Template(string source, object data)
-    {
-        if (data == null) return source;
-        var isJson = data is SimpleJson.JsonObject;
-        var result = source;
-        var regex = new Regex(@"\{.+?\}");
-        var matches = regex.Matches(source);
-        foreach (Match match in matches)
-        {
-            var paramRex = match.Value;
-            var paramKey = paramRex.Substring(1, paramRex.Length - 2).Trim(); // 截头截尾
-            try
-            {
-                if (isJson)
-                {
-                    object paramValue;
-                    (data as SimpleJson.JsonObject).TryGetValue(paramKey, out paramValue);
-                    if (paramValue != null)
-                    {
-                        result = result.Replace(paramRex, paramValue.ToString());
-                    }
-                }
-                else
-                {
-                    var field = data.GetType().GetField(paramKey);
-                    if (field != null)
-                    {
-                        var paramValue = field.GetValue(data).ToString();
-                        result = result.Replace(paramRex, paramValue);
-                    }
-                }
-            }
-            catch (Exception)
-            {
-                CDebug.LogError("not find field \"{0}\" for {1}", paramKey, data.GetType());
-            }
-        }
+    //public static string Template(string source, object data)
+    //{
+    //    if (data == null) return source;
+    //    var isJson = data is SimpleJson.SimpleJson.JsonObject;
+    //    var result = source;
+    //    var regex = new Regex(@"\{.+?\}");
+    //    var matches = regex.Matches(source);
+    //    foreach (Match match in matches)
+    //    {
+    //        var paramRex = match.Value;
+    //        var paramKey = paramRex.Substring(1, paramRex.Length - 2).Trim(); // 截头截尾
+    //        try
+    //        {
+    //            if (isJson)
+    //            {
+    //                object paramValue;
+    //                (data as SimpleJson.SimpleJson.JsonObject).TryGetValue(paramKey, out paramValue);
+    //                if (paramValue != null)
+    //                {
+    //                    result = result.Replace(paramRex, paramValue.ToString());
+    //                }
+    //            }
+    //            else
+    //            {
+    //                var field = data.GetType().GetField(paramKey);
+    //                if (field != null)
+    //                {
+    //                    var paramValue = field.GetValue(data).ToString();
+    //                    result = result.Replace(paramRex, paramValue);
+    //                }
+    //            }
+    //        }
+    //        catch (Exception)
+    //        {
+    //            CDebug.LogError("not find field \"{0}\" for {1}", paramKey, data.GetType());
+    //        }
+    //    }
 
-        return result;
-    }
+    //    return result;
+    //}
     /// <summary>
     /// 模板生成
     /// </summary>
     /// <param name="source">模板内容</param>
     /// <param name="datas">模板键-值对应数组[key1,value1,key2,value2,...]</param>
     /// <returns></returns>
-    public static string Template(string source, params object[] datas)
-    {
-        // 最少需要两个元素
-        if (datas.Length == 0 || datas.Length % 2 != 0)
-        {
-            CDebug.LogError("传入datas数量必须为偶数个!");
-            return source;
-        }
-        var json = new SimpleJson.JsonObject();
-        for (var i = 0; i < datas.Length; i += 2)
-        {
-            json[datas[i].ToString()] = datas[i + 1];
-        }
-        return Template(source, json);
-    }
+    //public static string Template(string source, params object[] datas)
+    //{
+    //    // 最少需要两个元素
+    //    if (datas.Length == 0 || datas.Length % 2 != 0)
+    //    {
+    //        CDebug.LogError("传入datas数量必须为偶数个!");
+    //        return source;
+    //    }
+    //    var json = new SimpleJson.SimpleJson.JsonObject();
+    //    for (var i = 0; i < datas.Length; i += 2)
+    //    {
+    //        json[datas[i].ToString()] = datas[i + 1];
+    //    }
+    //    return Template(source, json);
+    //}
     /// <summary>
     /// 混合模板
     /// </summary>
@@ -697,10 +698,10 @@ public class CTool
     /// <param name="data">数据来源[对象]</param>
     /// <param name="args">数据来源[数组]</param>
     /// <returns></returns>
-    public static string Template(string source, object data, object[] args)
-    {
-        return FormatArgs(Template(source, data), args);
-    }
+    //public static string Template(string source, object data, object[] args)
+    //{
+    //    return FormatArgs(Template(source, data), args);
+    //}
 
     public static string Format(string source, params object[] args)
     {

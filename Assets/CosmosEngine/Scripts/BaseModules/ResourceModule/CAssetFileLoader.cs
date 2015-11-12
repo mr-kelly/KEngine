@@ -11,7 +11,7 @@
 using UnityEngine;
 using System.Collections;
 using Object = UnityEngine.Object;
-using CosmosEngine;
+using KFramework;
 
 /// <summary>
 /// 根據不同模式，從AssetBundle中獲取Asset或從Resources中獲取,一個橋接類

@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 using UnityEngine;
 using System.Collections;
+using KFramework;
 
 /// <summary>
 /// Without Update, With some cache

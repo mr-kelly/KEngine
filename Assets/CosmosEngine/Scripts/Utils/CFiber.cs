@@ -23,6 +23,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using KFramework;
 
 
 public class CFiber : MonoBehaviour

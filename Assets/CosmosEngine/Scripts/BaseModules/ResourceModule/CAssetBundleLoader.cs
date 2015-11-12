@@ -12,6 +12,7 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using KFramework;
 
 // 調用WWWLoader
 public class CAssetBundleLoader : CBaseResourceLoader

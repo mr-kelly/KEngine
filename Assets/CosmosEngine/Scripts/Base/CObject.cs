@@ -14,7 +14,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System;
-using CosmosEngine;
+using KFramework;
 
 /// <summary>
 /// CosmosEngine标准Object,，带有自动Debug~

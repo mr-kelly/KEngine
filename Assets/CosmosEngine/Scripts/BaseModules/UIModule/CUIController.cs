@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 using UnityEngine;
 using System;
+using KFramework;
 
 /// <summary>
 /// Abstract class of all UI Script

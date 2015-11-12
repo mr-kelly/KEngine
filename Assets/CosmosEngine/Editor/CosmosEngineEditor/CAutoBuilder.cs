@@ -8,7 +8,7 @@
 //              https://github.com/mr-kelly/CosmosEngine
 //
 //------------------------------------------------------------------------------
-using CosmosEngine;
+using KFramework;
 using UnityEngine;
 using UnityEditor;
 using System;
@@ -225,14 +225,15 @@ public class CSymbolLinkHelper
     [MenuItem("CosmosEngine/Symbol Link Builded Resource to StreamingAssets")]
     public static void SymbolLinkResource()
     {
-        CSymbolLinkHelper.DeleteAllLinks(CSymbolLinkHelper.AssetBundlesLinkPath);
+        //CSymbolLinkHelper.DeleteAllLinks(CSymbolLinkHelper.AssetBundlesLinkPath);
 
-        var exportPath = GetResourceExportPath();
-        var linkPath = GetLinkPath();
+        //var exportPath = GetResourceExportPath();
+        //var linkPath = GetLinkPath();
 
         // TODO: 
         //CBuildTools.SymbolLinkFolder(exportPath, linkPath);
 
+        CDebug.Log("TODO:");
         AssetDatabase.Refresh();
     }
 
@@ -247,6 +248,7 @@ public class CSymbolLinkHelper
             foreach (var dirPath in Directory.GetDirectories(assetBundlesLinkPath))
             {
                 // TODO:
+                CDebug.Log("TODO: {0}", dirPath);
                 //CBuildTools.DeleteLink(dirPath);
             }
         }

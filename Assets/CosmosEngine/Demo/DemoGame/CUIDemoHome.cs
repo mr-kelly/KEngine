@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 using UnityEngine;
 using System.Collections;
+using KFramework;
 using UnityEngine.UI;
 
 /// <summary>

@@ -12,7 +12,7 @@ using System;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using CosmosEngine;
+using KFramework;
 /// <summary>
 /// 带有异步处理功能的组件
 /// 

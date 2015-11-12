@@ -12,6 +12,7 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using KFramework;
 
 /// <summary>
 /// AssetBundle字节解析器

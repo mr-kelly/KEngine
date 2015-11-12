@@ -12,6 +12,7 @@ using System;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using KFramework;
 using Object = UnityEngine.Object;
 
 /// <summary>

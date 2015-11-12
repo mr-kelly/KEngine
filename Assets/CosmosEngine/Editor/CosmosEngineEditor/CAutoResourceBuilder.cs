@@ -15,6 +15,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using KFramework;
 
 public abstract class CBuild_Base
 {

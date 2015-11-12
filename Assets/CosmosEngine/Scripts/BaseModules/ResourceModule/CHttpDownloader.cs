@@ -13,6 +13,7 @@ using System;
 using System.Collections;
 using System.IO;
 using System.Threading;
+using KFramework;
 
 public class CHttpDownloader : MonoBehaviour, IDisposable
 {

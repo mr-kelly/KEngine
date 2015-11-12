@@ -8,7 +8,7 @@
 //              https://github.com/mr-kelly/CosmosEngine
 //
 //------------------------------------------------------------------------------
-using CosmosEngine;
+using KFramework;
 using UnityEngine;
 using System;
 using System.Collections;
