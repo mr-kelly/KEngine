@@ -8,16 +8,16 @@
 //              https://github.com/mr-kelly/CosmosEngine
 //
 //------------------------------------------------------------------------------
-using KFramework;
+using KEngine;
 using UnityEngine;
 using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 
-namespace KFramework.Editor
+namespace KEngine.Editor
 {
-    [CustomEditor(typeof(CCosmosEngine))]
+    [CustomEditor(typeof(KEngine))]
     public class CCosmosEngineInspector : UnityEditor.Editor
     {
         static CCosmosEngineInspector()

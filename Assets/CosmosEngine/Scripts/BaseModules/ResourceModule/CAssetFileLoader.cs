@@ -11,7 +11,7 @@
 using UnityEngine;
 using System.Collections;
 using Object = UnityEngine.Object;
-using KFramework;
+using KEngine;
 
 /// <summary>
 /// 根據不同模式，從AssetBundle中獲取Asset或從Resources中獲取,一個橋接類
@@ -56,7 +56,7 @@ public class CAssetFileLoader : CBaseResourceLoader
 
     IEnumerator _Init(string path, string assetName)
     {
-        IsLoadAssetBundle = CCosmosEngine.GetConfig("IsLoadAssetBundle").ToInt32() != 0;
+        IsLoadAssetBundle = KEngine.KEngine.GetConfig("IsLoadAssetBundle").ToInt32() != 0;
         AssetInBundleName = assetName;
 
         UnityEngine.Object getAsset = null;

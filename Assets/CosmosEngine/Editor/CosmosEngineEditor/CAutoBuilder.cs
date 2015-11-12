@@ -8,7 +8,7 @@
 //              https://github.com/mr-kelly/CosmosEngine
 //
 //------------------------------------------------------------------------------
-using KFramework;
+using KEngine;
 using UnityEngine;
 using UnityEditor;
 using System;
@@ -42,7 +42,7 @@ public class CAutoBuilder
     {
         string[] args = System.Environment.GetCommandLineArgs();
 
-        string productPath = Path.Combine(Application.dataPath, CCosmosEngine.GetConfig("ProductRelPath"));
+        string productPath = Path.Combine(Application.dataPath, KEngine.KEngine.GetConfig("ProductRelPath"));
 
         if (!Directory.Exists(productPath))
         {
@@ -109,7 +109,7 @@ public class CAutoBuilder
 
         ParseArgs(ref opt, ref outputpath);
 
-        string fullPath = System.IO.Path.Combine(Application.dataPath, System.IO.Path.Combine(CCosmosEngine.GetConfig("ProductRelPath"), outputpath));
+        string fullPath = System.IO.Path.Combine(Application.dataPath, System.IO.Path.Combine(KEngine.KEngine.GetConfig("ProductRelPath"), outputpath));
 
         string fullDir = System.IO.Path.GetDirectoryName(fullPath);
 
@@ -208,7 +208,7 @@ public class CAutoBuilder
 public class CSymbolLinkHelper
 {
 
-    public static string AssetBundlesLinkPath = "Assets/StreamingAssets/" + CCosmosEngine.GetConfig(CCosmosEngineDefaultConfig.BundlesFolderName) + "/"; // hold asset bundles
+    public static string AssetBundlesLinkPath = "Assets/StreamingAssets/" + KEngine.KEngine.GetConfig(CCosmosEngineDefaultConfig.BundlesFolderName) + "/"; // hold asset bundles
     public static string GetLinkPath()
     {
         if (!Directory.Exists(AssetBundlesLinkPath))

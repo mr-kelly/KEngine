@@ -8,7 +8,7 @@
 //              https://github.com/mr-kelly/CosmosEngine
 //
 //------------------------------------------------------------------------------
-using KFramework;
+using KEngine;
 using UnityEngine;
 using System.Collections;
 using System.Security.Cryptography;
@@ -39,7 +39,7 @@ public class CCrypt
     /// 加密成功返回加密后的字符串，失败返回源串 
     public string EncryptDES(string encryptString)
     {
-        string encryptKey = CCosmosEngine.GetConfig("CryptKey");// 钥匙
+        string encryptKey = KEngine.KEngine.GetConfig("CryptKey");// 钥匙
         try
         {
             byte[] rgbKey = Encoding.UTF8.GetBytes(encryptKey.Substring(0, 8));
@@ -64,7 +64,7 @@ public class CCrypt
     /// 解密成功返回解密后的字符串，失败返源串
     public string DecryptDES(string decryptString)
     {
-        string decryptKey = CCosmosEngine.GetConfig("CryptKey");
+        string decryptKey = KEngine.KEngine.GetConfig("CryptKey");
         try
         {
             byte[] rgbKey = Encoding.UTF8.GetBytes(decryptKey);

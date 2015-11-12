@@ -25,7 +25,7 @@ public enum CLogLevel
     Error,
 }
 
-namespace KFramework
+namespace KEngine
 {
     /// Frequent Used,
     /// A File logger + Debug Tools

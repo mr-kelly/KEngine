@@ -14,7 +14,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System;
-using KFramework;
+using KEngine;
 
 /// <summary>
 /// CosmosEngine标准Object,，带有自动Debug~
@@ -126,7 +126,7 @@ public class CObjectDebugger : CBehaviour
         if (GlobalDebugCoroutine == null)
         {
             GlobalDebugCoroutine = CoGlobalDebugCoroutine();
-            CCosmosEngine.EngineInstance.StartCoroutine(GlobalDebugCoroutine);
+            KEngine.KEngine.EngineInstance.StartCoroutine(GlobalDebugCoroutine);
         }
     }
 

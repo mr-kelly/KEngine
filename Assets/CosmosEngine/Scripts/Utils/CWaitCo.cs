@@ -9,7 +9,7 @@
 //
 //------------------------------------------------------------------------------
 using System;
-using KFramework;
+using KEngine;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
@@ -31,7 +31,7 @@ public class CWaitCo
 {
     public static Coroutine WaitCallback(WaitCallbackDelegate func)
     {
-        return CCosmosEngine.EngineInstance.StartCoroutine((IEnumerator)CoWaitCallback(func));
+        return KEngine.KEngine.EngineInstance.StartCoroutine((IEnumerator)CoWaitCallback(func));
     }
 
     private static IEnumerator CoWaitCallback(WaitCallbackDelegate func)
@@ -68,12 +68,12 @@ public class CWaitCo
     /// <param name="okCallback"></param>
     public static void Wait(IEnumerable<IWaitable> waits, Action okCallback)
     {
-        CCosmosEngine.EngineInstance.StartCoroutine(CoWaitTrue(waits, okCallback));
+        KEngine.KEngine.EngineInstance.StartCoroutine(CoWaitTrue(waits, okCallback));
     }
 
     public static void Wait(IWaitable wait, Action okCallback)
     {
-        CCosmosEngine.EngineInstance.StartCoroutine(CoWaitTrue(new[] { wait }, okCallback));
+        KEngine.KEngine.EngineInstance.StartCoroutine(CoWaitTrue(new[] { wait }, okCallback));
     }
 
     static IEnumerator CoWaitTrue(IEnumerable<IWaitable> waits, Action okCallback)
@@ -102,7 +102,7 @@ public class CWaitCo
 
     public static Coroutine TimeCallback(float time, Action callback)
     {
-        return CCosmosEngine.EngineInstance.StartCoroutine((IEnumerator)CoTimeCallback(time, callback));
+        return KEngine.KEngine.EngineInstance.StartCoroutine((IEnumerator)CoTimeCallback(time, callback));
     }
 
     private static IEnumerator CoTimeCallback(float time, Action callback)

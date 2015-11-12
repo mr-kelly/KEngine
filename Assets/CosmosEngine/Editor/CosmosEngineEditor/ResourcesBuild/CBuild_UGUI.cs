@@ -9,7 +9,7 @@
 //
 //------------------------------------------------------------------------------
 using System.IO;
-using KFramework;
+using KEngine;
 using UnityEditor;
 using UnityEngine;
 using System.Collections;
@@ -28,7 +28,7 @@ public class CUGUIBuilder : CBuild_Base
     }
     public static string GetBuildRelPath(string uiName)
     {
-        return string.Format("UI/{0}_UI{1}", uiName, CCosmosEngine.GetConfig("AssetBundleExt"));
+        return string.Format("UI/{0}_UI{1}", uiName, KEngine.KEngine.GetConfig("AssetBundleExt"));
     }
 
     [MenuItem("CosmosEngine/UI(UGUI)/Create UI(UGUI)")]

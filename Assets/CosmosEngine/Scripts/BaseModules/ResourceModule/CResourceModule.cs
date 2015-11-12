@@ -9,7 +9,7 @@
 //
 //------------------------------------------------------------------------------
 using System;
-using KFramework;
+using KEngine;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
@@ -69,7 +69,7 @@ public class CResourceModule : MonoBehaviour, ICModule
     /// <summary>
     /// Product Folder's Relative Path   -  Default: ../Product,   which means Assets/../Product
     /// </summary>
-    public static string ProductRelPath { get { return CCosmosEngine.GetConfig(CCosmosEngineDefaultConfig.ProductRelPath); } }
+    public static string ProductRelPath { get { return KEngine.KEngine.GetConfig(CCosmosEngineDefaultConfig.ProductRelPath); } }
 
     /// <summary>
     /// Product Folder Full Path , Default: C:\xxxxx\xxxx\../Product
@@ -101,7 +101,7 @@ public class CResourceModule : MonoBehaviour, ICModule
     /// <returns></returns>
     public static string GetAssetBundlePath(string path, params object[] formats)
     {
-        return string.Format(path + CCosmosEngine.GetConfig("AssetBundleExt"), formats);
+        return string.Format(path + KEngine.KEngine.GetConfig("AssetBundleExt"), formats);
     }
 
     // 检查资源是否存在
@@ -366,7 +366,7 @@ public class CResourceModule : MonoBehaviour, ICModule
     {
         get
         {
-            return CCosmosEngine.GetConfig(CCosmosEngineDefaultConfig.BundlesFolderName);
+            return KEngine.KEngine.GetConfig(CCosmosEngineDefaultConfig.BundlesFolderName);
         }
     }
 
@@ -378,7 +378,7 @@ public class CResourceModule : MonoBehaviour, ICModule
     {
         get
         {
-            string editorAssetBundlePath = Path.Combine(Application.dataPath, CCosmosEngine.GetConfig(CCosmosEngineDefaultConfig.AssetBundleBuildRelPath));  // for editoronly
+            string editorAssetBundlePath = Path.Combine(Application.dataPath, KEngine.KEngine.GetConfig(CCosmosEngineDefaultConfig.AssetBundleBuildRelPath));  // for editoronly
 
             return editorAssetBundlePath;
         }

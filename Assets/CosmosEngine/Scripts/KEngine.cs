@@ -14,13 +14,13 @@ using System.Collections.Generic;
 using System;
 using CosmosTable;
 
-namespace KFramework
+namespace KEngine
 {
 
     /// <summary>
     /// Cosmos Engine - Unity3D Game Develop Framework
     /// </summary>
-    public class CCosmosEngine : MonoBehaviour
+    public class KEngine : MonoBehaviour
     {
         public static bool IsDebugBuild { get; private set; }  // cache Debug.isDebugBuild for multi thread
         public static bool ShowFps = Debug.isDebugBuild;
@@ -34,7 +34,7 @@ namespace KFramework
         /// </summary>
         public static bool IsRootUser;  // 是否越狱iOS
 
-        public static CCosmosEngine EngineInstance { get; private set; }
+        public static KEngine EngineInstance { get; private set; }
 
         private static TableFile<CCosmosEngineInfo> _configsTable;
 
@@ -52,7 +52,7 @@ namespace KFramework
         private CoroutineDelegate BeforeInitModules = null;
         private CoroutineDelegate AfterInitModules = null;
 
-        public static CCosmosEngine New(GameObject gameObjectToAttach, ICModule[] modules)
+        public static KEngine New(GameObject gameObjectToAttach, ICModule[] modules)
         {
             return New(gameObjectToAttach, modules, null, null);
         }
@@ -60,10 +60,10 @@ namespace KFramework
         /// <summary>
         /// Engine entry.... all begins from here
         /// </summary>
-        public static CCosmosEngine New(GameObject gameObjectToAttach, ICModule[] modules, CoroutineDelegate before, CoroutineDelegate after)
+        public static KEngine New(GameObject gameObjectToAttach, ICModule[] modules, CoroutineDelegate before, CoroutineDelegate after)
         {
             CDebug.Assert(gameObjectToAttach != null && modules != null);
-            CCosmosEngine engine = gameObjectToAttach.AddComponent<CCosmosEngine>();
+            KEngine engine = gameObjectToAttach.AddComponent<KEngine>();
             engine.GameModules = modules;
             engine.BeforeInitModules = before;
             engine.AfterInitModules = after;
@@ -76,7 +76,7 @@ namespace KFramework
 
             if (EngineInstance != null)
             {
-                CDebug.LogError("Duplicated Instance CCosmosEngine!!!");
+                CDebug.LogError("Duplicated Instance KEngine!!!");
             }
 
             EngineInstance = this;

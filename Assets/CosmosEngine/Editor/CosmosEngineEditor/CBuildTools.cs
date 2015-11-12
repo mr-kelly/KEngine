@@ -9,7 +9,7 @@
 //
 //------------------------------------------------------------------------------
 using System;
-using KFramework;
+using KEngine;
 using UnityEngine;
 using UnityEditor;
 using System.Collections;
@@ -57,7 +57,7 @@ public partial class CBuildTools
     /// <returns></returns>
     public static string GetExportPath(BuildTarget platfrom, CResourceQuality quality = CResourceQuality.Sd)
     {
-        string basePath = Path.GetFullPath(Application.dataPath + "/" + CCosmosEngine.GetConfig(CCosmosEngineDefaultConfig.AssetBundleBuildRelPath) + "/");
+        string basePath = Path.GetFullPath(Application.dataPath + "/" + KEngine.KEngine.GetConfig(CCosmosEngineDefaultConfig.AssetBundleBuildRelPath) + "/");
 
         if (!Directory.Exists(basePath))
         {

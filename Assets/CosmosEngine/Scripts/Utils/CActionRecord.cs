@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------------
 using System;
 using System.Collections.Generic;
-using KFramework;
+using KEngine;
 using UnityEngine;
 using System.Collections;
 
@@ -68,7 +68,7 @@ public class CActionRecords : CBehaviour
 
     public static Coroutine WaitCallback(Enum type, string subType, int count, WaitCallbackDelegate func)
     {
-        return CCosmosEngine.EngineInstance.StartCoroutine(CoWaitCallback(type, subType, count, func));
+        return KEngine.KEngine.EngineInstance.StartCoroutine(CoWaitCallback(type, subType, count, func));
     }
 
     private static IEnumerator CoWaitCallback(Enum type, string subType, int count, WaitCallbackDelegate func)

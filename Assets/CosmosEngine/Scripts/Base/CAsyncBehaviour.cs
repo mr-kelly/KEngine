@@ -12,7 +12,7 @@ using System;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using KFramework;
+using KEngine;
 /// <summary>
 /// 带有异步处理功能的组件
 /// 
@@ -83,7 +83,7 @@ public abstract class CAsyncBehaviour : CBehaviour
     private void DoCheckAsyncCall()
     {
         // 调试模式下，防止永远没设置AsyncCall的程序bug
-        CCosmosEngine.EngineInstance.StartCoroutine(DebuggerForCheckAsyncCall());
+        KEngine.KEngine.EngineInstance.StartCoroutine(DebuggerForCheckAsyncCall());
     }
 
     IEnumerator DebuggerForCheckAsyncCall()
@@ -110,7 +110,7 @@ public abstract class CAsyncBehaviour : CBehaviour
     /// <returns></returns>
     public static Coroutine AsyncCalls(IEnumerable<CAsyncBehaviour> ayncs, Action callback)
     {
-        return CCosmosEngine.EngineInstance.StartCoroutine(CoAsyncCalls(ayncs, callback));
+        return KEngine.KEngine.EngineInstance.StartCoroutine(CoAsyncCalls(ayncs, callback));
     }
 
     public static IEnumerator CoAsyncCalls(IEnumerable<CAsyncBehaviour> asyncs, Action callback)

@@ -8,7 +8,7 @@
 //              https://github.com/mr-kelly/CosmosEngine
 //
 //------------------------------------------------------------------------------
-using KFramework;
+using KEngine;
 using UnityEngine;
 using System;
 using System.Collections;
@@ -316,7 +316,7 @@ public class CUIModule : ICModule
         }
         CDebug.Assert(!UIWindows.ContainsKey(windowTemplateName));
 
-        string path = string.Format("UI/{0}_UI{1}", windowTemplateName, CCosmosEngine.GetConfig("AssetBundleExt"));
+        string path = string.Format("UI/{0}_UI{1}", windowTemplateName, KEngine.KEngine.GetConfig("AssetBundleExt"));
 
         CUILoadState openState = new CUILoadState(windowTemplateName, windowTemplateName);
         openState.IsStaticUI = true;

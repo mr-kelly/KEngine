@@ -12,7 +12,7 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections;
 using System.IO;
-using KFramework;
+using KEngine;
 
 public class CCommonProductPrefabExporter : CBuild_Base
 {

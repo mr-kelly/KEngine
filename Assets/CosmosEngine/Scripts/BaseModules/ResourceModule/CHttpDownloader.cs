@@ -13,7 +13,7 @@ using System;
 using System.Collections;
 using System.IO;
 using System.Threading;
-using KFramework;
+using KEngine;
 
 public class CHttpDownloader : MonoBehaviour, IDisposable
 {
@@ -92,7 +92,7 @@ public class CHttpDownloader : MonoBehaviour, IDisposable
 
     IEnumerator StartDownload(string fullUrl)
     {
-        float startTime = Time.time;
+        //float startTime = Time.time;
         if (UseCache && File.Exists(_SavePath))
         {
             var lastWriteTime = File.GetLastWriteTimeUtc(_SavePath);

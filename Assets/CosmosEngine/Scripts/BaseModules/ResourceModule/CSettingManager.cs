@@ -8,7 +8,7 @@
 //              https://github.com/mr-kelly/CosmosEngine
 //
 //------------------------------------------------------------------------------
-using KFramework;
+using KEngine;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
@@ -66,7 +66,7 @@ public class CSettingManager : ICModule
 
 	IEnumerator InitSetting()
 	{
-		var assetLoader = CStaticAssetLoader.Load("GameSetting" + CCosmosEngine.GetConfig("AssetBundleExt"), null);
+		var assetLoader = CStaticAssetLoader.Load("GameSetting" + KEngine.KEngine.GetConfig("AssetBundleExt"), null);
 		while (!assetLoader.IsFinished)
 			yield return null;
 

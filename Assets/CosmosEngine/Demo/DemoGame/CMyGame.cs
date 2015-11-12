@@ -11,7 +11,7 @@
 using System;
 using UnityEngine;
 using System.Collections;
-using KFramework;
+using KEngine;
 using System.IO;
 
 public class CMyGame : MonoBehaviour
@@ -20,7 +20,7 @@ public class CMyGame : MonoBehaviour
     {
         CGameSettings.Instance.InitAction += OnGameSettingsInit;
 
-        CCosmosEngine.New(
+        KEngine.KEngine.New(
             gameObject,
             new ICModule[] {
                 CGameSettings.Instance,
@@ -43,9 +43,9 @@ public class CMyGame : MonoBehaviour
 
         CDebug.Log("Begin Load tab file...");
 
-        //var tabContent = File.ReadAllText("Assets/" + CCosmosEngine.GetConfig("ProductRelPath") + "/setting/test_tab.bytes");
+        //var tabContent = File.ReadAllText("Assets/" + KEngine.GetConfig("ProductRelPath") + "/setting/test_tab.bytes");
         //var path = CResourceModule.GetResourceFullPath("/setting/test_tab.bytes");
-        var tabContent = File.ReadAllText(Application.dataPath + "/" + CCosmosEngine.GetConfig("ProductRelPath") + "/setting/test_tab.bytes");
+        var tabContent = File.ReadAllText(Application.dataPath + "/" + KEngine.KEngine.GetConfig("ProductRelPath") + "/setting/test_tab.bytes");
         _.LoadTab<CTestTabInfo>(tabContent);
         CDebug.Log("Output the tab file...");
         foreach (CTestTabInfo info in _.GetInfos<CTestTabInfo>())
