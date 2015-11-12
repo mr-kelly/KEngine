@@ -316,7 +316,7 @@ public class CUIModule : ICModule
         }
         Logger.Assert(!UIWindows.ContainsKey(windowTemplateName));
 
-        string path = string.Format("UI/{0}_UI{1}", windowTemplateName, KEngine.KEngine.GetConfig("AssetBundleExt"));
+        string path = string.Format("UI/{0}_UI{1}", windowTemplateName, KEngine.AppEngine.GetConfig("AssetBundleExt"));
 
         CUILoadState openState = new CUILoadState(windowTemplateName, windowTemplateName);
         openState.IsStaticUI = true;

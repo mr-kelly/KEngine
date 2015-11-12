@@ -56,7 +56,7 @@ public class CAssetFileLoader : CBaseResourceLoader
 
     IEnumerator _Init(string path, string assetName)
     {
-        IsLoadAssetBundle = KEngine.KEngine.GetConfig("IsLoadAssetBundle").ToInt32() != 0;
+        IsLoadAssetBundle = KEngine.AppEngine.GetConfig("IsLoadAssetBundle").ToInt32() != 0;
         AssetInBundleName = assetName;
 
         UnityEngine.Object getAsset = null;

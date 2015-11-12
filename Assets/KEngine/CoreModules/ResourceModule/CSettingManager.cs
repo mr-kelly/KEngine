@@ -66,7 +66,7 @@ public class CSettingManager : ICModule
 
 	IEnumerator InitSetting()
 	{
-		var assetLoader = CStaticAssetLoader.Load("GameSetting" + KEngine.KEngine.GetConfig("AssetBundleExt"), null);
+		var assetLoader = CStaticAssetLoader.Load("GameSetting" + KEngine.AppEngine.GetConfig("AssetBundleExt"), null);
 		while (!assetLoader.IsFinished)
 			yield return null;
 

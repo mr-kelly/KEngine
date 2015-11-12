@@ -83,7 +83,7 @@ public abstract class KAsyncBehaviour : KBehaviour
     private void DoCheckAsyncCall()
     {
         // 调试模式下，防止永远没设置AsyncCall的程序bug
-        KEngine.KEngine.EngineInstance.StartCoroutine(DebuggerForCheckAsyncCall());
+        KEngine.AppEngine.EngineInstance.StartCoroutine(DebuggerForCheckAsyncCall());
     }
 
     IEnumerator DebuggerForCheckAsyncCall()
@@ -110,7 +110,7 @@ public abstract class KAsyncBehaviour : KBehaviour
     /// <returns></returns>
     public static Coroutine AsyncCalls(IEnumerable<KAsyncBehaviour> ayncs, Action callback)
     {
-        return KEngine.KEngine.EngineInstance.StartCoroutine(CoAsyncCalls(ayncs, callback));
+        return KEngine.AppEngine.EngineInstance.StartCoroutine(CoAsyncCalls(ayncs, callback));
     }
 
     public static IEnumerator CoAsyncCalls(IEnumerable<KAsyncBehaviour> asyncs, Action callback)

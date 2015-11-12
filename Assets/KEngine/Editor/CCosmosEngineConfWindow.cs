@@ -17,7 +17,7 @@ using System.IO;
 
 namespace KEngine.Editor
 {
-    [CustomEditor(typeof(KEngine))]
+    [CustomEditor(typeof(AppEngine))]
     public class CCosmosEngineInspector : UnityEditor.Editor
     {
         static CCosmosEngineInspector()

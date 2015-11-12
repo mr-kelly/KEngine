@@ -20,7 +20,7 @@ public class CMyGame : MonoBehaviour
     {
         CGameSettings.Instance.InitAction += OnGameSettingsInit;
 
-        KEngine.KEngine.New(
+        KEngine.AppEngine.New(
             gameObject,
             new ICModule[] {
                 CGameSettings.Instance,
@@ -43,9 +43,9 @@ public class CMyGame : MonoBehaviour
 
         Logger.Log("Begin Load tab file...");
 
-        //var tabContent = File.ReadAllText("Assets/" + KEngine.GetConfig("ProductRelPath") + "/setting/test_tab.bytes");
+        //var tabContent = File.ReadAllText("Assets/" + Engine.GetConfig("ProductRelPath") + "/setting/test_tab.bytes");
         //var path = CResourceModule.GetResourceFullPath("/setting/test_tab.bytes");
-        var tabContent = File.ReadAllText(Application.dataPath + "/" + KEngine.KEngine.GetConfig("ProductRelPath") + "/setting/test_tab.bytes");
+        var tabContent = File.ReadAllText(Application.dataPath + "/" + KEngine.AppEngine.GetConfig("ProductRelPath") + "/setting/test_tab.bytes");
         _.LoadTab<CTestTabInfo>(tabContent);
         Logger.Log("Output the tab file...");
         foreach (CTestTabInfo info in _.GetInfos<CTestTabInfo>())

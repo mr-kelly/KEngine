@@ -126,7 +126,7 @@ public class KObjectDebugger : KBehaviour
         if (GlobalDebugCoroutine == null)
         {
             GlobalDebugCoroutine = CoGlobalDebugCoroutine();
-            KEngine.KEngine.EngineInstance.StartCoroutine(GlobalDebugCoroutine);
+            KEngine.AppEngine.EngineInstance.StartCoroutine(GlobalDebugCoroutine);
         }
     }
 

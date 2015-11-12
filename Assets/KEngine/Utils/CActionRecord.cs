@@ -68,7 +68,7 @@ public class KActionRecords : KBehaviour
 
     public static Coroutine WaitCallback(Enum type, string subType, int count, WaitCallbackDelegate func)
     {
-        return KEngine.KEngine.EngineInstance.StartCoroutine(CoWaitCallback(type, subType, count, func));
+        return KEngine.AppEngine.EngineInstance.StartCoroutine(CoWaitCallback(type, subType, count, func));
     }
 
     private static IEnumerator CoWaitCallback(Enum type, string subType, int count, WaitCallbackDelegate func)

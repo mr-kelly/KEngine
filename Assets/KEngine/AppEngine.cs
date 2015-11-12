@@ -20,7 +20,7 @@ namespace KEngine
     /// <summary>
     /// Cosmos Engine - Unity3D Game Develop Framework
     /// </summary>
-    public class KEngine : MonoBehaviour
+    public class AppEngine : MonoBehaviour
     {
         public static bool IsDebugBuild { get; private set; }  // cache Debug.isDebugBuild for multi thread
         public static bool ShowFps = Debug.isDebugBuild;
@@ -34,7 +34,7 @@ namespace KEngine
         /// </summary>
         public static bool IsRootUser;  // 是否越狱iOS
 
-        public static KEngine EngineInstance { get; private set; }
+        public static AppEngine EngineInstance { get; private set; }
 
         private static TableFile<CCosmosEngineInfo> _configsTable;
 
@@ -52,7 +52,7 @@ namespace KEngine
         private CoroutineDelegate BeforeInitModules = null;
         private CoroutineDelegate AfterInitModules = null;
 
-        public static KEngine New(GameObject gameObjectToAttach, ICModule[] modules)
+        public static AppEngine New(GameObject gameObjectToAttach, ICModule[] modules)
         {
             return New(gameObjectToAttach, modules, null, null);
         }
@@ -60,14 +60,14 @@ namespace KEngine
         /// <summary>
         /// Engine entry.... all begins from here
         /// </summary>
-        public static KEngine New(GameObject gameObjectToAttach, ICModule[] modules, CoroutineDelegate before, CoroutineDelegate after)
+        public static AppEngine New(GameObject gameObjectToAttach, ICModule[] modules, CoroutineDelegate before, CoroutineDelegate after)
         {
             Logger.Assert(gameObjectToAttach != null && modules != null);
-            KEngine engine = gameObjectToAttach.AddComponent<KEngine>();
-            engine.GameModules = modules;
-            engine.BeforeInitModules = before;
-            engine.AfterInitModules = after;
-            return engine;
+            AppEngine appEngine = gameObjectToAttach.AddComponent<AppEngine>();
+            appEngine.GameModules = modules;
+            appEngine.BeforeInitModules = before;
+            appEngine.AfterInitModules = after;
+            return appEngine;
         }
 
         private void Awake()
@@ -76,7 +76,7 @@ namespace KEngine
 
             if (EngineInstance != null)
             {
-                Logger.LogError("Duplicated Instance KEngine!!!");
+                Logger.LogError("Duplicated Instance Engine!!!");
             }
 
             EngineInstance = this;
@@ -114,7 +114,7 @@ namespace KEngine
         /// </summary>
         IEnumerator DoInit()
         {
-            var baseModules = new ICModule[] {  // 基础三件套
+            var baseModules = new ICModule[] {  // 基础2件套
                 CResourceModule.Instance, 
                 CUIModule.Instance, 
             };
