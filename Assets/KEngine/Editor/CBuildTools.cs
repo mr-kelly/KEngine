@@ -48,7 +48,6 @@ public partial class CBuildTools
         return path;
     }
 
-
     /// <summary>
     /// Extra Flag ->   ex:  Android/  AndroidSD/  AndroidHD/
     /// </summary>
@@ -59,10 +58,14 @@ public partial class CBuildTools
     {
         string basePath = Path.GetFullPath(Application.dataPath + "/" + KEngine.AppEngine.GetConfig(CCosmosEngineDefaultConfig.AssetBundleBuildRelPath) + "/");
 
-        if (!Directory.Exists(basePath))
+        if (File.Exists(basePath))
         {
             CBuildTools.ShowDialog("路径配置错误: " + basePath);
             throw new System.Exception("路径配置错误");
+        }
+        if (!Directory.Exists(basePath))
+        {
+            Directory.CreateDirectory(basePath);
         }
 
         string path = null;
@@ -382,7 +385,7 @@ public partial class CBuildTools
             Logger.LogError("无法找到py.exe, 或python指令");
             return "Error: Not found python";
         }
-        
+
         string allOutput = null;
         using (var process = new System.Diagnostics.Process())
         {
@@ -412,47 +415,47 @@ public partial class CBuildTools
             return allOutput;
         }
     }
-/* TODO: CFolderSyncTool
-    public static void DeleteLink(string linkPath)
-    {
-        var os = Environment.OSVersion;
-        if (os.ToString().Contains("Windows"))
+    /* TODO: CFolderSyncTool
+        public static void DeleteLink(string linkPath)
         {
-            CFolderSyncTool.ExecuteCommand(string.Format("rmdir \"{0}\"", linkPath));
-        }
-        else if (os.ToString().Contains("Unix"))
-        {
-            CFolderSyncTool.ExecuteCommand(string.Format("rm -Rf \"{0}\"", linkPath));
-        }
-        else
-        {
-            Logger.LogError("[SymbolLinkFolder]Error on OS: {0}", os.ToString());
-        }
-    }
-
-    public static void SymbolLinkFolder(string srcFolderPath, string targetPath)
-    {
-        var os = Environment.OSVersion;
-        if (os.ToString().Contains("Windows"))
-        {
-            CFolderSyncTool.ExecuteCommand(string.Format("mklink /J \"{0}\" \"{1}\"", targetPath, srcFolderPath));
-        }
-        else if (os.ToString().Contains("Unix"))
-        {
-            var fullPath = Path.GetFullPath(targetPath);
-            if (fullPath.EndsWith("/"))
+            var os = Environment.OSVersion;
+            if (os.ToString().Contains("Windows"))
             {
-                fullPath = fullPath.Substring(0, fullPath.Length - 1);
-                fullPath = Path.GetDirectoryName(fullPath);
+                CFolderSyncTool.ExecuteCommand(string.Format("rmdir \"{0}\"", linkPath));
             }
-            CFolderSyncTool.ExecuteCommand(string.Format("ln -s {0} {1}", Path.GetFullPath(srcFolderPath), fullPath));
+            else if (os.ToString().Contains("Unix"))
+            {
+                CFolderSyncTool.ExecuteCommand(string.Format("rm -Rf \"{0}\"", linkPath));
+            }
+            else
+            {
+                Logger.LogError("[SymbolLinkFolder]Error on OS: {0}", os.ToString());
+            }
         }
-        else
+
+        public static void SymbolLinkFolder(string srcFolderPath, string targetPath)
         {
-            Logger.LogError("[SymbolLinkFolder]Error on OS: {0}", os.ToString());
+            var os = Environment.OSVersion;
+            if (os.ToString().Contains("Windows"))
+            {
+                CFolderSyncTool.ExecuteCommand(string.Format("mklink /J \"{0}\" \"{1}\"", targetPath, srcFolderPath));
+            }
+            else if (os.ToString().Contains("Unix"))
+            {
+                var fullPath = Path.GetFullPath(targetPath);
+                if (fullPath.EndsWith("/"))
+                {
+                    fullPath = fullPath.Substring(0, fullPath.Length - 1);
+                    fullPath = Path.GetDirectoryName(fullPath);
+                }
+                CFolderSyncTool.ExecuteCommand(string.Format("ln -s {0} {1}", Path.GetFullPath(srcFolderPath), fullPath));
+            }
+            else
+            {
+                Logger.LogError("[SymbolLinkFolder]Error on OS: {0}", os.ToString());
+            }
         }
-    }
-    */
+        */
     #region 资源版本管理相关
     class BuildRecord
     {

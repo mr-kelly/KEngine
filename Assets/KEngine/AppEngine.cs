@@ -12,6 +12,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using System.Text;
 using CosmosTable;
 
 namespace KEngine
@@ -183,7 +184,15 @@ namespace KEngine
                     {
                         if (ex != TableFileExceptionType.DuplicatedKey)
                         {
-                            throw new Exception(ex.ToString());
+                            var sb = new StringBuilder();
+                            sb.Append(ex.ToString());
+                            sb.Append(": ");
+                            foreach (var s in args)
+                            {
+                                sb.Append(s);
+                                sb.Append(", ");
+                            }
+                            throw new Exception(sb.ToString());
                         }
                     },
 
@@ -250,7 +259,6 @@ namespace KEngine
     {
         public string Key;
         public string Value;
-        public string Desc;
 
         public override object PrimaryKey
         {

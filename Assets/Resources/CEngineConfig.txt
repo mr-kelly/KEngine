@@ -2,6 +2,8 @@
 [string]	[string]	[string]
 ProductRelPath	../Product	
 AssetBundleRelPath	StreamingAssets	
+AssetBundleBuildRelPath	StreamingAssets
+BundlesFolderName	Bundles		
 AssetBundleExt	.unity3d	base
 IsLoadAssetBundle	1	
 UIBridgeType	UGUI	
