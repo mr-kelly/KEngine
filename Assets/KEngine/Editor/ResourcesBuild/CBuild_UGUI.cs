@@ -18,7 +18,7 @@ using UnityEngine.UI;
 
 public class CUGUIBuilder : CBuild_Base
 {
-    [MenuItem("CosmosEngine/UI(UGUI)/Export Current UI")]
+    [MenuItem("KEngine/UI(UGUI)/Export Current UI")]
     public static void ExportCurrentUI()
     {
         var UIName = Path.GetFileNameWithoutExtension(EditorApplication.currentScene);
@@ -31,7 +31,7 @@ public class CUGUIBuilder : CBuild_Base
         return string.Format("UI/{0}_UI{1}", uiName, KEngine.AppEngine.GetConfig("AssetBundleExt"));
     }
 
-    [MenuItem("CosmosEngine/UI(UGUI)/Create UI(UGUI)")]
+    [MenuItem("KEngine/UI(UGUI)/Create UI(UGUI)")]
     public static void CreateNewUI()
     {
         GameObject mainCamera = GameObject.Find("Main Camera");

@@ -137,7 +137,7 @@ public class CAutoBuilder
     //    return programVersionFile;
     //}
 
-    [MenuItem("CosmosEngine/AutoBuilder/WindowsX86D")]  // 注意，PC版本放在不一样的目录的！
+    [MenuItem("KEngine/AutoBuilder/WindowsX86D")]  // 注意，PC版本放在不一样的目录的！
     public static void PerformWinBuild()
     {
         PerformBuild("ClientX86D.exe", BuildTarget.StandaloneWindows, BuildOptions.Development | BuildOptions.AllowDebugging | BuildOptions.ConnectWithProfiler);
@@ -149,7 +149,7 @@ public class CAutoBuilder
     //	PerformBuild(GetProjectName() + "X86.exe", BuildTarget.StandaloneWindows, BuildOptions.AllowDebugging | BuildOptions.ConnectWithProfiler);
     //}
 
-    [MenuItem("CosmosEngine/AutoBuilder/iOS")]
+    [MenuItem("KEngine/AutoBuilder/iOS")]
     public static void PerformiOSBuild()
     {
         PerformiOSBuild("App");        
@@ -163,7 +163,7 @@ public class CAutoBuilder
         return PerformBuild("Apps/IOSProjects/" + ipaName, BuildTarget.iPhone, opt);
     }
 
-    [MenuItem("CosmosEngine/AutoBuilder/Android")]
+    [MenuItem("KEngine/AutoBuilder/Android")]
     public static void PerformAndroidBuild()
     {
         PerformAndroidBuild("StrikeHero");
@@ -178,7 +178,7 @@ public class CAutoBuilder
         return PerformBuild(path, BuildTarget.Android, opt);
     }
 
-    [MenuItem("CosmosEngine/Clear PC PersitentDataPath")]
+    [MenuItem("KEngine/Clear PC PersitentDataPath")]
     public static void ClearPersistentDataPath()
     {
         foreach (string dir in Directory.GetDirectories(CResourceModule.GetAppDataPath()))
@@ -190,13 +190,13 @@ public class CAutoBuilder
             File.Delete(file);
         }
     }
-    [MenuItem("CosmosEngine/Open PC PersitentDataPath Folder")]
+    [MenuItem("KEngine/Open PC PersitentDataPath Folder")]
     public static void OpenPersistentDataPath()
     {
         System.Diagnostics.Process.Start(CResourceModule.GetAppDataPath());
     }
 
-    [MenuItem("CosmosEngine/Clear Prefs")]
+    [MenuItem("KEngine/Clear Prefs")]
     public static void ClearPlayerPrefs()
     {
         PlayerPrefs.DeleteAll();
@@ -222,7 +222,7 @@ public class CSymbolLinkHelper
         return resourcePath;
     }
 
-    [MenuItem("CosmosEngine/Symbol Link Builded Resource to StreamingAssets")]
+    [MenuItem("KEngine/Symbol Link Builded Resource to StreamingAssets")]
     public static void SymbolLinkResource()
     {
         //CSymbolLinkHelper.DeleteAllLinks(CSymbolLinkHelper.AssetBundlesLinkPath);

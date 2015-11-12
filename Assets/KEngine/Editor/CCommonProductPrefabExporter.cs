@@ -31,7 +31,7 @@ public class CCommonProductPrefabExporter : CBuild_Base
         }
     }
 
-    [MenuItem("CosmosEngine/Build Product Folder Prefabs")]
+    [MenuItem("KEngine/Build Product Folder Prefabs")]
     static void BuildProductFolderPrefabs()
     {
         CAutoResourceBuilder.ProductExport(new CCommonProductPrefabExporter());

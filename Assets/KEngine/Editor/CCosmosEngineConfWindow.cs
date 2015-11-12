@@ -57,7 +57,7 @@ namespace KEngine.Editor
 
         static CTabFile ConfFile;
 
-        [MenuItem("CosmosEngine/Configuration")]
+        [MenuItem("KEngine/Configuration")]
         static void Init()
         {
             // Get existing open window or if none, make a new one:		
