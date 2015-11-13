@@ -366,7 +366,7 @@ public class CResourceModule : MonoBehaviour, ICModule
     {
         get
         {
-            return KEngine.AppEngine.GetConfig(CCosmosEngineDefaultConfig.BundlesFolderName);
+            return KEngine.AppEngine.GetConfig(CCosmosEngineDefaultConfig.StreamingBundlesFolderName);
         }
     }
 

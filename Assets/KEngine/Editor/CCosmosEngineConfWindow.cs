@@ -43,7 +43,7 @@ namespace KEngine.Editor
             CheckConfigFile();
         }
 
-        static string ConfFilePath = "Assets/Resources/CEngineConfig.txt";
+        static string ConfFilePath = "Assets/Resources/KEngineConfig.txt";
 
         // 默認的配置文件內容
         static string[][] DefaultConfigFileContent = new string[][]{

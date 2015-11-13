@@ -174,7 +174,7 @@ namespace KEngine
             if (_configsTable == null || reload)
             {
                 TextAsset textAsset;
-                textAsset = Resources.Load<TextAsset>("CEngineConfig");
+                textAsset = Resources.Load<TextAsset>("KEngineConfig");
 
                 Logger.Assert(textAsset);
                 _configsTable = new TableFile<CCosmosEngineInfo>(new TableFileConfig
@@ -228,7 +228,7 @@ namespace KEngine
         ProductRelPath,
         AssetBundleBuildRelPath,  // FromRelPath
 
-        BundlesFolderName, // StreamingAssets inner folder name
+        StreamingBundlesFolderName, // StreamingAssets inner folder name, when build, will link the Bundle build Path to here
     }
 
     class CFpsWatcher

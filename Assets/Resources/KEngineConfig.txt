@@ -3,7 +3,7 @@
 ProductRelPath	../Product	
 AssetBundleRelPath	StreamingAssets	
 AssetBundleBuildRelPath	StreamingAssets
-BundlesFolderName	Bundles		
+StreamingBundlesFolderName	Bundles		#Link the BuildPath to StreamingAssets/Bundles
 AssetBundleExt	.unity3d	base
 IsLoadAssetBundle	1	
 UIBridgeType	UGUI	
