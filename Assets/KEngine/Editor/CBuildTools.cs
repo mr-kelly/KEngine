@@ -74,7 +74,7 @@ public partial class CBuildTools
             case BuildTarget.Android:
             case BuildTarget.iPhone:
             case BuildTarget.StandaloneWindows:
-                var platformName = CResourceModule.BuildPlatformName;
+                var platformName = KResourceModule.BuildPlatformName;
                 if (quality != CResourceQuality.Sd)  // SD no need add
                     platformName += quality.ToString().ToUpper();
 
@@ -137,7 +137,7 @@ public partial class CBuildTools
 
     public static uint BuildAssetBundle(Object asset, string path)
     {
-        return BuildAssetBundle(asset, path, EditorUserBuildSettings.activeBuildTarget, CResourceModule.Quality);
+        return BuildAssetBundle(asset, path, EditorUserBuildSettings.activeBuildTarget, KResourceModule.Quality);
     }
 
     public static uint BuildAssetBundle(Object asset, string path, BuildTarget buildTarget, CResourceQuality quality)
@@ -256,7 +256,7 @@ public partial class CBuildTools
 
     public static uint BuildScriptableObject<T>(T scriptObject, string path) where T : ScriptableObject
     {
-        return BuildScriptableObject(scriptObject, path, EditorUserBuildSettings.activeBuildTarget, CResourceModule.Quality);
+        return BuildScriptableObject(scriptObject, path, EditorUserBuildSettings.activeBuildTarget, KResourceModule.Quality);
     }
 
     public static uint BuildScriptableObject<T>(T scriptObject, string path, BuildTarget buildTarget, CResourceQuality quality) where T : ScriptableObject
@@ -558,7 +558,7 @@ public partial class CBuildTools
     // Prefab Asset打包版本號記錄
     public static string GetBuildVersionTab()
     {
-        return Application.dataPath + "/" + CCosmosEngineDef.ResourcesBuildInfosDir + "/ArtBuildResource_" + CResourceModule.BuildPlatformName + ".txt";
+        return Application.dataPath + "/" + KEngineDef.ResourcesBuildInfosDir + "/ArtBuildResource_" + KResourceModule.BuildPlatformName + ".txt";
     }
 
     public static bool CheckNeedBuild(params string[] sourceFiles)

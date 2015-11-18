@@ -17,8 +17,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
-[CDependencyClass(typeof(CResourceModule))]
-[CDependencyClass(typeof(CSettingManager))]
+[CDependencyClass(typeof(KResourceModule))]
+[CDependencyClass(typeof(KSettingManager))]
 public class CGameSettings : ICModule
 {
     class _InstanceClass { public static CGameSettings _Instance = new CGameSettings();}

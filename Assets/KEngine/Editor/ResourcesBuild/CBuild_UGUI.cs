@@ -16,7 +16,7 @@ using System.Collections;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class CUGUIBuilder : CBuild_Base
+public class CUGUIBuilder : KBuild_Base
 {
     [MenuItem("KEngine/UI(UGUI)/Export Current UI")]
     public static void ExportCurrentUI()

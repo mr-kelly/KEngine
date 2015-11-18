@@ -116,8 +116,8 @@ namespace KEngine
         IEnumerator DoInit()
         {
             var baseModules = new ICModule[] {  // 基础2件套
-                CResourceModule.Instance, 
-                CUIModule.Instance, 
+                KResourceModule.Instance, 
+                KUIModule.Instance, 
             };
 
             yield return StartCoroutine(DoInitModules(baseModules));

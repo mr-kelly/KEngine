@@ -28,9 +28,9 @@ public class CMyGame : MonoBehaviour
             null,
             null);
 
-        CUIModule.Instance.OpenWindow<CUIDemoHome>();
+        KUIModule.Instance.OpenWindow<KUIDemoHome>();
 
-        CUIModule.Instance.CallUI<CUIDemoHome>(ui => {
+        KUIModule.Instance.CallUI<KUIDemoHome>(ui => {
             
             // Do some UI stuff
 
@@ -44,7 +44,7 @@ public class CMyGame : MonoBehaviour
         Logger.Log("Begin Load tab file...");
 
         //var tabContent = File.ReadAllText("Assets/" + Engine.GetConfig("ProductRelPath") + "/setting/test_tab.bytes");
-        //var path = CResourceModule.GetResourceFullPath("/setting/test_tab.bytes");
+        //var path = KResourceModule.GetResourceFullPath("/setting/test_tab.bytes");
         var tabContent = File.ReadAllText(Application.dataPath + "/" + KEngine.AppEngine.GetConfig("ProductRelPath") + "/setting/test_tab.bytes");
         _.LoadTab<CTestTabInfo>(tabContent);
         Logger.Log("Output the tab file...");

@@ -102,7 +102,7 @@ public class KObjectDebugger : KBehaviour
                 var newDebugger = new GameObject(string.Format("{0}-{1}", obj.ToString(), obj.GetType())).AddComponent<KObjectDebugger>();
                 newDebugger.WatchObject = obj;
 
-                CDebuggerObjectTool.SetParent(ContainerName, obj.GetType().Name, newDebugger.gameObject);
+                KDebuggerObjectTool.SetParent(ContainerName, obj.GetType().Name, newDebugger.gameObject);
 
                 Cache[obj] = newDebugger;
             }

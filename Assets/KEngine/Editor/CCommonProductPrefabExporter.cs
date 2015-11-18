@@ -14,7 +14,7 @@ using System.Collections;
 using System.IO;
 using KEngine;
 
-public class CCommonProductPrefabExporter : CBuild_Base
+public class KCommonProductPrefabExporter : KBuild_Base
 {
     public override string GetDirectory() { return ""; }
     public override string GetExtention() { return "dir"; }
@@ -34,6 +34,6 @@ public class CCommonProductPrefabExporter : CBuild_Base
     [MenuItem("KEngine/Build Product Folder Prefabs")]
     static void BuildProductFolderPrefabs()
     {
-        CAutoResourceBuilder.ProductExport(new CCommonProductPrefabExporter());
+        KResourceBuilder.ProductExport(new KCommonProductPrefabExporter());
     }
 }

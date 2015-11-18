@@ -9,7 +9,9 @@
 #endregion
 
 using System;
+using System.IO;
 using System.Reflection;
+using System.Text;
 using UnityEditor;
 using UnityEngine;
 
@@ -35,9 +37,11 @@ namespace KUnityEditorTools
         /// 执行批处理命令
         /// </summary>
         /// <param name="command"></param>
-        public static void ExecuteCommand(string command)
+        /// <param name="workingDirectory"></param>
+        public static void ExecuteCommand(string command, string workingDirectory = null)
         {
-            EditorUtility.DisplayProgressBar("KEditorUtils.ExecuteCommand", command, .5f);
+            var fProgress = .1f;
+            EditorUtility.DisplayProgressBar("KEditorUtils.ExecuteCommand", command, fProgress);
 
             try
             {
@@ -60,9 +64,11 @@ namespace KUnityEditorTools
                 }
 
                 Debug.Log("[ExecuteCommand]" + command);
-                string allOutput = null;
+                var allOutput = new StringBuilder();
                 using (var process = new System.Diagnostics.Process())
                 {
+                    if (workingDirectory != null)
+                        process.StartInfo.WorkingDirectory = workingDirectory;
                     process.StartInfo.FileName = cmdName;
                     process.StartInfo.Arguments = preArg + "\"" + command + "\"";
                     process.StartInfo.UseShellExecute = false;
@@ -70,7 +76,15 @@ namespace KUnityEditorTools
                     process.StartInfo.RedirectStandardOutput = true;
                     process.Start();
 
-                    allOutput = process.StandardOutput.ReadToEnd();
+                    while (true)
+                    {
+                        var line = process.StandardOutput.ReadLine();
+                        if (line == null)
+                            break;
+                        allOutput.AppendLine(line);
+                        EditorUtility.DisplayProgressBar("[ExecuteCommand] " + command, line, fProgress);
+                        fProgress += .001f;
+                    }
 
                     process.WaitForExit();
                 }
