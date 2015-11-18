@@ -168,14 +168,15 @@ public class KResourceModule : MonoBehaviour, ICModule
     /// <returns></returns>
     public static string GetAppDataPath()
     {
-        // Windows 时使用特定的目录，避免中文User的存在
-        if (Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsWebPlayer)
-        {
-            string dataPath = Application.dataPath + "/../Library/UnityWinPersistentDataPath";
-            if (!Directory.Exists(dataPath))
-                Directory.CreateDirectory(dataPath);
-            return dataPath;
-        }
+        // Windows 时使用特定的目录，避免中文User的存在 
+        // 去掉自定义PersistentDataPath, 2015/11/18， 务必要求Windows Users是英文
+        //if (Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsWebPlayer)
+        //{
+        //    string dataPath = Application.dataPath + "/../Library/UnityWinPersistentDataPath";
+        //    if (!Directory.Exists(dataPath))
+        //        Directory.CreateDirectory(dataPath);
+        //    return dataPath;
+        //}
 
         return Application.persistentDataPath;
     }
