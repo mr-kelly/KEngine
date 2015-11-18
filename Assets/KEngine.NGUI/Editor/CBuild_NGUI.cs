@@ -16,23 +16,28 @@ using System.IO;
 using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
+using KEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using KEngine;
 
 public partial class CBuild_NGUI : KBuild_Base
 {
-    string UIName;
-    string UIScenePath;
+    private string UIScenePath
+    {
+        get
+        {
+            return EditorApplication.currentScene;
+        }
+    }
+
     //UIPanel PanelRoot;
     //GameObject AnchorObject;
-    GameObject WindowObject;
-    GameObject TempPanelObject;
+    //GameObject WindowObject;
 
     // 判断本次是否全局打包，是否剔除没用的UIlabel string
-    public bool IsBuildAll = false; 
+    public bool IsBuildAll = false;
 
-    public override string GetDirectory() { return "NGUI"; }
+    public override string GetDirectory() { return "UI"; }
     public override string GetExtention() { return "*.unity"; }
 
     public static event Action<CBuild_NGUI> BeginExportEvent;
@@ -42,38 +47,42 @@ public partial class CBuild_NGUI : KBuild_Base
 
     public static string GetBuildRelPath(string uiName)
     {
-        return string.Format("NGUI/{0}_UI{1}", uiName, AppEngine.GetConfig("AssetBundleExt"));
+        return string.Format("UI/{0}_UI{1}", uiName, AppEngine.GetConfig("AssetBundleExt"));
     }
 
     public void ExportCurrentUI()
     {
         //if (changeLayer)
         //{
-            // 去掉一些残留的Clone
-            //var allTrans = GameObject.FindObjectsOfType<Transform>();
-            //for (var i = allTrans.Length - 1; i >= 0 ; i--)
-            //{
-            //    var child = allTrans[i];
-            //    if (child != null && child.gameObject.name.EndsWith("Window(Clone)"))
-            //    {
-            //        GameObject.DestroyImmediate(child.gameObject);
-            //    }
-            //}
-            EditorApplication.SaveScene(); // 强制保存一下，保证一些Prefab更新
+        // 去掉一些残留的Clone
+        //var allTrans = GameObject.FindObjectsOfType<Transform>();
+        //for (var i = allTrans.Length - 1; i >= 0 ; i--)
+        //{
+        //    var child = allTrans[i];
+        //    if (child != null && child.gameObject.name.EndsWith("Window(Clone)"))
+        //    {
+        //        GameObject.DestroyImmediate(child.gameObject);
+        //    }
+        //}
+        EditorApplication.SaveScene(); // 强制保存一下，保证一些Prefab更新
 
         //}
 
-        CreateTempPrefab();
+        foreach (var windowAsset in GameObject.FindObjectsOfType<KUIWindowAsset>())
+        {
+            var uiName = windowAsset.name;
+            var tempPanelObject = CreateTempPrefab(windowAsset.gameObject);
 
-        if (ExportCurrentUIEvent != null)
-        {
-            ExportCurrentUIEvent(this, UIScenePath, UIName, TempPanelObject);
+            if (ExportCurrentUIEvent != null)
+            {
+                ExportCurrentUIEvent(this, UIScenePath, uiName, tempPanelObject);
+            }
+            else
+            {
+                CBuildTools.BuildAssetBundle(tempPanelObject, GetBuildRelPath(uiName));
+            }
+            DestroyTempPrefab(tempPanelObject);
         }
-        else
-        {
-            CBuildTools.BuildAssetBundle(TempPanelObject, GetBuildRelPath(UIName));
-        }
-        DestroyTempPrefab();
     }
 
     public override void BeforeExport()
@@ -103,9 +112,9 @@ public partial class CBuild_NGUI : KBuild_Base
 
     }
 
-    void CreateTempPrefab()
+    GameObject CreateTempPrefab(GameObject windowAsset)
     {
-        TempPanelObject = (GameObject)GameObject.Instantiate(WindowObject);
+        var tempPanelObject = (GameObject)GameObject.Instantiate(windowAsset);
 
         //if (WindowObject.GetComponent<UIPanel>() == null)
         //{
@@ -117,22 +126,22 @@ public partial class CBuild_NGUI : KBuild_Base
         //    }
         //}
 
-        foreach (UIButton go in TempPanelObject.GetComponentsInChildren<UIButton>(true))
+        foreach (UIButton go in tempPanelObject.GetComponentsInChildren<UIButton>(true))
         {
             if (go.tweenTarget != null && go.transform.FindChild(go.tweenTarget.name) != null && go.tweenTarget != go.transform.FindChild(go.tweenTarget.name).gameObject)
             {
-                Debug.LogWarning(UIName + " " + go.name + " UIButton 的Target 目标不是当前UIButton 子节点 ");
+                Debug.LogWarning(windowAsset + " " + go.name + " UIButton 的Target 目标不是当前UIButton 子节点 ");
             }
         }
+
+        return tempPanelObject;
     }
 
-    void DestroyTempPrefab()
+    void DestroyTempPrefab(GameObject tempPanelObject)
     {
-        GameObject.DestroyImmediate(TempPanelObject);
-        UIName = null;
+        GameObject.DestroyImmediate(tempPanelObject);
         //AnchorObject = null;
-        WindowObject = null;
-        TempPanelObject = null;
+        //WindowObject = null;
     }
 
     public static GameObject GetUIWindow()
@@ -158,18 +167,14 @@ public partial class CBuild_NGUI : KBuild_Base
             return null;
         }
         return AnchorObject.transform.GetChild(0).gameObject;
-        
+
     }
     public bool CheckUI(bool showMsg)
     {
-        WindowObject = GetUIWindow();
-        if (WindowObject == null)
+        var windowAssets = GameObject.FindObjectsOfType<KUIWindowAsset>();
+        if (windowAssets.Length == 0)
             return false;
 
-        UIName = EditorApplication.currentScene.Substring(EditorApplication.currentScene.LastIndexOf('/') + 1);
-        UIName = UIName.Substring(0, UIName.LastIndexOf('.'));
-
-        UIScenePath = EditorApplication.currentScene;
 
         // 確保Layer正確
         //bool changeLayer = false;
@@ -202,39 +207,59 @@ public partial class CBuild_NGUI : KBuild_Base
         if (mainCamera != null)
             GameObject.DestroyImmediate(mainCamera);
 
-        GameObject uiRootObj = new GameObject("UIRoot");
-        uiRootObj.layer = (int)UnityLayerDef.UI;
+        GameObject uiRootObj = GameObject.Find("UIRoot");
+        if (uiRootObj == null)
+        {
+            uiRootObj = new GameObject("UIRoot");
+            uiRootObj.layer = (int)UnityLayerDef.UI;
+        }
 
-        UIRoot uiRoot = uiRootObj.AddComponent<UIRoot>();
-        uiRoot.scalingStyle = UIRoot.Scaling.ConstrainedOnMobiles;
+        UIRoot uiRoot = uiRootObj.GetComponent<UIRoot>() ?? uiRootObj.AddComponent<UIRoot>();
+        uiRoot.scalingStyle = UIRoot.Scaling.FixedSizeOnMobiles;
         uiRoot.manualHeight = 1920;
-        uiRoot.manualWidth = 1080;
-        uiRoot.fitHeight = true;
-        uiRoot.fitWidth = true;
+        //uiRoot.manualWidth = 1080;
+        //uiRoot.fitHeight = true;
+        //uiRoot.fitWidth = true;
 
-        GameObject cameraObj = new GameObject("Camera");
-        cameraObj.layer = (int)UnityLayerDef.UI;
 
-        Camera camera = cameraObj.AddComponent<Camera>();
-        camera.clearFlags = CameraClearFlags.Skybox;
-        camera.depth = 0;
-        camera.backgroundColor = Color.grey;
-        camera.cullingMask = 1 << (int)UnityLayerDef.UI;
-        camera.orthographicSize = 1f;
-        camera.orthographic = true;
-        camera.nearClipPlane = -2f;
-        camera.farClipPlane = 2f;
+        GameObject cameraObj = GameObject.Find("UICamera");
+        if (cameraObj == null)
+        {
+            cameraObj = new GameObject("UICamera");
+            cameraObj.layer = (int)UnityLayerDef.UI;
 
-        camera.gameObject.AddComponent<AudioListener>();
-        camera.gameObject.AddComponent<UICamera>();
+            Camera camera = cameraObj.AddComponent<Camera>();
+            camera.clearFlags = CameraClearFlags.Skybox;
+            camera.depth = 0;
+            camera.backgroundColor = Color.grey;
+            camera.cullingMask = 1 << (int)UnityLayerDef.UI;
+            camera.orthographicSize = 1f;
+            camera.orthographic = true;
+            camera.nearClipPlane = -2f;
+            camera.farClipPlane = 2f;
 
-        UIPanel uiPanel = NGUITools.AddChild<UIPanel>(uiRootObj);
-        uiPanel.gameObject.name = "PanelRoot";
-        uiPanel.gameObject.AddComponent<Canvas>();
+        }
+        var aud = cameraObj.GetComponent<AudioListener>() ?? cameraObj.AddComponent<AudioListener>();
+        var uiCam = cameraObj.GetComponent<UICamera>() ?? cameraObj.AddComponent<UICamera>();
+        var panelRootTran = uiRootObj.transform.Find("PanelRoot");
+        if (panelRootTran == null)
+        {
+            UIPanel uiPanel = NGUITools.AddChild<UIPanel>(uiRootObj);
+            uiPanel.gameObject.name = "PanelRoot";
+            //uiPanel.gameObject.AddComponent<Canvas>();
+            panelRootTran = uiPanel.transform;
+        }
 
-        UIAnchor uiAnchor = NGUITools.AddChild<UIAnchor>(uiPanel.gameObject);
-        GameObject windowObj = NGUITools.AddChild(uiAnchor.gameObject);
-        windowObj.name = "Window";
+        var anchorTran = panelRootTran.Find("Anchor");
+        if (anchorTran == null)
+        {
+            UIAnchor uiAnchor = NGUITools.AddChild<UIAnchor>(panelRootTran.gameObject);
+            anchorTran = uiAnchor.transform;
+        }
+
+        GameObject windowObj = NGUITools.AddChild(anchorTran.gameObject);
+        windowObj.name = "UIWindow"+Path.GetRandomFileName();
+        windowObj.AddComponent<KUIWindowAsset>();
 
         Selection.activeGameObject = windowObj;
     }
@@ -250,7 +275,7 @@ public partial class CBuild_NGUI : KBuild_Base
     {
         if (ExportUIMenuEvent != null)
             ExportUIMenuEvent();
-        
+
         CBuild_NGUI uiBuild = new CBuild_NGUI();
         uiBuild.IsBuildAll = false;
         if (!uiBuild.CheckUI(true))
@@ -264,7 +289,7 @@ public partial class CBuild_NGUI : KBuild_Base
     /// <summary>
     /// Buidl All UI Scene under Assets/"+ CCosmosEngineDef.ResourcesBuildDir + "/ folder
     /// </summary>
-    [MenuItem("CosmosEngine/UI/Export All UI")]
+    [MenuItem("KEngine/NGUI/Export All UI")]
     public static void ExportAllUI()
     {
         var buildUI = new CBuild_NGUI();
