@@ -116,12 +116,12 @@ public class CNGUIBridge : IKUIBridge
         //UiRoot.manualWidth = 1920;//GameDef.ScreenPixelX;
 
         // 屏幕中间位置
-        UiRoot.transform.localPosition = new Vector3(GameDef.ScreenPixelX / 2f / GameDef.DefaultPixelPerMeters,
-            GameDef.ScreenPixelY / 2f / GameDef.DefaultPixelPerMeters, -50);
-        var scale = 1 / GameDef.DefaultPixelPerMeters;
-        // 覆盖NGUI的Uiroot自动缩放
-        UiRoot.transform.localScale = new Vector3(scale, scale, scale);
-        UiRoot.enabled = false;
+        //UiRoot.transform.localPosition = new Vector3(GameDef.ScreenPixelX / 2f / GameDef.DefaultPixelPerMeters,
+        //    GameDef.ScreenPixelY / 2f / GameDef.DefaultPixelPerMeters, -50);
+        //var scale = 1 / GameDef.DefaultPixelPerMeters;
+        //// 覆盖NGUI的Uiroot自动缩放
+        //UiRoot.transform.localScale = new Vector3(scale, scale, scale);
+        //UiRoot.enabled = false;
 
         GameObject panelRootObj = new GameObject("PanelRoot");
         CTool.SetChild(panelRootObj.transform, uiRootobj.transform);

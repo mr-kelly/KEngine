@@ -40,7 +40,7 @@ public class KUIModule : ICModule
     /// <summary>
     /// A bridge for different UI System, for instance, you can use NGUI or EZGUI or etc.. UI Plugin through UIBridge
     /// </summary>
-    public IKUIBridge UiBridge = new KUGUIBridge();
+    public IKUIBridge UiBridge = KEngineRuntimeCustom.UIBridge;
     public Dictionary<string, CUILoadState> UIWindows = new Dictionary<string, CUILoadState>();
     public bool UIRootLoaded = false;
 
