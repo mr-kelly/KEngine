@@ -267,7 +267,7 @@ namespace CosmosTable
                     var headerDef = Headers[fieldName].HeaderDef;
                     if (!string.IsNullOrEmpty(headerDef))
                     {
-                        var defs = headerDef.Split(new[] { '[', ']', ':' }, StringSplitOptions.RemoveEmptyEntries);
+                        var defs = headerDef.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                         //if (defs.Length >= 1) szType = defs[0];
                         if (defs.Length >= 2) defaultValue = defs[1];
                     }
