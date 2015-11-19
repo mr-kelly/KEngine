@@ -59,27 +59,52 @@ public partial class CDependencyBuild
 
     static IEnumerator<CSerializeMaterialProperty> _ShaderPropEnumtor(Material mat, string buildToFolder, float scaleTexture = 1f)
     {
+        var shader = mat.shader;
+        if (shader != null)
+        {
+            for (var i = 0; i < ShaderUtil.GetPropertyCount(shader); i++)
+            {
+                var shaderType = ShaderUtil.GetPropertyType(shader, i);
+                var shaderPropName  = ShaderUtil.GetPropertyName(shader, i);
+                switch (shaderType)
+                {
+                    case ShaderUtil.ShaderPropertyType.TexEnv:
+                        yield return _GetShaderTexProp(mat, shaderPropName, buildToFolder, scaleTexture);
+                        break;
+                    case ShaderUtil.ShaderPropertyType.Color:
+                        yield return _GetMatColor(mat, shaderPropName);
+                        break;
+                    case ShaderUtil.ShaderPropertyType.Range:
+                    case ShaderUtil.ShaderPropertyType.Float:  // TODO: 未确定Mat.GetInt是float还是range
+                        yield return _GetMatRange(mat, shaderPropName);
+                        break;
+                    case ShaderUtil.ShaderPropertyType.Vector:
+                        yield return  _GetShaderVectorProp(mat, shaderPropName);
+                        break;
+                }
+            }
+        }
         // Unity Builtin Shaders
-        yield return _GetShaderTexProp(mat, "_MainTex", buildToFolder, scaleTexture);
-        yield return _GetShaderTexProp(mat, "_BumpMap", buildToFolder, scaleTexture);
-        yield return _GetShaderTexProp(mat, "_Cube", buildToFolder, scaleTexture);
-        yield return _GetMatColor(mat, "_Color");
-        yield return _GetMatColor(mat, "_SpecColor");
-        yield return _GetMatColor(mat, "_Emission");
-        yield return _GetMatColor(mat, "_ReflectColor");
+        //yield return _GetShaderTexProp(mat, "_MainTex", buildToFolder, scaleTexture);
+        //yield return _GetShaderTexProp(mat, "_BumpMap", buildToFolder, scaleTexture);
+        //yield return _GetShaderTexProp(mat, "_Cube", buildToFolder, scaleTexture);
+        //yield return _GetMatColor(mat, "_Color");
+        //yield return _GetMatColor(mat, "_SpecColor");
+        //yield return _GetMatColor(mat, "_Emission");
+        //yield return _GetMatColor(mat, "_ReflectColor");
 
-        // FX/Water 
-        yield return _GetMatRange(mat, "_WaveScale");
-        yield return _GetMatRange(mat, "_ReflDistort");
-        yield return _GetMatRange(mat, "_RefrDistort");
-        yield return _GetMatColor(mat, "_RefrColor");
-        yield return _GetShaderTexProp(mat, "_Fresnel", buildToFolder, scaleTexture);
-        yield return _GetShaderVectorProp(mat, "WaveSpeed");
-        yield return _GetShaderTexProp(mat, "_ReflectiveColor", buildToFolder, scaleTexture);
-        yield return _GetShaderTexProp(mat, "_ReflectiveColorCube", buildToFolder, scaleTexture);
-        yield return _GetMatColor(mat, "_HorizonColor");
-        yield return _GetShaderTexProp(mat, "_ReflectionTex", buildToFolder, scaleTexture);
-        yield return _GetShaderTexProp(mat, "_RefractionTex", buildToFolder, scaleTexture);
+        //// FX/Water 
+        //yield return _GetMatRange(mat, "_WaveScale");
+        //yield return _GetMatRange(mat, "_ReflDistort");
+        //yield return _GetMatRange(mat, "_RefrDistort");
+        //yield return _GetMatColor(mat, "_RefrColor");
+        //yield return _GetShaderTexProp(mat, "_Fresnel", buildToFolder, scaleTexture);
+        //yield return _GetShaderVectorProp(mat, "WaveSpeed");
+        //yield return _GetShaderTexProp(mat, "_ReflectiveColor", buildToFolder, scaleTexture);
+        //yield return _GetShaderTexProp(mat, "_ReflectiveColorCube", buildToFolder, scaleTexture);
+        //yield return _GetMatColor(mat, "_HorizonColor");
+        //yield return _GetShaderTexProp(mat, "_ReflectionTex", buildToFolder, scaleTexture);
+        //yield return _GetShaderTexProp(mat, "_RefractionTex", buildToFolder, scaleTexture);
     }
 
     static CSerializeMaterialProperty _GetShaderTexProp(Material mm, string texProp, string buildToFolder, float scaleTexture = 1f)
@@ -149,7 +174,6 @@ public partial class CDependencyBuild
 
         return null; // 默认给个白
     }
-
     static CSerializeMaterialProperty _GetMatRange(Material mm, string propName)
     {
         if (mm.HasProperty(propName))

@@ -48,21 +48,18 @@ namespace KUnityEditorTools
                 var cmdName = "cmd.exe";
                 var preArg = "/C ";
                 var os = Environment.OSVersion;
+                
+                Debug.Log(string.Format("[ExecuteCommand]Command on OS: {0}", os.ToString()));
                 if (os.ToString().Contains("Windows"))
                 {
                     cmdName = "cmd.exe";
                     preArg = "/C ";
                 }
-                else if (os.ToString().Contains("Unix"))
+                else
                 {
                     cmdName = "sh";
                     preArg = "-c ";
                 }
-                else
-                {
-                    Debug.LogError(string.Format("[ExecuteCommand]Error on OS: {0}", os.ToString()));
-                }
-
                 Debug.Log("[ExecuteCommand]" + command);
                 var allOutput = new StringBuilder();
                 using (var process = new System.Diagnostics.Process())
@@ -74,6 +71,7 @@ namespace KUnityEditorTools
                     process.StartInfo.UseShellExecute = false;
                     process.StartInfo.CreateNoWindow = true;
                     process.StartInfo.RedirectStandardOutput = true;
+                    process.StartInfo.RedirectStandardError = true;
                     process.Start();
 
                     while (true)
@@ -86,6 +84,11 @@ namespace KUnityEditorTools
                         fProgress += .001f;
                     }
 
+                    var err = process.StandardError.ReadToEnd();
+                    if (!string.IsNullOrEmpty(err))
+                    {
+                        Debug.LogError(string.Format("[ExecuteCommand] {0}", err));
+                    }
                     process.WaitForExit();
                 }
                 Debug.Log("[ExecuteResult]" + allOutput);

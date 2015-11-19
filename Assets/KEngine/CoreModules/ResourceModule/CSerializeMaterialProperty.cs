@@ -8,7 +8,7 @@ public class CSerializeMaterialProperty
     {
         Texture,
         Color,
-        Range, // Float
+        Range, // equal Float
         Vector,
         RenderTexture,
     }
