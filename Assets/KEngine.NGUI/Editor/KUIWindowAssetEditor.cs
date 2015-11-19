@@ -30,7 +30,7 @@ class KUIPanelAssetEditorInitializer
     }
 }
 [CustomEditor(typeof(KUIWindowAsset))]
-public class KUIPanelAssetEditor : Editor
+public class KUIWindowAssetEditor : Editor
 {
     public override void OnInspectorGUI()
     {

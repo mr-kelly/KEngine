@@ -343,7 +343,7 @@ public abstract class CAssetDep : MonoBehaviour
     protected abstract void DoProcess(string resourcePath);
 }
 
-#if GAME_CLIENT && UNITY_EDITOR
+#if UNITY_EDITOR
 [UnityEditor.CustomEditor(typeof(CAssetDep))]
 public class CBaseAssetDepInspector : UnityEditor.Editor
 {
