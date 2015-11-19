@@ -9,7 +9,7 @@ obj
 /KEngine.*/*.sln.DotSettings
 /KEngine.*/*.suo
 /PushToClient.bat
-/Assets/UnityVS
+/KEngine.*//Assets/UnityVS
 
 /UnityVS.CosmosEngine.v11.suo
 /Assets/Resources/NGUIShaders
