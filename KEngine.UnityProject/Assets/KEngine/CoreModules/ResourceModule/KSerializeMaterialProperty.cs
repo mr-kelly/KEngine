@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/// <summary>
+/// 材质所包含的Shader属性，如_MainTexture等的记录
+/// </summary>
 [System.Serializable]
 public class KSerializeMaterialProperty
 {
