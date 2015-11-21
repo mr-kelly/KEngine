@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
-public class CFontDep : CAssetDep
+public class KUGUIDep : KAssetDep
 {
     protected override void DoProcess(string resourcePath)
     {
@@ -14,10 +15,10 @@ public class CFontDep : CAssetDep
         {
             if (!IsDestroy)
             {
-                var label = DependencyComponent as UILabel;
+                var label = DependencyComponent as Text;
                 //foreach (UILabel label in gameObject.GetComponents<UILabel>())
                 {
-                    label.trueTypeFont = _font;
+                    label.font = _font;
                 }
             }
             OnFinishLoadDependencies(_font);

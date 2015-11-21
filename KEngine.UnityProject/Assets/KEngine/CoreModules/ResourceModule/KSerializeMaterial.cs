@@ -2,10 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class CSerializeMaterial : ScriptableObject
+public class KSerializeMaterial : ScriptableObject
 {
     public string MaterialName;
     public string ShaderName;
 
-    public List<CSerializeMaterialProperty> Props = new List<CSerializeMaterialProperty>();
+    public List<KSerializeMaterialProperty> Props = new List<KSerializeMaterialProperty>();
 }

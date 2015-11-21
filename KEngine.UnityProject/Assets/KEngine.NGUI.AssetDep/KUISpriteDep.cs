@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using KEngine;
-public class CUISpriteDep : CAssetDep
+public class KUISpriteDep : KAssetDep
 {
     protected override void DoProcess(string resourcePath)
     {
@@ -10,7 +10,7 @@ public class CUISpriteDep : CAssetDep
 
     protected void ProcessUISprite(string resourcePath)
     {
-        var loader = CUIAtlasDep.LoadUIAtlas(resourcePath, (atlas) =>
+        var loader = KUIAtlasDep.LoadUIAtlas(resourcePath, (atlas) =>
         {
             if (!IsDestroy)
             {

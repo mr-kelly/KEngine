@@ -24,7 +24,7 @@ public class CUGUIBuilder : KBuild_Base
         var UIName = Path.GetFileNameWithoutExtension(EditorApplication.currentScene);
         
         var uiRoot = GameObject.Find("UI");
-        CBuildTools.BuildAssetBundle(uiRoot, GetBuildRelPath(UIName));
+        KBuildTools.BuildAssetBundle(uiRoot, GetBuildRelPath(UIName));
     }
     public static string GetBuildRelPath(string uiName)
     {

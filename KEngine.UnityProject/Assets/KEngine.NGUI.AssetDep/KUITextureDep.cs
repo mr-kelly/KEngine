@@ -2,7 +2,7 @@
 using UnityEngine;
 using System.Collections;
 using KEngine;
-public class CUITextureDep : CAssetDep
+public class KUITextureDep : KAssetDep
 {
     protected override void DoProcess(string resourcePath)
     {

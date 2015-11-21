@@ -2,7 +2,7 @@
 using UnityEngine;
 using System.Collections;
 using KEngine;
-public partial class CDependencyBuild
+public partial class KDependencyBuild
 {
     [DepBuild(typeof(AudioSource))]
     static void ProcessAudioSource(AudioSource com)
@@ -11,7 +11,7 @@ public partial class CDependencyBuild
         if (audioSource.clip != null)
         {
             string audioPath = BuildAudioClip(audioSource.clip);
-            CAssetDep.Create<CAudioSourceDep>(audioSource, audioPath);
+            KAssetDep.Create<KAudioSourceDep>(audioSource, audioPath);
             audioSource.clip = null;
         }
         else
@@ -23,9 +23,9 @@ public partial class CDependencyBuild
     static string BuildAudioClip(AudioClip audioClip)
     {
         string assetPath = AssetDatabase.GetAssetPath(audioClip);
-        bool needBuild = CBuildTools.CheckNeedBuild(assetPath);
+        bool needBuild = KBuildTools.CheckNeedBuild(assetPath);
         if (needBuild)
-            CBuildTools.MarkBuildVersion(assetPath);
+            KBuildTools.MarkBuildVersion(assetPath);
 
         var result = DoBuildAssetBundle("Audio/Audio_" + audioClip.name, audioClip, needBuild);
 

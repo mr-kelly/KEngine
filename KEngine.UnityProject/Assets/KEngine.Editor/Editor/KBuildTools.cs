@@ -18,7 +18,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using Object = UnityEngine.Object;
 
-public partial class CBuildTools
+public partial class KBuildTools
 {
     static int PushedAssetCount = 0;
 
@@ -36,7 +36,7 @@ public partial class CBuildTools
     /// <returns></returns>
     public static string MakeSureExportPath(string path, BuildTarget buildTarget, CResourceQuality quality)
     {
-        path = CBuildTools.GetExportPath(buildTarget, quality) + path;
+        path = KBuildTools.GetExportPath(buildTarget, quality) + path;
 
         string exportDirectory = path.Substring(0, path.LastIndexOf('/'));
 
@@ -60,7 +60,7 @@ public partial class CBuildTools
 
         if (File.Exists(basePath))
         {
-            CBuildTools.ShowDialog("路径配置错误: " + basePath);
+            KBuildTools.ShowDialog("路径配置错误: " + basePath);
             throw new System.Exception("路径配置错误");
         }
         if (!Directory.Exists(basePath))
@@ -81,7 +81,7 @@ public partial class CBuildTools
                 path = basePath + platformName + "/";
                 break;
             default:
-                CBuildTools.ShowDialog("构建平台配置错误");
+                KBuildTools.ShowDialog("构建平台配置错误");
                 throw new System.Exception("构建平台配置错误");
         }
         return path;
@@ -270,7 +270,7 @@ public partial class CBuildTools
             throw new System.Exception();
         }
 
-        uint crc = CBuildTools.BuildAssetBundle(tempObj, path, buildTarget, quality);
+        uint crc = KBuildTools.BuildAssetBundle(tempObj, path, buildTarget, quality);
         AssetDatabase.DeleteAsset(tempAssetPath);
 
         return crc;

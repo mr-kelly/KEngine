@@ -18,9 +18,9 @@ using System.IO;
 namespace KEngine.Editor
 {
     [CustomEditor(typeof(AppEngine))]
-    public class CCosmosEngineInspector : UnityEditor.Editor
+    public class KEngineInspector : UnityEditor.Editor
     {
-        static CCosmosEngineInspector()
+        static KEngineInspector()
         {
             SceneView.onSceneGUIDelegate -= OnSceneViewGUI;
             SceneView.onSceneGUIDelegate += OnSceneViewGUI;

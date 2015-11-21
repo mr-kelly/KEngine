@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using KEngine;
-public class CBitmapFontDep : CAssetDep
+public class KBitmapFontDep : KAssetDep
 {
 
     protected override void DoProcess(string resourcePath)

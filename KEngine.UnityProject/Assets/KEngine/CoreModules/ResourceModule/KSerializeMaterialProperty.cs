@@ -2,7 +2,7 @@
 using System.Collections;
 
 [System.Serializable]
-public class CSerializeMaterialProperty
+public class KSerializeMaterialProperty
 {
     public enum ShaderType
     {

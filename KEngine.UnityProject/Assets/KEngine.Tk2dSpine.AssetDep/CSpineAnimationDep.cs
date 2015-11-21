@@ -3,7 +3,7 @@ using UnityEngine;
 using System.Collections;
 
 #if SPINE_ANIMATION
-public class CSpineAnimationDep : CAssetDep
+public class CSpineAnimationDep : KAssetDep
 {
     protected override void DoProcess(string resourcePath)
     {

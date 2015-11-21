@@ -14,14 +14,14 @@ public class CDepCollectInfo
     public UnityEngine.Object Asset;  // 打包的对象
     public bool HasBuild;
 
-    public CAssetDep AssetDep;
+    public KAssetDep AssetDep;
 
     // TODO:
     public CDepCollectInfo Child; // 子依赖
 }
 
 // 处理依赖关系的打包工具
-public partial class CDependencyBuild
+public partial class KDependencyBuild
 {
     public static string DepBuildToFolder = "Common"; // 图片等依赖资源打包的地方, 运行时临时改变
 
@@ -91,7 +91,7 @@ public partial class CDependencyBuild
         {
             _cachedDepBuildAttributes = new Dictionary<MethodInfo, DepBuildAttribute>();
 
-            foreach (var methodInfo in typeof(CDependencyBuild).GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
+            foreach (var methodInfo in typeof(KDependencyBuild).GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
             {
                 var depAttrs = methodInfo.GetCustomAttributes(typeof(DepBuildAttribute), true);
                 Logger.Assert(depAttrs.Length <= 1); // 不会太大
@@ -155,7 +155,7 @@ public partial class CDependencyBuild
             if (!IsJustCollect && realBuildOrJustPath)
             {
                 //BuildedCache[fullAssetPath] = true;
-                CBuildTools.BuildAssetBundle(asset, path);
+                KBuildTools.BuildAssetBundle(asset, path);
                 hasBuilded = true;
             }
         }
@@ -192,7 +192,7 @@ public partial class CDependencyBuild
                 AddCache(fullAssetPath);
                 if (!IsJustCollect && realBuildOrJustPath)
                 {
-                    CBuildTools.BuildScriptableObject(so, fullAssetPath);
+                    KBuildTools.BuildScriptableObject(so, fullAssetPath);
                     hasBuilded = true;
                 }
             }
@@ -236,9 +236,9 @@ public partial class CDependencyBuild
         Logger.Assert(tex);
 
         string assetPath = AssetDatabase.GetAssetPath(tex);
-        bool needBuild = CBuildTools.CheckNeedBuild(assetPath);
+        bool needBuild = KBuildTools.CheckNeedBuild(assetPath);
         if (needBuild)
-            CBuildTools.MarkBuildVersion(assetPath);
+            KBuildTools.MarkBuildVersion(assetPath);
 
         Texture newTex;
         if (tex is Texture2D)
@@ -354,7 +354,7 @@ public partial class CDependencyBuild
 
         var fileName = Path.GetFileNameWithoutExtension(cleanPath);
         var buildPath = string.Format("{0}/{1}_{0}{2}", folderName, fileName, AppEngine.GetConfig(CCosmosEngineDefaultConfig.AssetBundleExt));
-        var needBuild = CBuildTools.CheckNeedBuild(cleanPath);
+        var needBuild = KBuildTools.CheckNeedBuild(cleanPath);
 
         var texture = new Texture2D(1, 1);
 
@@ -390,10 +390,10 @@ public partial class CDependencyBuild
         }
 
         // card/xxx_card.box
-        var result = CDependencyBuild.DoBuildAssetBundle(buildPath, texture, needBuild);
+        var result = KDependencyBuild.DoBuildAssetBundle(buildPath, texture, needBuild);
 
         if (needBuild)
-            CBuildTools.MarkBuildVersion(cleanPath);
+            KBuildTools.MarkBuildVersion(cleanPath);
 
         return result.Path;
     }
@@ -432,6 +432,6 @@ public partial class CDependencyBuild
     /// <param name="checkNeedBuild"></param>
     public static void BuildPureGameObject(GameObject tmpSpineObj, string path, bool checkNeedBuild)
     {
-        CDependencyBuild.DoBuildAssetBundle(path, tmpSpineObj, checkNeedBuild);
+        KDependencyBuild.DoBuildAssetBundle(path, tmpSpineObj, checkNeedBuild);
     }
 }

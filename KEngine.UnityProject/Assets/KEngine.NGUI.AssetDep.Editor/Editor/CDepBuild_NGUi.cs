@@ -8,7 +8,7 @@ using System.IO;
 using System.Linq;
 using KEngine;
 
-public partial class CDependencyBuild
+public partial class KDependencyBuild
 {
     private static float PictureScale = 1f;
 
@@ -24,9 +24,9 @@ public partial class CDependencyBuild
         //fontAssetPath = __GetPrefabBuildPath(fontAssetPath).Replace("Atlas_", "");
         //string[] splitArr = fontAssetPath.Split('/');
 
-        bool needBuild = CBuildTools.CheckNeedBuild(fontAssetPath);
+        bool needBuild = KBuildTools.CheckNeedBuild(fontAssetPath);
         if (needBuild)
-            CBuildTools.MarkBuildVersion(fontAssetPath);
+            KBuildTools.MarkBuildVersion(fontAssetPath);
 
         var result = DoBuildAssetBundle("Common/Font_" + font.name, font, needBuild);
 
@@ -40,9 +40,9 @@ public partial class CDependencyBuild
         GameObject atlasPrefab = PrefabUtility.FindPrefabRoot(atlas.gameObject) as GameObject;
         Logger.Assert(atlasPrefab);
         string path = AssetDatabase.GetAssetPath(atlasPrefab);  // prefab只用来获取路径，不打包不挖空
-        bool needBuild = CBuildTools.CheckNeedBuild(path);
+        bool needBuild = KBuildTools.CheckNeedBuild(path);
         if (needBuild)
-            CBuildTools.MarkBuildVersion(path);
+            KBuildTools.MarkBuildVersion(path);
 
         Logger.Assert(path);
 
@@ -73,7 +73,7 @@ public partial class CDependencyBuild
             spriteData.paddingRight = Mathf.FloorToInt(spriteData.paddingRight * PictureScale);
         }
 
-        CAssetDep.Create<CUIAtlasDep>(copyAtlas, matPath);
+        KAssetDep.Create<KUIAtlasDep>(copyAtlas, matPath);
 
         copyAtlas.spriteMaterial = null; // 挖空atlas
 
@@ -92,7 +92,7 @@ public partial class CDependencyBuild
         {
             string atlasPath = BuildUIAtlas(sprite.atlas);
             //CResourceDependencies.Create(sprite, CResourceDependencyType.UI_SPRITE, atlasPath);
-            CAssetDep.Create<CUISpriteDep>(sprite, atlasPath);
+            KAssetDep.Create<KUISpriteDep>(sprite, atlasPath);
             sprite.atlas = null;
         }
         else
@@ -111,9 +111,9 @@ public partial class CDependencyBuild
             return "";
         }
         string uiFontPrefabPath = AssetDatabase.GetAssetPath(uiFont.gameObject);
-        bool needBuild = CBuildTools.CheckNeedBuild(uiFontPrefabPath);
+        bool needBuild = KBuildTools.CheckNeedBuild(uiFontPrefabPath);
         if (needBuild)
-            CBuildTools.MarkBuildVersion(uiFontPrefabPath);
+            KBuildTools.MarkBuildVersion(uiFontPrefabPath);
 
         var copyUIFontObj = GameObject.Instantiate(uiFont.gameObject) as GameObject;
         var copyUIFont = copyUIFontObj.GetComponent<UIFont>();
@@ -122,7 +122,7 @@ public partial class CDependencyBuild
         copyUIFont.atlas = null;  // 清空依赖
         copyUIFont.material = null;
         //CResourceDependencies.Create(copyUIFont, CResourceDependencyType.NGUI_UIFONT, uiAtlas);
-        CAssetDep.Create<CUIFontDep>(copyUIFont, uiAtlas);
+        KAssetDep.Create<KUIFontDep>(copyUIFont, uiAtlas);
 
         var result = DoBuildAssetBundle("Common/UIFont_" + uiFont.name, copyUIFontObj, needBuild);
 
@@ -140,7 +140,7 @@ public partial class CDependencyBuild
         {
             string texPath = BuildDepTexture(tex.mainTexture, 1f);
             //CResourceDependencies.Create(tex, CResourceDependencyType.UI_TEXTURE, texPath);
-            CAssetDep.Create<CUITextureDep>(tex, texPath);
+            KAssetDep.Create<KUITextureDep>(tex, texPath);
             tex.mainTexture = null; // 挖空依赖的数据
 
             // UITexture的有bug，强行缩放有问题的！
@@ -160,7 +160,7 @@ public partial class CDependencyBuild
         {
             string uiFontPath = BuildUIFont(label.bitmapFont);
             //CResourceDependencies.Create(label, CResourceDependencyType.BITMAP_FONT, uiFontPath);
-            CAssetDep.Create<CBitmapFontDep>(label, uiFontPath);
+            KAssetDep.Create<KBitmapFontDep>(label, uiFontPath);
 
             label.bitmapFont = null;
         }
@@ -169,7 +169,7 @@ public partial class CDependencyBuild
             string fontPath = BuildFont(label.trueTypeFont);
 
             //CResourceDependencies.Create(label, CResourceDependencyType.FONT, fontPath);
-            CAssetDep.Create<CFontDep>(label, fontPath);
+            KAssetDep.Create<KFontDep>(label, fontPath);
             label.trueTypeFont = null; // 挖空依赖的数据
         }
         else

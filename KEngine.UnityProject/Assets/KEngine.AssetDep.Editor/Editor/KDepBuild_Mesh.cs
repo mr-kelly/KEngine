@@ -7,7 +7,7 @@ using System.Text;
 /// <summary>
 /// TODO: Mesh
 /// </summary>
-public partial class CDependencyBuild
+public partial class KDependencyBuild
 {
 
 }

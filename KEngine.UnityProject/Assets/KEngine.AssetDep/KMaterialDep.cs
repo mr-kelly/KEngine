@@ -1,7 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class CMaterialDep : CBaseAssetDep
+/// <summary>
+/// TODO:
+/// </summary>
+public class KMaterialDep : KBaseAssetDep
 {
     protected override void DoProcess(string resourcePath)
     {

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using KEngine;
-public class CParticleSystemDep : CAssetDep
+public class KParticleSystemDep : KAssetDep
 {
 
     protected override void DoProcess(string resourcePath)

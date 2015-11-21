@@ -18,7 +18,10 @@ using System;
 using System.IO;
 using KEngine;
 
-class CExcelFile
+/// <summary>
+/// 基于NPOI操作Excel文件
+/// </summary>
+public class KExcelFile
 {
     //private Workbook Workbook_;
     //private Worksheet Worksheet_;
@@ -28,7 +31,7 @@ class CExcelFile
     private IWorkbook Workbook;
     private ISheet Worksheet;
     public bool IsLoadSuccess = true;
-    public CExcelFile(string excelPath)
+    public KExcelFile(string excelPath)
     {
         Path = excelPath;
 

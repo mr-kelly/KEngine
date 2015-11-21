@@ -203,7 +203,7 @@ namespace KEngine.Editor
         {
             PlayerPrefs.DeleteAll();
             PlayerPrefs.Save();
-            CBuildTools.ShowDialog("Prefs Cleared!");
+            KBuildTools.ShowDialog("Prefs Cleared!");
         }
     }
 
@@ -220,7 +220,7 @@ namespace KEngine.Editor
 
         public static string GetResourceExportPath()
         {
-            var resourcePath = CBuildTools.GetExportPath(EditorUserBuildSettings.activeBuildTarget, KResourceModule.Quality);
+            var resourcePath = KBuildTools.GetExportPath(EditorUserBuildSettings.activeBuildTarget, KResourceModule.Quality);
             return resourcePath;
         }
 
@@ -233,7 +233,7 @@ namespace KEngine.Editor
             //var linkPath = GetLinkPath();
 
             // TODO: 
-            //CBuildTools.SymbolLinkFolder(exportPath, linkPath);
+            //KBuildTools.SymbolLinkFolder(exportPath, linkPath);
 
             Logger.Log("TODO:");
             AssetDatabase.Refresh();
@@ -251,7 +251,7 @@ namespace KEngine.Editor
                 {
                     // TODO:
                     Logger.Log("TODO: {0}", dirPath);
-                    //CBuildTools.DeleteLink(dirPath);
+                    //KBuildTools.DeleteLink(dirPath);
                 }
             }
 
@@ -274,7 +274,7 @@ namespace KEngine.Editor
                     doAction();
 
                 // TODO: DeleteLink
-                //CBuildTools.DeleteLink(linkPath);
+                //KBuildTools.DeleteLink(linkPath);
             }
             else
             {

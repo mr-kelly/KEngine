@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using Object = UnityEngine.Object;
 using KEngine;
-public partial class CDependencyBuild
+public partial class KDependencyBuild
 {
     [DepBuild(typeof(ParticleSystem))]
     static void ProcessParticleSystem(ParticleSystem particleCom)
@@ -17,7 +17,7 @@ public partial class CDependencyBuild
         {
             string matPath = BuildDepMaterial(particle.renderer.sharedMaterial);
             //CResourceDependencies.Create(particle, CResourceDependencyType.PARTICLE_SYSTEM, matPath);
-            CAssetDep.Create<CParticleSystemDep>(particle, matPath);
+            KAssetDep.Create<KParticleSystemDep>(particle, matPath);
 
             particle.renderer.sharedMaterial = null;
         }

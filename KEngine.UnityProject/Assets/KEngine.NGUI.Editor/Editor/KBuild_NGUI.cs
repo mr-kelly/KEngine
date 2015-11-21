@@ -20,7 +20,7 @@ using KEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public partial class CBuild_NGUI : KBuild_Base
+public partial class KBuild_NGUI : KBuild_Base
 {
     private string UIScenePath
     {
@@ -40,10 +40,10 @@ public partial class CBuild_NGUI : KBuild_Base
     public override string GetDirectory() { return "UI"; }
     public override string GetExtention() { return "*.unity"; }
 
-    public static event Action<CBuild_NGUI> BeginExportEvent;
-    public static event Action<CBuild_NGUI, string, string, GameObject> ExportCurrentUIEvent;
+    public static event Action<KBuild_NGUI> BeginExportEvent;
+    public static event Action<KBuild_NGUI, string, string, GameObject> ExportCurrentUIEvent;
     public static event Action ExportUIMenuEvent;
-    public static event Action<CBuild_NGUI> EndExportEvent;
+    public static event Action<KBuild_NGUI> EndExportEvent;
 
     public static string GetBuildRelPath(string uiName)
     {
@@ -79,7 +79,7 @@ public partial class CBuild_NGUI : KBuild_Base
             }
             else
             {
-                CBuildTools.BuildAssetBundle(tempPanelObject, GetBuildRelPath(uiName));
+                KBuildTools.BuildAssetBundle(tempPanelObject, GetBuildRelPath(uiName));
             }
             DestroyTempPrefab(tempPanelObject);
         }
@@ -152,7 +152,7 @@ public partial class CBuild_NGUI : KBuild_Base
         if (AnchorObject == null)
         {
             //if (showMsg)
-            //    CBuildTools.ShowDialog("找不到UIRoot/PanelRoot/Anchor");
+            //    KBuildTools.ShowDialog("找不到UIRoot/PanelRoot/Anchor");
             //else
             Debug.LogError("找不到UIRoot/PanelRoot/Anchor");
             return null;
@@ -161,7 +161,7 @@ public partial class CBuild_NGUI : KBuild_Base
         if (AnchorObject.transform.childCount != 1)
         {
             //if (showMsg)
-            //    CBuildTools.ShowDialog("UI结构错误，Ahchor下应该只有一个节点");
+            //    KBuildTools.ShowDialog("UI结构错误，Ahchor下应该只有一个节点");
             //else
             Debug.LogError("UI结构错误，Ahchor下应该只有一个节点");
             return null;
@@ -267,7 +267,7 @@ public partial class CBuild_NGUI : KBuild_Base
     [MenuItem("KEngine/NGUI/Create UI %&N")]
     public static void CreateUI()
     {
-        CBuild_NGUI.CreateNewUI();
+        KBuild_NGUI.CreateNewUI();
     }
 
     [MenuItem("KEngine/NGUI/Export Current UI %&U")]
@@ -276,7 +276,7 @@ public partial class CBuild_NGUI : KBuild_Base
         if (ExportUIMenuEvent != null)
             ExportUIMenuEvent();
 
-        CBuild_NGUI uiBuild = new CBuild_NGUI();
+        KBuild_NGUI uiBuild = new KBuild_NGUI();
         uiBuild.IsBuildAll = false;
         if (!uiBuild.CheckUI(true))
             return;
@@ -292,7 +292,7 @@ public partial class CBuild_NGUI : KBuild_Base
     [MenuItem("KEngine/NGUI/Export All UI")]
     public static void ExportAllUI()
     {
-        var buildUI = new CBuild_NGUI();
+        var buildUI = new KBuild_NGUI();
         buildUI.IsBuildAll = true;
         KResourceBuilder.ProductExport(buildUI);
     }

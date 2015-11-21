@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using System.Collections;
+using UnityEngine.UI;
 using KEngine;
-// Sprite Renderer
-public class CSpriteRendererDep : CAssetDep
+public class KImageDep : KAssetDep
 {
     protected override void DoProcess(string resourcePath)
     {
@@ -11,9 +10,9 @@ public class CSpriteRendererDep : CAssetDep
         {
             if (!IsDestroy)
             {
-                var spriteRenderer = DependencyComponent as SpriteRenderer;
-                Logger.Assert(spriteRenderer);
-                spriteRenderer.sprite = sprite;
+                var image = DependencyComponent as Image;
+                Logger.Assert(image);
+                image.sprite = sprite;
             }
             OnFinishLoadDependencies(gameObject);  // 返回GameObject而已哦
         });

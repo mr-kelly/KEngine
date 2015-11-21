@@ -7,7 +7,7 @@ using UnityEditor;
 using System.IO;
 using System.Linq;
 #if SPINE_ANIMATION
-public partial class CDependencyBuild
+public partial class KDependencyBuild
 {
 
     // 包含json！，不包含圖集
@@ -16,15 +16,15 @@ public partial class CDependencyBuild
         string path = AssetDatabase.GetAssetPath(data);
 
         // DataAsset
-        bool needBuildDataAsset = CBuildTools.CheckNeedBuild(path);
+        bool needBuildDataAsset = KBuildTools.CheckNeedBuild(path);
         if (needBuildDataAsset)
-            CBuildTools.MarkBuildVersion(path);
+            KBuildTools.MarkBuildVersion(path);
 
         // Spine的JSON
         string textAssetPath = AssetDatabase.GetAssetPath(data.skeletonJSON);
-        bool needBuildJsonTextAsset = CBuildTools.CheckNeedBuild(textAssetPath);
+        bool needBuildJsonTextAsset = KBuildTools.CheckNeedBuild(textAssetPath);
         if (needBuildJsonTextAsset)
-            CBuildTools.MarkBuildVersion(textAssetPath);
+            KBuildTools.MarkBuildVersion(textAssetPath);
 
         //string originPath = path;
         //string tmpPath = "Assets/~TempSkeletonDataAsset.asset";
@@ -39,9 +39,9 @@ public partial class CDependencyBuild
 
         string spriteColPath = BuildSpriteCollection(data.spriteCollection);
         string spriteColAssetPath = AssetDatabase.GetAssetPath(data.spriteCollection.gameObject);
-        bool needBuildSpriteCol = CBuildTools.CheckNeedBuild(spriteColAssetPath);
+        bool needBuildSpriteCol = KBuildTools.CheckNeedBuild(spriteColAssetPath);
         if (needBuildSpriteCol)
-            CBuildTools.MarkBuildVersion(spriteColAssetPath);
+            KBuildTools.MarkBuildVersion(spriteColAssetPath);
 
         SkeletonDataAsset copyData = GameObject.Instantiate(data) as SkeletonDataAsset;
         copyData.spriteCollection = null; // 挖空图集, 保留Json!
@@ -87,7 +87,7 @@ public partial class CDependencyBuild
 
             var spineDataResult = GetBuildSpineData(sa.skeletonDataAsset);  // 依赖SpineData
             //CResourceDependencies.Create(sa, CResourceDependencyType.SPINE_ANIMATION, spineDataPath);
-            spineDataResult.AssetDep = CAssetDep.Create<CSpineAnimationDep>(sa, spineDataResult.Path);
+            spineDataResult.AssetDep = KAssetDep.Create<CSpineAnimationDep>(sa, spineDataResult.Path);
 
             sa.skeletonDataAsset = null; // 挖空依赖的数据
 

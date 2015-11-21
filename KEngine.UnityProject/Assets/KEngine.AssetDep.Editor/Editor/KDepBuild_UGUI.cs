@@ -4,7 +4,7 @@ using System.Collections;
 using UnityEngine.UI;
 using KEngine;
 
-public partial class CDependencyBuild
+public partial class KDependencyBuild
 {
     [DepBuild(typeof(SpriteRenderer))]
     static void ProcessSpriteRenderer(SpriteRenderer renderer)
@@ -12,7 +12,7 @@ public partial class CDependencyBuild
         if (renderer.sprite != null)
         {
             var spritePath = BuildSprite(renderer.sprite);
-            CAssetDep.Create<CSpriteRendererDep>(renderer, spritePath);
+            KAssetDep.Create<KSpriteRendererDep>(renderer, spritePath);
             renderer.sprite = null; // 挖空依赖的数据
         }
         else
@@ -26,7 +26,7 @@ public partial class CDependencyBuild
         {
 
             var fontPath = BuildFont(text.font);
-            CAssetDep.Create<CTextDep>(text, fontPath);
+            KAssetDep.Create<KTextDep>(text, fontPath);
             text.font = null; // 挖空依赖的数据
         }
         else
@@ -39,7 +39,7 @@ public partial class CDependencyBuild
         if (image.sprite != null)
         {
             string spritePath = BuildSprite(image.sprite);
-            CAssetDep.Create<CImageDep>(image, spritePath);
+            KAssetDep.Create<KImageDep>(image, spritePath);
             image.sprite = null;
         }
     }
@@ -50,9 +50,9 @@ public partial class CDependencyBuild
             Logger.LogWarning("Sprite: {0} is packing!!!", sprite.name);
         
         string assetPath = AssetDatabase.GetAssetPath(sprite);
-        bool needBuild = CBuildTools.CheckNeedBuild(assetPath);
+        bool needBuild = KBuildTools.CheckNeedBuild(assetPath);
         if (needBuild)
-            CBuildTools.MarkBuildVersion(assetPath);
+            KBuildTools.MarkBuildVersion(assetPath);
 
         string path = __GetPrefabBuildPath(assetPath);
         if (string.IsNullOrEmpty(path))

@@ -6,9 +6,9 @@ using System.IO;
 using System.Collections.Generic;
 using Object = UnityEngine.Object;
 using KEngine;
-public partial class CBuildTools
+public partial class KBuildTools
 {
-    static CBuildTools()
+    static KBuildTools()
     {
         BeforeBuildAssetBundleEvent -= BeforeBuildAssetBundle;
         BeforeBuildAssetBundleEvent += BeforeBuildAssetBundle;

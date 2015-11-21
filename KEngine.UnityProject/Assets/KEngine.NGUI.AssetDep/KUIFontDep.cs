@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 using KEngine;
-public class CUIFontDep : CAssetDep
+
+public class KUIFontDep : KAssetDep
 {
     protected override void DoProcess(string resourcePath)
     {
@@ -10,7 +11,7 @@ public class CUIFontDep : CAssetDep
 
     protected void ProcessUIFont(string resPath)
     {
-        var loader = CUIAtlasDep.LoadUIAtlas(resPath, atlas =>
+        var loader = KUIAtlasDep.LoadUIAtlas(resPath, atlas =>
         {
             if (!IsDestroy)
             {

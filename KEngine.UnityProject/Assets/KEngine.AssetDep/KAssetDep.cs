@@ -7,7 +7,7 @@ using UnityEngine;
 /// <summary>
 /// 基础依赖组件, 由AssetDepBuilder派发
 /// </summary>
-public abstract class CAssetDep : MonoBehaviour
+public abstract class KAssetDep : MonoBehaviour
 {
     // 依赖加载出来的对象容器
     private static GameObject _DependenciesContainer;
@@ -31,22 +31,22 @@ public abstract class CAssetDep : MonoBehaviour
     protected static bool IsQuitApplication = false;
     protected bool IsDestroy = false;
 
-    public static event Action<CAssetDep> BeforeEvent; // 前置依赖加载时调用的事件，用于修改它的依赖哦!!!
-    public static event Action<CAssetDep> FinishEvent; // 完成依赖加载时调用的事件，只执行一次哦
+    public static event Action<KAssetDep> BeforeEvent; // 前置依赖加载时调用的事件，用于修改它的依赖哦!!!
+    public static event Action<KAssetDep> FinishEvent; // 完成依赖加载时调用的事件，只执行一次哦
 
     [System.NonSerialized]
     protected int TexturesWaitLoadCount = 0;
     [System.NonSerialized] protected readonly List<Action> TexturesLoadedCallback = new List<Action>();
-    [System.NonSerialized] protected readonly Queue<Action<CAssetDep, UnityEngine.Object>> LoadedDependenciesCallback = new Queue<Action<CAssetDep, UnityEngine.Object>>(); // 所有依赖加载完毕后的回调， 暂时用在SpriteCollection、UIAtlas加载完、Sprite加载完后, 会多次被用，跟FinishEvent不同
+    [System.NonSerialized] protected readonly Queue<Action<KAssetDep, UnityEngine.Object>> LoadedDependenciesCallback = new Queue<Action<KAssetDep, UnityEngine.Object>>(); // 所有依赖加载完毕后的回调， 暂时用在SpriteCollection、UIAtlas加载完、Sprite加载完后, 会多次被用，跟FinishEvent不同
     [System.NonSerialized]
     protected readonly List<KAbstractResourceLoader> ResourceLoaders = new List<KAbstractResourceLoader>();
 
-    protected CAssetDep()
+    protected KAssetDep()
     {
     }
 
     // TODO: 现在只支持MainAsset
-    public static T Create<T>(Component dependencyComponent, string path, string assetName = null) where T : CAssetDep
+    public static T Create<T>(Component dependencyComponent, string path, string assetName = null) where T : KAssetDep
     {
 
         var dep = dependencyComponent.gameObject.AddComponent<T>();
@@ -154,7 +154,7 @@ public abstract class CAssetDep : MonoBehaviour
     }
 #endif
     // 完成依赖加载后的回调
-    public void AddFinishCallback(Action<CAssetDep, UnityEngine.Object> callback)
+    public void AddFinishCallback(Action<KAssetDep, UnityEngine.Object> callback)
     {
         if (!IsFinishDependency)
             LoadedDependenciesCallback.Enqueue(callback);
@@ -263,19 +263,19 @@ public abstract class CAssetDep : MonoBehaviour
     } 
 
     // 等待器
-    public static CAssetDep[] WaitDep(GameObject obj, Action c)
+    public static KAssetDep[] WaitDep(GameObject obj, Action c)
     {
         CAssetDepWaiter newWaiter = new CAssetDepWaiter();
         newWaiter.DepCallback = c;
         newWaiter.WaitObject = obj;
 
-        CAssetDep[] deps = obj.GetComponentsInChildren<CAssetDep>(true);
+        KAssetDep[] deps = obj.GetComponentsInChildren<KAssetDep>(true);
         newWaiter.AssetDeps = deps;
 
         if (deps.Length > 0)
         {
             newWaiter.count = deps.Length;
-            foreach (CAssetDep dep in deps)
+            foreach (KAssetDep dep in deps)
             {
                 if (!dep._NewIsInit)
                     dep.Init();
@@ -294,12 +294,12 @@ public abstract class CAssetDep : MonoBehaviour
 
     internal class CAssetDepWaiter
     {
-        public IList<CAssetDep> AssetDeps;
+        public IList<KAssetDep> AssetDeps;
         public int count = 0;
         public Action DepCallback = null;
         public GameObject WaitObject;
 
-        public void OnLoadedDepCallback(CAssetDep assetDep, UnityEngine.Object obj)
+        public void OnLoadedDepCallback(KAssetDep assetDep, UnityEngine.Object obj)
         {
             count--;
 
@@ -344,13 +344,13 @@ public abstract class CAssetDep : MonoBehaviour
 }
 
 #if UNITY_EDITOR
-[UnityEditor.CustomEditor(typeof(CAssetDep))]
+[UnityEditor.CustomEditor(typeof(KAssetDep))]
 public class CBaseAssetDepInspector : UnityEditor.Editor
 {
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
-        bool isFinish = ((CAssetDep)target).IsFinishDependency;
+        bool isFinish = ((KAssetDep)target).IsFinishDependency;
         if (isFinish)
             UnityEditor.EditorGUILayout.LabelField("依赖已经加载完毕！");
     }

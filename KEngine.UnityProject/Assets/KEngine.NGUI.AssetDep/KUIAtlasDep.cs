@@ -3,7 +3,7 @@ using UnityEngine;
 using System.Collections;
 using KEngine;
 
-public class CUIAtlasDep : CAssetDep
+public class KUIAtlasDep : KAssetDep
 {
     protected override void DoProcess(string resourcePath)
     {
@@ -56,8 +56,8 @@ public class CUIAtlasDep : CAssetDep
             if (!exist)
             {
                 // Wait Load Material
-                var colDep = gameObj.GetComponent<CAssetDep>();
-                Logger.Assert(colDep && colDep.GetType() == typeof(CUIAtlasDep));// CResourceDependencyType.UI_ATLAS);
+                var colDep = gameObj.GetComponent<KAssetDep>();
+                Logger.Assert(colDep && colDep.GetType() == typeof(KUIAtlasDep));// CResourceDependencyType.UI_ATLAS);
                 // 依赖材质Material, 加载后是Material
                 colDep.AddFinishCallback((assetDep, _obj) =>
                 {

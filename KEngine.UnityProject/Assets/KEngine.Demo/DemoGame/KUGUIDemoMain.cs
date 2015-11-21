@@ -14,7 +14,7 @@ using System.Collections;
 using KEngine;
 using System.IO;
 
-public class CMyGame : MonoBehaviour
+public class KUGUIDemoMain : MonoBehaviour
 {
     void Awake()
     {

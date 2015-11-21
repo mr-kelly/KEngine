@@ -14,7 +14,7 @@ using System.Reflection;
 using UnityEditor;
 
 [CustomEditor(typeof(KObjectDebugger))]
-public class CObjectDebuggerEditor : Editor
+public class KObjectDebuggerEditor : Editor
 {
     public override void OnInspectorGUI()
     {

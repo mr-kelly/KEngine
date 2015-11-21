@@ -51,7 +51,7 @@ public class KMaterialLoader : KAbstractResourceLoader
             yield return null;
         }
 
-        var sMat = matLoadBridge.ResultObject as CSerializeMaterial;
+        var sMat = matLoadBridge.ResultObject as KSerializeMaterial;
         Logger.Assert(sMat);
 
         Logger.Assert(Mat == null);
@@ -107,7 +107,7 @@ public class KMaterialLoader : KAbstractResourceLoader
         return texturePath;
     }
     // 加载材质的图片, 协程等待
-    IEnumerator CoGenerateMaterial(string matPath, CSerializeMaterial sMat)
+    IEnumerator CoGenerateMaterial(string matPath, KSerializeMaterial sMat)
     {
         // 纹理全部加载完成后到这里
         //if (!CachedMaterials.TryGetValue(matPath, out mat))
@@ -125,11 +125,11 @@ public class KMaterialLoader : KAbstractResourceLoader
 
             //CachedMaterials[matPath] = mat;
 
-            foreach (CSerializeMaterialProperty shaderProp in sMat.Props)
+            foreach (KSerializeMaterialProperty shaderProp in sMat.Props)
             {
                 switch (shaderProp.Type)
                 {
-                    case CSerializeMaterialProperty.ShaderType.Texture:
+                    case KSerializeMaterialProperty.ShaderType.Texture:
                         Vector2 tiling;
                         Vector2 offset;
                         var texturePath = ParseMaterialStr(shaderProp.PropValue, out tiling, out offset);
@@ -151,16 +151,16 @@ public class KMaterialLoader : KAbstractResourceLoader
                             _SetMatTex(Mat, shaderProp.PropName, tex, tiling, offset);
                         }
                         break;
-                    case CSerializeMaterialProperty.ShaderType.Color:
+                    case KSerializeMaterialProperty.ShaderType.Color:
                         _SetMatColor(Mat, shaderProp.PropName, shaderProp.PropValue);
                         break;
-                    case CSerializeMaterialProperty.ShaderType.Range:
+                    case KSerializeMaterialProperty.ShaderType.Range:
                         _SetMatRange(Mat, shaderProp.PropName, shaderProp.PropValue);
                         break;
-                    case CSerializeMaterialProperty.ShaderType.Vector:
+                    case KSerializeMaterialProperty.ShaderType.Vector:
                         _SetMatVector(Mat, shaderProp.PropName, shaderProp.PropValue);
                         break;
-                    case CSerializeMaterialProperty.ShaderType.RenderTexture:
+                    case KSerializeMaterialProperty.ShaderType.RenderTexture:
                         // RenderTextures, 不处理, 一般用在水，Water脚本会自动生成
                         break;
 

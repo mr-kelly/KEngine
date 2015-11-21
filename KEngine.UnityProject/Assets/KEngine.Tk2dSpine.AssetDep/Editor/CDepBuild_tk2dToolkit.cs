@@ -8,7 +8,7 @@ using System.IO;
 using System.Linq;
 
 #if TK2D
-public partial class CDependencyBuild
+public partial class KDependencyBuild
 {
 
     // Not SpriteCollectionData
@@ -30,7 +30,7 @@ public partial class CDependencyBuild
     //{
     //    string scPath = BuildSpriteCollection(tileMap.Editor__SpriteCollection, "TileMap");
     //    //CResourceDependencies.Create(tileMap, CResourceDependencyType.TILE_MAP__SPRITE_COLLECTION, scPath);
-    //    CAssetDep.Create<Ctk2dTileMapDep>(tileMap, scPath);
+    //    KAssetDep.Create<Ctk2dTileMapDep>(tileMap, scPath);
     //    tileMap.Editor__SpriteCollection = null;
     //}
 
@@ -53,7 +53,7 @@ public partial class CDependencyBuild
         if (!string.IsNullOrEmpty(spriteCollectionPath))
 
             //CResourceDependencies.Create(sprite, CResourceDependencyType.TK2D_SPRITE, spriteCollectionPath);
-            CAssetDep.Create<CTk2dSpriteDep>(baseSprite, spriteCollectionPath);
+            KAssetDep.Create<CTk2dSpriteDep>(baseSprite, spriteCollectionPath);
 
         baseSprite.Collection = null;
 
@@ -81,9 +81,9 @@ public partial class CDependencyBuild
             Logger.Log("Null Sprite Collection {0}", path);
             return "";   // !!! SpriteCollection可能动态生成的，不打包它
         }
-        bool needBuild = CBuildTools.CheckNeedBuild(path);
+        bool needBuild = KBuildTools.CheckNeedBuild(path);
         if (needBuild)
-            CBuildTools.MarkBuildVersion(path);
+            KBuildTools.MarkBuildVersion(path);
 
         path = __GetPrefabBuildPath(path);
 
@@ -95,7 +95,7 @@ public partial class CDependencyBuild
             string matPath = BuildDepMaterial(mat, GameDef.PictureScale);
             if (!string.IsNullOrEmpty(matPath))  // 材质可能动态创建的，无需打包
                 //CResourceDependencies.Create(spriteColData, CResourceDependencyType.SPRITE_COLLECTION, matPath);
-                CAssetDep.Create<CTk2dSpriteCollectionDep>(spriteColData, matPath);
+                KAssetDep.Create<CTk2dSpriteCollectionDep>(spriteColData, matPath);
         }
 
         spriteColData.materials = new Material[0]; // 挖空spriteCollections

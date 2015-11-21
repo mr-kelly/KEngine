@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 #if TK2D
-public class CTk2dSpriteDep : CAssetDep
+public class CTk2dSpriteDep : KAssetDep
 {
     protected override void DoProcess(string resourcePath)
     {

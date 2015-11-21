@@ -1,9 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
-using UnityEngine.UI;
 
-//UGUI Text
-public class CTextDep : CAssetDep
+public class KFontDep : KAssetDep
 {
     protected override void DoProcess(string resourcePath)
     {
@@ -16,15 +14,15 @@ public class CTextDep : CAssetDep
         {
             if (!IsDestroy)
             {
-                var label = DependencyComponent as Text;
-                label.font = _font;
-                label.text = label.text + " ";
-
+                var label = DependencyComponent as UILabel;
+                //foreach (UILabel label in gameObject.GetComponents<UILabel>())
+                {
+                    label.trueTypeFont = _font;
+                }
             }
             OnFinishLoadDependencies(_font);
         });
         this.ResourceLoaders.Add(loader);
     }
 
-    
 }

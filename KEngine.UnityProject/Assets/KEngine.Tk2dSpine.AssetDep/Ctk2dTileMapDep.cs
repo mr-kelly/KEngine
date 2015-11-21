@@ -2,7 +2,7 @@
 using System.Collections;
 
 #if tk2dTileMap
-public class Ctk2dTileMapDep : CAssetDep {
+public class Ctk2dTileMapDep : KAssetDep {
 
     protected override void DoProcess(string resourcePath)
     {

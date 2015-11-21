@@ -9,9 +9,9 @@ using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 
-public partial class CBuild_NGUI : KBuild_Base
+public partial class KBuild_NGUI : KBuild_Base
 {
-    static CBuild_NGUI()
+    static KBuild_NGUI()
     {
         BeginExportEvent -= Custom_BeginExport;
         BeginExportEvent += Custom_BeginExport;
@@ -38,20 +38,20 @@ public partial class CBuild_NGUI : KBuild_Base
     readonly static Regex TemplateRegex = new Regex(@"\{(.+)\}");
 
     // 针对当前打开的单个UI
-    public static void Custom_ExportCurrentUI(CBuild_NGUI uiBuilder, string uiScenepath, string uiName, GameObject objToBuild)
+    public static void Custom_ExportCurrentUI(KBuild_NGUI uiBuilder, string uiScenepath, string uiName, GameObject objToBuild)
     {
-        bool reBuildPanel = CBuildTools.CheckNeedBuild(uiScenepath);
+        bool reBuildPanel = KBuildTools.CheckNeedBuild(uiScenepath);
 
-        CDependencyBuild.BuildGameObject(objToBuild, GetBuildRelPath(uiName), reBuildPanel);
+        KDependencyBuild.BuildGameObject(objToBuild, GetBuildRelPath(uiName), reBuildPanel);
 
         if (reBuildPanel)
-            CBuildTools.MarkBuildVersion(uiScenepath);
+            KBuildTools.MarkBuildVersion(uiScenepath);
 
         _FindLabelLocalization(uiBuilder);
     }
 
 
-    public static void Custom_BeginExport(CBuild_NGUI uiBuilder)
+    public static void Custom_BeginExport(KBuild_NGUI uiBuilder)
     {
         // 读取字符串
         //uiBuilder.UILabelStrings.Clear();
@@ -72,7 +72,7 @@ public partial class CBuild_NGUI : KBuild_Base
     }
 
     // big export
-    private static void Custom_EndExport(CBuild_NGUI uiBuilder)
+    private static void Custom_EndExport(KBuild_NGUI uiBuilder)
     {
         //CLocalizationItems exportHashSet;
         //if (uiBuilder.IsBuildAll)
@@ -98,7 +98,7 @@ public partial class CBuild_NGUI : KBuild_Base
 
     }
 
-    static void _FindLabelLocalization(CBuild_NGUI uiBuilder)
+    static void _FindLabelLocalization(KBuild_NGUI uiBuilder)
     {
         // 收集UiLabel的字符串
         //if (uiBuilder.WindowObject.GetComponent<UIPanel>() == null)
@@ -134,6 +134,6 @@ public partial class CBuild_NGUI : KBuild_Base
 
     public static void Custom_ExportUIMenu()
     {
-        CDependencyBuild.Clear();
+        KDependencyBuild.Clear();
     }
 }

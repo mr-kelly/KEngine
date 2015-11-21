@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using KEngine;
-public class CAudioSourceDep : CAssetDep {
+public class KAudioSourceDep : KAssetDep {
 
     protected override void DoProcess(string resourcePath)
     {
