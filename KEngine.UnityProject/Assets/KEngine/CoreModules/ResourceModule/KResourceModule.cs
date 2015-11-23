@@ -69,7 +69,7 @@ public class KResourceModule : MonoBehaviour, ICModule
     /// <summary>
     /// Product Folder's Relative Path   -  Default: ../Product,   which means Assets/../Product
     /// </summary>
-    public static string ProductRelPath { get { return KEngine.AppEngine.GetConfig(CCosmosEngineDefaultConfig.ProductRelPath); } }
+    public static string ProductRelPath { get { return KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.ProductRelPath); } }
 
     /// <summary>
     /// Product Folder Full Path , Default: C:\xxxxx\xxxx\../Product
@@ -367,7 +367,7 @@ public class KResourceModule : MonoBehaviour, ICModule
     {
         get
         {
-            return KEngine.AppEngine.GetConfig(CCosmosEngineDefaultConfig.StreamingBundlesFolderName);
+            return KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.StreamingBundlesFolderName);
         }
     }
 
@@ -379,7 +379,7 @@ public class KResourceModule : MonoBehaviour, ICModule
     {
         get
         {
-            string editorAssetBundlePath = Path.Combine(Application.dataPath, KEngine.AppEngine.GetConfig(CCosmosEngineDefaultConfig.AssetBundleBuildRelPath));  // for editoronly
+            string editorAssetBundlePath = Path.Combine(Application.dataPath, KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleBuildRelPath));  // for editoronly
 
             return editorAssetBundlePath;
         }

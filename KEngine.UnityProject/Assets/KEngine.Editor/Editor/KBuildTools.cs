@@ -56,7 +56,7 @@ public partial class KBuildTools
     /// <returns></returns>
     public static string GetExportPath(BuildTarget platfrom, CResourceQuality quality = CResourceQuality.Sd)
     {
-        string basePath = Path.GetFullPath(Application.dataPath + "/" + KEngine.AppEngine.GetConfig(CCosmosEngineDefaultConfig.AssetBundleBuildRelPath) + "/");
+        string basePath = Path.GetFullPath(Application.dataPath + "/" + KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleBuildRelPath) + "/");
 
         if (File.Exists(basePath))
         {

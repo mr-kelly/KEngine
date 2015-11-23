@@ -39,6 +39,7 @@ namespace KEngine
 
         private static TableFile<CCosmosEngineInfo> _configsTable;
 
+        
         /// <summary>
         /// Read Tab file (CEngineConfig.txt), cache to here
         /// </summary>
@@ -48,6 +49,11 @@ namespace KEngine
         /// Modules passed from the CosmosEngine.New function. All your custom game logic modules 
         /// </summary>
         private ICModule[] GameModules;
+
+        /// <summary>
+        /// 是否初始化完成
+        /// </summary>
+        public bool IsInited { get; private set; }
 
         public delegate IEnumerator CoroutineDelegate();
         private CoroutineDelegate BeforeInitModules = null;
@@ -132,6 +138,7 @@ namespace KEngine
             if (AfterInitModules != null)
                 yield return StartCoroutine(AfterInitModules());
 
+            IsInited = true;
         }
 
         IEnumerator DoInitModules(IList<ICModule> modules)
@@ -216,13 +223,13 @@ namespace KEngine
             }
             return conf.Value;
         }
-        public static string GetConfig(CCosmosEngineDefaultConfig cfg)
+        public static string GetConfig(KEngineDefaultConfigs cfg)
         {
             return GetConfig(cfg.ToString());
         }
     }
 
-    public enum CCosmosEngineDefaultConfig
+    public enum KEngineDefaultConfigs
     {
         AssetBundleExt,
         ProductRelPath,

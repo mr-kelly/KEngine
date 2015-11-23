@@ -353,7 +353,7 @@ public partial class KDependencyBuild
         var cleanPath = imageSystemFullPath.Replace("\\", "/");
 
         var fileName = Path.GetFileNameWithoutExtension(cleanPath);
-        var buildPath = string.Format("{0}/{1}_{0}{2}", folderName, fileName, AppEngine.GetConfig(CCosmosEngineDefaultConfig.AssetBundleExt));
+        var buildPath = string.Format("{0}/{1}_{0}{2}", folderName, fileName, AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt));
         var needBuild = KBuildTools.CheckNeedBuild(cleanPath);
 
         var texture = new Texture2D(1, 1);

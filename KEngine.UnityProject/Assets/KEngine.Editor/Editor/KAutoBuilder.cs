@@ -210,7 +210,7 @@ namespace KEngine.Editor
     public class CSymbolLinkHelper
     {
 
-        public static string AssetBundlesLinkPath = "Assets/StreamingAssets/" + KEngine.AppEngine.GetConfig(CCosmosEngineDefaultConfig.StreamingBundlesFolderName) + "/"; // hold asset bundles
+        public static string AssetBundlesLinkPath = "Assets/StreamingAssets/" + KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.StreamingBundlesFolderName) + "/"; // hold asset bundles
         public static string GetLinkPath()
         {
             if (!Directory.Exists(AssetBundlesLinkPath))
