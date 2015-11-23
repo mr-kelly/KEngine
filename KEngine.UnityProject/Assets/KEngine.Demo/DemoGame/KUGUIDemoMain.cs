@@ -23,7 +23,7 @@ public class KUGUIDemoMain : MonoBehaviour
         KEngine.AppEngine.New(
             gameObject,
             new ICModule[] {
-                CGameSettings.Instance,
+                //CGameSettings.Instance,
             },
             null,
             null);

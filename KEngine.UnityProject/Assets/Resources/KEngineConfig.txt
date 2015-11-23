@@ -1,7 +1,6 @@
 ﻿Key	Value	Comment
 [string]	[string]	[string]
 ProductRelPath	../Product	
-AssetBundleRelPath	StreamingAssets	
 AssetBundleBuildRelPath	../Product/Bundles
 StreamingBundlesFolderName	Bundles		#Link the BuildPath to StreamingAssets/Bundles
 AssetBundleExt	.unity3d	base

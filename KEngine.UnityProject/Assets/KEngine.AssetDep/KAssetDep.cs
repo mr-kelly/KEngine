@@ -260,16 +260,21 @@ public abstract class KAssetDep : MonoBehaviour
 
         while (wait)
             yield return null;
-    } 
+    }
 
-    // 等待器
+    /// <summary>
+    /// 等待一个对象完整的依赖加载完毕，包括其孩子的依赖
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <param name="c"></param>
+    /// <returns></returns>
     public static KAssetDep[] WaitDep(GameObject obj, Action c)
     {
         CAssetDepWaiter newWaiter = new CAssetDepWaiter();
         newWaiter.DepCallback = c;
         newWaiter.WaitObject = obj;
 
-        KAssetDep[] deps = obj.GetComponentsInChildren<KAssetDep>(true);
+        KAssetDep[] deps = obj.GetComponentsInChildren<KAssetDep>(true); // GetAll
         newWaiter.AssetDeps = deps;
 
         if (deps.Length > 0)
