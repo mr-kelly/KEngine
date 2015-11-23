@@ -112,11 +112,11 @@ public class KMaterialLoader : KAbstractResourceLoader
         // 纹理全部加载完成后到这里
         //if (!CachedMaterials.TryGetValue(matPath, out mat))
         {
-            Shader shader = CTool.FindShader(sMat.ShaderName);
+            Shader shader = KTool.FindShader(sMat.ShaderName);
             if (shader == null)
             {
                 Logger.LogWarning("找不到Shader: {0}, 使用Diffuse临时代替", sMat.ShaderName);
-                shader = CTool.FindShader("Diffuse");
+                shader = KTool.FindShader("Diffuse");
             }
             Logger.Assert(shader);
 

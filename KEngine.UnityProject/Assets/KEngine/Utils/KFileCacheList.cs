@@ -22,7 +22,7 @@ using System.Text;
 /// 
 /// 不能做Delete的操作，只适合Add, 比CFileHashSet更好！后边替代它！
 /// </summary>
-public class CFileCacheList : IDisposable
+public class KFileCacheList : IDisposable
 {
     private StreamWriter _writer;
     private Stream _appendStream;
@@ -30,13 +30,13 @@ public class CFileCacheList : IDisposable
     
     private bool _isMD5 = true;
 
-    public CFileCacheList(string ioPath, bool isMd5Mode = true)
+    public KFileCacheList(string ioPath, bool isMd5Mode = true)
     {
         var newHashSet = new HashSet<string>();
         Init(ioPath, ref newHashSet, isMd5Mode);
     }
 
-    public CFileCacheList(string ioPath, ref HashSet<string> refHashSet, bool isMd5Mode = true)
+    public KFileCacheList(string ioPath, ref HashSet<string> refHashSet, bool isMd5Mode = true)
     {
         Init(ioPath, ref refHashSet, isMd5Mode);
     }
@@ -90,7 +90,7 @@ public class CFileCacheList : IDisposable
 
         var setStr = str.Trim();
         if (_isMD5)
-            setStr = CTool.MD5_16bit(str);
+            setStr = KTool.MD5_16bit(str);
         if (_hashSet.Add(setStr))
         {
             _writer.WriteLine(setStr);
@@ -104,7 +104,7 @@ public class CFileCacheList : IDisposable
     {
         var findStr = str;
         if (_isMD5)
-            findStr = CTool.MD5_16bit(str);
+            findStr = KTool.MD5_16bit(str);
 
         return _hashSet.Contains(findStr);
     }

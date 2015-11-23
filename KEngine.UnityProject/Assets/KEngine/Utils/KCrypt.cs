@@ -21,16 +21,16 @@ namespace KEngine
     /// <summary>
     /// 加密解密，依赖表CosmosEngineConfig DEC
     /// </summary>
-    public class Crypt
+    public class KCrypt
     {
         public byte[] CustomKeys = null;
         private readonly byte[] DefaultKeys = { 0x00, 0x01, 0x02, 0x03, 0xAB, 0xCD, 0xEF, 0x05 };
 
-        public Crypt()
+        public KCrypt()
         {
             CustomKeys = DefaultKeys;
         }
-        public Crypt(byte[] keys)
+        public KCrypt(byte[] keys)
         {
             CustomKeys = keys;
         }

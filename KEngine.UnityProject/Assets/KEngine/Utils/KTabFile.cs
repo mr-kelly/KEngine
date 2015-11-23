@@ -16,15 +16,15 @@ using System.Text;
 using KEngine;
 using UnityEngine;
 
-public class CTabFileDef
+public class KTabFileDef
 {
     public static char[] Separators = new char[] { '\t' };
 }
 
-public class CTabFile : IDisposable, ICTabReadble, IEnumerable<CTabFile.RowInterator>
+public class KTabFile : IDisposable, IKTabReadble, IEnumerable<KTabFile.RowInterator>
 {
     private readonly RowInterator _rowInteratorCache;
-    public CTabFile()
+    public KTabFile()
         : base()
     {
         _rowInteratorCache = new RowInterator(this);  // 用來迭代的
@@ -60,18 +60,18 @@ public class CTabFile : IDisposable, ICTabReadble, IEnumerable<CTabFile.RowInter
     protected Dictionary<int, string[]> TabInfo = new Dictionary<int, string[]>();
 
     // 直接从字符串分析
-    public static CTabFile LoadFromString(string content)
+    public static KTabFile LoadFromString(string content)
     {
-        CTabFile tabFile = new CTabFile();
+        KTabFile tabFile = new KTabFile();
         tabFile.ParseString(content);
 
         return tabFile;
     }
 
     // 直接从文件, 传入完整目录，跟通过资源管理器自动生成完整目录不一样，给art库用的
-    public static CTabFile LoadFromFile(string fileFullPath)
+    public static KTabFile LoadFromFile(string fileFullPath)
     {
-        CTabFile tabFile = new CTabFile();
+        KTabFile tabFile = new KTabFile();
         if (tabFile.LoadByIO(fileFullPath))
             return tabFile;
         else
@@ -107,9 +107,9 @@ public class CTabFile : IDisposable, ICTabReadble, IEnumerable<CTabFile.RowInter
         Logger.Assert(headLine != null);
         var defLine = oReader.ReadLine(); // 声明行
         Logger.Assert(defLine != null);
-        var defLineArr = defLine.Split(CTabFileDef.Separators, StringSplitOptions.None);
+        var defLineArr = defLine.Split(KTabFileDef.Separators, StringSplitOptions.None);
 
-        string[] firstLineSplitString = headLine.Split(CTabFileDef.Separators, StringSplitOptions.None);  // don't remove RemoveEmptyEntries!
+        string[] firstLineSplitString = headLine.Split(KTabFileDef.Separators, StringSplitOptions.None);  // don't remove RemoveEmptyEntries!
         string[] firstLineDef = new string[firstLineSplitString.Length];
         Array.Copy(defLineArr, 0, firstLineDef, 0, defLineArr.Length);  // 拷贝，确保不会超出表头的
 
@@ -136,7 +136,7 @@ public class CTabFile : IDisposable, ICTabReadble, IEnumerable<CTabFile.RowInter
             sLine = oReader.ReadLine();
             if (sLine != null)
             {
-                string[] splitString1 = sLine.Split(CTabFileDef.Separators, StringSplitOptions.None);
+                string[] splitString1 = sLine.Split(KTabFileDef.Separators, StringSplitOptions.None);
 
                 TabInfo[rowIndex] = splitString1;
                 rowIndex++;
@@ -479,11 +479,11 @@ public class CTabFile : IDisposable, ICTabReadble, IEnumerable<CTabFile.RowInter
 
     public class RowInterator  // 一行
     {
-        internal CTabFile TabFile;
+        internal KTabFile TabFile;
 
         public int Row { get; internal set; }
 
-        internal RowInterator(CTabFile tabFile)
+        internal RowInterator(KTabFile tabFile)
         {
             TabFile = tabFile;
         }

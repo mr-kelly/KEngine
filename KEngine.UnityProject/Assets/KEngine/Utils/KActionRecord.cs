@@ -16,12 +16,12 @@ using System.Collections;
 
 /// <summary>
 /// 客户端版的行为记录仪, 类似服务器的records.js
-/// 
+/// 本质是一个事件驱动管理器, 但是拥有传入计数参数功能
 /// 为了性能，5秒保存一次(或特殊情况)
 /// </summary>
 public class KActionRecords : KBehaviour
 {
-    private static readonly CPrefs Prefs = new CPrefs(123456789);
+    private static readonly KPrefs Prefs = new KPrefs(123456789);
 
     private bool _isDirty = false;
 
@@ -88,12 +88,12 @@ public class KActionRecords : KBehaviour
     private void Init()
     {
         var str = Prefs.GetKey("ActionRecords") ?? "";
-        _records = CTool.SplitToDict<string, int>(str);
+        _records = KTool.SplitToDict<string, int>(str);
     }
 
     private void Save()
     {
-        Prefs.SetKey("ActionRecords", CTool.DictToSplitStr(_records));
+        Prefs.SetKey("ActionRecords", KTool.DictToSplitStr(_records));
         _isDirty = false;
     }
 

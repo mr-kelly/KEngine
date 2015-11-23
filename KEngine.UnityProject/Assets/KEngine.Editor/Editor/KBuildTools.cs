@@ -16,6 +16,7 @@ using System.Collections;
 using System.IO;
 using System.Reflection;
 using System.Collections.Generic;
+using System.Text;
 using Object = UnityEngine.Object;
 
 public partial class KBuildTools
@@ -156,10 +157,13 @@ public partial class KBuildTools
         string relativePath = path;
         path = MakeSureExportPath(path, buildTarget, quality);
 
+        var assetPath = AssetDatabase.GetAssetPath(asset);
+        CheckAndLogDependencies(assetPath);
+
         uint crc = 0;
         if (asset is Texture2D)
         {
-            var assetPath = AssetDatabase.GetAssetPath(asset);
+
             if (!string.IsNullOrEmpty(assetPath))  // Assets内的纹理
             {// Texutre不复制拷贝一份
                 _DoBuild(out crc, asset, null, path, relativePath, buildTarget);
@@ -196,11 +200,12 @@ public partial class KBuildTools
                     File.Delete(tmpTexPath + ".meta");
             }
         }
-        else if ((prefabType == PrefabType.None && AssetDatabase.GetAssetPath(asset) == string.Empty) ||
+        else if ((prefabType == PrefabType.None && assetPath == string.Empty) ||
             (prefabType == PrefabType.ModelPrefabInstance))  // 非prefab对象
         {
             Object tmpInsObj = (GameObject)GameObject.Instantiate(asset);  // 拷出来创建Prefab
-            Object tmpPrefab = PrefabUtility.CreatePrefab(tmpPrefabPath, (GameObject)tmpInsObj, ReplacePrefabOptions.ConnectToPrefab);
+            Object tmpPrefab = PrefabUtility.CreatePrefab(tmpPrefabPath, (GameObject)tmpInsObj, ReplacePrefabOptions.Default); 
+            CheckAndLogDependencies(tmpPrefabPath);
             asset = tmpPrefab;
 
             _DoBuild(out crc, asset, null, path, relativePath, buildTarget);
@@ -221,6 +226,48 @@ public partial class KBuildTools
         return crc;
     }
 
+    /// <summary>
+    /// 检查如果有依赖，报出
+    /// 检查prefab中存在prefab依赖，进行打散！
+    /// </summary>
+    /// <param name="assetPath"></param>
+    public static void CheckAndLogDependencies(string assetPath)
+    {
+        if (string.IsNullOrEmpty(assetPath))
+            return;
+
+        // 输出依赖
+        var depSb = new StringBuilder();
+        var depsArray = AssetDatabase.GetDependencies(new string[] { assetPath });
+        if (depsArray != null && depsArray.Length > 0)
+        {
+            if (depsArray.Length == 1 && depsArray[0] == assetPath)
+            {
+                // 自己依赖自己的忽略掉
+            }
+            else
+            {
+                foreach (var depAssetPath in depsArray)
+                {
+                    depSb.AppendLine(depAssetPath);
+                }
+                Logger.Log("[BuildAssetBundle]Asset: {0} has dependencies: {1}", assetPath, depSb.ToString());
+            }
+        }
+    }
+
+    [MenuItem("Assets/Print Aseet Dependencies", false, 100)]
+    public static void MenuCheckAndLogDependencies()
+    {
+        var obj = Selection.activeObject;
+        if (obj == null)
+        {
+            Debug.LogError("No selection object");
+            return;
+        }
+        var assetPath = AssetDatabase.GetAssetPath(obj);
+        KBuildTools.CheckAndLogDependencies(assetPath);
+    }
     private static void _DoBuild(out uint crc, Object asset, Object[] subAssets, string path, string relativePath, BuildTarget buildTarget)
     {
         if (BeforeBuildAssetBundleEvent != null)
@@ -240,6 +287,7 @@ public partial class KBuildTools
             subAssets = listSubAsset.ToArray();
         }
 
+        var time = DateTime.Now;
         BuildPipeline.BuildAssetBundle(
             asset,
             subAssets,
@@ -248,7 +296,7 @@ public partial class KBuildTools
             BuildAssetBundleOptions.CollectDependencies | BuildAssetBundleOptions.CompleteAssets | BuildAssetBundleOptions.DeterministicAssetBundle,
             buildTarget);
 
-        Logger.Log("生成文件： {0}", path);
+        Logger.Log("生成文件： {0}, 耗时: {1:F5}", path, (DateTime.Now - time).TotalSeconds);
         BuildCount++;
         if (AfterBuildAssetBundleEvent != null)
             AfterBuildAssetBundleEvent(asset, path, relativePath);
@@ -489,7 +537,7 @@ public partial class KBuildTools
     public static void WriteVersion()
     {
         string path = GetBuildVersionTab();// MakeSureExportPath(VerCtrlInfo.VerFile, EditorUserBuildSettings.activeBuildTarget);
-        CTabFile tabFile = new CTabFile();
+        KTabFile tabFile = new KTabFile();
         tabFile.NewColumn("AssetPath");
         tabFile.NewColumn("AssetMD5");
         tabFile.NewColumn("AssetDateTime");
@@ -514,12 +562,12 @@ public partial class KBuildTools
         if (!rebuild)
         {
             string verFile = GetBuildVersionTab(); //MakeSureExportPath(VerCtrlInfo.VerFile, EditorUserBuildSettings.activeBuildTarget);
-            CTabFile tabFile;
+            KTabFile tabFile;
             if (File.Exists(verFile))
             {
-                tabFile = CTabFile.LoadFromFile(verFile);
+                tabFile = KTabFile.LoadFromFile(verFile);
 
-                foreach (CTabFile.RowInterator row in tabFile)
+                foreach (KTabFile.RowInterator row in tabFile)
                 {
                     BuildVersion[row.GetString("AssetPath")] =
                         new BuildRecord(
@@ -592,7 +640,7 @@ public partial class KBuildTools
         if (!BuildVersion.TryGetValue(filePath, out assetMd5))
             return true;
 
-        if (CTool.MD5_File(filePath) != assetMd5.MD5)
+        if (KTool.MD5_File(filePath) != assetMd5.MD5)
             return true;  // different
 
         return false;
@@ -610,7 +658,7 @@ public partial class KBuildTools
         {
             //BuildVersion[file] = GetAssetVersion(file);
             BuildRecord theRecord;
-            var nowMd5 = CTool.MD5_File(file);
+            var nowMd5 = KTool.MD5_File(file);
             if (!BuildVersion.TryGetValue(file, out theRecord))
             {
                 theRecord = BuildVersion[file] = new BuildRecord();
@@ -629,7 +677,7 @@ public partial class KBuildTools
             if (File.Exists(metaFile))
             {
                 BuildRecord theMetaRecord;
-                var nowMetaMd5 = CTool.MD5_File(metaFile);
+                var nowMetaMd5 = KTool.MD5_File(metaFile);
                 if (!BuildVersion.TryGetValue(metaFile, out theMetaRecord))
                 {
                     theMetaRecord = BuildVersion[metaFile] = new BuildRecord();

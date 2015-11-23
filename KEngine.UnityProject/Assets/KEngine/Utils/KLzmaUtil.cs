@@ -13,7 +13,7 @@ using UnityEngine;
 using System.Collections;
 using System.IO;
 
-public class CLzmaTool
+public class KLzmaUtil
 {
 
     #region LZMA Related

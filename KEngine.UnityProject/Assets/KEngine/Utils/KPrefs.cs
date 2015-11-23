@@ -18,14 +18,14 @@ namespace KEngine
     /// <summary>
     /// CosmosEngine Prefs的封装，带有加密!
     /// </summary>
-    public class CPrefs
+    public class KPrefs
     {
-        private readonly Crypt Crypter;
+        private readonly KCrypt Crypter;
 
-        public CPrefs(ulong secretKey)
+        public KPrefs(ulong secretKey)
         {
             var bytes = BitConverter.GetBytes(secretKey);  // 8 bytes secret key
-            Crypter = new Crypt(bytes);
+            Crypter = new KCrypt(bytes);
         }
 
         public string GetKey(string key, bool crypt = true)

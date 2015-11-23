@@ -11,7 +11,7 @@
 using UnityEngine;
 using System.Collections;
 
-public interface ICTabReadble
+public interface IKTabReadble
 {
     bool HasColumn(string columnName);
     int GetInteger(int row, string columnName);

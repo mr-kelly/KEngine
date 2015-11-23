@@ -55,7 +55,7 @@ namespace KEngine.Editor
 
         static CCosmosEngineWindow Instance;
 
-        static CTabFile ConfFile;
+        static KTabFile ConfFile;
 
         [MenuItem("KEngine/Configuration")]
         static void Init()
@@ -74,7 +74,7 @@ namespace KEngine.Editor
         {
             if (!File.Exists(ConfFilePath))
             {
-                CTabFile confFile = new CTabFile();
+                KTabFile confFile = new KTabFile();
                 confFile.NewColumn("Key");
                 confFile.NewColumn("Value");
                 confFile.NewColumn("Comment");
@@ -93,12 +93,12 @@ namespace KEngine.Editor
                 AssetDatabase.Refresh();
             }
 
-            ConfFile = CTabFile.LoadFromFile(ConfFilePath);
+            ConfFile = KTabFile.LoadFromFile(ConfFilePath);
         }
 
         string GetConfValue(string key)
         {
-            foreach (CTabFile.RowInterator row in ConfFile)
+            foreach (KTabFile.RowInterator row in ConfFile)
             {
                 string key2 = row.GetString("Key");
                 if (key == key2)
@@ -113,7 +113,7 @@ namespace KEngine.Editor
 
         void SetConfValue(string key, string value)
         {
-            foreach (CTabFile.RowInterator row in ConfFile)
+            foreach (KTabFile.RowInterator row in ConfFile)
             {
                 string key2 = row.GetString("Key");
                 if (key == key2)
@@ -133,7 +133,7 @@ namespace KEngine.Editor
 
             EditorGUILayout.LabelField("== Advanced Setting ==");
             bool tabDirty = false;
-            foreach (CTabFile.RowInterator row in ConfFile)
+            foreach (KTabFile.RowInterator row in ConfFile)
             {
                 string value = row.GetString("Value");
                 string newValue = EditorGUILayout.TextField(row.GetString("Key"), value);

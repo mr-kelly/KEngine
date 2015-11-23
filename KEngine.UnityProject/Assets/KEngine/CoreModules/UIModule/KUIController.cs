@@ -119,7 +119,7 @@ public abstract class KUIController : KBehaviour
     /// <param name="go"></param>
     public void DestroyGameObjectChildren(GameObject go)
     {
-        CTool.DestroyGameObjectChildren(go);
+        KTool.DestroyGameObjectChildren(go);
     }
 
     /// <summary>

@@ -93,7 +93,7 @@ namespace KEngine
 
         private void Init()
         {
-            IsRootUser = CTool.HasWriteAccessToFolder(Application.dataPath);  // Root User运行时，能穿越沙盒写DataPath, 以此为依据
+            IsRootUser = KTool.HasWriteAccessToFolder(Application.dataPath);  // Root User运行时，能穿越沙盒写DataPath, 以此为依据
 
             if (ShowFps)
             {
@@ -105,9 +105,9 @@ namespace KEngine
                 Logger.Log("====================================================================================");
                 Logger.Log("Application.platform = {0}", Application.platform);
                 Logger.Log("Application.dataPath = {0} , WritePermission: {1}", Application.dataPath, IsRootUser);
-                Logger.Log("Application.streamingAssetsPath = {0} , WritePermission: {1}", Application.streamingAssetsPath, CTool.HasWriteAccessToFolder(Application.streamingAssetsPath));
-                Logger.Log("Application.persistentDataPath = {0} , WritePermission: {1}", Application.persistentDataPath, CTool.HasWriteAccessToFolder(Application.persistentDataPath));
-                Logger.Log("Application.temporaryCachePath = {0} , WritePermission: {1}", Application.temporaryCachePath, CTool.HasWriteAccessToFolder(Application.temporaryCachePath));
+                Logger.Log("Application.streamingAssetsPath = {0} , WritePermission: {1}", Application.streamingAssetsPath, KTool.HasWriteAccessToFolder(Application.streamingAssetsPath));
+                Logger.Log("Application.persistentDataPath = {0} , WritePermission: {1}", Application.persistentDataPath, KTool.HasWriteAccessToFolder(Application.persistentDataPath));
+                Logger.Log("Application.temporaryCachePath = {0} , WritePermission: {1}", Application.temporaryCachePath, KTool.HasWriteAccessToFolder(Application.temporaryCachePath));
                 Logger.Log("Application.unityVersion = {0}", Application.unityVersion);
                 Logger.Log("SystemInfo.deviceModel = {0}", SystemInfo.deviceModel);
                 Logger.Log("SystemInfo.deviceUniqueIdentifier = {0}", SystemInfo.deviceUniqueIdentifier);

@@ -67,8 +67,8 @@ public class CNGUIBridge : IKUIBridge
     {
         //if (ui is IUGUIWindow)
         //{
-        //    CTool.SetChild(uiObj, UICanvas.gameObject);// 放进UICanvas
-        //    CTool.SetLayer(uiObj, (int)CLayerDef.UI);
+        //    KTool.SetChild(uiObj, UICanvas.gameObject);// 放进UICanvas
+        //    KTool.SetLayer(uiObj, (int)CLayerDef.UI);
         //}
         //else
         {
@@ -100,7 +100,7 @@ public class CNGUIBridge : IKUIBridge
     //    scaler.referenceResolution = new Vector2(1080, 1920);
 
     //    var evtSysObj = new GameObject("EventSystem");
-    //    CTool.SetChild(evtSysObj, canvasObj);
+    //    KTool.SetChild(evtSysObj, canvasObj);
     //    evtSysObj.AddComponent<EventSystem>();
     //}
 
@@ -124,7 +124,7 @@ public class CNGUIBridge : IKUIBridge
         //UiRoot.enabled = false;
 
         GameObject panelRootObj = new GameObject("PanelRoot");
-        CTool.SetChild(panelRootObj.transform, uiRootobj.transform);
+        KTool.SetChild(panelRootObj.transform, uiRootobj.transform);
 
         Transform panelTrans = panelRootObj.transform;
         PanelRoot = panelRootObj.AddComponent<UIPanel>();
@@ -134,7 +134,7 @@ public class CNGUIBridge : IKUIBridge
         var uiCamTrans = uiRootobj.transform.Find("UICamera");
         GameObject uiCamObj = uiCamTrans != null ? uiCamTrans.gameObject : new GameObject("UICamera");
 
-        CTool.SetChild(uiCamObj.transform, UiRoot.transform);
+        KTool.SetChild(uiCamObj.transform, UiRoot.transform);
         UiCamera = uiCamObj.GetComponent<UICamera>() ?? uiCamObj.AddComponent<UICamera>();
         UiCamera.cachedCamera.cullingMask = 1 << (int)UnityLayerDef.UI;
         UiCamera.cachedCamera.clearFlags = CameraClearFlags.Depth;
@@ -146,12 +146,12 @@ public class CNGUIBridge : IKUIBridge
         foreach (UIAnchor.Side side in Enum.GetValues(typeof(UIAnchor.Side)))
         {
             GameObject anchorObj = new GameObject(side.ToString());
-            CTool.SetChild(anchorObj.transform, panelTrans);
+            KTool.SetChild(anchorObj.transform, panelTrans);
             AnchorSide[side.ToString()] = anchorObj.transform;
         }
 
         GameObject nullAnchor = new GameObject("Null");
-        CTool.SetChild(nullAnchor.transform, panelTrans);
+        KTool.SetChild(nullAnchor.transform, panelTrans);
         AnchorSide["Null"] = nullAnchor.transform;
         AnchorSide[""] = AnchorSide[UIAnchor.Side.Center.ToString()]; // default
 
@@ -160,7 +160,7 @@ public class CNGUIBridge : IKUIBridge
 
         PressWidget = new GameObject("PressWidget").AddComponent<UIWidget>();
         NGUITools.SetLayer(PressWidget.gameObject, (int)UnityLayerDef.UI);
-        CTool.SetChild(PressWidget.gameObject, panelRootObj);
+        KTool.SetChild(PressWidget.gameObject, panelRootObj);
         PressWidget.SetDimensions(2000, 2000);
         var col = PressWidget.gameObject.AddComponent<BoxCollider>();
         col.size = new Vector3(2000, 2000);

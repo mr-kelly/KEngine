@@ -33,7 +33,7 @@ public partial class KBuild_NGUI : KBuild_Base
 
     //readonly HashSet<string> UILabelStrings = new HashSet<string>();
     //readonly HashSet<string> UILabelStrings2 = new HashSet<string>();  // 为什么要弄两个？ 一个用来记录本次打包的字符串，如果全局打包，到最后判断，哪些是已经被删掉不用的！
-    CTabFile UIStringsFile;
+    KTabFile UIStringsFile;
 
     readonly static Regex TemplateRegex = new Regex(@"\{(.+)\}");
 
@@ -57,7 +57,7 @@ public partial class KBuild_NGUI : KBuild_Base
         //uiBuilder.UILabelStrings.Clear();
         //if (File.Exists(UILabelStringsFile))
         //{
-        //    uiBuilder.UIStringsFile = CTabFile.LoadFromFile(UILabelStringsFile);
+        //    uiBuilder.UIStringsFile = KTabFile.LoadFromFile(UILabelStringsFile);
         //    for (int row = 1; row < uiBuilder.UIStringsFile.GetHeight(); ++row)
         //    {
         //        // 获取当前UI名~
@@ -66,7 +66,7 @@ public partial class KBuild_NGUI : KBuild_Base
         //}
         //else
         //{
-        //    uiBuilder.UIStringsFile = new CTabFile();
+        //    uiBuilder.UIStringsFile = new KTabFile();
         //    uiBuilder.UIStringsFile.NewColumn("_String_");
         //}
     }
@@ -83,7 +83,7 @@ public partial class KBuild_NGUI : KBuild_Base
         //    exportHashSet = uiBuilder.UILabelStrings;  // 在原来的基础上
 
         //int srcFileRowCount = uiBuilder.UIStringsFile.GetHeight();
-        //uiBuilder.UIStringsFile = new CTabFile();
+        //uiBuilder.UIStringsFile = new KTabFile();
         //uiBuilder.UIStringsFile.NewColumn("_String_");
         //uiBuilder.UIStringsFile.NewColumn("_Sources_");
 

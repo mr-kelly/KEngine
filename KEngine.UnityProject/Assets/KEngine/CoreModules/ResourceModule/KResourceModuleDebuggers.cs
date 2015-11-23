@@ -41,7 +41,7 @@ public class KDebuggerObjectTool
         }
         typeCount = ++Counts[uri];
 
-        CTool.SetChild(obj, theParent.gameObject);
+        KTool.SetChild(obj, theParent.gameObject);
 
         theParent.gameObject.name = GetNameWithCount(smallType, typeCount);
 
@@ -85,7 +85,7 @@ public class KDebuggerObjectTool
             var bigTypeObj = GameObject.Find(bigTypeObjName) ?? new GameObject(bigTypeObjName);
 
             theParent = new GameObject(smallType).transform;
-            CTool.SetChild(theParent, bigTypeObj.transform);
+            KTool.SetChild(theParent, bigTypeObj.transform);
             Parents[uri] = theParent;
         }
         return theParent;

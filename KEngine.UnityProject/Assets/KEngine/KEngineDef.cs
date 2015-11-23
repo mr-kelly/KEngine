@@ -56,7 +56,7 @@ public struct CVersionNumber
     }
     public static CVersionNumber Parse(string verStr)
     {
-        var verArgs = CTool.Split<string>(verStr, '.');
+        var verArgs = KTool.Split<string>(verStr, '.');
         return new CVersionNumber
         {
             Major = verArgs.Count >= 1 ? verArgs[0].ToInt32() : 0,

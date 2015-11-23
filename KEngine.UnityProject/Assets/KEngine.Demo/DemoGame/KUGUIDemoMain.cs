@@ -13,17 +13,18 @@ using UnityEngine;
 using System.Collections;
 using KEngine;
 using System.IO;
+using KEngine.CoreModules;
 
 public class KUGUIDemoMain : MonoBehaviour
 {
     void Awake()
     {
-        CGameSettings.Instance.InitAction += OnGameSettingsInit;
+        KGameSettings.Instance.InitAction += OnGameSettingsInit;
 
         KEngine.AppEngine.New(
-            gameObject,
+            gameObject, 
             new ICModule[] {
-                //CGameSettings.Instance,
+                //KGameSettings.Instance,
             },
             null,
             null);
@@ -39,7 +40,7 @@ public class KUGUIDemoMain : MonoBehaviour
 
     void OnGameSettingsInit()
     {
-        CGameSettings _ = CGameSettings.Instance;
+        KGameSettings _ = KGameSettings.Instance;
 
         Logger.Log("Begin Load tab file...");
 

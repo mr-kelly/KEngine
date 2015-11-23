@@ -19,6 +19,11 @@ using KEngine;
 
 public abstract class KBuild_Base
 {
+    public virtual string GetResourceBuildDir()
+    {
+        return KEngineDef.ResourcesBuildDir;
+    }
+
     public virtual void BeforeExport() { }
     public abstract void Export(string path);
 
@@ -47,26 +52,35 @@ public partial class KResourceBuilder
             if (ext.StartsWith("dir:"))  // 目錄下的所有文件，包括子文件夾
             {
                 string newExt = ext.Replace("dir:", "");
-                itemArray = Directory.GetFiles("Assets/" + KEngineDef.ResourcesBuildDir + "/" + export.GetDirectory(), newExt, SearchOption.AllDirectories);
+                itemArray = Directory.GetFiles("Assets/" + export.GetResourceBuildDir() + "/" + export.GetDirectory(), newExt, SearchOption.AllDirectories);
             }
             else if (ext == "dir")
-                itemArray = Directory.GetDirectories("Assets/" + KEngineDef.ResourcesBuildDir + "/" + export.GetDirectory());
+                itemArray = Directory.GetDirectories("Assets/" + export.GetResourceBuildDir() + "/" + export.GetDirectory());
             else if (ext == "")
                 itemArray = new string[0];
             else
-                itemArray = Directory.GetFiles("Assets/" + KEngineDef.ResourcesBuildDir + "/" + export.GetDirectory(), export.GetExtention());  // 不包括子文件夾
+                itemArray = Directory.GetFiles("Assets/" + export.GetResourceBuildDir() + "/" + export.GetDirectory(), export.GetExtention());  // 不包括子文件夾
 
             export.BeforeExport();
             foreach (string item in itemArray)
             {
                 EditorUtility.DisplayCancelableProgressBar("[ProductExport]", item, .5f);
-                export.Export(item.Replace('\\', '/'));
-                EditorUtility.ClearProgressBar();
-
+                try
+                {
+                    export.Export(item.Replace('\\', '/'));
+                }
+                finally
+                {
+                    EditorUtility.ClearProgressBar();    
+                }
+                
                 GC.Collect();
                 Resources.UnloadUnusedAssets();
             }
             export.AfterExport();
+
+
+            Logger.Log("Finish Auto Build: {0}, ItemsCount: {1}, Used Time: {2}", export.GetType().Name, itemArray.Length, DateTime.Now - time);
 
         }
         catch (Exception e)
@@ -78,7 +92,6 @@ public partial class KResourceBuilder
 
         GC.Collect();
 
-        Logger.Log("Finish Auto Build... {0}, Used Time: {1}", export.GetType().Name, DateTime.Now - time);
     }
 
 }

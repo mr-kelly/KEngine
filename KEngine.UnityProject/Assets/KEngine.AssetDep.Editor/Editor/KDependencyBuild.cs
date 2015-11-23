@@ -81,9 +81,37 @@ public partial class KDependencyBuild
         BuildedCache.Clear();
     }
 
+    /// <summary>
+    /// 移除一个GameObject里所存在的Prefab引用
+    /// </summary>
+    /// <param name="copyGameObject"></param>
+    [Obsolete]
+    private static void RemoveGameObjectChildPrefab(GameObject copyGameObject)
+    {
+        // Prefab检查
+        //var gameObjectAsset = AssetDatabase.LoadAssetAtPath(assetPath, typeof(GameObject)) as GameObject;
+        //if (gameObjectAsset != null)
+        {
+            // 遍历是否存在Prefab
+            foreach (var child in copyGameObject.GetComponentsInChildren<Transform>(true))
+            {
+                if (child == copyGameObject.transform) continue; // 忽略自己
+
+                var prefabParent = PrefabUtility.GetPrefabParent(child.gameObject);
+                var prefabObject = PrefabUtility.GetPrefabObject(child.gameObject);
+                if (//PrefabUtility.GetPrefabParent(child.gameObject) == null &&
+                    PrefabUtility.GetPrefabObject(child.gameObject) != null)
+                {
+                    Debug.LogWarning("一个Prefab中的Prefab保持引用,剥除。。。" + child.name);
+                    PrefabUtility.DisconnectPrefabInstance(child.gameObject);
+                }
+            }
+        }
+
+    }
     private static Dictionary<MethodInfo, DepBuildAttribute> _cachedDepBuildAttributes;
     // 可選擇是否打包自己，還是只打包依賴
-    public static void BuildGameObject(GameObject obj, string path, bool buildSelf = true, bool allInOne = false)  // TODO: All in One
+    public static void BuildGameObject(GameObject obj, string path, bool buildSelf = true, bool allInOne = false, bool keepCopyObjToDebug = false)  // TODO: All in One
     {
         GameObject copyObj = GameObject.Instantiate(obj) as GameObject;
 
@@ -121,8 +149,8 @@ public partial class KDependencyBuild
         {
             DoBuildAssetBundle(path, copyObj);  // TODO: BuildResult...
         }
-
-        GameObject.DestroyImmediate(copyObj);
+        if (!keepCopyObjToDebug)
+            GameObject.DestroyImmediate(copyObj);
     }
 
 

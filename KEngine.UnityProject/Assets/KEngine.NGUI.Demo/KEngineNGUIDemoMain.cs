@@ -1,16 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections;
+using KEngine.CoreModules;
 
 public class KEngineNGUIDemoMain : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        //CGameSettings.Instance.InitAction += OnGameSettingsInit;
+        //KGameSettings.Instance.InitAction += OnGameSettingsInit;
 
         KEngine.AppEngine.New(
             gameObject,
             new ICModule[] {
-                CGameSettings.Instance,
+                KGameSettings.Instance,
             },
             null,
             null);

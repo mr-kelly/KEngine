@@ -19,7 +19,7 @@ using System.Text;
 /// 性能更好，不能写入的Tab读取器
 /// </summary>
 [System.Obsolete("不支持行头定义类型！暂时不用了！")]
-public class CTabReader : ICTabReadble, IDisposable
+public class KTabReader : IKTabReadble, IDisposable
 {
     Stream m_tableStream;
     StreamReader m_tableReader;
@@ -32,12 +32,12 @@ public class CTabReader : ICTabReadble, IDisposable
     private string m_FileName = "";  // LoadFromFile调用时才产生
 
     /** 构造器 */
-    private CTabReader() { }
+    private KTabReader() { }
 
     /*  从文件对象中创建 */
-    public static CTabReader LoadFromFile(string path)
+    public static KTabReader LoadFromFile(string path)
     {
-        CTabReader tableFile = null;
+        KTabReader tableFile = null;
         try
         {
             byte[] fileBuffer = File.ReadAllBytes(path);
@@ -52,15 +52,15 @@ public class CTabReader : ICTabReadble, IDisposable
         return tableFile;
     }
     /* 从字符串中创建对象 */
-    public static CTabReader LoadFromString(string filename, string str)
+    public static KTabReader LoadFromString(string filename, string str)
     {
         return LoadFromContent(filename, Encoding.UTF8.GetBytes(str));
     }
 
     /* 从字符串中创建对象 */
-    public static CTabReader LoadFromContent(string filename, byte[] data)
+    public static KTabReader LoadFromContent(string filename, byte[] data)
     {
-        CTabReader tableFile = new CTabReader();
+        KTabReader tableFile = new KTabReader();
 
         tableFile.m_FileName = filename;  // 文件名保存，用于输出
         //byte[] tableBytes = Convert.FromBase64String(txt);  // string -> bytes -> stream

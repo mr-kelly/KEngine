@@ -27,7 +27,7 @@ using KEngine;
 /// <summary>
 /// Some tool function for time, bytes, MD5, or something...
 /// </summary>
-public class CTool
+public class KTool
 {
     static readonly Dictionary<string, Shader> CacheShaders = new Dictionary<string, Shader>(); // Shader.Find是一个非常消耗的函数，因此尽量缓存起来
 
@@ -281,7 +281,7 @@ public class CTool
     /// <returns></returns>
     public static FromToNumber ParseMinMaxNumber(string str)
     {
-        var rangeArr = CTool.Split<float>(str, '~', '-');
+        var rangeArr = KTool.Split<float>(str, '~', '-');
         var number = new FromToNumber();
         if (rangeArr.Count > 0)
         {

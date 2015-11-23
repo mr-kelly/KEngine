@@ -61,7 +61,7 @@ public partial class KBuildTools
             }
 
             //stream.Position = stream.Length;  // 去到最后
-            //byte[] md5Str = CTool.MD5_bytes(relativePath);
+            //byte[] md5Str = KTool.MD5_bytes(relativePath);
             //stream.Write(md5Str, 0, md5Str.Length);  // append 16bit md5 of relativePath
 
             // 第二位修改
