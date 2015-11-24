@@ -32,6 +32,7 @@ namespace KEngine
     public class Logger
     {
         public static CLogLevel LogLevel = CLogLevel.Info;
+
         static event Application.LogCallback LogCallbackEvent;
         private static bool _hasRegisterLogCallback = false;
 
@@ -197,10 +198,9 @@ namespace KEngine
         //{
         //    DoLog(string.Format(log, args), CLogLevel.Debug);
         //}
-
-        public static void Log(string log)
+        public static void Info(string log, params object[] args)
         {
-            DoLog(log, CLogLevel.Info);
+            Log(log, args);
         }
         public static void Log(string log, params object[] args)
         {

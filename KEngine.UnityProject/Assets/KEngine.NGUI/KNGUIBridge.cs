@@ -27,7 +27,7 @@ class GameDef
     public const int DefaultPixelPerMeters = 100;
 }
 
-public class CNGUIBridge : IKUIBridge
+public class KNGUIBridge : IKUIBridge
 {
     public UICamera UiCamera;
     public UIRoot UiRoot;
@@ -39,7 +39,7 @@ public class CNGUIBridge : IKUIBridge
 
     readonly Dictionary<string, Transform> AnchorSide = new Dictionary<string, Transform>();
 
-    public static CNGUIBridge Instance;
+    public static KNGUIBridge Instance;
 
     public void InitBridge()
     {

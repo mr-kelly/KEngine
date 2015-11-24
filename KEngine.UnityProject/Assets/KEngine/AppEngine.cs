@@ -211,14 +211,15 @@ namespace KEngine
         /// <summary>
         /// Get Config from the CEngineConfig file through key
         /// </summary>
-        public static string GetConfig(string key)
+        public static string GetConfig(string key, bool showLog = true)
         {
             EnsureConfigTab();
 
             var conf = _configsTable.FindByPrimaryKey(key);
             if (conf == null)
             {
-                Logger.LogError("Cannot get CosmosConfig: {0}", key);
+                if (showLog)
+                    Logger.LogError("Cannot get CosmosConfig: {0}", key);
                 return null;
             }
             return conf.Value;

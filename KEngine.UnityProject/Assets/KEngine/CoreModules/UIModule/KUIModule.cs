@@ -37,10 +37,11 @@ public class KUIModule : ICModule
         }
     }
 
+
     /// <summary>
     /// A bridge for different UI System, for instance, you can use NGUI or EZGUI or etc.. UI Plugin through UIBridge
     /// </summary>
-    public IKUIBridge UiBridge = KEngineRuntimeCustom.UIBridge;
+    public IKUIBridge UiBridge;
     public Dictionary<string, CUILoadState> UIWindows = new Dictionary<string, CUILoadState>();
     public bool UIRootLoaded = false;
 
@@ -53,15 +54,29 @@ public class KUIModule : ICModule
     {
     }
 
-    public void SetupUIBridge(IKUIBridge bridge)
-    {
-        UiBridge = bridge;
-    }
-
     public IEnumerator Init()
     {
+        var configUiBridge = AppEngine.GetConfig("UIModuleBridge");
+
+        if (!string.IsNullOrEmpty(configUiBridge))
+        {
+            var uiBridgeTypeName = string.Format("K{0}Bridge", configUiBridge);
+            var uiBridgeType = Type.GetType(uiBridgeTypeName);
+            if (uiBridgeType != null)
+            {
+                UiBridge = Activator.CreateInstance(uiBridgeType) as IKUIBridge;
+                Logger.Debug("Use UI Bridge: {0}", uiBridgeType);
+            }
+            else
+            {
+                Logger.LogError("Cannot find UIBridge Type: {0}", uiBridgeTypeName);
+            }
+        }
+        
         if (UiBridge == null)
+        {
             UiBridge = new KUGUIBridge();
+        }
 
         UiBridge.InitBridge();
 

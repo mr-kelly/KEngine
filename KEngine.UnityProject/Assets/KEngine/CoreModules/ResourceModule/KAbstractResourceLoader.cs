@@ -93,6 +93,11 @@ public abstract class KAbstractResourceLoader
     }
 
     /// <summary>
+    /// 是否处于Application退出状态
+    /// </summary>
+    private bool _isQuitApplication = false;
+
+    /// <summary>
     /// ForceNew的，非AutoNew
     /// </summary>
     protected bool IsForceNew;
@@ -448,6 +453,8 @@ public abstract class KAbstractResourceLoader
     /// </summary>
     public virtual void ForceDispose()
     {
+        if (_isQuitApplication)
+            return;
         if (RefCount != 1)
         {
             Logger.LogWarning("[ForceDisose]Use force dispose to dispose loader, recommend this loader RefCount == 1");
@@ -455,5 +462,12 @@ public abstract class KAbstractResourceLoader
         Dispose();
     }
 
+    /// <summary>
+    /// By Unity Reflection
+    /// </summary>
+    protected void OnApplicationQuit()
+    {
+        _isQuitApplication = true;
+    }
 }
 // Unity潜规则: 等待帧最后再执行，避免一些(DestroyImmediatly)在Phycis函数内
