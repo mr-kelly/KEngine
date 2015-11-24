@@ -197,6 +197,9 @@ public class KTabFile : IDisposable, IKTabReadble, IEnumerable<KTabFile.RowInter
             sb.Append("\r\n");
         }
 
+        var dirPath = Path.GetDirectoryName(fileName);
+        if (!Directory.Exists(dirPath))
+            Directory.CreateDirectory(dirPath);
         try
         {
             using (FileStream fs = new FileStream(fileName, FileMode.Create))

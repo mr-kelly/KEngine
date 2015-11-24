@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using KEngine;
+using KEngine.Editor;
 
 public class CDepCollectInfo
 {
@@ -44,7 +45,10 @@ public partial class KDependencyBuild
     {
         if (BuildedCache.Count > 0)
         {
-            var zipPath = "Assets/" + KEngineDef.ResourcesBuildInfosDir + "/BuildAction_" + KResourceModule.BuildPlatformName + ".zip";
+            var zipDirPath = "Assets/" + KEngineDef.ResourcesBuildInfosDir;
+            if (!Directory.Exists(zipDirPath))
+                Directory.CreateDirectory(zipDirPath);
+            var zipPath = zipDirPath + "/BuildAction_" + KResourceModule.BuildPlatformName + ".zip";
             var buildActionCount = 0;
             var actionCountStr = CZipTool.GetFileContentFromZip(zipPath, "BuildActionCount.txt");
             if (!string.IsNullOrEmpty(actionCountStr))
@@ -52,7 +56,7 @@ public partial class KDependencyBuild
                 buildActionCount = actionCountStr.ToInt32();
             }
             buildActionCount++;
-            Logger.Log(" Now: {0}", buildActionCount);
+            Logger.Log(" DepBuild Now Action Count: {0}", buildActionCount);
             CZipTool.SetZipFile(zipPath, "BuildActionCount.txt", buildActionCount.ToString());
 
             // 真实打包的资源记录
@@ -264,9 +268,9 @@ public partial class KDependencyBuild
         Logger.Assert(tex);
 
         string assetPath = AssetDatabase.GetAssetPath(tex);
-        bool needBuild = KBuildTools.CheckNeedBuild(assetPath);
+        bool needBuild = KAssetVersionControl.TryCheckNeedBuildWithMeta(assetPath);
         if (needBuild)
-            KBuildTools.MarkBuildVersion(assetPath);
+            KAssetVersionControl.TryMarkBuildVersion(assetPath);
 
         Texture newTex;
         if (tex is Texture2D)
@@ -382,7 +386,7 @@ public partial class KDependencyBuild
 
         var fileName = Path.GetFileNameWithoutExtension(cleanPath);
         var buildPath = string.Format("{0}/{1}_{0}{2}", folderName, fileName, AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt));
-        var needBuild = KBuildTools.CheckNeedBuild(cleanPath);
+        var needBuild = KAssetVersionControl.TryCheckNeedBuildWithMeta(cleanPath);
 
         var texture = new Texture2D(1, 1);
 
@@ -421,7 +425,7 @@ public partial class KDependencyBuild
         var result = KDependencyBuild.DoBuildAssetBundle(buildPath, texture, needBuild);
 
         if (needBuild)
-            KBuildTools.MarkBuildVersion(cleanPath);
+            KAssetVersionControl.TryMarkBuildVersion(cleanPath);
 
         return result.Path;
     }

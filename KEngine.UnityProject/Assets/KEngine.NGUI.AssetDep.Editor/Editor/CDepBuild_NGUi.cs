@@ -7,6 +7,7 @@ using UnityEditor;
 using System.IO;
 using System.Linq;
 using KEngine;
+using KEngine.Editor;
 
 public partial class KDependencyBuild
 {
@@ -24,9 +25,9 @@ public partial class KDependencyBuild
         //fontAssetPath = __GetPrefabBuildPath(fontAssetPath).Replace("Atlas_", "");
         //string[] splitArr = fontAssetPath.Split('/');
 
-        bool needBuild = KBuildTools.CheckNeedBuild(fontAssetPath);
+        bool needBuild = KAssetVersionControl.TryCheckNeedBuildWithMeta(fontAssetPath);
         if (needBuild)
-            KBuildTools.MarkBuildVersion(fontAssetPath);
+            KAssetVersionControl.TryMarkBuildVersion(fontAssetPath);
 
         var result = DoBuildAssetBundle("Common/Font_" + font.name, font, needBuild);
 
@@ -40,9 +41,9 @@ public partial class KDependencyBuild
         GameObject atlasPrefab = PrefabUtility.FindPrefabRoot(atlas.gameObject) as GameObject;
         Logger.Assert(atlasPrefab);
         string path = AssetDatabase.GetAssetPath(atlasPrefab);  // prefab只用来获取路径，不打包不挖空
-        bool needBuild = KBuildTools.CheckNeedBuild(path);
+        bool needBuild = KAssetVersionControl.TryCheckNeedBuildWithMeta(path);
         if (needBuild)
-            KBuildTools.MarkBuildVersion(path);
+            KAssetVersionControl.TryMarkBuildVersion(path);
 
         Logger.Assert(path);
 
@@ -111,9 +112,9 @@ public partial class KDependencyBuild
             return "";
         }
         string uiFontPrefabPath = AssetDatabase.GetAssetPath(uiFont.gameObject);
-        bool needBuild = KBuildTools.CheckNeedBuild(uiFontPrefabPath);
+        bool needBuild = KAssetVersionControl.TryCheckNeedBuildWithMeta(uiFontPrefabPath);
         if (needBuild)
-            KBuildTools.MarkBuildVersion(uiFontPrefabPath);
+            KAssetVersionControl.TryMarkBuildVersion(uiFontPrefabPath);
 
         var copyUIFontObj = GameObject.Instantiate(uiFont.gameObject) as GameObject;
         var copyUIFont = copyUIFontObj.GetComponent<UIFont>();

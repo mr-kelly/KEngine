@@ -8,6 +8,7 @@ using System.IO;
 using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
+using KEngine.Editor;
 
 public partial class KBuild_NGUI : KBuild_Base
 {
@@ -40,12 +41,12 @@ public partial class KBuild_NGUI : KBuild_Base
     // 针对当前打开的单个UI
     public static void Custom_ExportCurrentUI(KBuild_NGUI uiBuilder, string uiScenepath, string uiName, GameObject objToBuild)
     {
-        bool reBuildPanel = KBuildTools.CheckNeedBuild(uiScenepath);
+        bool reBuildPanel = KAssetVersionControl.TryCheckNeedBuildWithMeta(uiScenepath);
 
         KDependencyBuild.BuildGameObject(objToBuild, GetBuildRelPath(uiName), reBuildPanel);
 
         if (reBuildPanel)
-            KBuildTools.MarkBuildVersion(uiScenepath);
+            KAssetVersionControl.TryMarkBuildVersion(uiScenepath);
 
         _FindLabelLocalization(uiBuilder);
     }

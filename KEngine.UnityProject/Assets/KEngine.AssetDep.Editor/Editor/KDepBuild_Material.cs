@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEngine;
 using System.Collections;
 using KEngine;
+using KEngine.Editor;
 
 public partial class KDependencyBuild
 {
@@ -15,9 +16,9 @@ public partial class KDependencyBuild
         {
             string path = AssetDatabase.GetAssetPath(mat);
 
-            bool needBuild = KBuildTools.CheckNeedBuild(path);
+            bool needBuild = KAssetVersionControl.TryCheckNeedBuildWithMeta(path);
             if (needBuild)
-                KBuildTools.MarkBuildVersion(path);
+                KAssetVersionControl.TryMarkBuildVersion(path);
 
             path = __GetPrefabBuildPath(path);
             var buildResult = __DoBuildScriptableObject(DepBuildToFolder + "/Mat_" + path, sMat, needBuild);

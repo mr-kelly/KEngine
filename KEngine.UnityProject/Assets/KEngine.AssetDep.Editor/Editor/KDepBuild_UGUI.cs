@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
 using KEngine;
+using KEngine.Editor;
 
 public partial class KDependencyBuild
 {
@@ -50,9 +51,9 @@ public partial class KDependencyBuild
             Logger.LogWarning("Sprite: {0} is packing!!!", sprite.name);
         
         string assetPath = AssetDatabase.GetAssetPath(sprite);
-        bool needBuild = KBuildTools.CheckNeedBuild(assetPath);
+        bool needBuild = KAssetVersionControl.TryCheckNeedBuildWithMeta(assetPath);
         if (needBuild)
-            KBuildTools.MarkBuildVersion(assetPath);
+            KAssetVersionControl.TryMarkBuildVersion(assetPath);
 
         string path = __GetPrefabBuildPath(assetPath);
         if (string.IsNullOrEmpty(path))

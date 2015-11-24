@@ -2,6 +2,8 @@
 using UnityEngine;
 using System.Collections;
 using KEngine;
+using KEngine.Editor;
+
 public partial class KDependencyBuild
 {
     [DepBuild(typeof(AudioSource))]
@@ -23,9 +25,9 @@ public partial class KDependencyBuild
     static string BuildAudioClip(AudioClip audioClip)
     {
         string assetPath = AssetDatabase.GetAssetPath(audioClip);
-        bool needBuild = KBuildTools.CheckNeedBuild(assetPath);
+        bool needBuild = KAssetVersionControl.TryCheckNeedBuildWithMeta(assetPath);
         if (needBuild)
-            KBuildTools.MarkBuildVersion(assetPath);
+            KAssetVersionControl.TryMarkBuildVersion(assetPath);
 
         var result = DoBuildAssetBundle("Audio/Audio_" + audioClip.name, audioClip, needBuild);
 

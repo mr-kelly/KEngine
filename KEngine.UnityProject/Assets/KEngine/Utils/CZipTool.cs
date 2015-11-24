@@ -59,7 +59,7 @@ public class CZipTool : MonoBehaviour
         {
             zip = ZipFile.Create(filePath);
             zip.BeginUpdate();
-            zip.Add(new StringDataSource("Copyright Cosmosbox Game Studio, created zip by Kelly's ZipTool"), ".COSMOSBOX"); // must have a file on init, or a Exception
+            zip.Add(new StringDataSource("Copyright KEngine, created zip by Kelly's ZipTool"), ".KEngine"); // must have a file on init, or a Exception
             zip.CommitUpdate();
         }
         return zip;
