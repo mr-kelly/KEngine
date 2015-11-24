@@ -16,6 +16,7 @@ namespace KEngine.Editor
     {
         public static KAssetVersionControl Current;
 
+        private bool _isRebuild = false;
         /// <summary>
         /// 资源打包周期版本管理
         /// </summary>
@@ -28,9 +29,12 @@ namespace KEngine.Editor
             }
 
             Current = this;
+            
+            _isRebuild = rebuild;
+
             Logger.LogWarning("================== KAssetVersionControl Begin ======================");
-            ClearHistroy();
-            SetupHistory(rebuild);
+            
+            SetupHistory();
 
             KDependencyBuild.Clear();
 
@@ -58,27 +62,7 @@ namespace KEngine.Editor
             Current = null;
             KBuildTools.AfterBuildAssetBundleEvent -= OnAfterBuildAssetBundleEvent;
         }
-
-        /// <summary>
-        /// 标记一个路径为打包
-        /// </summary>
-        /// <param name="paths"></param>
-        //public void TryMarkBuildVersion(params string[] paths)
-        //{
-        //    KBuildTools.TryMarkBuildVersion(paths);
-        //}
-
-        ///// <summary>
-        ///// 判断路径，并且尝试判断meta文件
-        ///// </summary>
-        ///// <param name="paths"></param>
-        ///// <returns></returns>
-        //public bool CheckNeedBuildWithMeta(params string[] paths)
-        //{
-        //    return KBuildTools.CheckNeedBuildWithMeta(paths);
-        //}
-
-
+        
         #region 资源版本管理相关
         class BuildRecord
         {
@@ -107,7 +91,6 @@ namespace KEngine.Editor
         }
 
         static Dictionary<string, BuildRecord> BuildVersion;
-        public static bool IsCheckMd5 = false;  // 跟AssetServer关联~如果true，函数才有效
 
         public static void WriteVersion()
         {
@@ -130,31 +113,27 @@ namespace KEngine.Editor
             tabFile.Save(path);
         }
 
-        public static void SetupHistory(bool rebuild)
+        static void SetupHistory()
         {
-            IsCheckMd5 = true;
+            BuildCount = 0;
+            BuildVersion = new Dictionary<string, BuildRecord>();
+
             BuildVersion.Clear();
-            if (!rebuild)
+
+            string verFile = GetBuildVersionTab(); //MakeSureExportPath(VerCtrlInfo.VerFile, EditorUserBuildSettings.activeBuildTarget);
+            KTabFile tabFile;
+            if (File.Exists(verFile))
             {
-                string verFile = GetBuildVersionTab(); //MakeSureExportPath(VerCtrlInfo.VerFile, EditorUserBuildSettings.activeBuildTarget);
-                KTabFile tabFile;
-                if (File.Exists(verFile))
+                tabFile = KTabFile.LoadFromFile(verFile);
+
+                foreach (KTabFile.RowInterator row in tabFile)
                 {
-                    tabFile = KTabFile.LoadFromFile(verFile);
-
-                    foreach (KTabFile.RowInterator row in tabFile)
-                    {
-                        BuildVersion[row.GetString("AssetPath")] =
-                            new BuildRecord(
-                                row.GetString("AssetMD5"),
-                                row.GetString("AssetDateTime"),
-                                row.GetInteger("ChangeCount"));
-                    }
+                    BuildVersion[row.GetString("AssetPath")] =
+                        new BuildRecord(
+                            row.GetString("AssetMD5"),
+                            row.GetString("AssetDateTime"),
+                            row.GetInteger("ChangeCount"));
                 }
-            }
-            else
-            {
-
             }
         }
 
@@ -171,15 +150,6 @@ namespace KEngine.Editor
 
         public static int BuildCount = 0;  // 累计Build了多少次，用于版本控制时用的
 
-        public static void ClearHistroy()
-        {
-            if (IsCheckMd5)
-                IsCheckMd5 = false;
-
-            BuildCount = 0;
-            BuildVersion = new Dictionary<string, BuildRecord>();
-        }
-
         // Prefab Asset打包版本號記錄
         public static string GetBuildVersionTab()
         {
@@ -189,15 +159,16 @@ namespace KEngine.Editor
         public static bool TryCheckNeedBuildWithMeta(params string[] sourceFiles)
         {
             if (Current == null)
-                return false;
+                return true;
 
             return Current.CheckNeedBuildWithMeta(sourceFiles);
         }
+
+        ///// <summary>
+        ///// 判断路径，并且尝试判断meta文件
+        ///// </summary>
         public bool CheckNeedBuildWithMeta(params string[] sourceFiles)
         {
-            if (!IsCheckMd5)
-                return true;
-
             foreach (string file in sourceFiles)
             {
                 if (DoCheckNeedBuild(file, true) || DoCheckNeedBuild(file + ".meta"))
@@ -207,7 +178,7 @@ namespace KEngine.Editor
             return false;
         }
 
-        private static bool DoCheckNeedBuild(string filePath, bool log = false)
+        private bool DoCheckNeedBuild(string filePath, bool log = false)
         {
             BuildRecord assetMd5;
             if (!File.Exists(filePath))
@@ -221,6 +192,10 @@ namespace KEngine.Editor
                 }
                 return false;
             }
+            
+            if (_isRebuild) // 所有rebuild，不用判断，直接需要build, 保留change count的正确性
+                return true;
+
             if (!BuildVersion.TryGetValue(filePath, out assetMd5))
                 return true;
 
@@ -229,12 +204,11 @@ namespace KEngine.Editor
 
             return false;
         }
-
+        /// <summary>
+        /// 标记一个路径为打包
+        /// </summary>
         public void MarkBuildVersion(params string[] sourceFiles)
         {
-            if (!IsCheckMd5)
-                return;
-
             if (sourceFiles == null || sourceFiles.Length == 0)
                 return;
 
@@ -250,7 +224,7 @@ namespace KEngine.Editor
                 }
                 else
                 {
-                    if (nowMd5 != theRecord.MD5)
+                    if (nowMd5 != theRecord.MD5) // 只有改变时才会mark，所以可能会出现情况，rebuild时，change count不改变
                     {
                         theRecord.Mark(nowMd5);
                     }

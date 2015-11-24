@@ -56,7 +56,7 @@ public partial class KDependencyBuild
                 buildActionCount = actionCountStr.ToInt32();
             }
             buildActionCount++;
-            Logger.Log(" DepBuild Now Action Count: {0}", buildActionCount);
+            Logger.Log(" DepBuild Now Action Version: {0}", buildActionCount);
             CZipTool.SetZipFile(zipPath, "BuildActionCount.txt", buildActionCount.ToString());
 
             // 真实打包的资源记录

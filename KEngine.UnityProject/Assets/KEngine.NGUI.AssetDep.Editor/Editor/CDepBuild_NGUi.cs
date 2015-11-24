@@ -170,7 +170,7 @@ public partial class KDependencyBuild
             string fontPath = BuildFont(label.trueTypeFont);
 
             //CResourceDependencies.Create(label, CResourceDependencyType.FONT, fontPath);
-            KAssetDep.Create<KFontDep>(label, fontPath);
+            KAssetDep.Create<KUILabelDep>(label, fontPath);
             label.trueTypeFont = null; // 挖空依赖的数据
         }
         else

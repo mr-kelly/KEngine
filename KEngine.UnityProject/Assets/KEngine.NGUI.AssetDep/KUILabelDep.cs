@@ -1,7 +1,13 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections;
 
-public class KFontDep : KAssetDep
+[Obsolete("KUILabelDep Instead")]
+public class KFontDep : KUILabelDep
+{
+    
+}
+public class KUILabelDep : KAssetDep
 {
     protected override void DoProcess(string resourcePath)
     {
