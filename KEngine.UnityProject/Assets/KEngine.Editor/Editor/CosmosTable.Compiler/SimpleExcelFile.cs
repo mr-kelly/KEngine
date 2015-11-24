@@ -34,7 +34,7 @@ namespace CosmosTable
         {
             Path = excelPath;
 
-            using (var file = new FileStream(excelPath, FileMode.Open, FileAccess.Read))
+            using (var file = new FileStream(excelPath, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 try
                 {

@@ -92,8 +92,6 @@ namespace {{ NameSpace }}
                         relativePath = relativePath.Substring(1);
 
                     var compileBaseDir = Path.Combine(Application.dataPath, compilePath);
-                    Logger.Log("relativePath: {0}", relativePath);
-                    Logger.Log("Bbase dir: {0}", compileBaseDir);
                     var compileToPath = string.Format("{0}/{1}", compileBaseDir, Path.ChangeExtension(relativePath, ".bytes"));
                 
                     Logger.Log("Compile from {0} to {1}", excelPath, compileToPath);

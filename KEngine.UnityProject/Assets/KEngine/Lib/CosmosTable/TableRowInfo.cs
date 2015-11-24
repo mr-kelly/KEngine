@@ -14,6 +14,9 @@ namespace CosmosTable
 {
     public partial class TableRowInfo
     {
+        /// <summary>
+        /// When true, will use reflection to map the Tab File
+        /// </summary>
         public virtual bool IsAutoParse
         {
             get { return true; }
@@ -73,7 +76,7 @@ namespace CosmosTable
         protected string[] Get_string_array(string value, string defaultValue)
         {
             var str = Get_string(value, defaultValue);
-            return str.Split('|');
+            return str.Split(',');
         }
     }
 

@@ -7,4 +7,4 @@ AssetBundleExt	.unity3d	base
 IsLoadAssetBundle	1	
 UIModuleBridge	NGUI	
 SettingSourcePath	../Product/SettingSource
-SettingPath	../Product/Setting
+SettingPath	Resources/Setting

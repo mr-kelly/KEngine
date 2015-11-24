@@ -333,6 +333,9 @@ namespace CosmosTable
                 exportPath = string.Format("{0}{1}", fileName, _config.ExportTabExt);
             }
 
+            var exportDirPath = Path.GetDirectoryName(exportPath);
+            if (!Directory.Exists(exportDirPath))
+                Directory.CreateDirectory(exportDirPath);
             File.WriteAllText(exportPath, strBuilder.ToString());
 
 

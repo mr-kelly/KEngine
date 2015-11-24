@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using CosmosTable;
 
 namespace KEngine.CoreModules
 {
@@ -10,6 +11,9 @@ namespace KEngine.CoreModules
     /// </summary>
     public class SettingModule
     {
-
+        public static TableFile<T> Get<T>(string path) where T : TableRowInfo, new()
+        {
+            return TableFile<T>.LoadFromString(path);
+        }
     }
 }
