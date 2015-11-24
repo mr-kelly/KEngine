@@ -73,7 +73,7 @@ namespace KEngine
         {
             var downloader = new GameObject("HttpDownloader+" + fullUrl).AddComponent<KHttpDownloader>();
             downloader.Init(fullUrl, saveFullPath, useContinue, useCache, expireDays, timeout);
-
+            DontDestroyOnLoad(downloader.gameObject);
             return downloader;
         }
 

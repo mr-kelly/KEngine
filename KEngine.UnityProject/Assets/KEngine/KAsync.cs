@@ -356,6 +356,7 @@ namespace KEngine
 
                 const string name = "[AsyncManager]";
                 var findObj = new GameObject(name);
+                GameObject.DontDestroyOnLoad(findObj);
                 _instance = findObj.GetComponent<KAsyncManager>() ?? findObj.AddComponent<KAsyncManager>();
 
                 return _instance;

@@ -6,3 +6,5 @@ StreamingBundlesFolderName	Bundles		#Link the BuildPath to StreamingAssets/Bundl
 AssetBundleExt	.unity3d	base
 IsLoadAssetBundle	1	
 UIModuleBridge	NGUI	
+SettingSourcePath	../Product/SettingSource
+SettingPath	../Product/Setting

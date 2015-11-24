@@ -41,11 +41,6 @@ namespace KEngine.Editor
             KBuildTools.AfterBuildAssetBundleEvent += OnAfterBuildAssetBundleEvent;
         }
 
-        private void OnAfterBuildAssetBundleEvent(Object arg1, string arg2, string arg3)
-        {
-            BuildCount++;
-        }
-
         public void Dispose()
         {
             WriteVersion();
@@ -61,8 +56,14 @@ namespace KEngine.Editor
 
             Current = null;
             KBuildTools.AfterBuildAssetBundleEvent -= OnAfterBuildAssetBundleEvent;
+            KDependencyBuild.Clear();
         }
-        
+
+        private void OnAfterBuildAssetBundleEvent(Object arg1, string arg2, string arg3)
+        {
+            BuildCount++;
+        }
+
         #region 资源版本管理相关
         class BuildRecord
         {
@@ -90,8 +91,11 @@ namespace KEngine.Editor
             }
         }
 
-        static Dictionary<string, BuildRecord> BuildVersion;
-
+        /// <summary>
+        /// 持久化，硬盘的
+        /// </summary>
+        static Dictionary<string, BuildRecord> StoreBuildVersion = new Dictionary<string, BuildRecord>();
+        
         public static void WriteVersion()
         {
             string path = GetBuildVersionTab();// MakeSureExportPath(VerCtrlInfo.VerFile, EditorUserBuildSettings.activeBuildTarget);
@@ -101,7 +105,7 @@ namespace KEngine.Editor
             tabFile.NewColumn("AssetDateTime");
             tabFile.NewColumn("ChangeCount");
 
-            foreach (var node in BuildVersion)
+            foreach (var node in StoreBuildVersion)
             {
                 int row = tabFile.NewRow();
                 tabFile.SetValue(row, "AssetPath", node.Key);
@@ -116,9 +120,6 @@ namespace KEngine.Editor
         static void SetupHistory()
         {
             BuildCount = 0;
-            BuildVersion = new Dictionary<string, BuildRecord>();
-
-            BuildVersion.Clear();
 
             string verFile = GetBuildVersionTab(); //MakeSureExportPath(VerCtrlInfo.VerFile, EditorUserBuildSettings.activeBuildTarget);
             KTabFile tabFile;
@@ -128,7 +129,7 @@ namespace KEngine.Editor
 
                 foreach (KTabFile.RowInterator row in tabFile)
                 {
-                    BuildVersion[row.GetString("AssetPath")] =
+                    StoreBuildVersion[row.GetString("AssetPath")] =
                         new BuildRecord(
                             row.GetString("AssetMD5"),
                             row.GetString("AssetDateTime"),
@@ -140,7 +141,7 @@ namespace KEngine.Editor
         public static string GetAssetLastBuildMD5(string assetPath)
         {
             BuildRecord md5;
-            if (BuildVersion.TryGetValue(assetPath, out md5))
+            if (StoreBuildVersion.TryGetValue(assetPath, out md5))
             {
                 return md5.MD5;
             }
@@ -195,10 +196,10 @@ namespace KEngine.Editor
             
             if (_isRebuild) // 所有rebuild，不用判断，直接需要build, 保留change count的正确性
                 return true;
-
-            if (!BuildVersion.TryGetValue(filePath, out assetMd5))
+            
+            if (!StoreBuildVersion.TryGetValue(filePath, out assetMd5))
                 return true;
-
+            
             if (KTool.MD5_File(filePath) != assetMd5.MD5)
                 return true;  // different
 
@@ -214,12 +215,12 @@ namespace KEngine.Editor
 
             foreach (string file in sourceFiles)
             {
-                //BuildVersion[file] = GetAssetVersion(file);
+                //StoreBuildVersion[file] = GetAssetVersion(file);
                 BuildRecord theRecord;
                 var nowMd5 = KTool.MD5_File(file);
-                if (!BuildVersion.TryGetValue(file, out theRecord))
+                if (!StoreBuildVersion.TryGetValue(file, out theRecord))
                 {
-                    theRecord = BuildVersion[file] = new BuildRecord();
+                    theRecord = StoreBuildVersion[file] = new BuildRecord();
                     theRecord.Mark(nowMd5);
                 }
                 else
@@ -230,15 +231,14 @@ namespace KEngine.Editor
                     }
                 }
 
-
                 string metaFile = file + ".meta";
                 if (File.Exists(metaFile))
                 {
                     BuildRecord theMetaRecord;
                     var nowMetaMd5 = KTool.MD5_File(metaFile);
-                    if (!BuildVersion.TryGetValue(metaFile, out theMetaRecord))
+                    if (!StoreBuildVersion.TryGetValue(metaFile, out theMetaRecord))
                     {
-                        theMetaRecord = BuildVersion[metaFile] = new BuildRecord();
+                        theMetaRecord = StoreBuildVersion[metaFile] = new BuildRecord();
                         theMetaRecord.Mark(nowMetaMd5);
                     }
                     else
@@ -258,6 +258,14 @@ namespace KEngine.Editor
             Current.MarkBuildVersion(sourceFiles);
         }
         #endregion
+
+        public static bool TryIsRebuild()
+        {
+            if (Current == null)
+                return true;
+
+            return Current._isRebuild;
+        }
     }
 
 }

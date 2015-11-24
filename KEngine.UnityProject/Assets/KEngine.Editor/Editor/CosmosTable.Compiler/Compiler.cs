@@ -65,10 +65,10 @@ namespace CosmosTable
         public CompilerConfig()
         {
             // Default C# Code Templates
-            CodeTemplates = new Dictionary<string, string>()
-            {
-                {File.ReadAllText("./GenCode.cs.tpl"), "TabConfigs.cs"}, // code template -> CodePath
-            };
+            //CodeTemplates = new Dictionary<string, string>()
+            //{
+            //    {File.ReadAllText("./GenCode.cs.tpl"), "TabConfigs.cs"}, // code template -> CodePath
+            //};
         }
     }
 
@@ -91,7 +91,7 @@ namespace CosmosTable
             _config = cfg;
         }
 
-        private Hash DoCompiler(string path, SimpleExcelFile excelFile, string compileToFilePath = null)
+        private Hash DoCompiler(string path, SimpleExcelFile excelFile, string compileToFilePath = null, string compileBaseDir = null)
         {
             var fileExt = Path.GetExtension(path);
             //IExcelDataReader excelReader = null;
@@ -128,11 +128,11 @@ namespace CosmosTable
 
             //    }
             //}
-            return DoCompilerExcelReader(path, excelFile, compileToFilePath);
+            return DoCompilerExcelReader(path, excelFile, compileToFilePath, compileBaseDir);
         }
 
 
-        private Hash DoCompilerExcelReader(string path, SimpleExcelFile excelFile, string compileToFilePath = null)
+        private Hash DoCompilerExcelReader(string path, SimpleExcelFile excelFile, string compileToFilePath = null, string compileBaseDir = null)
         {
             //3. DataSet - The result of each spreadsheet will be created in the result.Tables
             //DataSet result = excelReader.AsDataSet();
@@ -332,13 +332,23 @@ namespace CosmosTable
                 // use default
                 exportPath = string.Format("{0}{1}", fileName, _config.ExportTabExt);
             }
+
             File.WriteAllText(exportPath, strBuilder.ToString());
 
+
+            // 基于base dir路径
+            var tabFilePath = exportPath;
+            if (!string.IsNullOrEmpty(compileBaseDir))
+            {
+                tabFilePath = tabFilePath.Replace(compileBaseDir, ""); // 保留后戳
+            }
+            if (tabFilePath.StartsWith("/"))
+                tabFilePath = tabFilePath.Substring(1);
 
             renderVars.ClassName = string.Join("",
                 (from name in fileName.Split('_')
                     select System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(name)).ToArray());
-            renderVars.TabFilePath = exportPath;
+            renderVars.TabFilePath = tabFilePath;
 
             return Hash.FromAnonymousObject(renderVars);
         }
@@ -360,7 +370,7 @@ namespace CosmosTable
             return false;
         }
 
-        public bool Compile(string path, string compileToFilePath = null)
+        public bool Compile(string path, string compileToFilePath = null, string compileBaseDir = null)
         {
             //using (FileStream stream = File.Open(path, FileMode.Open, FileAccess.Read))
             //using (
@@ -378,7 +388,7 @@ namespace CosmosTable
                     var files = new List<Hash>();
                     topHash["Files"] = files;
 
-                    var hash = DoCompiler(path, excelFile, compileToFilePath);
+                    var hash = DoCompiler(path, excelFile, compileToFilePath, compileBaseDir);
                     files.Add(hash);
 
                     if (!string.IsNullOrEmpty(exportPath))

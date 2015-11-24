@@ -1,5 +1,6 @@
 
-# 资源模块 / Resource Module
+资源模块 / Resource Module
+============================
 
 资源模块可以说是KEngine最核心的构成，所有其它模块可以说都会对它进行依赖。
 它负责AssetBunbld的打包自动化、异步加载化和统一的资源路径规范管理。
@@ -10,12 +11,14 @@
 * 打包系统(KResourceBuilder): 基于工程需求的资源打包，比方说针对UI、特效，通过写脚本，分别对应不同的打包策略
 * 依赖系统(KAssetDep): U3D官方提供的Push/Pop Dependency以外的另一个选择
 
-## 加载系统 / KResourceModule
+加载系统 / KResourceModule
+------------------------------------------
 
 资源模块的核心部分，KResourceModule规范了不同平台所不同的打包路径、读取路径、Loader调度等基础部分。已KWWWLoader为基础，提供像AssetBundleLoader, TextureLoader, AssetLoader(GameObject), MaterialLoader等多个加载类，提供Callback和协程两种异步风格方式可选。
 
 
-## 打包系统 / ResourceBuilder
+打包系统 / ResourceBuilder
+------------------------------------------
 
 提供一套可编程的AssetBundle打包器。基于ResourceModule提供的资源路径规范。
 
@@ -38,3 +41,8 @@ TODO：
 ### 依赖加载 / AssetDep
 
 经过DependencyBuilder打包后，一个具有依赖的GameObject上面将绑有一个AssetDep组件，在运行时通过代码
+
+
+清理无用的AssetBundle
+-----------------------------
+一个完整的Build过程中，所有涉及的资源是有记录的，因此，可以轻松通过Build记录来知道，哪些是废弃资源，然后删除。

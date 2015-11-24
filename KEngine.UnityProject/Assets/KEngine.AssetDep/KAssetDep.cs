@@ -14,7 +14,15 @@ public abstract class KAssetDep : MonoBehaviour
 
     public static GameObject DependenciesContainer
     {
-        get { return _DependenciesContainer ?? (_DependenciesContainer = new GameObject("[AssetDep]")); }
+        get
+        {
+            if (_DependenciesContainer == null)
+            {
+                _DependenciesContainer = new GameObject("[AssetDep]");
+                DontDestroyOnLoad(_DependenciesContainer);
+            }
+            return _DependenciesContainer;
+        }
     }
 
     private GameObject _cacheGameObject;

@@ -99,6 +99,7 @@ public sealed class ObjectPool : MonoBehaviour
 			if (_instance != null)
 				return _instance;
 			var obj = new GameObject("_CUnityObjectPool");
+            DontDestroyOnLoad(obj);
 			obj.transform.localPosition = Vector3.zero;
 			_instance = obj.AddComponent<ObjectPool>();
 			return _instance;

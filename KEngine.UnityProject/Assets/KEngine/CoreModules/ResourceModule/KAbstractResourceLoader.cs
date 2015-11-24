@@ -27,7 +27,7 @@ public abstract class KAbstractResourceLoader
     }
 
     public delegate void CLoaderDelgate(bool isOk, object resultObject);
-    private static readonly Dictionary<Type, Dictionary<string, KAbstractResourceLoader>> Caches = new Dictionary<Type, Dictionary<string, KAbstractResourceLoader>>();
+    private static readonly Dictionary<Type, Dictionary<string, KAbstractResourceLoader>> _loadersPool = new Dictionary<Type, Dictionary<string, KAbstractResourceLoader>>();
     private readonly List<CLoaderDelgate> _afterFinishedCallbacks = new List<CLoaderDelgate>();
 
     #region 垃圾回收 Garbage Collect
@@ -48,7 +48,7 @@ public abstract class KAbstractResourceLoader
                 Application.platform == RuntimePlatform.OSXEditor)
                 return 1f;
 
-            return Debug.isDebugBuild ? 1f : 4f;
+            return Debug.isDebugBuild ? 5f : 10f;
         }
     }
 
@@ -165,9 +165,9 @@ public abstract class KAbstractResourceLoader
     protected static Dictionary<string, KAbstractResourceLoader> GetTypeDict(Type type)
     {
         Dictionary<string, KAbstractResourceLoader> typesDict;
-        if (!Caches.TryGetValue(type, out typesDict))
+        if (!_loadersPool.TryGetValue(type, out typesDict))
         {
-            typesDict = Caches[type] = new Dictionary<string, KAbstractResourceLoader>();
+            typesDict = _loadersPool[type] = new Dictionary<string, KAbstractResourceLoader>();
         }
         return typesDict;
     }
@@ -183,6 +183,14 @@ public abstract class KAbstractResourceLoader
         return 0;
     }
 
+    /// <summary>
+    /// 统一的对象工厂
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="url"></param>
+    /// <param name="callback"></param>
+    /// <param name="forceCreateNew"></param>
+    /// <returns></returns>
     protected static T AutoNew<T>(string url, CLoaderDelgate callback = null, bool forceCreateNew = false) where T : KAbstractResourceLoader, new()
     {
         Dictionary<string, KAbstractResourceLoader> typesDict = GetTypeDict(typeof(T));

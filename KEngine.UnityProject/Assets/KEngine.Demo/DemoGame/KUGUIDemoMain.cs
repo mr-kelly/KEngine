@@ -44,9 +44,9 @@ public class KUGUIDemoMain : MonoBehaviour
 
         Logger.Log("Begin Load tab file...");
 
-        //var tabContent = File.ReadAllText("Assets/" + Engine.GetConfig("ProductRelPath") + "/setting/test_tab.bytes");
-        //var path = KResourceModule.GetResourceFullPath("/setting/test_tab.bytes");
-        var tabContent = File.ReadAllText(Application.dataPath + "/" + KEngine.AppEngine.GetConfig("ProductRelPath") + "/setting/test_tab.bytes");
+        //var tabContent = File.ReadAllText("Assets/" + Engine.GetConfig("ProductRelPath") + "/Setting/test_tab.bytes");
+        //var path = KResourceModule.GetResourceFullPath("/Setting/test_tab.bytes");
+        var tabContent = File.ReadAllText(Application.dataPath + "/" + KEngine.AppEngine.GetConfig("ProductRelPath") + "/Setting/test_tab.bytes");
         _.LoadTab<CTestTabInfo>(tabContent);
         Logger.Log("Output the tab file...");
         foreach (CTestTabInfo info in _.GetInfos<CTestTabInfo>())

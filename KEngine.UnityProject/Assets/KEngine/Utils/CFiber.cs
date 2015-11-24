@@ -34,7 +34,10 @@ public class CFiber : MonoBehaviour
         get
         {
             if (_Instance == null)
-                new GameObject("CFiber").AddComponent<CFiber>();
+            {
+                var f = new GameObject("CFiber").AddComponent<CFiber>();
+                GameObject.DontDestroyOnLoad(f.gameObject);
+            }
 
             return _Instance;
         }

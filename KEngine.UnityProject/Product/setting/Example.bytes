@@ -1,0 +1,5 @@
+Id	Name	StrArray
+int,0,pk	string	string[]
+1	Test1	1,2,3
+2	Test2	a,b,c
+3	中文	

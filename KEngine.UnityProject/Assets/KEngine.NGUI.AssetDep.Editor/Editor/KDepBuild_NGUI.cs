@@ -34,6 +34,18 @@ public partial class KDependencyBuild
         return result.Path;
 
     }
+
+
+    /// <summary>
+    /// 打包UIAtlas前处理
+    /// </summary>
+    public static Action<UIAtlas> BeforeBuildUIAtlasFilter;
+
+    /// <summary>
+    ///  打包UIAtlas后处理
+    /// </summary>
+    public static Action<UIAtlas> AfterBuildUIAtlasFilter;
+
     // Prefab ,  build
     public static string BuildUIAtlas(UIAtlas atlas)
     {
@@ -50,7 +62,13 @@ public partial class KDependencyBuild
         path = __GetPrefabBuildPath(path);
 
         GameObject copyAtlasObj = GameObject.Instantiate(atlasPrefab) as GameObject;
+
         UIAtlas copyAtlas = copyAtlasObj.GetComponent<UIAtlas>();
+
+        if (BeforeBuildUIAtlasFilter != null)
+        {
+            BeforeBuildUIAtlasFilter(copyAtlas);
+        }
 
         Material cacheMat = copyAtlas.spriteMaterial;
         string matPath = BuildDepMaterial(cacheMat, scale); // 缩放
@@ -80,6 +98,10 @@ public partial class KDependencyBuild
 
         var result = DoBuildAssetBundle("Common/Atlas_" + path, copyAtlasObj, needBuild); // Build主对象, 被挖空Material了的
 
+        if (AfterBuildUIAtlasFilter != null)
+        {
+            AfterBuildUIAtlasFilter(copyAtlas);
+        }
         GameObject.DestroyImmediate(copyAtlasObj);
 
         return result.Path;

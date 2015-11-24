@@ -38,6 +38,7 @@ public class KActionRecords : KBehaviour
                     return null;
                 }
                 _instance = (new GameObject("__ActionRecorder__")).AddComponent<KActionRecords>();
+                DontDestroyOnLoad(_instance.CachedGameObject);
                 _instance.Init();
             }
             return _instance;

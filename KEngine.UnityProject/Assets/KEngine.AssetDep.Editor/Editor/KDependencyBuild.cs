@@ -36,7 +36,7 @@ public partial class KDependencyBuild
     public static event Action<string> AddCacheEvent;
     public static Dictionary<string, bool> BuildedCache = new Dictionary<string, bool>();
     public static bool IsJustCollect = false;  // 是否只收集，不作打包（照旧可以拿到BuildedCache），只是没有实际执行Build而已
-
+    public static List<Action> ClearActions = new List<Action>();  // Clear时执行的委托
     /// <summary>
     /// save the cache. which file builded
     /// </summary>
@@ -83,6 +83,12 @@ public partial class KDependencyBuild
     {
         IsJustCollect = false;
         BuildedCache.Clear();
+
+        foreach (var action in ClearActions)
+        {
+            action();
+        }
+        ClearActions.Clear();
     }
 
     /// <summary>
@@ -149,10 +155,8 @@ public partial class KDependencyBuild
 
 
         // Build主对象
-        if (buildSelf)
-        {
-            DoBuildAssetBundle(path, copyObj);  // TODO: BuildResult...
-        }
+        DoBuildAssetBundle(path, copyObj, buildSelf);  // TODO: BuildResult...
+
         if (!keepCopyObjToDebug)
             GameObject.DestroyImmediate(copyObj);
     }

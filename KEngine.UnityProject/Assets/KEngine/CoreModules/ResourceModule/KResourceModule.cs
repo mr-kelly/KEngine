@@ -54,7 +54,10 @@ public class KResourceModule : MonoBehaviour, ICModule
             {
                 GameObject resMgr = GameObject.Find("_ResourceModule_");
                 if (resMgr == null)
+                {
                     resMgr = new GameObject("_ResourceModule_");
+                    GameObject.DontDestroyOnLoad(resMgr);
+                }
 
                 _Instance = resMgr.AddComponent<KResourceModule>();
             }

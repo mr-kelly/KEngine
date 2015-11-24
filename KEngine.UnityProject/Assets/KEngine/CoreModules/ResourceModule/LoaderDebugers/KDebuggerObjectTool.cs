@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using KEngine;
 
 /// <summary>
 /// 专门用于资源Debugger用到的父对象自动生成
@@ -31,8 +32,15 @@ public class KDebuggerObjectTool
         }
         typeCount = ++Counts[uri];
 
-        KTool.SetChild(obj, theParent.gameObject);
-
+        try
+        {
+            KTool.SetChild(obj, theParent.gameObject);
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(string.Format("[SetParent]{0}->{1}->{2}", bigType, smallType, e.Message));
+        }
+        
         theParent.gameObject.name = GetNameWithCount(smallType, typeCount);
 
     }
@@ -73,6 +81,7 @@ public class KDebuggerObjectTool
         {
             var bigTypeObjName = string.Format("__{0}__", bigType);
             var bigTypeObj = GameObject.Find(bigTypeObjName) ?? new GameObject(bigTypeObjName);
+            GameObject.DontDestroyOnLoad(bigTypeObj);
 
             theParent = new GameObject(smallType).transform;
             KTool.SetChild(theParent, bigTypeObj.transform);
