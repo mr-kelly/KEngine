@@ -73,7 +73,7 @@ public class KInstanceAssetLoader : KAbstractResourceLoader
 
             if (Application.isEditor)
             {
-                KResourceLoadObjectDebugger.Create("AssetCopy", url, InstanceAsset);
+                KResoourceLoadedAssetDebugger.Create("AssetCopy", url, InstanceAsset);
             }
 
             OnFinish(InstanceAsset);

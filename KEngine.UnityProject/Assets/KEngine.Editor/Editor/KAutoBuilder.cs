@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using KUnityEditorTools;
 
 namespace KEngine.Editor
 {
@@ -227,62 +228,14 @@ namespace KEngine.Editor
         [MenuItem("KEngine/Symbol Link Builded Resource to StreamingAssets")]
         public static void SymbolLinkResource()
         {
-            //CSymbolLinkHelper.DeleteAllLinks(CSymbolLinkHelper.AssetBundlesLinkPath);
+            KSymbolLinkHelper.DeleteAllLinks(CSymbolLinkHelper.AssetBundlesLinkPath);
 
-            //var exportPath = GetResourceExportPath();
-            //var linkPath = GetLinkPath();
-
-            // TODO: 
-            //KBuildTools.SymbolLinkFolder(exportPath, linkPath);
-
-            Logger.Log("TODO:");
-            AssetDatabase.Refresh();
-        }
-
-        /// <summary>
-        /// 删除指定目录所有链接
-        /// </summary>
-        /// <param name="assetBundlesLinkPath"></param>
-        private static void DeleteAllLinks(string assetBundlesLinkPath)
-        {
-            if (Directory.Exists(assetBundlesLinkPath))
-            {
-                foreach (var dirPath in Directory.GetDirectories(assetBundlesLinkPath))
-                {
-                    // TODO:
-                    Logger.Log("TODO: {0}", dirPath);
-                    //KBuildTools.DeleteLink(dirPath);
-                }
-            }
-
-        }
-
-        /// <summary>
-        /// 如果不存在，创建link，并执行callback，完成后删掉link
-        /// 如果存在，执行callback，完成后不删
-        /// </summary>
-
-        public static void SymbolLinkResourceAndDoAction(Action doAction = null)
-        {
-            var resourcePath = GetResourceExportPath();
+            var exportPath = GetResourceExportPath();
             var linkPath = GetLinkPath();
-            if (!Directory.Exists(linkPath))
-            {
-                SymbolLinkResource();
 
-                if (doAction != null)
-                    doAction();
-
-                // TODO: DeleteLink
-                //KBuildTools.DeleteLink(linkPath);
-            }
-            else
-            {
-                if (doAction != null)
-                    doAction();
-
-                Logger.LogWarning("[SymbolLinkTest]Exist so not link: {0}", resourcePath);
-            }
+            KSymbolLinkHelper.SymbolLinkFolder(exportPath, linkPath);
+            
+            AssetDatabase.Refresh();
         }
     }
 

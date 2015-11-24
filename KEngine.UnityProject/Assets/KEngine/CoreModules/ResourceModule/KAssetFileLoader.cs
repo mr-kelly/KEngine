@@ -14,7 +14,7 @@ using Object = UnityEngine.Object;
 using KEngine;
 
 /// <summary>
-/// 根據不同模式，從AssetBundle中獲取Asset或從Resources中獲取,一個橋接類
+/// 根據不同模式，從AssetBundle中獲取Asset或從Resources中獲取,两种加载方式同时实现的桥接类
 /// 读取一个文件的对象，不做拷贝和引用
 /// </summary>
 public class KAssetFileLoader : KAbstractResourceLoader
@@ -140,7 +140,7 @@ public class KAssetFileLoader : KAbstractResourceLoader
         if (Application.isEditor)
         {
             if (getAsset != null)
-                KResourceLoadObjectDebugger.Create(getAsset.GetType().Name, Url, getAsset as UnityEngine.Object);
+                KResoourceLoadedAssetDebugger.Create(getAsset.GetType().Name, Url, getAsset as UnityEngine.Object);
         }
 
         if (getAsset != null)

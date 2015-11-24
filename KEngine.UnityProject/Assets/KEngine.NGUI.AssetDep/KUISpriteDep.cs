@@ -28,11 +28,9 @@ public class KUISpriteDep : KAssetDep
                 {
                     spriteAnim.RebuildSpriteList();
                 }
-
             }
             OnFinishLoadDependencies(gameObject);  // 返回GameObject而已哦
         });
         ResourceLoaders.Add(loader);
     }
-
 }

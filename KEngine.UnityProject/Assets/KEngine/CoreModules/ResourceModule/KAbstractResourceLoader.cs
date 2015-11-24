@@ -58,7 +58,7 @@ public abstract class KAbstractResourceLoader
     private static float _lastGcTime = -1;
 
     /// <summary>
-    /// 缓存起来要删掉的，供DoGarbageCollect函数用
+    /// 缓存起来要删掉的，供DoGarbageCollect函数用, 避免重复的new List
     /// </summary>
     private static readonly List<KAbstractResourceLoader> CacheLoaderToRemoveFromUnUsed = new List<KAbstractResourceLoader>();
 
@@ -440,6 +440,19 @@ public abstract class KAbstractResourceLoader
 
     protected virtual void DoDispose()
     {
+    }
+
+
+    /// <summary>
+    /// 强制进行Dispose，无视Ref引用数，建议用在RefCount为1的Loader上
+    /// </summary>
+    public virtual void ForceDispose()
+    {
+        if (RefCount != 1)
+        {
+            Logger.LogWarning("[ForceDisose]Use force dispose to dispose loader, recommend this loader RefCount == 1");
+        }
+        Dispose();
     }
 
 }

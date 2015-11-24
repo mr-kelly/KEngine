@@ -54,6 +54,8 @@ public class KMaterialLoader : KAbstractResourceLoader
         var sMat = matLoadBridge.ResultObject as KSerializeMaterial;
         Logger.Assert(sMat);
 
+        Desc = sMat.ShaderName;
+
         Logger.Assert(Mat == null);
         yield return KResourceModule.Instance.StartCoroutine(CoGenerateMaterial(Url, sMat));
         Logger.Assert(Mat);
@@ -61,7 +63,7 @@ public class KMaterialLoader : KAbstractResourceLoader
         matLoadBridge.Release(); //不需要它了
 
 #if UNITY_EDITOR
-        KResourceLoadObjectDebugger.Create("Material", Url, Mat);
+        KResoourceLoadedAssetDebugger.Create("Material", Url, Mat);
 #endif
         OnFinish(Mat);
     }

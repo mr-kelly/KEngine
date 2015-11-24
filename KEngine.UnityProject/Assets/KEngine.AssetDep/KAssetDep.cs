@@ -207,7 +207,7 @@ public abstract class KAssetDep : MonoBehaviour
         ResourceLoaders.Add(mLoader);
     }
 
-    // 清理Textures, 下次加载时，重新执行依赖加载 TODO: 目前暂时只测试支持UITextures的
+    // 清理Textures, 下次加载时，重新执行依赖加载
     public void ClearAndReset()
     {
         _NewIsInit = false;
@@ -246,7 +246,7 @@ public abstract class KAssetDep : MonoBehaviour
         }
     }
 
-    public static Coroutine WaitDep(GameObject obj)
+    public static Coroutine WaitDepCoroutine(GameObject obj)
     {
         return KResourceModule.Instance.StartCoroutine(CoWaitDep(obj));
     }
@@ -268,9 +268,9 @@ public abstract class KAssetDep : MonoBehaviour
     /// <param name="obj"></param>
     /// <param name="c"></param>
     /// <returns></returns>
-    public static KAssetDep[] WaitDep(GameObject obj, Action c)
+    public static AssetDepWaiter WaitDep(GameObject obj, Action c = null)
     {
-        CAssetDepWaiter newWaiter = new CAssetDepWaiter();
+        AssetDepWaiter newWaiter = new AssetDepWaiter();
         newWaiter.DepCallback = c;
         newWaiter.WaitObject = obj;
 
@@ -293,16 +293,21 @@ public abstract class KAssetDep : MonoBehaviour
             if (newWaiter.DepCallback != null)
                 newWaiter.DepCallback();
         }
-        
-        return deps;
+
+        return newWaiter;
     }
 
-    internal class CAssetDepWaiter
+    public class AssetDepWaiter
     {
         public IList<KAssetDep> AssetDeps;
         public int count = 0;
         public Action DepCallback = null;
         public GameObject WaitObject;
+
+        public bool IsFinished
+        {
+            get { return count <= 0; }
+        }
 
         public void OnLoadedDepCallback(KAssetDep assetDep, UnityEngine.Object obj)
         {

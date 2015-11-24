@@ -27,7 +27,7 @@ public class KAssetBundleParser
     /// <summary>
     /// 是异步解析，还是同步解析
     /// </summary>
-    public static CAssetBundleParserMode Mode = CAssetBundleParserMode.Sync;
+    public static CAssetBundleParserMode Mode = CAssetBundleParserMode.Async;
 
     private bool IsDisposed = false;
     private bool UnloadAllAssets; // Dispose时赋值

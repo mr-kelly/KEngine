@@ -18,7 +18,7 @@ using KEngine;
 /// <summary>
 /// Extension Unity's function, to be more convinient
 /// </summary>
-public static class CExtensions
+public static class KEngineExtensions
 {
     public static void SetWidth(this RectTransform rectTrans, float width)
     {

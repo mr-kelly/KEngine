@@ -58,7 +58,7 @@ public class KStaticAssetLoader : KAbstractResourceLoader
 
             if (Application.isEditor)
                 if (TheAsset != null)
-                    KResourceLoadObjectDebugger.Create("StaticAsset", path, TheAsset);
+                    KResoourceLoadedAssetDebugger.Create("StaticAsset", path, TheAsset);
         });
     }
 
