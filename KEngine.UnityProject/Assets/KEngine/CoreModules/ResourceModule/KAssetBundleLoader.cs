@@ -12,7 +12,15 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using KEngine;
+
+//public enum AssetBundleLoadMode
+//{
+//    StreamingAssetsWww, // default, use WWW class -> StreamingAssets Path
+//    ResourcesLoadAsync,  // -> Resources path
+//    ResourcesLoad, // -> Resources Path
+//}
 
 // 調用WWWLoader
 public class KAssetBundleLoader : KAbstractResourceLoader
@@ -21,7 +29,8 @@ public class KAssetBundleLoader : KAbstractResourceLoader
     
     public static Action<string> NewAssetBundleLoaderEvent;
     public static Action<KAssetBundleLoader> AssetBundlerLoaderErrorEvent;
-
+    
+    private KWWWLoader _wwwLoader;
     private KAssetBundleParser BundleParser;
     //private bool UnloadAllAssets; // Dispose时赋值
     public AssetBundle Bundle
@@ -67,57 +76,86 @@ public class KAssetBundleLoader : KAbstractResourceLoader
 
     IEnumerator LoadAssetBundle(string relativeUrl)
     {
-        var wwwLoader = KWWWLoader.Load(FullUrl);
-        while (!wwwLoader.IsFinished)
+        byte[] bundleBytes;
+        if (KResourceModule.InAppPathType == KResourceInAppPathType.StreamingAssetsPath)
         {
-            Progress = wwwLoader.Progress / 2f;  // 最多50%， 要算上Parser的嘛
-            yield return null;
-        }
-        Progress = 1/2f;
-
-        if (!wwwLoader.IsOk)
-        {
-            if (AssetBundlerLoaderErrorEvent != null)
+            _wwwLoader = KWWWLoader.Load(FullUrl);
+            while (!_wwwLoader.IsFinished)
             {
-                AssetBundlerLoaderErrorEvent(this);
+                Progress = _wwwLoader.Progress / 2f;  // 最多50%， 要算上Parser的嘛
+                yield return null;
             }
-            Logger.LogError("[KAssetBundleLoader]Error Load AssetBundle: {0}", relativeUrl);
-            OnFinish(null);
-            wwwLoader.Release();
-            yield break;
+
+            Progress = 1 / 2f;
+
+            if (!_wwwLoader.IsOk)
+            {
+                if (AssetBundlerLoaderErrorEvent != null)
+                {
+                    AssetBundlerLoaderErrorEvent(this);
+                }
+                Logger.LogError("[KAssetBundleLoader]Error Load AssetBundle: {0}", relativeUrl);
+                OnFinish(null);
+                yield break;
+            }
+
+            bundleBytes = _wwwLoader.Www.bytes;
+        }
+        else if (KResourceModule.InAppPathType == KResourceInAppPathType.ResourcesAssetsPath)  // 使用Resources文件夹模式
+        {
+            var pathExt = Path.GetExtension(FullUrl);
+            var pathWithoutExt = FullUrl.Substring(0,
+                FullUrl.Length - pathExt.Length);
+            var textAsset = Resources.Load<TextAsset>(pathWithoutExt);
+            if (textAsset == null)
+            {
+                Logger.LogError("[LoadAssetBundle]Cannot Resources.Load from : {0}", pathWithoutExt);
+                OnFinish(null);
+                yield break;
+            }
+
+            bundleBytes = textAsset.bytes;
         }
         else
         {
-            // 提前结束
-
-            // 解密
-            // 释放WWW加载的字节。。释放该部分内存，因为AssetBundle已经自己有缓存了
-            var cloneBytes = (byte[])wwwLoader.Www.bytes.Clone();
-            wwwLoader.Release();
-
-            BundleParser = new KAssetBundleParser(RelativeResourceUrl, cloneBytes);
-            while (!BundleParser.IsFinished)
-            {
-                if (IsReadyDisposed)  // 中途释放
-                {
-                    OnFinish(null);
-                    yield break;
-                }
-                Progress = BundleParser.Progress / 2f + 1/2f;  // 最多50%， 要算上WWWLoader的嘛
-                yield return null;
-            }
-            Progress = 1f;
-            var assetBundle = BundleParser.Bundle;
-            if (assetBundle == null)
-                Logger.LogError("WWW.assetBundle is NULL: {0}", FullUrl);
-
-            OnFinish(assetBundle);
-
-            //Array.Clear(cloneBytes, 0, cloneBytes.Length);  // 手工释放内存
+            Logger.LogError("[LoadAssetBundle]Error InAppPathType: {0}", KResourceModule.InAppPathType);
+            OnFinish(null);
+            yield break;
         }
 
-        
+        BundleParser = new KAssetBundleParser(RelativeResourceUrl, bundleBytes);
+        while (!BundleParser.IsFinished)
+        {
+            if (IsReadyDisposed)  // 中途释放
+            {
+                OnFinish(null);
+                yield break;
+            }
+            Progress = BundleParser.Progress / 2f + 1/2f;  // 最多50%， 要算上WWWLoader的嘛
+            yield return null;
+        }
+
+        Progress = 1f;
+        var assetBundle = BundleParser.Bundle;
+        if (assetBundle == null)
+            Logger.LogError("WWW.assetBundle is NULL: {0}", FullUrl);
+
+        OnFinish(assetBundle);
+
+        //Array.Clear(cloneBytes, 0, cloneBytes.Length);  // 手工释放内存
+
         //GC.Collect(0);// 手工释放内存
+    }
+
+    protected override void OnFinish(object resultObj)
+    {
+        if (_wwwLoader != null)
+        {
+            // 释放WWW加载的字节。。释放该部分内存，因为AssetBundle已经自己有缓存了
+            _wwwLoader.Release();
+            _wwwLoader = null;
+        }
+        base.OnFinish(resultObj);
     }
 
     override protected void DoDispose()

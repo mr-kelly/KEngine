@@ -34,7 +34,7 @@ public partial class KBuildTools
     /// <param name="path"></param>
     /// <param name="buildTarget"></param>
     /// <returns></returns>
-    public static string MakeSureExportPath(string path, BuildTarget buildTarget, CResourceQuality quality)
+    public static string MakeSureExportPath(string path, BuildTarget buildTarget, KResourceQuality quality)
     {
         path = KBuildTools.GetExportPath(buildTarget, quality) + path;
 
@@ -54,7 +54,7 @@ public partial class KBuildTools
     /// <param name="platfrom"></param>
     /// <param name="quality"></param>
     /// <returns></returns>
-    public static string GetExportPath(BuildTarget platfrom, CResourceQuality quality = CResourceQuality.Sd)
+    public static string GetExportPath(BuildTarget platfrom, KResourceQuality quality = KResourceQuality.Sd)
     {
         string basePath = Path.GetFullPath(Application.dataPath + "/" + KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleBuildRelPath) + "/");
 
@@ -75,7 +75,7 @@ public partial class KBuildTools
             case BuildTarget.iPhone:
             case BuildTarget.StandaloneWindows:
                 var platformName = KResourceModule.BuildPlatformName;
-                if (quality != CResourceQuality.Sd)  // SD no need add
+                if (quality != KResourceQuality.Sd)  // SD no need add
                     platformName += quality.ToString().ToUpper();
 
                 path = basePath + platformName + "/";
@@ -140,7 +140,7 @@ public partial class KBuildTools
         return BuildAssetBundle(asset, path, EditorUserBuildSettings.activeBuildTarget, KResourceModule.Quality);
     }
 
-    public static uint BuildAssetBundle(Object asset, string path, BuildTarget buildTarget, CResourceQuality quality)
+    public static uint BuildAssetBundle(Object asset, string path, BuildTarget buildTarget, KResourceQuality quality)
     {
         if (asset == null || string.IsNullOrEmpty(path))
         {
@@ -306,7 +306,7 @@ public partial class KBuildTools
         return BuildScriptableObject(scriptObject, path, EditorUserBuildSettings.activeBuildTarget, KResourceModule.Quality);
     }
 
-    public static uint BuildScriptableObject<T>(T scriptObject, string path, BuildTarget buildTarget, CResourceQuality quality) where T : ScriptableObject
+    public static uint BuildScriptableObject<T>(T scriptObject, string path, BuildTarget buildTarget, KResourceQuality quality) where T : ScriptableObject
     {
         const string tempAssetPath = "Assets/~Temp.asset";
         AssetDatabase.CreateAsset(scriptObject, tempAssetPath);

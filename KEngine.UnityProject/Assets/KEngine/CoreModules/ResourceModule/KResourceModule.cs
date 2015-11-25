@@ -14,20 +14,34 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using ICSharpCode.SharpZipLib.Tar;
 using Object = UnityEngine.Object;
 
-public enum CResourceQuality
+public enum KResourceQuality
 {
     Sd = 2,
-
     Hd = 1,
-    
     Ld = 4,
 }
 
-public enum CResourceManagerPathType
+/// <summary>
+/// In App Path, 指Streaming Assets目录或Resources目录，使用哪一种方式去加载AssetBundle
+/// StreamingAssets目录，不能使用同步语法去加载，但Resources可以
+/// 使用StreamingAssets读取AssetBundle，还是使用Resources目录使用AssetBundle？
+/// </summary>
+public enum KResourceInAppPathType
 {
-    StreamingAssetsPathPriority, // 忽略PersitentDataPath
+    Invalid,
+    StreamingAssetsPath,
+    ResourcesAssetsPath,
+}
+/// <summary>
+/// 资源路径优先级，优先使用
+/// </summary>
+public enum KResourcePathPriorityType
+{
+    Invalid,
+    InAppPathPriority, // 忽略PersitentDataPath, 优先寻找Resources或StreamingAssets路径 (取决于ResourcePathType)
     PersistentDataPathPriority,  // 尝试在Persistent目錄尋找，找不到再去StreamingAssets
 }
 public class KResourceModule : MonoBehaviour, ICModule
@@ -39,7 +53,9 @@ public class KResourceModule : MonoBehaviour, ICModule
         ShowTime,
         ShowDetail,
     }
-    public static CResourceQuality Quality = CResourceQuality.Sd;
+    public static KResourceQuality Quality = KResourceQuality.Sd;
+
+    public static KResourceInAppPathType InAppPathType = KResourceInAppPathType.ResourcesAssetsPath;
 
     public static float TextureScale
     {
@@ -79,20 +95,29 @@ public class KResourceModule : MonoBehaviour, ICModule
     /// </summary>
     public static string EditorProductFullPath { get { return Path.Combine(Application.dataPath, ProductRelPath); } }
 
-    public static string ResourcesPath;
-    public static string ResourcesPathWithoutFileProtocol;
+    /// <summary>
+    /// StreamingAssetsPath/Bundles/Android/ etc.
+    /// </summary>
+    public static string StreamingPlatformPath;
+    public static string StreamingPlatformPathWithoutFileProtocol;
+    
+    /// <summary>
+    /// Resources/Bundles/Android/ etc...
+    /// </summary>
+    public static string ResourceFolderPlatformPath;
+
     public static string ApplicationPath;
 
     public static string DocumentResourcesPathWithoutFileProtocol 
     {
         get
         {
-            return string.Format("{0}/{1}/{2}/", GetAppDataPath(), ResourceDirName, GetBuildPlatformName());  // 各平台通用
+            return string.Format("{0}/{1}/{2}/", GetAppDataPath(), BundlesDirName, GetBuildPlatformName());  // 各平台通用
         }
     }
     public static string DocumentResourcesPath;
 
-    public static CResourceManagerPathType ResourcePathType = CResourceManagerPathType.PersistentDataPathPriority;  // 是否優先找下載的資源?還是app本身資源優先
+    public static KResourcePathPriorityType ResourcePathPriorityType = KResourcePathPriorityType.PersistentDataPathPriority;  // 是否優先找下載的資源?還是app本身資源優先
 
     public static System.Func<string, string> CustomGetResourcesPath; // 自定义资源路径。。。
 
@@ -138,9 +163,23 @@ public class KResourceModule : MonoBehaviour, ICModule
         bool hasDocUrl = TryGetDocumentResourceUrl(url, out docUrl);
 
         string inAppUrl;
-        bool hasInAppUrl = TryGetInAppResourceUrl(url, out inAppUrl);
+        bool hasInAppUrl;
+        if (InAppPathType == KResourceInAppPathType.StreamingAssetsPath)
+        {
+            hasInAppUrl = TryGetInAppStreamingUrl(url, out inAppUrl);
+        }
+        else if (InAppPathType == KResourceInAppPathType.ResourcesAssetsPath)
+        {
+            hasInAppUrl = TryGetInAppResourcesFolderUrl(url, out inAppUrl); // 使用Resources某
+        }
+        else
+        {
+            Logger.LogError("[GetResourceFullPath]Invalid InAppPathType: {0}", InAppPathType);
+            hasInAppUrl = false;
+            inAppUrl = null;
+        }
 
-        if (ResourcePathType == CResourceManagerPathType.PersistentDataPathPriority)  // 優先下載資源模式
+        if (ResourcePathPriorityType == KResourcePathPriorityType.PersistentDataPathPriority)  // 優先下載資源模式
         {
             if (hasDocUrl)
             {
@@ -155,7 +194,7 @@ public class KResourceModule : MonoBehaviour, ICModule
         if (!hasInAppUrl) // 连本地资源都没有，直接失败吧 ？？ 沒有本地資源但又遠程資源？竟然！!?
         {
             if (isLog)
-                Logger.LogError("[Not Found] InApp Url Resource: {0}", url);
+                Logger.LogError("[Not Found] StreamingAssetsPath Url Resource: {0}", url);
             fullPath = null;
             return false;
         }
@@ -184,20 +223,37 @@ public class KResourceModule : MonoBehaviour, ICModule
         return Application.persistentDataPath;
     }
 
-    // (not android ) only! Android资源不在目录！
-    public static bool TryGetInAppResourceUrl(string url, out string newUrl)
+    /// <summary>
+    /// 使用Resources来放置AssetBundle
+    /// </summary>
+    /// <param name="relativePath"></param>
+    /// <param name="inAppUrl"></param>
+    /// <returns></returns>
+    static bool TryGetInAppResourcesFolderUrl(string relativePath, out string inAppUrl)
     {
-        newUrl = ResourcesPath + url;
+        inAppUrl = ResourceFolderPlatformPath + relativePath;
+        return true;
+    }
+    /// <summary>
+    /// (not android ) only! Android资源不在目录！
+    /// Editor返回文件系统目录，运行时返回StreamingAssets目录
+    /// </summary>
+    /// <param name="url"></param>
+    /// <param name="newUrl"></param>
+    /// <returns></returns>
+    public static bool TryGetInAppStreamingUrl(string url, out string newUrl)
+    {
+        newUrl = StreamingPlatformPath + url;
 
         // 注意，StreamingAssetsPath在Android平台時，壓縮在apk里面，不要做文件檢查了
-        if (Application.platform != RuntimePlatform.Android && !File.Exists(ResourcesPathWithoutFileProtocol + url))
+        if (Application.platform != RuntimePlatform.Android && !File.Exists(StreamingPlatformPathWithoutFileProtocol + url))
         {
             return false;
         }
         // Windows/Edtiro平台下，进行大小敏感判断
         if (Application.isEditor)
         {
-            var result = FileExistsWithDifferentCase(ResourcesPathWithoutFileProtocol + url);
+            var result = FileExistsWithDifferentCase(StreamingPlatformPathWithoutFileProtocol + url);
             if (!result)
             {
                 Logger.LogError("[大小写敏感]发现一个资源 {0}，大小写出现问题，在Windows可以读取，手机不行，请改表修改！", url);
@@ -256,7 +312,7 @@ public class KResourceModule : MonoBehaviour, ICModule
         if (Debug.isDebugBuild)
         {
             Logger.Log("ResourceManager ApplicationPath: {0}", ApplicationPath);
-            Logger.Log("ResourceManager ResourcesPath: {0}", ResourcesPath);
+            Logger.Log("ResourceManager StreamingPlatformPath: {0}", StreamingPlatformPath);
             Logger.Log("ResourceManager DocumentResourcesPath: {0}", DocumentResourcesPath);
             Logger.Log("================================================================================");
         }
@@ -348,7 +404,7 @@ public class KResourceModule : MonoBehaviour, ICModule
                 break;
         }
 #endif
-        if (Quality != CResourceQuality.Sd)  // SD no need add
+        if (Quality != KResourceQuality.Sd)  // SD no need add
             buildPlatformName += Quality.ToString().ToUpper();
         return buildPlatformName;
     }
@@ -366,7 +422,7 @@ public class KResourceModule : MonoBehaviour, ICModule
         return fileProtocol;
     }
 
-    public static string ResourceDirName
+    public static string BundlesDirName
     {
         get
         {
@@ -404,9 +460,9 @@ public class KResourceModule : MonoBehaviour, ICModule
             case RuntimePlatform.OSXEditor:
                 {
                     ApplicationPath = string.Format("{0}{1}/", GetFileProtocol(), editorProductPath);
-                    ResourcesPath = GetFileProtocol() + EditorAssetBundlePath + "/" + BuildPlatformName + "/";
-                    ResourcesPathWithoutFileProtocol = EditorAssetBundlePath + "/" + BuildPlatformName + "/";
-
+                    StreamingPlatformPath = GetFileProtocol() + EditorAssetBundlePath + "/" + BuildPlatformName + "/";
+                    StreamingPlatformPathWithoutFileProtocol = EditorAssetBundlePath + "/" + BuildPlatformName + "/";
+                    ResourceFolderPlatformPath = string.Format("{0}/{1}/", BundlesDirName, GetBuildPlatformName());  // Resources folder
                 }
                 break;
             case RuntimePlatform.WindowsPlayer:
@@ -415,23 +471,25 @@ public class KResourceModule : MonoBehaviour, ICModule
                     string path = Application.dataPath.Replace('\\', '/');
                     path = path.Substring(0, path.LastIndexOf('/') + 1);
                     ApplicationPath = string.Format("{0}{1}/", GetFileProtocol(), path);
-                    ResourcesPath = string.Format("{0}{1}/{2}/{3}/", GetFileProtocol(), path, ResourceDirName, GetBuildPlatformName());
-                    ResourcesPathWithoutFileProtocol = string.Format("{0}/{1}/{2}/", path, ResourceDirName, GetBuildPlatformName());
+                    StreamingPlatformPath = string.Format("{0}{1}/{2}/{3}/", GetFileProtocol(), path, BundlesDirName, GetBuildPlatformName());
+                    StreamingPlatformPathWithoutFileProtocol = string.Format("{0}/{1}/{2}/", path, BundlesDirName, GetBuildPlatformName());
+                    ResourceFolderPlatformPath = string.Format("{0}/{1}/", BundlesDirName, GetBuildPlatformName());  // Resources folder
                 }
                 break;
             case RuntimePlatform.Android:
                 {
-                    ApplicationPath = string.Concat("jar:", GetFileProtocol(), Application.dataPath, string.Format("!/assets/{0}/", ResourceDirName));
-
-                    ResourcesPath = string.Concat(ApplicationPath, GetBuildPlatformName(), "/");
-                    ResourcesPathWithoutFileProtocol = string.Concat(Application.dataPath, "!/assets/" + ResourceDirName + "/", GetBuildPlatformName() + "/");  // 注意，StramingAsset在Android平台中，是在壓縮的apk里，不做文件檢查
+                    ApplicationPath = string.Concat("jar:", GetFileProtocol(), Application.dataPath, string.Format("!/assets/{0}/", BundlesDirName));
+                    StreamingPlatformPath = string.Concat(ApplicationPath, GetBuildPlatformName(), "/");
+                    StreamingPlatformPathWithoutFileProtocol = string.Concat(Application.dataPath, "!/assets/" + BundlesDirName + "/", GetBuildPlatformName() + "/");  // 注意，StramingAsset在Android平台中，是在壓縮的apk里，不做文件檢查
+                    ResourceFolderPlatformPath = string.Format("{0}/{1}/", BundlesDirName, GetBuildPlatformName());  // Resources folder
                 }
                 break;
             case RuntimePlatform.IPhonePlayer:
                 {
-                    ApplicationPath = System.Uri.EscapeUriString(GetFileProtocol() + Application.streamingAssetsPath + "/" + ResourceDirName + "/");  // MacOSX下，带空格的文件夹，空格字符需要转义成%20
-                    ResourcesPath = string.Format("{0}{1}/", ApplicationPath, GetBuildPlatformName());  // only iPhone need to Escape the fucking Url!!! other platform works without it!!! Keng Die!
-                    ResourcesPathWithoutFileProtocol = Application.streamingAssetsPath + "/" + ResourceDirName + "/" + GetBuildPlatformName() + "/";
+                    ApplicationPath = System.Uri.EscapeUriString(GetFileProtocol() + Application.streamingAssetsPath + "/" + BundlesDirName + "/");  // MacOSX下，带空格的文件夹，空格字符需要转义成%20
+                    StreamingPlatformPath = string.Format("{0}{1}/", ApplicationPath, GetBuildPlatformName());  // only iPhone need to Escape the fucking Url!!! other platform works without it!!! Keng Die!
+                    StreamingPlatformPathWithoutFileProtocol = Application.streamingAssetsPath + "/" + BundlesDirName + "/" + GetBuildPlatformName() + "/";
+                    ResourceFolderPlatformPath = string.Format("{0}/{1}/", BundlesDirName, GetBuildPlatformName());  // Resources folder
                 }
                 break;
             default:

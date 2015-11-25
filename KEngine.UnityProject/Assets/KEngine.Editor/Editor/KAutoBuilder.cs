@@ -211,7 +211,20 @@ namespace KEngine.Editor
     public class CSymbolLinkHelper
     {
 
-        public static string AssetBundlesLinkPath = "Assets/StreamingAssets/" + KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.StreamingBundlesFolderName) + "/"; // hold asset bundles
+        public static string AssetBundlesLinkPath
+        {
+            get
+            {
+                // StreamingAssetsPath
+                if (KResourceModule.InAppPathType == KResourceInAppPathType.StreamingAssetsPath)
+                    return "Assets/StreamingAssets/" + KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.StreamingBundlesFolderName) + "/"; // hold asset bundles
+                if (KResourceModule.InAppPathType == KResourceInAppPathType.ResourcesAssetsPath)
+                    return "Assets/Resources/" + KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.StreamingBundlesFolderName) + "/"; // hold asset bundles"
+
+                Logger.LogError("[AssetBundlesLinkPath]Invalid {0}", KResourceModule.InAppPathType);
+                return null;
+            }
+        }
         public static string GetLinkPath()
         {
             if (!Directory.Exists(AssetBundlesLinkPath))
