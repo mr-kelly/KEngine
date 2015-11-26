@@ -36,9 +36,9 @@ public class KMaterialLoader : KAbstractResourceLoader
         return AutoNew<KMaterialLoader>(path, newCallback);
     }
 
-    protected override void Init(string url)
+    protected override void Init(string url, params object[] args)
     {
-        base.Init(url);
+        base.Init(url, args);
         KResourceModule.Instance.StartCoroutine(CoLoadSerializeMaterial());
     }
 
@@ -114,11 +114,22 @@ public class KMaterialLoader : KAbstractResourceLoader
         // 纹理全部加载完成后到这里
         //if (!CachedMaterials.TryGetValue(matPath, out mat))
         {
-            Shader shader = KTool.FindShader(sMat.ShaderName);
+            var shaderLoader = KShaderLoader.Load(sMat.ShaderPath);
+            while (!shaderLoader.IsFinished)
+            {
+                yield return null;
+            }
+            
+            var shader = shaderLoader.ShaderAsset;
             if (shader == null)
             {
-                Logger.LogWarning("找不到Shader: {0}, 使用Diffuse临时代替", sMat.ShaderName);
-                shader = KTool.FindShader("Diffuse");
+                shader = KTool.FindShader(sMat.ShaderName);
+                Logger.LogWarning("无法加载Shader资源: {0}, 使用Shaders.Find代替", sMat.ShaderName);
+                if (shader == null)
+                {
+                    Logger.LogWarning("找不到Shader: {0}, 使用Diffuse临时代替", sMat.ShaderName);
+                    shader = KTool.FindShader("Diffuse");    
+                }
             }
             Logger.Assert(shader);
 

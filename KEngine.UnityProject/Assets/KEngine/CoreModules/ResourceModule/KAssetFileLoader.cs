@@ -48,9 +48,9 @@ public class KAssetFileLoader : KAbstractResourceLoader
         return AutoNew<KAssetFileLoader>(path, realcallback);
     }
 
-    protected override void Init(string url)
+    protected override void Init(string url, params object[] args)
     {
-        base.Init(url);
+        base.Init(url, args);
         KResourceModule.Instance.StartCoroutine(_Init(Url, null));
     }
 

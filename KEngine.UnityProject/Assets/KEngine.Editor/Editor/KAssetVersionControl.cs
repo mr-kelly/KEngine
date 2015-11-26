@@ -95,6 +95,7 @@ namespace KEngine.Editor
         /// 持久化，硬盘的
         /// </summary>
         static Dictionary<string, BuildRecord> StoreBuildVersion = new Dictionary<string, BuildRecord>();
+        static Dictionary<string, BuildRecord> InstanceBuildVersion = new Dictionary<string, BuildRecord>();
         
         public static void WriteVersion()
         {
@@ -129,7 +130,8 @@ namespace KEngine.Editor
 
                 foreach (KTabFile.RowInterator row in tabFile)
                 {
-                    StoreBuildVersion[row.GetString("AssetPath")] =
+                    var assetPath = row.GetString("AssetPath");
+                    StoreBuildVersion[assetPath] =
                         new BuildRecord(
                             row.GetString("AssetMD5"),
                             row.GetString("AssetDateTime"),
@@ -157,43 +159,63 @@ namespace KEngine.Editor
             return Application.dataPath + "/" + KEngineDef.ResourcesBuildInfosDir + "/ArtBuildResource_" + KResourceModule.BuildPlatformName + ".txt";
         }
 
+        public static bool TryCheckFileBuild(string filePath)
+        {
+            if (Current == null)
+                return true;
+
+            return Current.DoCheckBuild(filePath, true);
+        }
+
         public static bool TryCheckNeedBuildWithMeta(params string[] sourceFiles)
         {
             if (Current == null)
                 return true;
 
-            return Current.CheckNeedBuildWithMeta(sourceFiles);
+            return Current.CheckFileBuildWithMeta(sourceFiles);
         }
 
         ///// <summary>
         ///// 判断路径，并且尝试判断meta文件
         ///// </summary>
-        public bool CheckNeedBuildWithMeta(params string[] sourceFiles)
+        public bool CheckFileBuildWithMeta(params string[] sourceFiles)
         {
             foreach (string file in sourceFiles)
             {
-                if (DoCheckNeedBuild(file, true) || DoCheckNeedBuild(file + ".meta"))
+                if (DoCheckBuild(file, true) || DoCheckBuild(file + ".meta", false))
                     return true;
             }
 
             return false;
         }
 
-        private bool DoCheckNeedBuild(string filePath, bool log = false)
+        /// <summary>
+        /// 检查是否需要build，
+        /// 文件，要进行MD5校验
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="isFile"></param>
+        /// <param name="log"></param>
+        /// <returns></returns>
+        private bool DoCheckBuild(string filePath, bool log = true)
         {
             BuildRecord assetMd5;
             if (!File.Exists(filePath))
             {
                 if (log)
-                    Logger.LogError("[DoCheckNeedBuild]Not Found 无法找到文件 {0}", filePath);
+                    Logger.LogError("[DoCheckBuild]Not Found 无法找到文件 {0}", filePath);
 
                 if (filePath.Contains("unity_builtin_extra"))
                 {
-                    Logger.LogError("[DoCheckNeedBuild]Find unity_builtin_extra resource to build!! Please check it! current scene: {0}", EditorApplication.currentScene);
+                    Logger.LogError("[DoCheckBuild]Find unity_builtin_extra resource to build!! Please check it! current scene: {0}", EditorApplication.currentScene);
                 }
                 return false;
             }
-            
+
+
+            if (InstanceBuildVersion.ContainsKey(filePath))  // 本次打包已经处理过，就不用重复处理了
+                return false;
+
             if (_isRebuild) // 所有rebuild，不用判断，直接需要build, 保留change count的正确性
                 return true;
             
@@ -220,7 +242,7 @@ namespace KEngine.Editor
                 var nowMd5 = KTool.MD5_File(file);
                 if (!StoreBuildVersion.TryGetValue(file, out theRecord))
                 {
-                    theRecord = StoreBuildVersion[file] = new BuildRecord();
+                    theRecord = new BuildRecord();
                     theRecord.Mark(nowMd5);
                 }
                 else
@@ -230,6 +252,7 @@ namespace KEngine.Editor
                         theRecord.Mark(nowMd5);
                     }
                 }
+                StoreBuildVersion[file] = InstanceBuildVersion[file] = theRecord; // ensure in dict
 
                 string metaFile = file + ".meta";
                 if (File.Exists(metaFile))
@@ -238,7 +261,7 @@ namespace KEngine.Editor
                     var nowMetaMd5 = KTool.MD5_File(metaFile);
                     if (!StoreBuildVersion.TryGetValue(metaFile, out theMetaRecord))
                     {
-                        theMetaRecord = StoreBuildVersion[metaFile] = new BuildRecord();
+                        theMetaRecord = new BuildRecord();
                         theMetaRecord.Mark(nowMetaMd5);
                     }
                     else
@@ -247,9 +270,12 @@ namespace KEngine.Editor
                             theMetaRecord.Mark(nowMetaMd5);
                     }
 
+                    StoreBuildVersion[metaFile] = InstanceBuildVersion[metaFile] = theMetaRecord; // ensure in dict
+
                 }
             }
         }
+
         public static void TryMarkBuildVersion(params string[] sourceFiles)
         {
             if (Current == null)

@@ -46,11 +46,11 @@ public class KStaticAssetLoader : KAbstractResourceLoader
         return AutoNew<KStaticAssetLoader>(url, newCallback);
     }
 
-    protected override void Init(string path)
+    protected override void Init(string path, params object[] args)
     {
-        base.Init(path);
+        base.Init(path, args);
         if (string.IsNullOrEmpty(path))
-            Logger.LogError("XStaticAssetLoader 空资源路径!");
+            Logger.LogError("StaticAssetLoader 空资源路径!");
 
         _assetFileLoader = KAssetFileLoader.Load(path, (_isOk, _obj) =>
         {

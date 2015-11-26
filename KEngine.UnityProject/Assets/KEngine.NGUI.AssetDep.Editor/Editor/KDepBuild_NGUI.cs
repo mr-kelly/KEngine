@@ -29,7 +29,7 @@ public partial class KDependencyBuild
         if (needBuild)
             KAssetVersionControl.TryMarkBuildVersion(fontAssetPath);
 
-        var result = DoBuildAssetBundle("Common/Font_" + font.name, font, needBuild);
+        var result = DoBuildAssetBundle("Font/Font_" + font.name, font, needBuild);
 
         return result.Path;
 
@@ -96,7 +96,7 @@ public partial class KDependencyBuild
 
         copyAtlas.spriteMaterial = null; // 挖空atlas
 
-        var result = DoBuildAssetBundle("Common/Atlas_" + path, copyAtlasObj, needBuild); // Build主对象, 被挖空Material了的
+        var result = DoBuildAssetBundle("UIAtlas/UIAtlas_" + path, copyAtlasObj, needBuild); // Build主对象, 被挖空Material了的
 
         if (AfterBuildUIAtlasFilter != null)
         {
@@ -147,7 +147,7 @@ public partial class KDependencyBuild
         //CResourceDependencies.Create(copyUIFont, CResourceDependencyType.NGUI_UIFONT, uiAtlas);
         KAssetDep.Create<KUIFontDep>(copyUIFont, uiAtlas);
 
-        var result = DoBuildAssetBundle("Common/UIFont_" + uiFont.name, copyUIFontObj, needBuild);
+        var result = DoBuildAssetBundle("UIFont/UIFont_" + uiFont.name, copyUIFontObj, needBuild);
 
         GameObject.DestroyImmediate(copyUIFontObj);
 

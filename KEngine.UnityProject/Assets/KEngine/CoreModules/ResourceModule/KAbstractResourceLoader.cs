@@ -191,7 +191,7 @@ public abstract class KAbstractResourceLoader
     /// <param name="callback"></param>
     /// <param name="forceCreateNew"></param>
     /// <returns></returns>
-    protected static T AutoNew<T>(string url, CLoaderDelgate callback = null, bool forceCreateNew = false) where T : KAbstractResourceLoader, new()
+    protected static T AutoNew<T>(string url, CLoaderDelgate callback = null, bool forceCreateNew = false, params object[] initArgs) where T : KAbstractResourceLoader, new()
     {
         Dictionary<string, KAbstractResourceLoader> typesDict = GetTypeDict(typeof(T));
         KAbstractResourceLoader loader;
@@ -209,7 +209,7 @@ public abstract class KAbstractResourceLoader
             }
 
             loader.IsForceNew = forceCreateNew;
-            loader.Init(url);
+            loader.Init(url, initArgs);
 
             if (Application.isEditor)
             {
@@ -303,7 +303,7 @@ public abstract class KAbstractResourceLoader
     protected float MemoryOnStart;
 #endif
 
-    protected virtual void Init(string url)
+    protected virtual void Init(string url, params object[] args)
     {
 #if MEMORY_DEBUG
         MemoryOnStart = GC.GetTotalMemory(true) / 1000f;

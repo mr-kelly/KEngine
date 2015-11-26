@@ -24,7 +24,7 @@ public class CDepCollectInfo
 // 处理依赖关系的打包工具
 public partial class KDependencyBuild
 {
-    public static string DepBuildToFolder = "Common"; // 图片等依赖资源打包的地方, 运行时临时改变
+    //public static string DepBuildToFolder = "Common"; // 图片等依赖资源打包的地方, 运行时临时改变
 
     [AttributeUsage(AttributeTargets.Method)]
     public class DepBuildAttribute : Attribute
@@ -346,7 +346,7 @@ public partial class KDependencyBuild
         string path = __GetPrefabBuildPath(assetPath);
         if (string.IsNullOrEmpty(path))
             Logger.LogWarning("[BuildTexture]不是文件的Texture, 估计是Material的原始Texture?");
-        var result = DoBuildAssetBundle(DepBuildToFolder + "/Tex_" + path, newTex, needBuild);
+        var result = DoBuildAssetBundle("Texture/Texture_" + path, newTex, needBuild);
 
 
         GC.Collect(0);

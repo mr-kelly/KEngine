@@ -33,9 +33,9 @@ public class KAudioLoader : KAbstractResourceLoader
         return AutoNew<KAudioLoader>(url, newCallback);
 
     }
-    protected override void Init(string url)
+    protected override void Init(string url, params object[] args)
     {
-        base.Init(url);
+        base.Init(url, args);
 
         AssetFileBridge = KAssetFileLoader.Load(url, (bool isOk, UnityEngine.Object obj) =>
         {

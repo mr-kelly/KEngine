@@ -34,9 +34,9 @@ public class KFontLoader : KAbstractResourceLoader
 
         return AutoNew<KFontLoader>(path, realcallback);
     }
-    protected override void Init(string url)
+    protected override void Init(string url, params object[] args)
     {
-        base.Init(url);
+        base.Init(url, args);
 
         _bridge = KAssetFileLoader.Load(Url, (_isOk, _obj) =>
         {

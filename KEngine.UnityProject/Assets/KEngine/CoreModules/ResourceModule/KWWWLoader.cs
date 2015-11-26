@@ -54,9 +54,9 @@ public class KWWWLoader : KAbstractResourceLoader
         return wwwLoader;
     }
 
-    protected override void Init(string url)
+    protected override void Init(string url, params object[] args)
     {
-        base.Init(url);
+        base.Init(url, args);
         WWWLoadersStack.Push(this);  // 不执行开始加载，由www监控器协程控制
 
         if (CachedWWWLoaderMonitorCoroutine == null)

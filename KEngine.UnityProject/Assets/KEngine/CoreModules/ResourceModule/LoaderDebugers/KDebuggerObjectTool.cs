@@ -20,6 +20,12 @@ public class KDebuggerObjectTool
         return uri;
     }
 
+    /// <summary>
+    /// 设置某个物件，在指定调试组下
+    /// </summary>
+    /// <param name="bigType"></param>
+    /// <param name="smallType"></param>
+    /// <param name="obj"></param>
     public static void SetParent(string bigType, string smallType, GameObject obj)
     {
         var uri = GetUri(bigType, smallType);
@@ -40,7 +46,7 @@ public class KDebuggerObjectTool
         {
             Logger.LogError(string.Format("[SetParent]{0}->{1}->{2}", bigType, smallType, e.Message));
         }
-        
+
         theParent.gameObject.name = GetNameWithCount(smallType, typeCount);
 
     }
@@ -57,7 +63,8 @@ public class KDebuggerObjectTool
         var newCount = --Counts[GetUri(bigType, smallType)];
         if (!KBehaviour.IsApplicationQuited)
         {
-            GetParent(bigType, smallType).gameObject.name = GetNameWithCount(smallType, newCount);
+            var parent = GetParent(bigType, smallType);
+            parent.name = GetNameWithCount(smallType, newCount);
         }
     }
 

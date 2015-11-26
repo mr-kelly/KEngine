@@ -21,9 +21,12 @@ public class KResourceLoaderDebugger : MonoBehaviour
     public KAbstractResourceLoader TheLoader;
     public int RefCount;
     public float FinishUsedTime; // 参考，完成所需时间
+    public static bool IsApplicationQuit = false;
 
     public static KResourceLoaderDebugger Create(string type, string url, KAbstractResourceLoader loader)
     {
+        if (IsApplicationQuit) return null;
+
         const string bigType = "ResourceLoaderDebuger";
 
         Func<string> getName = () => string.Format("{0}-{1}-{2}", type, url, loader.Desc);
@@ -52,5 +55,10 @@ public class KResourceLoaderDebugger : MonoBehaviour
     {
         RefCount = TheLoader.RefCount;
         FinishUsedTime = TheLoader.FinishUsedTime;
+    }
+
+    void OnApplicationQuit()
+    {
+        IsApplicationQuit = true;
     }
 }

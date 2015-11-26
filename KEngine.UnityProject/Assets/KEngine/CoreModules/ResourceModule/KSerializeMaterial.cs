@@ -12,6 +12,7 @@ public class KSerializeMaterial : ScriptableObject
 {
     public string MaterialName;
     public string ShaderName;
+    public string ShaderPath;
 
     public List<KSerializeMaterialProperty> Props = new List<KSerializeMaterialProperty>();
 }

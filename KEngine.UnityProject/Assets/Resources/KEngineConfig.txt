@@ -3,7 +3,7 @@
 ProductRelPath	../Product	
 AssetBundleBuildRelPath	../Product/Bundles
 StreamingBundlesFolderName	Bundles		#Link the BuildPath to StreamingAssets/Bundles
-AssetBundleExt	.unity3d	base
+AssetBundleExt	.bytes	base
 IsLoadAssetBundle	1	
 UIModuleBridge	NGUI	
 SettingSourcePath	../Product/SettingSource

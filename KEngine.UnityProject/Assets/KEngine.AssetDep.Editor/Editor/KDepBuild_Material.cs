@@ -10,7 +10,7 @@ public partial class KDependencyBuild
 
     static string BuildDepMaterial(Material mat, float scaleTexture = 1f)
     {
-        KSerializeMaterial sMat = __DoExportMaterial(mat, DepBuildToFolder, scaleTexture);
+        KSerializeMaterial sMat = __DoExportMaterial(mat, scaleTexture);
 
         if (sMat != null)
         {
@@ -21,7 +21,7 @@ public partial class KDependencyBuild
                 KAssetVersionControl.TryMarkBuildVersion(path);
 
             path = __GetPrefabBuildPath(path);
-            var buildResult = __DoBuildScriptableObject(DepBuildToFolder + "/Mat_" + path, sMat, needBuild);
+            var buildResult = __DoBuildScriptableObject("Material/Material_" + path, sMat, needBuild);
 
             return buildResult.Path;
         }
@@ -30,7 +30,7 @@ public partial class KDependencyBuild
     }
 
     // 只导出材质信息，不实际导出材质
-    static KSerializeMaterial __DoExportMaterial(Material mat, string buildToFolder, float scaleTexture = 1f)
+    static KSerializeMaterial __DoExportMaterial(Material mat, float scaleTexture = 1f)
     {
         string matPath = AssetDatabase.GetAssetPath(mat).Replace("Assets/", "");
         if (string.IsNullOrEmpty(matPath))
@@ -40,7 +40,7 @@ public partial class KDependencyBuild
         }
 
         var props = new List<KSerializeMaterialProperty>();
-        IEnumerator<KSerializeMaterialProperty> shaderPropEnumtor = _ShaderPropEnumtor(mat, buildToFolder, scaleTexture);
+        IEnumerator<KSerializeMaterialProperty> shaderPropEnumtor = _ShaderPropEnumtor(mat, scaleTexture);
         while (shaderPropEnumtor.MoveNext())
         {
             KSerializeMaterialProperty shaderProp = shaderPropEnumtor.Current;
@@ -50,16 +50,59 @@ public partial class KDependencyBuild
             }
         }
 
+        var shaderBuildPath = _BuildShader(mat.shader);
         KSerializeMaterial xMat = ScriptableObject.CreateInstance<KSerializeMaterial>();
         xMat.MaterialName = matPath;
         xMat.ShaderName = mat.shader.name;
+        xMat.ShaderPath = shaderBuildPath;
         xMat.Props = props;
 
         return xMat;
     }
 
+    static string _BuildShader(Shader shader)
+    {
+        Shader fileShader;
+        string shaderAssetPath = AssetDatabase.GetAssetPath(shader);
+        if (shaderAssetPath.Contains("unity_builtin_extra"))
+        {
+            shaderAssetPath = "Assets/" + KEngineDef.ResourcesBuildCacheDir + "/BuiltinShader";
 
-    static IEnumerator<KSerializeMaterialProperty> _ShaderPropEnumtor(Material mat, string buildToFolder, float scaleTexture = 1f)
+            fileShader = AssetDatabase.LoadAssetAtPath(shaderAssetPath, typeof(Shader)) as Shader;
+            if (fileShader == null)
+            {
+                AssetDatabase.CreateAsset(shader, shaderAssetPath);
+                AssetDatabase.ImportAsset(shaderAssetPath);
+                fileShader = AssetDatabase.LoadAssetAtPath(shaderAssetPath, typeof(Shader)) as Shader;
+
+                if (fileShader == null)
+                {
+                    Logger.LogError("Cannot Build Builtin Shader: {0}", shader.name);
+                }
+            }
+        }
+        else
+        {
+            fileShader = shader;
+        }
+        
+        //var shaderFlag = string.Format("Shader:{0}:{1}", fileShader.name, shaderAssetPath);  // 构造一个标记
+
+        bool needBuild = KAssetVersionControl.TryCheckFileBuild(shaderAssetPath);
+        if (needBuild)
+            KAssetVersionControl.TryMarkBuildVersion(shaderAssetPath);
+
+        var cleanShaderName = GetShaderNameToBuild(fileShader);
+        var result = DoBuildAssetBundle("Shader/Shader_" + cleanShaderName, fileShader, needBuild);
+        return result.Path;
+    }
+
+    static string GetShaderNameToBuild(Shader shader)
+    {
+        var cleanShaderName = shader.name.Replace(" ", "_").Replace("/", "_"); // 去空格，去斜杠
+        return cleanShaderName;
+    }
+    static IEnumerator<KSerializeMaterialProperty> _ShaderPropEnumtor(Material mat, float scaleTexture = 1f)
     {
         var shader = mat.shader;
         if (shader != null)
@@ -71,7 +114,7 @@ public partial class KDependencyBuild
                 switch (shaderType)
                 {
                     case ShaderUtil.ShaderPropertyType.TexEnv:
-                        yield return _GetShaderTexProp(mat, shaderPropName, buildToFolder, scaleTexture);
+                        yield return _GetShaderTexProp(mat, shaderPropName, scaleTexture);
                         break;
                     case ShaderUtil.ShaderPropertyType.Color:
                         yield return _GetMatColor(mat, shaderPropName);
@@ -109,7 +152,7 @@ public partial class KDependencyBuild
         //yield return _GetShaderTexProp(mat, "_RefractionTex", buildToFolder, scaleTexture);
     }
 
-    static KSerializeMaterialProperty _GetShaderTexProp(Material mm, string texProp, string buildToFolder, float scaleTexture = 1f)
+    static KSerializeMaterialProperty _GetShaderTexProp(Material mm, string texProp, float scaleTexture = 1f)
     {
         if (mm.HasProperty(texProp))
         {

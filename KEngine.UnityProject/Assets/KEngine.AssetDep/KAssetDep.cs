@@ -202,7 +202,7 @@ public abstract class KAssetDep : MonoBehaviour
     protected void LoadMaterial(string path, Action<Material> callback)
     {
         //var matLoader = new CStaticAssetLoader(path, OnLoadMaterialScript, path, matCallback);
-        //ResourceLoaders.Add(matLoader); 
+        //ResourceLoaders.Add(matLoader);  
         var mLoader = KMaterialLoader.Load(path, (isOk, getMat) =>
         {
             if (isOk)

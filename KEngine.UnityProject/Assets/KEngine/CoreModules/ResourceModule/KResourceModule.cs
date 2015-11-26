@@ -33,7 +33,13 @@ public enum KResourceInAppPathType
 {
     Invalid,
     StreamingAssetsPath,
+
     ResourcesAssetsPath,
+
+    /// <summary>
+    /// 将采用KResourceModule中的DefaultInAppPathType来设置
+    /// </summary>
+    Default,
 }
 /// <summary>
 /// 资源路径优先级，优先使用
@@ -41,8 +47,16 @@ public enum KResourceInAppPathType
 public enum KResourcePathPriorityType
 {
     Invalid,
-    InAppPathPriority, // 忽略PersitentDataPath, 优先寻找Resources或StreamingAssets路径 (取决于ResourcePathType)
-    PersistentDataPathPriority,  // 尝试在Persistent目錄尋找，找不到再去StreamingAssets
+
+    /// <summary>
+    /// 忽略PersitentDataPath, 优先寻找Resources或StreamingAssets路径 (取决于ResourcePathType)
+    /// </summary>
+    InAppPathPriority,
+    /// <summary>
+    /// 尝试在Persistent目錄尋找，找不到再去StreamingAssets, 
+    /// 这一般用于进行热更新版本号判断后，设置成该属性
+    /// </summary>
+    PersistentDataPathPriority,  
 }
 public class KResourceModule : MonoBehaviour, ICModule
 {
@@ -55,7 +69,7 @@ public class KResourceModule : MonoBehaviour, ICModule
     }
     public static KResourceQuality Quality = KResourceQuality.Sd;
 
-    public static KResourceInAppPathType InAppPathType = KResourceInAppPathType.ResourcesAssetsPath;
+    public static KResourceInAppPathType DefaultInAppPathType = KResourceInAppPathType.ResourcesAssetsPath;
 
     public static float TextureScale
     {
@@ -133,48 +147,60 @@ public class KResourceModule : MonoBehaviour, ICModule
     }
 
     // 检查资源是否存在
-    public static bool ContainsResourceUrl(string resourceUrl)
+    public static bool ContainsResourceUrl(string resourceUrl, KResourceInAppPathType inAppPathType = KResourceInAppPathType.StreamingAssetsPath)
     {
         string fullPath;
-        return GetResourceFullPath(resourceUrl, out fullPath, false);
+        return GetResourceFullPath(resourceUrl, out fullPath, inAppPathType, false);
     }
 
     /// <summary>
     /// 完整路径，www加载
     /// </summary>
     /// <param name="url"></param>
+    /// <param name="inAppPathType"></param>
     /// <param name="isLog"></param>
     /// <returns></returns>
-    public static string GetResourceFullPath(string url, bool isLog = true)
+    public static string GetResourceFullPath(string url, 
+        KResourceInAppPathType inAppPathType = KResourceInAppPathType.StreamingAssetsPath, bool isLog = true)
     {
         string fullPath;
-        if (GetResourceFullPath(url, out fullPath, isLog))
+        if (GetResourceFullPath(url, out fullPath, inAppPathType, isLog))
             return fullPath;
 
         return null;
     }
-
-    public static bool GetResourceFullPath(string url, out string fullPath, bool isLog = true)
+    /// <summary>
+    /// 根据相对路径，获取到StreamingAssets完整路径，或Resources中的路径
+    /// </summary>
+    /// <param name="url"></param>
+    /// <param name="fullPath"></param>
+    /// <param name="inAppPathType"></param>
+    /// <param name="isLog"></param>
+    /// <returns></returns>
+    public static bool GetResourceFullPath(string url, out string fullPath, KResourceInAppPathType inAppPathType = KResourceInAppPathType.Default, bool isLog = true)
     {
         if (string.IsNullOrEmpty(url))
             Logger.LogError("尝试获取一个空的资源路径！");
+
+        if (inAppPathType == KResourceInAppPathType.Default)
+            inAppPathType = DefaultInAppPathType;
 
         string docUrl;
         bool hasDocUrl = TryGetDocumentResourceUrl(url, out docUrl);
 
         string inAppUrl;
         bool hasInAppUrl;
-        if (InAppPathType == KResourceInAppPathType.StreamingAssetsPath)
+        if (inAppPathType == KResourceInAppPathType.StreamingAssetsPath)
         {
             hasInAppUrl = TryGetInAppStreamingUrl(url, out inAppUrl);
         }
-        else if (InAppPathType == KResourceInAppPathType.ResourcesAssetsPath)
+        else if (inAppPathType == KResourceInAppPathType.ResourcesAssetsPath)
         {
             hasInAppUrl = TryGetInAppResourcesFolderUrl(url, out inAppUrl); // 使用Resources某
         }
         else
         {
-            Logger.LogError("[GetResourceFullPath]Invalid InAppPathType: {0}", InAppPathType);
+            Logger.LogError("[GetResourceFullPath]Invalid InAppPathType: {0}", DefaultInAppPathType);
             hasInAppUrl = false;
             inAppUrl = null;
         }

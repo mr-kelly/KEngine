@@ -44,9 +44,9 @@ public class KInstanceAssetLoader : KAbstractResourceLoader
         return loader;
     }
 
-    protected override void Init(string url)
+    protected override void Init(string url, params object[] args)
     {
-        base.Init(url);
+        base.Init(url, args);
 
         _assetFileBridge = KAssetFileLoader.Load(url, (isOk, asset) =>
         {

@@ -41,9 +41,9 @@ public class KTextureLoader : KAbstractResourceLoader
         }
         return AutoNew<KTextureLoader>(path, newCallback);
     }
-    protected override void Init(string url)
+    protected override void Init(string url, params object[] args)
     {
-        base.Init(url);
+        base.Init(url, args);
 
         Path = url;
         AssetFileBridge = KAssetFileLoader.Load(Path, OnAssetLoaded);
