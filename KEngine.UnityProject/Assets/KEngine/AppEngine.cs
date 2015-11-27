@@ -28,7 +28,7 @@ namespace KEngine
         /// <summary>
         /// To Display FPS in the Debug Mode (Debug.isDebugBuild is true)
         /// </summary>
-        static CFpsWatcher RenderWatcher;  // 帧数监听器
+        public static CFpsWatcher RenderWatcher { get; private set; }  // 帧数监听器
 
         /// <summary>
         /// In Init func has a check if the user has the write privillige
@@ -48,7 +48,7 @@ namespace KEngine
         /// <summary>
         /// Modules passed from the CosmosEngine.New function. All your custom game logic modules 
         /// </summary>
-        private ICModule[] GameModules;
+        public ICModule[] GameModules { get; private set; }
 
         /// <summary>
         /// 是否初始化完成
@@ -167,7 +167,7 @@ namespace KEngine
             if (ShowFps)
             {
                 GUILayout.BeginVertical(GUILayout.Width(300));
-                GUILayout.Label(string.Format("CodeMemory: {0}KB", GC.GetTotalMemory(false) / 1000f));
+                GUILayout.Label(string.Format("Memory: {0:F3}KB", UnityEngine.Profiler.GetMonoUsedSize() / 1024f));
                 GUILayout.Label(RenderWatcher.Watch("FPS: {0:N0}", 1f / Time.deltaTime));
                 GUILayout.EndVertical();
             }
@@ -239,7 +239,7 @@ namespace KEngine
         StreamingBundlesFolderName, // StreamingAssets inner folder name, when build, will link the Bundle build Path to here
     }
 
-    class CFpsWatcher
+    public class CFpsWatcher
     {
         float Value;
         float Sensitivity;

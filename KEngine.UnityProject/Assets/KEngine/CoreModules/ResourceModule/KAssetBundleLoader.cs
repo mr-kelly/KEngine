@@ -251,13 +251,15 @@ public class KAssetBundleLoader : KAbstractResourceLoader
     public override void Release()
     {
 
-#if UNITY_EDITOR
-        if (Url.Contains("Arial"))
+        if (Application.isEditor)
         {
-            Logger.LogError("要释放Arial字体！！错啦！！:{0}", Url);
-            UnityEditor.EditorApplication.isPaused = true;
+            if (Url.Contains("Arial"))
+            {
+                Logger.LogError("要释放Arial字体！！错啦！！builtinextra:{0}", Url);
+                UnityEditor.EditorApplication.isPaused = true;
+            }
         }
-#endif
+        
         base.Release();
     }
 

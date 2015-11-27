@@ -63,7 +63,7 @@ public class KTextureLoader : KAbstractResourceLoader
             var tex = Asset as Texture2D;            
 
             string format = tex != null ? tex.format.ToString() : "";
-            Desc = string.Format("{0}*{1}={2}px-{3}", Asset.width, Asset.height, Asset.width*Asset.height, format);
+            Desc = string.Format("{0}*{1}-{2}-{3}", Asset.width, Asset.height, Asset.width*Asset.height, format);
         }
     }
 

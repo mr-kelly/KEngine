@@ -15,23 +15,23 @@ using System.Text;
 using System.Threading;
 using UnityEngine;
 
-public enum CLogLevel
-{
-    All = 0,
-    Trace,
-    Debug,
-    Info, // Info, default
-    Warning,
-    Error,
-}
-
 namespace KEngine
 {
+    public enum KLogLevel
+    {
+        All = 0,
+        Trace,
+        Debug,
+        Info, // Info, default
+        Warning,
+        Error,
+    }
+
     /// Frequent Used,
     /// A File logger + Debug Tools
     public class Logger
     {
-        public static CLogLevel LogLevel = CLogLevel.Info;
+        public static KLogLevel LogLevel = KLogLevel.Info;
 
         static event Application.LogCallback LogCallbackEvent;
         private static bool _hasRegisterLogCallback = false;
@@ -185,18 +185,18 @@ namespace KEngine
 
         public static void Trace(string log, params object[] args)
         {
-            DoLog(string.Format(log, args), CLogLevel.Trace);
+            DoLog(string.Format(log, args), KLogLevel.Trace);
         }
 
         public static void Debug(string log, params object[] args)
         {
-            DoLog(string.Format(log, args), CLogLevel.Debug);
+            DoLog(string.Format(log, args), KLogLevel.Debug);
         }
 
         //[Obsolete]
         //public static void Trace(string log, params object[] args)
         //{
-        //    DoLog(string.Format(log, args), CLogLevel.Debug);
+        //    DoLog(string.Format(log, args), KLogLevel.Debug);
         //}
         public static void Info(string log, params object[] args)
         {
@@ -204,7 +204,7 @@ namespace KEngine
         }
         public static void Log(string log, params object[] args)
         {
-            DoLog(string.Format(log, args), CLogLevel.Info);
+            DoLog(string.Format(log, args), KLogLevel.Info);
         }
 
         public static void Logs(params object[] logs)
@@ -233,7 +233,7 @@ namespace KEngine
             StackFrame sf = GetTopStack(stack);
             string log = string.Format("[ERROR]{0}\n\n{1}:{2}\t{3}", err, sf.GetFileName(), sf.GetFileLineNumber(), sf.GetMethod());
             Console.Write(log);
-            DoLog(log, CLogLevel.Error);
+            DoLog(log, KLogLevel.Error);
 
             if (LogErrorEvent != null)
                 LogErrorEvent(err);
@@ -255,7 +255,7 @@ namespace KEngine
         public static void LogWarning(string err, params object[] args)
         {
             string log = string.Format(err, args);
-            DoLog(log, CLogLevel.Warning);
+            DoLog(log, KLogLevel.Warning);
         }
 
         public static void Pause()
@@ -263,7 +263,7 @@ namespace KEngine
             UnityEngine.Debug.Break();
         }
 
-        private static void DoLog(string szMsg, CLogLevel emLevel)
+        private static void DoLog(string szMsg, KLogLevel emLevel)
         {
             if (LogLevel > emLevel)
                 return;
@@ -271,11 +271,11 @@ namespace KEngine
 
             switch (emLevel)
             {
-                case CLogLevel.Warning:
-                case CLogLevel.Trace:
+                case KLogLevel.Warning:
+                case KLogLevel.Trace:
                     UnityEngine.Debug.LogWarning(szMsg);
                     break;
-                case CLogLevel.Error:
+                case KLogLevel.Error:
                     UnityEngine.Debug.LogError(szMsg);
                     break;
                 default:

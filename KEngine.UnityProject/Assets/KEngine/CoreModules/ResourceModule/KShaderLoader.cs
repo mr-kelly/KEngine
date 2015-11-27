@@ -49,9 +49,9 @@ namespace KEngine
 
             Desc = shader.name;
 
-#if UNITY_EDITOR
-            KResoourceLoadedAssetDebugger.Create("Shader", Url, shader);
-#endif
+            if (Application.isEditor)
+                KResoourceLoadedAssetDebugger.Create("Shader", Url, shader);
+
             loader.Release();
 
             OnFinish(shader);

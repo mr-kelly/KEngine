@@ -8,7 +8,7 @@
 //              https://github.com/mr-kelly/CosmosEngine
 //
 //------------------------------------------------------------------------------
-//#define COBJECT_DEBUGGER
+//#define KOBJECT_DEBUGGER
 
 using UnityEngine;
 using System.Collections;
@@ -23,12 +23,16 @@ public class KObject : IDisposable
 {
     public KObject()
     {
-        this.StartWatch();
+#if KOBJECT_DEBUGGER
+        this.CreateDebugObject();
+#endif
     }
 
     public virtual void Dispose()
     {
-        this.StopWatch();
+#if KOBJECT_DEBUGGER
+        this.RemoveDebugObject();
+#endif
     }
 }
 
@@ -37,14 +41,14 @@ public class KObject : IDisposable
 /// </summary>
 public static class CObjectDebuggerExtensions
 {
-    public static void StartWatch(this object obj)
+    public static void CreateDebugObject(this object obj)
     {
-        KObjectDebugger.StartWatch(obj);
+        KObjectDebugger.CreateDebugObject(obj);
     }
 
-    public static void StopWatch(this object obj)
+    public static void RemoveDebugObject(this object obj)
     {
-        KObjectDebugger.StopWatch(obj);
+        KObjectDebugger.RemoveDebugObject(obj);
     }
 }
 
@@ -61,9 +65,8 @@ public class KObjectDebugger : KBehaviour
     public List<string> DebugStrs = new List<string>();
     private GameObject _cacheGameObject;
 
-    public static void StopWatch(object obj)
+    public static void RemoveDebugObject(object obj)
     {
-#if COBJECT_DEBUGGER
         if (!Logger.IsEditor || !Application.isPlaying || IsApplicationQuited)
             return;
 
@@ -85,12 +88,10 @@ public class KObjectDebugger : KBehaviour
             }
  
         });
-#endif
     }
 
-    public static void StartWatch(object obj)
+    public static void CreateDebugObject(object obj)
     {
-#if COBJECT_DEBUGGER
         if (!Logger.IsEditor || !Application.isPlaying || IsApplicationQuited)
             return;
 
@@ -112,7 +113,6 @@ public class KObjectDebugger : KBehaviour
             }
 
         });
-#endif
     }
 
     void Awake()

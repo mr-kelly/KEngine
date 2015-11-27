@@ -62,9 +62,8 @@ public class KMaterialLoader : KAbstractResourceLoader
 
         matLoadBridge.Release(); //不需要它了
 
-#if UNITY_EDITOR
-        KResoourceLoadedAssetDebugger.Create("Material", Url, Mat);
-#endif
+        if (Application.isEditor)
+            KResoourceLoadedAssetDebugger.Create("Material", Url, Mat);
         OnFinish(Mat);
     }
 

@@ -394,42 +394,46 @@ public class KResourceModule : MonoBehaviour, ICModule
     {
         string buildPlatformName = "Win32"; // default
 
-#if UNITY_EDITOR
-        var buildTarget = UnityEditor_EditorUserBuildSettings_activeBuildTarget; //UnityEditor.EditorUserBuildSettings.activeBuildTarget;
-        switch (buildTarget)
+        if (Application.isEditor)
         {
-            case "StandaloneWindows":// UnityEditor.BuildTarget.StandaloneWindows:
-            case "StandaloneWindows64":// UnityEditor.BuildTarget.StandaloneWindows64:
-                buildPlatformName = "Win32";
-                break;
-            case "Android":// UnityEditor.BuildTarget.Android:
-                buildPlatformName = "Android";
-                break;
-            case "iPhone":// UnityEditor.BuildTarget.iPhone:
-                buildPlatformName = "IOS";
-                break;
-            default:
-                Logger.Assert(false);
-                break;
+            var buildTarget = UnityEditor_EditorUserBuildSettings_activeBuildTarget; //UnityEditor.EditorUserBuildSettings.activeBuildTarget;
+            switch (buildTarget)
+            {
+                case "StandaloneWindows":// UnityEditor.BuildTarget.StandaloneWindows:
+                case "StandaloneWindows64":// UnityEditor.BuildTarget.StandaloneWindows64:
+                    buildPlatformName = "Win32";
+                    break;
+                case "Android":// UnityEditor.BuildTarget.Android:
+                    buildPlatformName = "Android";
+                    break;
+                case "iPhone":// UnityEditor.BuildTarget.iPhone:
+                    buildPlatformName = "IOS";
+                    break;
+                default:
+                    Logger.Assert(false);
+                    break;
+            }
         }
-#else
-        switch (Application.platform)
+        else
         {
-            case RuntimePlatform.Android:
-                buildPlatformName = "Android";
-                break;
-            case RuntimePlatform.IPhonePlayer:
-                buildPlatformName = "IOS";
-                break;
-            case RuntimePlatform.WindowsPlayer:
-            case RuntimePlatform.WindowsWebPlayer:
-                buildPlatformName = "Win32";
-                break;
-            default:
-                Logger.Assert(false);
-                break;
+            switch (Application.platform)
+            {
+                case RuntimePlatform.Android:
+                    buildPlatformName = "Android";
+                    break;
+                case RuntimePlatform.IPhonePlayer:
+                    buildPlatformName = "IOS";
+                    break;
+                case RuntimePlatform.WindowsPlayer:
+                case RuntimePlatform.WindowsWebPlayer:
+                    buildPlatformName = "Win32";
+                    break;
+                default:
+                    Logger.Assert(false);
+                    break;
+            }
         }
-#endif
+        
         if (Quality != KResourceQuality.Sd)  // SD no need add
             buildPlatformName += Quality.ToString().ToUpper();
         return buildPlatformName;

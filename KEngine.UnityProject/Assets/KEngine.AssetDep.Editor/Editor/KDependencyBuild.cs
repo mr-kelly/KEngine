@@ -370,33 +370,33 @@ public partial class KDependencyBuild
     ///// <summary>
     ///// TODO:
     ///// </summary>
-    ///// <param name="folderName"></param>
+    ///// <param name="saveCacheFolderName"></param>
     ///// <param name="imageSystemFullPath"></param>
     ///// <returns></returns>
-    //public static string BuildImage(string folderName, string imageSystemFullPath)
+    //public static string BuildImage(string saveCacheFolderName, string imageSystemFullPath)
     //{
     //    var asset = GetImageFromPath(imageSystemFullPath, "etc1");
     //    return null;
     //}
     /// <summary>
-    /// 单独打包的纹理图片, 用bytes读取, 指定保存的目录
+    /// 单独打包的纹理图片, 这种图片，不在Unity目录内，用bytes读取, 指定保存的目录
     /// </summary>
-    /// <param name="folderName"></param>
+    /// <param name="saveCacheFolderName"></param>
     /// <param name="tex"></param>
     /// <returns></returns>
-    public static string BuildIOTexture(string folderName, string imageSystemFullPath, float scale = 1)
+    public static string BuildIOTexture(string saveCacheFolderName, string imageSystemFullPath, float scale = 1)
     {
         var cleanPath = imageSystemFullPath.Replace("\\", "/");
 
         var fileName = Path.GetFileNameWithoutExtension(cleanPath);
-        var buildPath = string.Format("{0}/{1}_{0}{2}", folderName, fileName, AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt));
+        var buildPath = string.Format("{0}/{1}_{0}{2}", saveCacheFolderName, fileName, AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt));
         var needBuild = KAssetVersionControl.TryCheckNeedBuildWithMeta(cleanPath);
 
         var texture = new Texture2D(1, 1);
 
         if (needBuild && !IsJustCollect)
         {
-            var cacheDir = "Assets/" + KEngineDef.ResourcesBuildCacheDir + "/BuildIOTexture/" + folderName + "/";
+            var cacheDir = "Assets/" + KEngineDef.ResourcesBuildCacheDir + "/BuildIOTexture/" + saveCacheFolderName + "/";
             var cacheFilePath = cacheDir + Path.GetFileName(cleanPath);
 
             //CFolderSyncTool.TexturePackerScaleImage(cleanPath, cacheFilePath, Math.Min(1, GameDef.PictureScale * scale));  // TODO: do scale

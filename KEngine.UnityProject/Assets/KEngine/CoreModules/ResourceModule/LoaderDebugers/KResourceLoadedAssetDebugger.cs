@@ -6,6 +6,7 @@ using System.Collections;
 /// </summary>
 public class KResoourceLoadedAssetDebugger : MonoBehaviour
 {
+    public string MemorySize;
     public UnityEngine.Object TheObject;
     const string bigType = "LoadedAssetDebugger";
     public string Type;
@@ -18,6 +19,7 @@ public class KResoourceLoadedAssetDebugger : MonoBehaviour
         var newHelp = newHelpGameObject.AddComponent<KResoourceLoadedAssetDebugger>();
         newHelp.Type = type;
         newHelp.TheObject = theObject;
+        newHelp.MemorySize = string.Format("{0:F5}KB", Profiler.GetRuntimeMemorySize(theObject) / 1024f);
         return newHelp;
     }
 

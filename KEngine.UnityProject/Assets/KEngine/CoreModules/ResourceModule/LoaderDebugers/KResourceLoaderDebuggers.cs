@@ -41,6 +41,7 @@ public class KResourceLoaderDebugger : MonoBehaviour
             if (loader.RefCount > 0)
                 newHelpGameObject.name = getName();
         };
+        
 
         loader.DisposeEvent += () =>
         {
