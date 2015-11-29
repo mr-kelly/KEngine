@@ -81,24 +81,52 @@ namespace {{ NameSpace }}
 
             var excelExt = new HashSet<string>() {".xls", ".xlsx"};
             var findDir = Path.Combine(Application.dataPath, sourcePath);
-            foreach (var excelPath in Directory.GetFiles(findDir, "*.*", SearchOption.AllDirectories))
+            try
             {
-                var ext = Path.GetExtension(excelPath);
-                if (excelExt.Contains(ext))
+                var allFiles = Directory.GetFiles(findDir, "*.*", SearchOption.AllDirectories);
+                var allFilesCount = allFiles.Length;
+                var nowFileIndex = -1; // 开头+1， 起始为0
+                foreach (var excelPath in allFiles)
                 {
-                    // it's an excel file
-                    var relativePath = excelPath.Replace(findDir, "").Replace("\\", "/");
-                    if (relativePath.StartsWith("/"))
-                        relativePath = relativePath.Substring(1);
+                    nowFileIndex++;
+                    var ext = Path.GetExtension(excelPath);
+                    if (excelExt.Contains(ext))
+                    {
+                        // it's an excel file
+                        var relativePath = excelPath.Replace(findDir, "").Replace("\\", "/");
+                        if (relativePath.StartsWith("/"))
+                            relativePath = relativePath.Substring(1);
 
-                    var compileBaseDir = Path.Combine(Application.dataPath, compilePath);
-                    var compileToPath = string.Format("{0}/{1}", compileBaseDir, Path.ChangeExtension(relativePath, ".bytes"));
-                
-                    Logger.Log("Compile from {0} to {1}", excelPath, compileToPath);
-                    compiler.Compile(excelPath, compileToPath, compileBaseDir);
+                        var compileBaseDir = Path.Combine(Application.dataPath, compilePath);
+                        var compileToPath = string.Format("{0}/{1}", compileBaseDir, Path.ChangeExtension(relativePath, ".bytes"));
+                        var srcFileInfo = new FileInfo(excelPath);
 
+                        EditorUtility.DisplayProgressBar("Compiling Excel to Tab...", string.Format("{0} -> {1}", excelPath, compilePath), nowFileIndex / (float)allFilesCount);
+
+                        // 如果已经存在，判断修改时间是否一致，用此来判断是否无需compile，节省时间
+                        if (File.Exists(compileToPath))
+                        {
+                            var toFileInfo = new FileInfo(compileToPath);
+
+                            if (srcFileInfo.LastWriteTime == toFileInfo.LastWriteTime)
+                            {
+                                Logger.Log("Pass!SameTime! From {0} to {1}", excelPath, compileToPath);
+                                continue;
+                            }
+                        }
+                        Logger.Log("Compile from {0} to {1}", excelPath, compileToPath);
+                        compiler.Compile(excelPath, compileToPath, compileBaseDir);
+                        var compiledFileInfo = new FileInfo(compileToPath);
+                        compiledFileInfo.LastWriteTime = srcFileInfo.LastWriteTime;
+
+                    }
                 }
             }
+            finally
+            {
+                EditorUtility.ClearProgressBar();
+            }
+            
         }
     }
 }

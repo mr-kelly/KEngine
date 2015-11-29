@@ -256,7 +256,7 @@ public class KAssetBundleLoader : KAbstractResourceLoader
             if (Url.Contains("Arial"))
             {
                 Logger.LogError("要释放Arial字体！！错啦！！builtinextra:{0}", Url);
-                UnityEditor.EditorApplication.isPaused = true;
+                //UnityEditor.EditorApplication.isPaused = true;
             }
         }
         

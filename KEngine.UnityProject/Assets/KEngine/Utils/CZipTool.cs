@@ -15,7 +15,7 @@ using System.IO;
 using System.Text;
 using ICSharpCode.SharpZipLib.Zip;
 
-public class CZipTool : MonoBehaviour
+public class CZipTool
 {
 
     public static void SetZipFile(string zipPath, string fileName, string content)
