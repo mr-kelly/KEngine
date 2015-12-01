@@ -17,7 +17,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\Build\</OutputPath>
+    <OutputPath>..\..\Build\KEngine\</OutputPath>
     <BaseIntermediateOutputPath>obj\Debug\KEngine\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
     <DefineConstants>_DEBUG;DEBUG;TRACE;MS_DOTNET</DefineConstants>
@@ -28,7 +28,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\Build\</OutputPath>
+    <OutputPath>..\..\Build\KEngine\</OutputPath>
     <BaseIntermediateOutputPath>obj\Release\KEngine\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
     <DefineConstants>MS_DOTNET</DefineConstants>

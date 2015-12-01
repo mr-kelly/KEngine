@@ -15,39 +15,6 @@ configuration "Release"
 configuration "vs*"
 	defines { "MS_DOTNET" }
 
-------------------DevBase.dll 全局依赖的底层库 Kelly/chenpeilin 2015.11.8--------------------
--- project "dev_base"
--- language "C#"
--- kind "SharedLib"
--- framework "4.5"
--- targetdir "../_bin"
--- files
--- {
---     "../../CoreSource/DevBase/**.cs"
--- }
-
--- defines
--- {
---     "KTV_SERVER"
--- }
-
--- links
--- {
---     "System",
---     "System.Core",
---     "System.Data",
---     "System.Xml",
---     "System.Xml.Linq",
---     "../deps/packages/MySql.Data.6.8.3/lib/net45/MySql.Data",
---     "../deps/packages/protobuf-net.2.0.0.668/lib/net35/protobuf-net",
---     "../deps/packages/LitJson",
---     "../deps/packages/Newtonsoft.Json",
---     "../deps/packages/DotNetZip/Ionic.Zip.Reduced",
-
---     -- NeoLua
---     "../deps/packages/NeoLua.1.0.3/lib/net45/Neo.Lua",
---     "../deps/packages/NeoLua.1.0.3/lib/net45/Neo.Lua.Desktop",
--- }
 
 local UNITY_ENGINE_DLL = "C:/Program Files (x86)/Unity/Editor/Data/Managed/UnityEngine.dll"
 local UNITY_UI_DLL = "C:/Program Files (x86)/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/4.6.9/UnityEngine.UI.dll"
@@ -59,7 +26,7 @@ project "KEngine"
 language "C#"
 kind "SharedLib"
 framework "3.5"
-targetdir "../Build"
+targetdir "../Build/KEngine"
 
 files
 {
@@ -82,7 +49,7 @@ project "KEngine.Editor"
 language "C#"
 kind "SharedLib"
 framework "3.5"
-targetdir "../Build"
+targetdir "../Build/KEngine.Editor"
 
 files
 {
