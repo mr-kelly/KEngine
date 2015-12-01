@@ -503,14 +503,15 @@ public partial class KBuildTools
             }
         }
         */
-    [Obsolete("Please use KAssetVersionControl")]
-    public static bool CheckNeedBuildWithMeta(params string[] assetPath)
-    {
-        return KAssetVersionControl.TryCheckNeedBuildWithMeta(assetPath);
-    }
-    [Obsolete("Please use KAssetVersionControl")]
-    public static void MarkBuildVersion(string assetPath)
-    {
-        KAssetVersionControl.TryMarkBuildVersion(assetPath);
-    }
+
+    //[Obsolete("Please use KAssetVersionControl")]
+    //public static bool CheckNeedBuildWithMeta(params string[] assetPath)
+    //{
+    //    return KAssetVersionControl.TryCheckNeedBuildWithMeta(assetPath);
+    //}
+    //[Obsolete("Please use KAssetVersionControl")]
+    //public static void MarkBuildVersion(string assetPath)
+    //{
+    //    KAssetVersionControl.TryMarkBuildVersion(assetPath);
+    //}
 }

@@ -299,15 +299,9 @@ public abstract class KAbstractResourceLoader
     {
         RefCount = 0;
     }
-#if MEMORY_DEBUG
-    protected float MemoryOnStart;
-#endif
 
     protected virtual void Init(string url, params object[] args)
     {
-#if MEMORY_DEBUG
-        MemoryOnStart = GC.GetTotalMemory(true) / 1000f;
-#endif
         InitTiming = Time.realtimeSinceStartup;
         ResultObject = null;
         IsReadyDisposed = false;
@@ -323,9 +317,6 @@ public abstract class KAbstractResourceLoader
     {
         Action doFinish = () =>
         {
-#if MEMORY_DEBUG
-        Logger.Log("OnFinish {0}:{1} Memory Diff: {2}", this, Url, (GC.GetTotalMemory(true) / 1000f) - MemoryOnStart);
-#endif
             // 如果ReadyDispose，无效！不用传入最终结果！
             ResultObject = resultObj;
 

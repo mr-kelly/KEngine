@@ -1,4 +1,5 @@
 *.suo
+*.csproj.user
 /KEngine.UnityProject/Temp
 /KEngine.UnityProject/Library
 /KEngine.UnityProject/obj
@@ -32,3 +33,4 @@
 *SyncToy*
 _gsdata_
 /logs
+/Solution/vs2012/obj

@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KEngine", "KEngine.csproj", "{062D043A-720C-83D5-7B24-0EACE782E936}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KEngine.Editor", "KEngine.Editor.csproj", "{BB8AB2E6-A758-A6EC-90EC-16137C598251}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{062D043A-720C-83D5-7B24-0EACE782E936}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{062D043A-720C-83D5-7B24-0EACE782E936}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{062D043A-720C-83D5-7B24-0EACE782E936}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{062D043A-720C-83D5-7B24-0EACE782E936}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB8AB2E6-A758-A6EC-90EC-16137C598251}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB8AB2E6-A758-A6EC-90EC-16137C598251}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB8AB2E6-A758-A6EC-90EC-16137C598251}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB8AB2E6-A758-A6EC-90EC-16137C598251}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
