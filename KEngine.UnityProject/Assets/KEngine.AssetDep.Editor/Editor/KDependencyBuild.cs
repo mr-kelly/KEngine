@@ -354,6 +354,34 @@ public partial class KDependencyBuild
     }
 
     /// <summary>
+    /// 对依赖的字体进行打包，返回打包结果路径
+    /// </summary>
+    /// <param name="font"></param>
+    /// <returns></returns>
+    static string BuildFont(Font font)
+    {
+        string fontAssetPath = AssetDatabase.GetAssetPath(font);
+
+        if (string.IsNullOrEmpty(fontAssetPath) || fontAssetPath == "Library/unity default resources")
+        {
+            Logger.LogError("[BuildFont]无法打包字体...{0}", font);
+            return null;
+        }
+        //fontAssetPath = __GetPrefabBuildPath(fontAssetPath).Replace("Atlas_", "");
+        //string[] splitArr = fontAssetPath.Split('/');
+
+        bool needBuild = KAssetVersionControl.TryCheckNeedBuildWithMeta(fontAssetPath);
+        if (needBuild)
+            KAssetVersionControl.TryMarkBuildVersion(fontAssetPath);
+
+        var result = DoBuildAssetBundle("Font/Font_" + font.name, font, needBuild);
+
+        return result.Path;
+
+    }
+
+
+    /// <summary>
     /// 图片打包工具，直接打包，不用弄成Texture!, 需要借助TexturePacker
     /// </summary>
     //public static TextAsset GetImageFromPath(string imageSystemFullPath, string toImageFormat)

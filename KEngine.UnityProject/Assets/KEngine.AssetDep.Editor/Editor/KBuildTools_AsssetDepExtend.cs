@@ -6,14 +6,16 @@ using System.IO;
 using System.Collections.Generic;
 using Object = UnityEngine.Object;
 using KEngine;
-public partial class KBuildTools
+
+[InitializeOnLoad]
+public partial class KBuildTools_AssetDep
 {
-    static KBuildTools()
+    static KBuildTools_AssetDep()
     {
-        BeforeBuildAssetBundleEvent -= BeforeBuildAssetBundle;
-        BeforeBuildAssetBundleEvent += BeforeBuildAssetBundle;
-        AfterBuildAssetBundleEvent -= AfterBuildAssetBundle;
-        AfterBuildAssetBundleEvent += AfterBuildAssetBundle;
+        KBuildTools.BeforeBuildAssetBundleEvent -= BeforeBuildAssetBundle;
+        KBuildTools.BeforeBuildAssetBundleEvent += BeforeBuildAssetBundle;
+        KBuildTools.AfterBuildAssetBundleEvent -= AfterBuildAssetBundle;
+        KBuildTools.AfterBuildAssetBundleEvent += AfterBuildAssetBundle;
     }
 
 

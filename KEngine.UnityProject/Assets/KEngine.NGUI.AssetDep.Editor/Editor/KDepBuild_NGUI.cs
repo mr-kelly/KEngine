@@ -13,29 +13,6 @@ public partial class KDependencyBuild
 {
     private static float PictureScale = 1f;
 
-    static string BuildFont(Font font)
-    {
-        string fontAssetPath = AssetDatabase.GetAssetPath(font);
-
-        if (string.IsNullOrEmpty(fontAssetPath) || fontAssetPath == "Library/unity default resources")
-        {
-            Logger.LogError("[BuildFont]无法打包字体...{0}", font);
-            return null;
-        }
-        //fontAssetPath = __GetPrefabBuildPath(fontAssetPath).Replace("Atlas_", "");
-        //string[] splitArr = fontAssetPath.Split('/');
-
-        bool needBuild = KAssetVersionControl.TryCheckNeedBuildWithMeta(fontAssetPath);
-        if (needBuild)
-            KAssetVersionControl.TryMarkBuildVersion(fontAssetPath);
-
-        var result = DoBuildAssetBundle("Font/Font_" + font.name, font, needBuild);
-
-        return result.Path;
-
-    }
-
-
     /// <summary>
     /// 打包UIAtlas前处理
     /// </summary>
