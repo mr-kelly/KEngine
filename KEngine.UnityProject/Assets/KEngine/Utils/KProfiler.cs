@@ -122,19 +122,19 @@ namespace KEngine
                 memDiff / 1000f)); // 7位精度
         }
 
-    public static void BeginSample(string strName)
-    {
-        if (!CanWatch) return;
+        public static void BeginSample(string strName)
+        {
+            if (!CanWatch) return;
 
-        Profiler.BeginSample(strName);
-    }
+            Profiler.BeginSample(strName);
+        }
 
-    public static void EndSample()
-    {
-        if (!CanWatch) return;
+        public static void EndSample()
+        {
+            if (!CanWatch) return;
 
-        Profiler.EndSample();
-    }
+            Profiler.EndSample();
+        }
     }
 
 }

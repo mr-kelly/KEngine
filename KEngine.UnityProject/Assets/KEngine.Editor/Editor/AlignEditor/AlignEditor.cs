@@ -28,7 +28,7 @@ public class AlignEditor : EditorWindow
     public string alignZ = "0";
 
     [MenuItem("Window/AlignEditor")]
-    static void Init()
+    public static void Init()
     {
         // Init Editor Window
         var alignEditor = EditorWindow.GetWindow(typeof(AlignEditor));

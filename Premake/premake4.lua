@@ -10,8 +10,10 @@ solution "KEngine.Solution"
 configuration "Debug"
     flags { "Symbols" }
     defines { "_DEBUG", "DEBUG", "TRACE" }
+    targetdir "../Build/Debug"
 configuration "Release"
     flags { "Optimize" }
+    targetdir "../Build/Release"
 configuration "vs*"
 	defines { "MS_DOTNET" }
 
@@ -26,7 +28,6 @@ project "KEngine"
 language "C#"
 kind "SharedLib"
 framework "3.5"
-targetdir "../Build"
 
 files
 {
@@ -49,7 +50,6 @@ project "KEngine.Editor"
 language "C#"
 kind "SharedLib"
 framework "3.5"
-targetdir "../Build"
 
 files
 {
@@ -81,7 +81,6 @@ project "KEngine.AssetDep"
 language "C#"
 kind "SharedLib"
 framework "3.5"
-targetdir "../Build"
 
 files
 {
@@ -105,7 +104,6 @@ project "KEngine.AssetDep.Editor"
 language "C#"
 kind "SharedLib"
 framework "3.5"
-targetdir "../Build"
 
 files
 {
@@ -125,4 +123,34 @@ links
     UNITY_ENGINE_DLL,
     UNITY_UI_DLL,
     UNITY_EDITOR_DLL,
+}
+
+
+----------------------- KEngine Test ----------------
+project "KEngine.Tests"
+language "C#"
+kind "SharedLib"
+framework "3.5"
+
+files
+{
+    "../KEngine.UnityProject/Assets/KEngine.Tests/**.cs",
+}
+
+defines
+{
+    "NUNIT"
+}
+
+links
+{
+    "KEngine",
+    "KEngine.AssetDep",
+    "KEngine.Editor",
+    "KEngine.AssetDep.Editor",
+    "System",
+    UNITY_ENGINE_DLL,
+    UNITY_UI_DLL,
+    UNITY_EDITOR_DLL,
+    "packages/NUnit.3.0.0/lib/net20/nunit.framework.dll",
 }

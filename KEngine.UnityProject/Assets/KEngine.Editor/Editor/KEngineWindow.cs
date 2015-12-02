@@ -8,16 +8,14 @@
 //              https://github.com/mr-kelly/CosmosEngine
 //
 //------------------------------------------------------------------------------
-using KEngine;
-using UnityEngine;
-using UnityEditor;
-using System.Collections;
-using System.Collections.Generic;
+
 using System.IO;
+using UnityEditor;
+using UnityEngine;
 
 namespace KEngine.Editor
 {
-    [CustomEditor(typeof(AppEngine))]
+    [CustomEditor(typeof (AppEngine))]
     public class KEngineInspector : UnityEditor.Editor
     {
         static KEngineInspector()
@@ -26,51 +24,52 @@ namespace KEngine.Editor
             SceneView.onSceneGUIDelegate += OnSceneViewGUI;
         }
 
-        static void OnSceneViewGUI(SceneView view)
+        private static void OnSceneViewGUI(SceneView view)
         {
             // 检查编译中，立刻暂停游戏！
             if (EditorApplication.isCompiling)
             {
                 EditorApplication.isPlaying = false;
             }
-
         }
     }
-    public class CCosmosEngineWindow : EditorWindow
+
+    internal class KEngineWindow : EditorWindow
     {
-        static CCosmosEngineWindow()
+        static KEngineWindow()
         {
             CheckConfigFile();
         }
 
-        static string ConfFilePath = "Assets/Resources/KEngineConfig.txt";
+        private static string ConfFilePath = "Assets/Resources/KEngineConfig.txt";
 
         // 默認的配置文件內容
-        static string[][] DefaultConfigFileContent = new string[][]{
-        new string[] {"ProductRelPath", "BuildProduct/", ""},
-        new string[] {"AssetBundleBuildRelPath", "StreamingAssets/", "The Relative path to build assetbundles"},
-       new string[] { "AssetBundleExt", ".unity3d", "Asset bundle file extension"},
-       new string[] { "IsLoadAssetBundle", "1", "Asset bundle or in resources?"},
-    };
+        private static string[][] DefaultConfigFileContent = new string[][]
+        {
+            new string[] {"ProductRelPath", "BuildProduct/", ""},
+            new string[] {"AssetBundleBuildRelPath", "StreamingAssets/", "The Relative path to build assetbundles"},
+            new string[] {"AssetBundleExt", ".unity3d", "Asset bundle file extension"},
+            new string[] {"IsLoadAssetBundle", "1", "Asset bundle or in resources?"},
+        };
 
-        static CCosmosEngineWindow Instance;
+        private static KEngineWindow Instance;
 
-        static KTabFile ConfFile;
+        private static KTabFile ConfFile;
 
         [MenuItem("KEngine/Configuration")]
-        static void Init()
+        private static void Init()
         {
             // Get existing open window or if none, make a new one:		
             CheckConfigFile();
 
             if (Instance == null)
             {
-                Instance = ScriptableObject.CreateInstance<CCosmosEngineWindow>();
+                Instance = ScriptableObject.CreateInstance<KEngineWindow>();
             }
             Instance.Show();
         }
 
-        static void CheckConfigFile()
+        private static void CheckConfigFile()
         {
             if (!File.Exists(ConfFilePath))
             {
@@ -96,7 +95,7 @@ namespace KEngine.Editor
             ConfFile = KTabFile.LoadFromFile(ConfFilePath);
         }
 
-        string GetConfValue(string key)
+        private string GetConfValue(string key)
         {
             foreach (KTabFile.RowInterator row in ConfFile)
             {
@@ -111,7 +110,7 @@ namespace KEngine.Editor
             return null;
         }
 
-        void SetConfValue(string key, string value)
+        private void SetConfValue(string key, string value)
         {
             foreach (KTabFile.RowInterator row in ConfFile)
             {
@@ -125,7 +124,7 @@ namespace KEngine.Editor
             AssetDatabase.Refresh();
         }
 
-        void OnGUI()
+        private void OnGUI()
         {
             EditorGUILayout.LabelField("== Configure the CosmosEngine ==");
 
@@ -149,8 +148,6 @@ namespace KEngine.Editor
                 ConfFile.Save(ConfFilePath);
                 AssetDatabase.Refresh();
             }
-
-
         }
     }
 }

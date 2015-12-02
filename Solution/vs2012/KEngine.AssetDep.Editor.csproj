@@ -17,7 +17,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\Build\</OutputPath>
+    <OutputPath>..\..\Build\Debug\</OutputPath>
     <BaseIntermediateOutputPath>obj\Debug\KEngine.AssetDep.Editor\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
     <DefineConstants>_DEBUG;DEBUG;TRACE;MS_DOTNET</DefineConstants>
@@ -28,7 +28,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\Build\</OutputPath>
+    <OutputPath>..\..\Build\Release\</OutputPath>
     <BaseIntermediateOutputPath>obj\Release\KEngine.AssetDep.Editor\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
     <DefineConstants>MS_DOTNET</DefineConstants>
@@ -48,6 +48,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.AssetDep.Editor\Editor\KAssetDepInspector.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.AssetDep.Editor\Editor\KAssetDepInspector.cs</Link>
+    </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.AssetDep.Editor\Editor\KAssetVersionControl.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.AssetDep.Editor\Editor\KAssetVersionControl.cs</Link>
     </Compile>

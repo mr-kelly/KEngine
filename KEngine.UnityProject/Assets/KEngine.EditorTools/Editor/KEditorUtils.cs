@@ -45,8 +45,8 @@ namespace KUnityEditorTools
 
             try
             {
-                var cmdName = "cmd.exe";
-                var preArg = "/C ";
+                string cmdName;
+                string preArg;
                 var os = Environment.OSVersion;
                 
                 Debug.Log(string.Format("[ExecuteCommand]Command on OS: {0}", os.ToString()));

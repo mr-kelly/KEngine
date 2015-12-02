@@ -9,6 +9,16 @@ using UnityEngine;
 /// </summary>
 public abstract class KAssetDep : MonoBehaviour
 {
+    /// <summary>
+    /// 所有AssetDep的引用容器
+    /// </summary>
+    static LinkedList<KAssetDep> AssetDepsContainer = new LinkedList<KAssetDep>();
+
+    /// <summary>
+    /// AssetDep相对容器的位置
+    /// </summary>
+    private LinkedListNode<KAssetDep> _assetDepContainerNode;
+
     // 依赖加载出来的对象容器
     private static GameObject _DependenciesContainer;
 
@@ -60,8 +70,6 @@ public abstract class KAssetDep : MonoBehaviour
         var dep = dependencyComponent.gameObject.AddComponent<T>();
         dep.DependencyComponent = dependencyComponent;
         dep.ResourcePath = path;
-
-        //
         // dep.Arg  // AssetName
 
         return (T)dep;
@@ -88,9 +96,20 @@ public abstract class KAssetDep : MonoBehaviour
 
     private IEnumerator ExistCustomUpdate;
 
+    private static IEnumerator CheckErrorCoroutine = null;
+
     // 让外部主动调，他妈的有一些inactive状态的，awake都不会激活
     public void Init()
     {
+        if (Application.isEditor && CheckErrorCoroutine == null)
+        {
+            CheckErrorCoroutine = CheckErrorUpdate();
+            AppEngine.EngineInstance.StartCoroutine(CheckErrorCoroutine);  // 一个不停检查状态的Coroutine，为了效率，不放Update函数，单独开辟循环协程
+        }
+
+        this._assetDepContainerNode = AssetDepsContainer.AddLast(this);
+
+        //
         _NewIsInit = true;
 
         if (IsFinishDependency)
@@ -142,25 +161,40 @@ public abstract class KAssetDep : MonoBehaviour
             yield return null;
         }
     }
-#if UNITY_EDITOR
-    private int _logErrorCount = 0;
-    void Update()
+
+    /// <summary>
+    /// 不停的检查AssetDep状态是否正常, Editor Only
+    /// </summary>
+    /// <returns></returns>
+    static IEnumerator CheckErrorUpdate()
     {
-        const int maxShowCount = 30;
-        if (IsFinishDependency)
+        while (true)
         {
-            if (DependencyObject == null)
+            const int maxShowCount = 30;
+            LinkedListNode<KAssetDep> depNode = AssetDepsContainer.First;
+            if (depNode == null)
             {
-                if (_logErrorCount < maxShowCount)
-                {
-                    Debug.LogError(string.Format("加载完的依赖对象: {0}, 加载完成对象 {1} 却被销毁", this.ResourcePath, this.name), this);
-                    _logErrorCount++;
-                }
-                
+                yield return null;
+                continue;
             }
+
+            do
+            {
+                var dep = depNode.Value;
+                if (dep.IsFinishDependency)
+                {
+                    if (dep.DependencyObject == null)
+                    {
+                        Debug.LogError(string.Format("加载完的依赖对象: {0}, 加载完成对象 {1} 却被销毁", dep.ResourcePath, dep.name),
+                            dep);
+                    }
+                }
+                yield return null;
+
+            } while ((depNode = depNode.Next) != null);
+
         }
     }
-#endif
     // 完成依赖加载后的回调
     public void AddFinishCallback(Action<KAssetDep, UnityEngine.Object> callback)
     {
@@ -250,6 +284,8 @@ public abstract class KAssetDep : MonoBehaviour
                 ExistCustomUpdate = null;    
             }
 
+            AssetDepsContainer.Remove(_assetDepContainerNode); // 使用node移除更快
+
             DisposeAllLoaders();
         }
     }
@@ -258,6 +294,7 @@ public abstract class KAssetDep : MonoBehaviour
     {
         return KResourceModule.Instance.StartCoroutine(CoWaitDep(obj));
     }
+
     public static IEnumerator CoWaitDep(GameObject obj)
     {
         var wait = true;
@@ -323,7 +360,8 @@ public abstract class KAssetDep : MonoBehaviour
 
 //            AssetDeps.Remove(assetDep);
 //#if UNITY_EDITOR
-//            Logger.Assert(count == AssetDeps.Count);
+            //if (Application.isEditor)
+            //    Logger.Assert(count == AssetDeps.Count);
 //#endif
             if (count <= 0)
             {
@@ -334,23 +372,22 @@ public abstract class KAssetDep : MonoBehaviour
 
         public void StartDebug()
         {
-//#if UNITY_EDITOR
-//            CGame.StartCo(CoDebug());
-//#endif
+            if (Application.isEditor)
+                KResourceModule.Instance.StartCoroutine(CoDebug());
         }
 
-        //IEnumerator CoDebug()
-        //{
-        //    yield return new WaitForSeconds(5f);
-        //    foreach (var dep in AssetDeps)
-        //    {
-        //        //if (!dep.IsFinishDependency)
-        //        {
-        //            Debug.LogError(string.Format("超过时间AssetDep未加载完: {0}", dep.ResourcePath));
-        //            Debug.LogError("target: ", dep.gameObject);
-        //        }
-        //    }
-        //} 
+        IEnumerator CoDebug()
+        {
+            yield return new WaitForSeconds(20f);
+            foreach (var dep in AssetDeps)
+            {
+                if (!dep.IsFinishDependency)
+                {
+                    Debug.LogError(string.Format("超过20s时间AssetDep未加载完: {0}", dep.ResourcePath));
+                    Debug.LogError("target: ", dep.gameObject);
+                }
+            }
+        } 
 
     }
 
@@ -360,17 +397,3 @@ public abstract class KAssetDep : MonoBehaviour
     /// <param name="resourcePath"></param>
     protected abstract void DoProcess(string resourcePath);
 }
-
-#if UNITY_EDITOR
-[UnityEditor.CustomEditor(typeof(KAssetDep))]
-public class CBaseAssetDepInspector : UnityEditor.Editor
-{
-    public override void OnInspectorGUI()
-    {
-        base.OnInspectorGUI();
-        bool isFinish = ((KAssetDep)target).IsFinishDependency;
-        if (isFinish)
-            UnityEditor.EditorGUILayout.LabelField("依赖已经加载完毕！");
-    }
-}
-#endif

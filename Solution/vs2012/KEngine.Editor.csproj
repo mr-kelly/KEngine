@@ -11,13 +11,14 @@
     <AssemblyName>KEngine.Editor</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile>Unity Full v3.5</TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\Build\</OutputPath>
+    <OutputPath>..\..\Build\Debug\</OutputPath>
     <BaseIntermediateOutputPath>obj\Debug\KEngine.Editor\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
     <DefineConstants>_DEBUG;DEBUG;TRACE;MS_DOTNET</DefineConstants>
@@ -28,7 +29,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\Build\</OutputPath>
+    <OutputPath>..\..\Build\Release\</OutputPath>
     <BaseIntermediateOutputPath>obj\Release\KEngine.Editor\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
     <DefineConstants>MS_DOTNET</DefineConstants>
@@ -72,12 +73,6 @@
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\AppEngineInspector.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\AppEngineInspector.cs</Link>
     </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\CCommonProductPrefabExporter.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\CCommonProductPrefabExporter.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\CCosmosEngineConfWindow.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\CCosmosEngineConfWindow.cs</Link>
-    </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\CommandLine.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\CommandLine.cs</Link>
     </Compile>
@@ -92,6 +87,12 @@
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\KBuildTools.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\KBuildTools.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\KCommonProductPrefabExporter.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\KCommonProductPrefabExporter.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\KEngineWindow.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\KEngineWindow.cs</Link>
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\KExcelFile.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\KExcelFile.cs</Link>

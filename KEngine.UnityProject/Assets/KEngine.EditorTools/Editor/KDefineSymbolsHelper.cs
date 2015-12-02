@@ -17,7 +17,7 @@ namespace KUnityEditorTools
     /// <summary>
     /// 用于预编译指令（宏）的增删查
     /// </summary>
-    public class KDefineSymbolsHelper : MonoBehaviour
+    public class KDefineSymbolsHelper
     {
         /// <summary>
         /// 是否有指定宏呢

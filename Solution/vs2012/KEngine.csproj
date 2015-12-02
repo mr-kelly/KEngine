@@ -17,7 +17,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\Build\</OutputPath>
+    <OutputPath>..\..\Build\Debug\</OutputPath>
     <BaseIntermediateOutputPath>obj\Debug\KEngine\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
     <DefineConstants>_DEBUG;DEBUG;TRACE;MS_DOTNET</DefineConstants>
@@ -28,7 +28,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\Build\</OutputPath>
+    <OutputPath>..\..\Build\Release\</OutputPath>
     <BaseIntermediateOutputPath>obj\Release\KEngine\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
     <DefineConstants>MS_DOTNET</DefineConstants>
@@ -252,8 +252,14 @@
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KActionRecord.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\Utils\KActionRecord.cs</Link>
     </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KAppVersion.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Utils\KAppVersion.cs</Link>
+    </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KCrypt.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\Utils\KCrypt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KDelegateList.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Utils\KDelegateList.cs</Link>
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KEngineExtensions.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\Utils\KEngineExtensions.cs</Link>
