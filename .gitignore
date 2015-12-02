@@ -34,3 +34,4 @@
 _gsdata_
 /logs
 /Solution/vs2012/obj
+/Solution/vs2012/*.user

@@ -32,10 +32,32 @@ KEngine本质上只是一个模块容器(Module Container)，它只为各个模�
 AppEngine.Create函数可以传入继承IModule的类来实现模块添加。一个IModule是通过协程来进行初始化的。
 
 -----------------------
+
 # 快速入门DEMO
 
 **Unity打开Assets/KEngine.NGUI.Demo/KEngineNGUIDemo.unity**
 
+------------
+
+# KEngine安装器
+
+KEngine安装器，用于对现有的Unity项目进行安装KEngine的快捷操作，提供一种比Unity Package更有效的导入操作。
+
+## KEngine.Installer操作
+
+* 把KEngine.Installer目录拷贝到Unity工程的Assets目录;
+* 从菜单KEngine->KEngine Installer打开安装器界面;
+* 点击Select Git Project to Install, 选择KEngine源码目录
+
+## 3种拷贝模式
+* Hardlink，默认，方便对源码进行修改，立刻就反应到源码目录;
+* SymbolLink， 类似Hardlink
+* Copy, 拷贝文件，缺点是对安装后的KEngine代码修改，无法反应到源码目录，git提交不方便
+
+## 2种安装模式
+
+* DLL模式，使用KEngine编译后的DLL，Unity编译后的游戏产品将会产生KEngine.dll，编译更快
+* Code模式，使用KEngine源码，方便进行修改源码，断点调试
 
 
 # 针对美术人员的使用指南
