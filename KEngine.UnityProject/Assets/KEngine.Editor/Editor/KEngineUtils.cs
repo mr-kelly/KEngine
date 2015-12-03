@@ -15,36 +15,19 @@ using UnityEngine;
 
 namespace KEngine.Editor
 {
-    [CustomEditor(typeof (AppEngine))]
-    public class KEngineInspector : UnityEditor.Editor
+    public class KEngineUtils : EditorWindow
     {
-        static KEngineInspector()
-        {
-            SceneView.onSceneGUIDelegate -= OnSceneViewGUI;
-            SceneView.onSceneGUIDelegate += OnSceneViewGUI;
-        }
+        public static readonly AppVersion KEngineVersion = new AppVersion("0.9.1.0.beta");
 
-        private static void OnSceneViewGUI(SceneView view)
+        static KEngineUtils()
         {
-            // 检查编译中，立刻暂停游戏！
-            if (EditorApplication.isCompiling)
-            {
-                EditorApplication.isPlaying = false;
-            }
-        }
-    }
-
-    internal class KEngineWindow : EditorWindow
-    {
-        static KEngineWindow()
-        {
-            CheckConfigFile();
+            EnsureConfigFile();
         }
 
         private static string ConfFilePath = "Assets/Resources/KEngineConfig.txt";
 
         // 默認的配置文件內容
-        private static string[][] DefaultConfigFileContent = new string[][]
+        private static string[][] DefaultConfigs = new string[][]
         {
             new string[] {"ProductRelPath", "BuildProduct/", ""},
             new string[] {"AssetBundleBuildRelPath", "StreamingAssets/", "The Relative path to build assetbundles"},
@@ -52,24 +35,31 @@ namespace KEngine.Editor
             new string[] {"IsLoadAssetBundle", "1", "Asset bundle or in resources?"},
         };
 
-        private static KEngineWindow Instance;
+        private static KEngineUtils Instance;
 
         private static KTabFile ConfFile;
 
-        [MenuItem("KEngine/Configuration")]
+        [MenuItem("KEngine/Options")]
         private static void Init()
         {
             // Get existing open window or if none, make a new one:		
-            CheckConfigFile();
+            EnsureConfigFile();
 
             if (Instance == null)
             {
-                Instance = ScriptableObject.CreateInstance<KEngineWindow>();
-            }
-            Instance.Show();
+                Instance = KEngineUtils .GetWindow<KEngineUtils>(true, "KEngine Options");
+            } 
+            Instance.Show(); 
         }
 
-        private static void CheckConfigFile()
+        readonly GUIStyle _headerStyle = new GUIStyle();
+        KEngineUtils()
+        {
+            _headerStyle.fontSize = 22;
+            _headerStyle.normal.textColor = Color.white;
+        }
+
+        private static void EnsureConfigFile()
         {
             if (!File.Exists(ConfFilePath))
             {
@@ -79,7 +69,7 @@ namespace KEngine.Editor
                 confFile.NewColumn("Comment");
 
 
-                foreach (string[] strArr in DefaultConfigFileContent)
+                foreach (string[] strArr in DefaultConfigs)
                 {
                     int row = confFile.NewRow();
                     confFile.SetValue<string>(row, "Key", strArr[0]);
@@ -110,7 +100,20 @@ namespace KEngine.Editor
             return null;
         }
 
-        private void SetConfValue(string key, string value)
+        /// <summary>
+        /// Set AppVersion of KEngineConfig.txt
+        /// </summary>
+        /// <param name="appVersion"></param>
+        public static void SetAppVersion(AppVersion appVersion)
+        {
+            EnsureConfigFile();
+
+            SetConfValue(KEngineDefaultConfigs.AppVersion.ToString(), appVersion.ToString());
+
+            Logger.Log("Save AppVersion to KEngineConfig.txt: {0}", appVersion.ToString());
+        }
+
+        private static void SetConfValue(string key, string value)
         {
             foreach (KTabFile.RowInterator row in ConfFile)
             {
@@ -126,11 +129,12 @@ namespace KEngine.Editor
 
         private void OnGUI()
         {
-            EditorGUILayout.LabelField("== Configure the CosmosEngine ==");
+            GUILayout.Label(string.Format("KEngine Options"), _headerStyle);
+            EditorGUILayout.LabelField("KEngine Version:", KEngineVersion.ToString());
 
             EditorGUILayout.Space();
 
-            EditorGUILayout.LabelField("== Advanced Setting ==");
+            EditorGUILayout.LabelField("== KEngineConfig.txt ==");
             bool tabDirty = false;
             foreach (KTabFile.RowInterator row in ConfFile)
             {
@@ -145,9 +149,17 @@ namespace KEngine.Editor
 
             if (tabDirty)
             {
-                ConfFile.Save(ConfFilePath);
-                AssetDatabase.Refresh();
+                SaveConfigFile();
             }
+        }
+
+        /// <summary>
+        /// Save to EngineConfig
+        /// </summary>
+        private void SaveConfigFile()
+        {
+            ConfFile.Save(ConfFilePath);
+            AssetDatabase.Refresh();
         }
     }
 }

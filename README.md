@@ -72,7 +72,11 @@ TODO:Excel的表编辑、编译
 
 # 针对开发人员的使用指南
 
-* [资源模块/ResourceModule](Docs/Docs_ResourceModule.md)
+* [资源模块/ResourceModule](Docs/Doc_ResourceModule.md)
+	* [简单资源版本控制/AssetVersionControl](Docs/Doc_AssetVersionControl.md)
+* [UI模块/UIModule](Docs/Doc_UIModule.md)
+* [配置表模块/SettingModule](Docs/Doc_SettingModule.md)
+
 
 
 # UI模块 / UI Module

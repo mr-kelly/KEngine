@@ -39,7 +39,28 @@ namespace KEngine
 
         private static TableFile<CCosmosEngineInfo> _configsTable;
 
-        
+        private static AppVersion _appVersion = null;
+
+        /// <summary>
+        /// Get App Version from KEngineConfig.txt
+        /// </summary>
+        public static AppVersion AppVersion
+        {
+            get
+            {
+                if (_appVersion == null)
+                {
+                    var appVersionStr = GetConfig(KEngineDefaultConfigs.AppVersion);
+                    if (string.IsNullOrEmpty(appVersionStr))
+                    {
+                        Logger.LogError("Cannot find AppVersion in KEngineConfig.txt, use 1.0.0.0 as default");
+                        appVersionStr = "1.0.0.0.alpha.default";
+                    }
+                    _appVersion = new AppVersion(appVersionStr);
+                }
+                return _appVersion;
+            }
+        }
         /// <summary>
         /// Read Tab file (CEngineConfig.txt), cache to here
         /// </summary>
@@ -232,6 +253,7 @@ namespace KEngine
 
     public enum KEngineDefaultConfigs
     {
+        AppVersion,
         AssetBundleExt,
         ProductRelPath,
         AssetBundleBuildRelPath,  // FromRelPath

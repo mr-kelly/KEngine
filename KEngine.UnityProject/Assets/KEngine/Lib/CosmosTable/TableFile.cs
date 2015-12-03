@@ -88,7 +88,6 @@ namespace CosmosTable
                 ParseString(_config.Content);
         }
 
-
         protected internal int _colCount;  // 列数
 
         protected internal Dictionary<string, HeaderInfo> Headers = new Dictionary<string, HeaderInfo>();
