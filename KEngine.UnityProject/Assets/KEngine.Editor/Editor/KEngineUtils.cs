@@ -32,7 +32,7 @@ namespace KEngine.Editor
 {
     public class KEngineUtils : EditorWindow
     {
-        public static readonly AppVersion KEngineVersion = new AppVersion("0.9.1.0.beta");
+        public static readonly AppVersion KEngineVersion = new AppVersion("0.9.2.0.beta");
 
         static KEngineUtils()
         {

@@ -231,11 +231,11 @@ namespace KEngine.Editor
                 // StreamingAssetsPath
                 if (KResourceModule.DefaultInAppPathType == KResourceInAppPathType.StreamingAssetsPath)
                     return "Assets/StreamingAssets/" +
-                           KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.StreamingBundlesFolderName) + "/";
+                           KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.StreamingBundlesFolderName);
                         // hold asset bundles
                 if (KResourceModule.DefaultInAppPathType == KResourceInAppPathType.ResourcesAssetsPath)
                     return "Assets/Resources/" +
-                           KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.StreamingBundlesFolderName) + "/";
+                           KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.StreamingBundlesFolderName);
                         // hold asset bundles"
 
                 Logger.LogError("[AssetBundlesLinkPath]Invalid {0}", KResourceModule.DefaultInAppPathType);
@@ -247,7 +247,7 @@ namespace KEngine.Editor
         {
             if (!Directory.Exists(AssetBundlesLinkPath))
                 Directory.CreateDirectory(AssetBundlesLinkPath);
-            return AssetBundlesLinkPath + KResourceModule.BuildPlatformName + "/";
+            return AssetBundlesLinkPath + "/" + KResourceModule.BuildPlatformName + "/";
         }
 
         public static string GetResourceExportPath()
@@ -257,7 +257,7 @@ namespace KEngine.Editor
             return resourcePath;
         }
 
-        [MenuItem("KEngine/Symbol Link Builded Resource to StreamingAssets")]
+        [MenuItem("KEngine/Symbol Link Resources/Link Builded Resource -> StreamingAssets or Resources")]
         public static void SymbolLinkResource()
         {
             KSymbolLinkHelper.DeleteAllLinks(CSymbolLinkHelper.AssetBundlesLinkPath);
@@ -269,5 +269,15 @@ namespace KEngine.Editor
 
             AssetDatabase.Refresh();
         }
+		[MenuItem("KEngine/Symbol Link Resources/Remove StreamingAssets or Resources links")]
+		public static void RemoveSymbolLinkResource()
+		{
+			KSymbolLinkHelper.DeleteAllLinks(CSymbolLinkHelper.AssetBundlesLinkPath);
+			Debug.Log ("Remove " + CSymbolLinkHelper.AssetBundlesLinkPath);
+
+			AssetDatabase.DeleteAsset(CSymbolLinkHelper.AssetBundlesLinkPath);
+
+			AssetDatabase.Refresh ();
+		}
     }
 }
