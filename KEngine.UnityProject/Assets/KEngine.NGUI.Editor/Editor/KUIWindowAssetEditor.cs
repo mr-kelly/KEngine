@@ -27,6 +27,7 @@
 using UnityEditor;
 using UnityEngine;
 
+#if NGUI
 [InitializeOnLoad]
 internal class KUIPanelAssetEditorInitializer
 {
@@ -63,3 +64,4 @@ public class KUIWindowAssetEditor : Editor
         base.OnInspectorGUI();
     }
 }
+#endif

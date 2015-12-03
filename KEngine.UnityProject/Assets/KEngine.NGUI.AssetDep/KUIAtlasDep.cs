@@ -27,7 +27,7 @@
 using System;
 using KEngine;
 using UnityEngine;
-
+#if NGUI
 public class KUIAtlasDep : KAssetDep
 {
     protected override void DoProcess(string resourcePath)
@@ -103,3 +103,4 @@ public class KUIAtlasDep : KAssetDep
         });
     }
 }
+#endif

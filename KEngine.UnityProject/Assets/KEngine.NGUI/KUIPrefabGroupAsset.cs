@@ -24,6 +24,7 @@
 
 #endregion
 
+#if NGUI
 using UnityEngine;
 
 public class KUIPrefabGroupAsset : MonoBehaviour
@@ -38,3 +39,4 @@ public class KUIPrefabGroupAsset : MonoBehaviour
     {
     }
 }
+#endif

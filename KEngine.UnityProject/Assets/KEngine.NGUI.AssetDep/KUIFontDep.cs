@@ -24,6 +24,7 @@
 
 #endregion
 
+#if NGUI
 using KEngine;
 
 public class KUIFontDep : KAssetDep
@@ -54,3 +55,4 @@ public class KUIFontDep : KAssetDep
         ResourceLoaders.Add(loader);
     }
 }
+#endif

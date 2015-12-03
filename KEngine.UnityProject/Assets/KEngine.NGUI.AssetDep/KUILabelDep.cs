@@ -23,7 +23,7 @@
 // License along with this library.
 
 #endregion
-
+#if NGUI
 using System;
 
 [Obsolete("KUILabelDep Instead")]
@@ -55,3 +55,4 @@ public class KUILabelDep : KAssetDep
         this.ResourceLoaders.Add(loader);
     }
 }
+#endif

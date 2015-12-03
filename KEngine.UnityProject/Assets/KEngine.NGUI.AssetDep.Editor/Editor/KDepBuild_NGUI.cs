@@ -23,7 +23,7 @@
 // License along with this library.
 
 #endregion
-
+#if NGUI
 using System;
 using KEngine;
 using KEngine.Editor;
@@ -197,3 +197,4 @@ public partial class KDependencyBuild
         }
     }
 }
+#endif

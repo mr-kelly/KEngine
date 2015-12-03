@@ -27,7 +27,7 @@
 using System.Text.RegularExpressions;
 using KEngine.Editor;
 using UnityEngine;
-
+#if NGUI
 public partial class KBuild_NGUI : KBuild_Base
 {
     static KBuild_NGUI()
@@ -156,3 +156,4 @@ public partial class KBuild_NGUI : KBuild_Base
         KDependencyBuild.Clear();
     }
 }
+#endif

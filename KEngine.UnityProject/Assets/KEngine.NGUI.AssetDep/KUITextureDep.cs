@@ -24,6 +24,7 @@
 
 #endregion
 
+#if NGUI
 using System;
 using KEngine;
 using UnityEngine;
@@ -76,3 +77,4 @@ public class KUITextureDep : KAssetDep
         ResourceLoaders.Add(texLoader);
     }
 }
+#endif

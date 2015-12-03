@@ -23,7 +23,7 @@
 // License along with this library.
 
 #endregion
-
+#if NGUI
 using KEngine;
 
 public class KUISpriteDep : KAssetDep
@@ -59,3 +59,4 @@ public class KUISpriteDep : KAssetDep
         ResourceLoaders.Add(loader);
     }
 }
+#endif

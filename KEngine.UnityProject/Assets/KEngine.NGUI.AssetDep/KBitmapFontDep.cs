@@ -26,7 +26,7 @@
 
 using KEngine;
 using UnityEngine;
-
+#if NGUI
 public class KBitmapFontDep : KAssetDep
 {
     protected override void DoProcess(string resourcePath)
@@ -62,3 +62,4 @@ public class KBitmapFontDep : KAssetDep
         ResourceLoaders.Add(loader);
     }
 }
+#endif

@@ -24,6 +24,7 @@
 
 #endregion
 
+#if NGUI
 using System;
 using System.Collections.Generic;
 using KEngine;
@@ -218,3 +219,5 @@ public class KNGUIBridge : IKUIBridge
         //};
     }
 }
+
+#endif

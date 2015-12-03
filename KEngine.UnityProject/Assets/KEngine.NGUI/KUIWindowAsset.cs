@@ -23,7 +23,7 @@
 // License along with this library.
 
 #endregion
-
+#if NGUI
 using UnityEngine;
 
 /// <summary>
@@ -33,3 +33,4 @@ public class KUIWindowAsset : MonoBehaviour
 {
     public string StringArgument;
 }
+#endif

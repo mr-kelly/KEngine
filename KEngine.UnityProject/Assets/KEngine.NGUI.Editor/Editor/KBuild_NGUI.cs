@@ -24,6 +24,7 @@
 
 #endregion
 
+#if NGUI
 using System;
 using System.IO;
 using KEngine;
@@ -310,3 +311,4 @@ public partial class KBuild_NGUI : KBuild_Base
         KResourceBuilder.ProductExport(buildUI);
     }
 }
+#endif
