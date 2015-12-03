@@ -1,52 +1,71 @@
-﻿//------------------------------------------------------------------------------
-//
-//      CosmosEngine - The Lightweight Unity3D Game Develop Framework
-//
-//                     Version 0.9.1 (20151010)
-//                     Copyright © 2011-2015
-//                   MrKelly <23110388@qq.com>
-//              https://github.com/mr-kelly/CosmosEngine
-//
-//------------------------------------------------------------------------------
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
 
-using UnityEngine;
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: KHttpDownloader.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
 using System;
 using System.Collections;
 using System.IO;
 using System.Threading;
+using UnityEngine;
 
 namespace KEngine
 {
-
     /// <summary>
     /// 多线程+断点续传 http下载器, 注意用完后要Dispose
-    /// 
     /// TODO: 线程的回调Callback有点难看，以后弄个KHttpDownloader2（本类稳定就不改本类）
     /// </summary>
     public class KHttpDownloader : MonoBehaviour, IDisposable
     {
-        string _saveFullPath;
-        public string SaveFullPath { get { return _saveFullPath; } }
+        private string _saveFullPath;
+
+        public string SaveFullPath
+        {
+            get { return _saveFullPath; }
+        }
 
         public string Url { get; private set; }
-        string ToPath;
+        private string ToPath;
 
         //CWWWLoader WWWLoader;
 
-        float TIME_OUT_DEF;
+        private float TIME_OUT_DEF;
 
         private bool FinishedFlag = false;
 
         public bool IsFinished
         {
-            get
-            {
-                return ErrorFlag || FinishedFlag;
-            }
+            get { return ErrorFlag || FinishedFlag; }
         }
 
         private bool ErrorFlag = false;
-        public bool IsError { get { return ErrorFlag; } }
+
+        public bool IsError
+        {
+            get { return ErrorFlag; }
+        }
+
         private bool _useContinue; // 是否断点续传
         private bool UseCache;
         private int ExpireDays = 1; // 过期时间, 默认1天
@@ -61,7 +80,6 @@ namespace KEngine
 
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="fullUrl"></param>
         /// <param name="saveFullPath">完整的保存路径！</param>
@@ -69,7 +87,8 @@ namespace KEngine
         /// <param name="useCache">如果存在则不下载了！</param>
         /// <param name="expireDays"></param>
         /// <param name="timeout"></param>
-        public static KHttpDownloader Load(string fullUrl, string saveFullPath, bool useContinue = false, bool useCache = false, int expireDays = 1, int timeout = 5)
+        public static KHttpDownloader Load(string fullUrl, string saveFullPath, bool useContinue = false,
+            bool useCache = false, int expireDays = 1, int timeout = 5)
         {
             var downloader = new GameObject("HttpDownloader+" + fullUrl).AddComponent<KHttpDownloader>();
             downloader.Init(fullUrl, saveFullPath, useContinue, useCache, expireDays, timeout);
@@ -81,7 +100,9 @@ namespace KEngine
         {
             return Application.persistentDataPath + "/" + relativePath;
         }
-        private void Init(string fullUrl, string saveFullPath, bool useContinue, bool useCache = false, int expireDays = 1, int timeout = 10)
+
+        private void Init(string fullUrl, string saveFullPath, bool useContinue, bool useCache = false,
+            int expireDays = 1, int timeout = 10)
         {
             Url = fullUrl;
             ToPath = saveFullPath;
@@ -91,7 +112,6 @@ namespace KEngine
             ExpireDays = expireDays;
             TIME_OUT_DEF = timeout; // 默认10秒延遲
             StartCoroutine(StartDownload(fullUrl));
-
         }
 
         public static KHttpDownloader Load(string fullUrl, string saveFullPath, int expireDays, int timeout = 5)
@@ -99,7 +119,7 @@ namespace KEngine
             return Load(fullUrl, saveFullPath, expireDays != 0, true, expireDays, timeout);
         }
 
-        IEnumerator StartDownload(string fullUrl)
+        private IEnumerator StartDownload(string fullUrl)
         {
             float startTime = Time.time;
             if (UseCache && File.Exists(_saveFullPath))
@@ -139,10 +159,7 @@ namespace KEngine
                     isThreadError = true;
                     isThreadFinish = true;
                     isThreadStart = true;
-                }, () =>
-                {
-                    isThreadFinish = true;
-                });
+                }, () => { isThreadFinish = true; });
             });
 
             var timeCounter = 0f;
@@ -159,7 +176,7 @@ namespace KEngine
                     isThreadError = true;
                     break;
                 }
-                Progress = (downloadSize / (float)totalSize);
+                Progress = (downloadSize/(float) totalSize);
                 yield return null;
             }
 
@@ -185,7 +202,7 @@ namespace KEngine
             OnFinish();
         }
 
-        void OnFinish()
+        private void OnFinish()
         {
             FinishedFlag = true;
         }
@@ -204,7 +221,8 @@ namespace KEngine
             get { return _saveFullPath + ".download"; }
         }
 
-        void ThreadableResumeDownload(string url, Action<int, int> stepCallback, Action errorCallback, Action successCallback)
+        private void ThreadableResumeDownload(string url, Action<int, int> stepCallback, Action errorCallback,
+            Action successCallback)
         {
             //string tmpFullPath = TmpDownloadPath; //根据实际情况设置 
             System.IO.FileStream downloadFileStream;
@@ -229,16 +247,15 @@ namespace KEngine
             //打开网络连接 
             try
             {
-
-                request = (System.Net.HttpWebRequest)System.Net.WebRequest.Create(url);
+                request = (System.Net.HttpWebRequest) System.Net.WebRequest.Create(url);
                 if (lStartPos > 0)
-                    request.AddRange((int)lStartPos); //设置Range值
+                    request.AddRange((int) lStartPos); //设置Range值
 
                 Console.WriteLine("Getting Response : {0}", url);
                 //CDebug.LogConsole_MultiThread("Getting Response : {0}", url);
 
                 //向服务器请求，获得服务器回应数据流 
-                using (var response = request.GetResponse())  // TODO: Async Timeout
+                using (var response = request.GetResponse()) // TODO: Async Timeout
                 {
                     //CDebug.LogConsole_MultiThread("Getted Response : {0}", url);
                     Console.WriteLine("Getted Response : {0}", url);
@@ -248,21 +265,20 @@ namespace KEngine
                     }
                     else
                     {
-                        var totalSize = (int)response.ContentLength;
+                        var totalSize = (int) response.ContentLength;
                         if (totalSize <= 0)
                         {
                             totalSize = int.MaxValue;
                         }
                         using (var ns = response.GetResponseStream())
                         {
-
                             //CDebug.LogConsole_MultiThread("Start Stream: {0}", url);
                             Console.WriteLine("Start Stream: {0}", url);
 
-                            int downSize = (int)lStartPos;
+                            int downSize = (int) lStartPos;
                             int chunkSize = 10240;
                             byte[] nbytes = new byte[chunkSize];
-                            int nReadSize = (int)lStartPos;
+                            int nReadSize = (int) lStartPos;
                             while ((nReadSize = ns.Read(nbytes, 0, chunkSize)) > 0)
                             {
                                 if (IsFinished)
@@ -314,7 +330,7 @@ namespace KEngine
             successCallback();
         }
 
-        void OnDestroy()
+        private void OnDestroy()
         {
             if (!FinishedFlag)
             {
@@ -330,5 +346,4 @@ namespace KEngine
             GameObject.Destroy(gameObject);
         }
     }
-
 }

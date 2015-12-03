@@ -1,27 +1,39 @@
-﻿//------------------------------------------------------------------------------
-//
-//      CosmosEngine - The Lightweight Unity3D Game Develop Framework
-//
-//                     Version 0.9.1 (20151010)
-//                     Copyright © 2011-2015
-//                   MrKelly <23110388@qq.com>
-//              https://github.com/mr-kelly/CosmosEngine
-//
-//------------------------------------------------------------------------------
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: KAsyncBehaviour.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
 using System;
-using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using KEngine;
+using UnityEngine;
+
 /// <summary>
 /// 带有异步处理功能的组件
-/// 
-/// 
 /// 有一些组件，如果武器、英雄球、UI窗等，它们涉及资源的异步加载.
 /// 要在加载完成后，才能做某些事情
-/// 
 /// 用AsyncCall(()=>xxx)
-/// 
 /// 注意资源加载完，要把CanAsyncCall标记到true!
 /// </summary>
 public abstract class KAsyncBehaviour : KBehaviour
@@ -31,6 +43,7 @@ public abstract class KAsyncBehaviour : KBehaviour
     private bool _firstTouchCanAsyncCalled = false; // 第一次设置CanAsyncCall时，开启超时检查
 
     private bool _canAsyncCall = false;
+
     public virtual bool CanAsyncCall
     {
         get { return _canAsyncCall; }
@@ -54,7 +67,6 @@ public abstract class KAsyncBehaviour : KBehaviour
                     DoCheckAsyncCall();
                 }
             }
-
         }
     }
 
@@ -77,7 +89,6 @@ public abstract class KAsyncBehaviour : KBehaviour
         {
             call();
         }
-
     }
 
     private void DoCheckAsyncCall()
@@ -86,7 +97,7 @@ public abstract class KAsyncBehaviour : KBehaviour
         KEngine.AppEngine.EngineInstance.StartCoroutine(DebuggerForCheckAsyncCall());
     }
 
-    IEnumerator DebuggerForCheckAsyncCall()
+    private IEnumerator DebuggerForCheckAsyncCall()
     {
         if (CanAsyncCall)
             yield break;
@@ -96,7 +107,9 @@ public abstract class KAsyncBehaviour : KBehaviour
             yield return new WaitForSeconds(20f); // 20秒检测
             if (!CanAsyncCall)
             {
-                Debug.LogError(string.Format("[KAsyncBehaviour]超过10秒，组件还是不能CanAsyncCall!是否程序有错？ {0}", this.gameObject.name), gameObject);
+                Debug.LogError(
+                    string.Format("[KAsyncBehaviour]超过10秒，组件还是不能CanAsyncCall!是否程序有错？ {0}", this.gameObject.name),
+                    gameObject);
             }
         }
     }
@@ -133,5 +146,4 @@ public abstract class KAsyncBehaviour : KBehaviour
 
         callback();
     }
-
 }

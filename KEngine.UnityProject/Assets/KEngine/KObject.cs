@@ -1,20 +1,34 @@
-﻿//------------------------------------------------------------------------------
-//
-//      CosmosEngine - The Lightweight Unity3D Game Develop Framework
-//
-//                     Version 0.9.1 (20151010)
-//                     Copyright © 2011-2015
-//                   MrKelly <23110388@qq.com>
-//              https://github.com/mr-kelly/CosmosEngine
-//
-//------------------------------------------------------------------------------
-//#define KOBJECT_DEBUGGER
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
 
-using UnityEngine;
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: KObject.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System;
 using KEngine;
+using UnityEngine;
 
 /// <summary>
 /// CosmosEngine标准Object,，带有自动Debug~
@@ -58,7 +72,7 @@ public static class CObjectDebuggerExtensions
 public class KObjectDebugger : KBehaviour
 {
     public static Dictionary<object, KObjectDebugger> Cache = new Dictionary<object, KObjectDebugger>();
-    public static IEnumerator GlobalDebugCoroutine;  // 不用Update，用这个~
+    public static IEnumerator GlobalDebugCoroutine; // 不用Update，用这个~
 
     public const string ContainerName = "KObjectDebugger";
     public object WatchObject;
@@ -72,10 +86,8 @@ public class KObjectDebugger : KBehaviour
 
         KAsync.AddMainThreadCall(() =>
         {
-
             try
             {
-
                 KObjectDebugger debuger;
                 if (KObjectDebugger.Cache.TryGetValue(obj, out debuger))
                 {
@@ -86,7 +98,6 @@ public class KObjectDebugger : KBehaviour
             {
                 Logger.LogError(e.Message);
             }
- 
         });
     }
 
@@ -99,8 +110,9 @@ public class KObjectDebugger : KBehaviour
         {
             try
             {
-
-                var newDebugger = new GameObject(string.Format("{0}-{1}", obj.ToString(), obj.GetType())).AddComponent<KObjectDebugger>();
+                var newDebugger =
+                    new GameObject(string.Format("{0}-{1}", obj.ToString(), obj.GetType()))
+                        .AddComponent<KObjectDebugger>();
                 newDebugger.WatchObject = obj;
 
                 KDebuggerObjectTool.SetParent(ContainerName, obj.GetType().Name, newDebugger.gameObject);
@@ -111,11 +123,10 @@ public class KObjectDebugger : KBehaviour
             {
                 Logger.LogError(e.Message);
             }
-
         });
     }
 
-    void Awake()
+    private void Awake()
     {
         if (!Logger.IsEditor)
         {
@@ -134,7 +145,7 @@ public class KObjectDebugger : KBehaviour
     /// 主要为了清理和改名
     /// </summary>
     /// <returns></returns>
-    static IEnumerator CoGlobalDebugCoroutine()
+    private static IEnumerator CoGlobalDebugCoroutine()
     {
         while (true)
         {
@@ -145,7 +156,7 @@ public class KObjectDebugger : KBehaviour
             }
 
             var copyCache = new Dictionary<object, KObjectDebugger>();
-            foreach (var kv in Cache)  // copy
+            foreach (var kv in Cache) // copy
             {
                 copyCache[kv.Key] = kv.Value;
             }
@@ -159,7 +170,6 @@ public class KObjectDebugger : KBehaviour
                 }
                 else
                 {
-
                     if (!debugger.IsDestroyed && debugger._cacheGameObject.name != debugger.WatchObject.ToString())
                     {
                         debugger._cacheGameObject.name = debugger.WatchObject.ToString();
@@ -168,6 +178,5 @@ public class KObjectDebugger : KBehaviour
                 yield return null;
             }
         }
-
     }
 }

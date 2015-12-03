@@ -1,39 +1,55 @@
-﻿//------------------------------------------------------------------------------
-//
-//      CosmosEngine - The Lightweight Unity3D Game Develop Framework
-//
-//                     Version 0.9.1 (20151010)
-//                     Copyright © 2011-2015
-//                   MrKelly <23110388@qq.com>
-//              https://github.com/mr-kelly/CosmosEngine
-//
-//------------------------------------------------------------------------------
-using UnityEngine;
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: AppEngine.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System;
 using System.Text;
 using CosmosTable;
+using UnityEngine;
 
 namespace KEngine
 {
-
     /// <summary>
     /// Cosmos Engine - Unity3D Game Develop Framework
     /// </summary>
     public class AppEngine : MonoBehaviour
     {
-        public static bool IsDebugBuild { get; private set; }  // cache Debug.isDebugBuild for multi thread
+        public static bool IsDebugBuild { get; private set; } // cache Debug.isDebugBuild for multi thread
         public static bool ShowFps = Debug.isDebugBuild;
+
         /// <summary>
         /// To Display FPS in the Debug Mode (Debug.isDebugBuild is true)
         /// </summary>
-        public static CFpsWatcher RenderWatcher { get; private set; }  // 帧数监听器
+        public static CFpsWatcher RenderWatcher { get; private set; } // 帧数监听器
 
         /// <summary>
         /// In Init func has a check if the user has the write privillige
         /// </summary>
-        public static bool IsRootUser;  // 是否越狱iOS
+        public static bool IsRootUser; // 是否越狱iOS
 
         public static AppEngine EngineInstance { get; private set; }
 
@@ -61,13 +77,12 @@ namespace KEngine
                 return _appVersion;
             }
         }
+
         /// <summary>
         /// Read Tab file (CEngineConfig.txt), cache to here
         /// </summary>
-        //static Dictionary<string, string> ConfigMap = null;// 遊戲配置，讀取Resources目錄里
-
         /// <summary>
-        /// Modules passed from the CosmosEngine.New function. All your custom game logic modules 
+        /// Modules passed from the CosmosEngine.New function. All your custom game logic modules
         /// </summary>
         public ICModule[] GameModules { get; private set; }
 
@@ -77,6 +92,7 @@ namespace KEngine
         public bool IsInited { get; private set; }
 
         public delegate IEnumerator CoroutineDelegate();
+
         private CoroutineDelegate BeforeInitModules = null;
         private CoroutineDelegate AfterInitModules = null;
 
@@ -88,7 +104,8 @@ namespace KEngine
         /// <summary>
         /// Engine entry.... all begins from here
         /// </summary>
-        public static AppEngine New(GameObject gameObjectToAttach, ICModule[] modules, CoroutineDelegate before, CoroutineDelegate after)
+        public static AppEngine New(GameObject gameObjectToAttach, ICModule[] modules, CoroutineDelegate before,
+            CoroutineDelegate after)
         {
             Logger.Assert(gameObjectToAttach != null && modules != null);
             AppEngine appEngine = gameObjectToAttach.AddComponent<AppEngine>();
@@ -114,7 +131,7 @@ namespace KEngine
 
         private void Init()
         {
-            IsRootUser = KTool.HasWriteAccessToFolder(Application.dataPath);  // Root User运行时，能穿越沙盒写DataPath, 以此为依据
+            IsRootUser = KTool.HasWriteAccessToFolder(Application.dataPath); // Root User运行时，能穿越沙盒写DataPath, 以此为依据
 
             if (ShowFps)
             {
@@ -126,9 +143,12 @@ namespace KEngine
                 Logger.Log("====================================================================================");
                 Logger.Log("Application.platform = {0}", Application.platform);
                 Logger.Log("Application.dataPath = {0} , WritePermission: {1}", Application.dataPath, IsRootUser);
-                Logger.Log("Application.streamingAssetsPath = {0} , WritePermission: {1}", Application.streamingAssetsPath, KTool.HasWriteAccessToFolder(Application.streamingAssetsPath));
-                Logger.Log("Application.persistentDataPath = {0} , WritePermission: {1}", Application.persistentDataPath, KTool.HasWriteAccessToFolder(Application.persistentDataPath));
-                Logger.Log("Application.temporaryCachePath = {0} , WritePermission: {1}", Application.temporaryCachePath, KTool.HasWriteAccessToFolder(Application.temporaryCachePath));
+                Logger.Log("Application.streamingAssetsPath = {0} , WritePermission: {1}",
+                    Application.streamingAssetsPath, KTool.HasWriteAccessToFolder(Application.streamingAssetsPath));
+                Logger.Log("Application.persistentDataPath = {0} , WritePermission: {1}", Application.persistentDataPath,
+                    KTool.HasWriteAccessToFolder(Application.persistentDataPath));
+                Logger.Log("Application.temporaryCachePath = {0} , WritePermission: {1}", Application.temporaryCachePath,
+                    KTool.HasWriteAccessToFolder(Application.temporaryCachePath));
                 Logger.Log("Application.unityVersion = {0}", Application.unityVersion);
                 Logger.Log("SystemInfo.deviceModel = {0}", SystemInfo.deviceModel);
                 Logger.Log("SystemInfo.deviceUniqueIdentifier = {0}", SystemInfo.deviceUniqueIdentifier);
@@ -140,11 +160,13 @@ namespace KEngine
         /// <summary>
         /// Use Coroutine to initialize the two base modules: Resource & UI
         /// </summary>
-        IEnumerator DoInit()
+        private IEnumerator DoInit()
         {
-            var baseModules = new ICModule[] {  // 基础2件套
-                KResourceModule.Instance, 
-                KUIModule.Instance, 
+            var baseModules = new ICModule[]
+            {
+                // 基础2件套
+                KResourceModule.Instance,
+                KUIModule.Instance,
             };
 
             yield return StartCoroutine(DoInitModules(baseModules));
@@ -162,7 +184,7 @@ namespace KEngine
             IsInited = true;
         }
 
-        IEnumerator DoInitModules(IList<ICModule> modules)
+        private IEnumerator DoInitModules(IList<ICModule> modules)
         {
             var startInitTime = 0f;
             var startMem = 0f;
@@ -181,15 +203,15 @@ namespace KEngine
                         Time.time - startInitTime, nowMem - startMem, nowMem);
                 }
             }
-
         }
-        void OnGUI()
+
+        private void OnGUI()
         {
             if (ShowFps)
             {
                 GUILayout.BeginVertical(GUILayout.Width(300));
-                GUILayout.Label(string.Format("Memory: {0:F3}KB", UnityEngine.Profiler.GetMonoUsedSize() / 1024f));
-                GUILayout.Label(RenderWatcher.Watch("FPS: {0:N0}", 1f / Time.deltaTime));
+                GUILayout.Label(string.Format("Memory: {0:F3}KB", UnityEngine.Profiler.GetMonoUsedSize()/1024f));
+                GUILayout.Label(RenderWatcher.Watch("FPS: {0:N0}", 1f/Time.deltaTime));
                 GUILayout.EndVertical();
             }
         }
@@ -223,7 +245,6 @@ namespace KEngine
                             throw new Exception(sb.ToString());
                         }
                     },
-
                 });
             }
             return _configsTable;
@@ -245,6 +266,7 @@ namespace KEngine
             }
             return conf.Value;
         }
+
         public static string GetConfig(KEngineDefaultConfigs cfg)
         {
             return GetConfig(cfg.ToString());
@@ -256,15 +278,16 @@ namespace KEngine
         AppVersion,
         AssetBundleExt,
         ProductRelPath,
-        AssetBundleBuildRelPath,  // FromRelPath
+        AssetBundleBuildRelPath, // FromRelPath
 
-        StreamingBundlesFolderName, // StreamingAssets inner folder name, when build, will link the Bundle build Path to here
+        StreamingBundlesFolderName,
+        // StreamingAssets inner folder name, when build, will link the Bundle build Path to here
     }
 
     public class CFpsWatcher
     {
-        float Value;
-        float Sensitivity;
+        private float Value;
+        private float Sensitivity;
 
         public CFpsWatcher(float sensitivity)
         {
@@ -274,11 +297,9 @@ namespace KEngine
 
         public string Watch(string format, float value)
         {
-            Value = Value * Sensitivity + value * (1f - Sensitivity);
+            Value = Value*Sensitivity + value*(1f - Sensitivity);
             return string.Format(format, Value);
         }
-
-
     }
 
 
@@ -295,13 +316,13 @@ namespace KEngine
             get { return Key; }
         }
 
-        public CCosmosEngineInfo() { }
+        public CCosmosEngineInfo()
+        {
+        }
 
         public override bool IsAutoParse
         {
             get { return true; }
         }
     }
-
 }
-

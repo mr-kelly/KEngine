@@ -1,21 +1,33 @@
-﻿//------------------------------------------------------------------------------
-//
-//      CosmosEngine - The Lightweight Unity3D Game Develop Framework
-//
-//                     Version 0.9.1 (20151010)
-//                     Copyright © 2011-2015
-//                   MrKelly <23110388@qq.com>
-//              https://github.com/mr-kelly/CosmosEngine
-//
-//------------------------------------------------------------------------------
-//#define MEMORY_DEBUG
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
 
-using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: KAbstractResourceLoader.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
 using System;
+using System.Collections.Generic;
 using KEngine;
-
+using UnityEngine;
 
 /// <summary>
 /// 所有资源Loader继承这个
@@ -27,7 +39,10 @@ public abstract class KAbstractResourceLoader
     }
 
     public delegate void CLoaderDelgate(bool isOk, object resultObject);
-    private static readonly Dictionary<Type, Dictionary<string, KAbstractResourceLoader>> _loadersPool = new Dictionary<Type, Dictionary<string, KAbstractResourceLoader>>();
+
+    private static readonly Dictionary<Type, Dictionary<string, KAbstractResourceLoader>> _loadersPool =
+        new Dictionary<Type, Dictionary<string, KAbstractResourceLoader>>();
+
     private readonly List<CLoaderDelgate> _afterFinishedCallbacks = new List<CLoaderDelgate>();
 
     #region 垃圾回收 Garbage Collect
@@ -60,13 +75,15 @@ public abstract class KAbstractResourceLoader
     /// <summary>
     /// 缓存起来要删掉的，供DoGarbageCollect函数用, 避免重复的new List
     /// </summary>
-    private static readonly List<KAbstractResourceLoader> CacheLoaderToRemoveFromUnUsed = new List<KAbstractResourceLoader>();
+    private static readonly List<KAbstractResourceLoader> CacheLoaderToRemoveFromUnUsed =
+        new List<KAbstractResourceLoader>();
 
     /// <summary>
     /// 进行垃圾回收
     /// </summary>
     private static readonly Dictionary<KAbstractResourceLoader, float> UnUsesLoaders =
         new Dictionary<KAbstractResourceLoader, float>();
+
     #endregion
 
     /// <summary>
@@ -101,19 +118,19 @@ public abstract class KAbstractResourceLoader
     /// ForceNew的，非AutoNew
     /// </summary>
     protected bool IsForceNew;
+
     /// <summary>
     /// RefCount 为 0，进入预备状态
     /// </summary>
     protected bool IsReadyDisposed { get; private set; }
+
     /// <summary>
     ///  销毁事件
     /// </summary>
     public event Action DisposeEvent;
 
-    [System.NonSerialized]
-    public float InitTiming = -1;
-    [System.NonSerialized]
-    public float FinishTiming = -1;
+    [System.NonSerialized] public float InitTiming = -1;
+    [System.NonSerialized] public float FinishTiming = -1;
 
     /// <summary>
     /// 用时
@@ -126,6 +143,7 @@ public abstract class KAbstractResourceLoader
             return FinishTiming - InitTiming;
         }
     }
+
     /// <summary>
     /// 引用计数
     /// </summary>
@@ -159,7 +177,7 @@ public abstract class KAbstractResourceLoader
 
     protected static int GetCount<T>()
     {
-        return GetTypeDict(typeof(T)).Count;
+        return GetTypeDict(typeof (T)).Count;
     }
 
     protected static Dictionary<string, KAbstractResourceLoader> GetTypeDict(Type type)
@@ -174,7 +192,7 @@ public abstract class KAbstractResourceLoader
 
     public static int GetRefCount<T>(string url)
     {
-        var dict = GetTypeDict(typeof(T));
+        var dict = GetTypeDict(typeof (T));
         KAbstractResourceLoader loader;
         if (dict.TryGetValue(url, out loader))
         {
@@ -191,13 +209,14 @@ public abstract class KAbstractResourceLoader
     /// <param name="callback"></param>
     /// <param name="forceCreateNew"></param>
     /// <returns></returns>
-    protected static T AutoNew<T>(string url, CLoaderDelgate callback = null, bool forceCreateNew = false, params object[] initArgs) where T : KAbstractResourceLoader, new()
+    protected static T AutoNew<T>(string url, CLoaderDelgate callback = null, bool forceCreateNew = false,
+        params object[] initArgs) where T : KAbstractResourceLoader, new()
     {
-        Dictionary<string, KAbstractResourceLoader> typesDict = GetTypeDict(typeof(T));
+        Dictionary<string, KAbstractResourceLoader> typesDict = GetTypeDict(typeof (T));
         KAbstractResourceLoader loader;
         if (string.IsNullOrEmpty(url))
         {
-            Logger.LogError("[{0}:AutoNew]url为空", typeof(T));
+            Logger.LogError("[{0}:AutoNew]url为空", typeof (T));
         }
 
         if (forceCreateNew || !typesDict.TryGetValue(url, out loader))
@@ -213,7 +232,7 @@ public abstract class KAbstractResourceLoader
 
             if (Application.isEditor)
             {
-                KResourceLoaderDebugger.Create(typeof(T).Name, url, loader);
+                KResourceLoaderDebugger.Create(typeof (T).Name, url, loader);
             }
         }
         else
@@ -292,7 +311,7 @@ public abstract class KAbstractResourceLoader
     /// </summary>
     protected virtual void Revive()
     {
-        IsReadyDisposed = false;  // 复活！
+        IsReadyDisposed = false; // 复活！
     }
 
     protected KAbstractResourceLoader()
@@ -310,7 +329,6 @@ public abstract class KAbstractResourceLoader
 
         Url = url;
         Progress = 0;
-
     }
 
     protected virtual void OnFinish(object resultObj)
@@ -372,7 +390,6 @@ public abstract class KAbstractResourceLoader
         {
             justDo();
         }
-
     }
 
     // 后边改变吧~~不叫Dispose!
@@ -391,7 +408,8 @@ public abstract class KAbstractResourceLoader
             {
                 if (RefCount < 0)
                 {
-                    Logger.LogError("[{3}]RefCount< 0, {0} : {1}, NowRefCount: {2}, Will be fix to 0", GetType().Name, Url, RefCount, GetType());
+                    Logger.LogError("[{3}]RefCount< 0, {0} : {1}, NowRefCount: {2}, Will be fix to 0", GetType().Name,
+                        Url, RefCount, GetType());
 
                     RefCount = Mathf.Max(0, RefCount);
                 }
@@ -469,4 +487,5 @@ public abstract class KAbstractResourceLoader
         _isQuitApplication = true;
     }
 }
+
 // Unity潜规则: 等待帧最后再执行，避免一些(DestroyImmediatly)在Phycis函数内

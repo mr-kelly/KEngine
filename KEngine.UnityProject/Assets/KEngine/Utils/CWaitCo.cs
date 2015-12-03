@@ -1,18 +1,33 @@
-﻿//------------------------------------------------------------------------------
-//
-//      CosmosEngine - The Lightweight Unity3D Game Develop Framework
-//
-//                     Version 0.9.1 (20151010)
-//                     Copyright © 2011-2015
-//                   MrKelly <23110388@qq.com>
-//              https://github.com/mr-kelly/CosmosEngine
-//
-//------------------------------------------------------------------------------
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: CWaitCo.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
 using System;
-using KEngine;
-using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 public interface IWaitable
 {
@@ -31,16 +46,13 @@ public class CWaitCo
 {
     public static Coroutine WaitCallback(WaitCallbackDelegate func)
     {
-        return KEngine.AppEngine.EngineInstance.StartCoroutine((IEnumerator)CoWaitCallback(func));
+        return KEngine.AppEngine.EngineInstance.StartCoroutine((IEnumerator) CoWaitCallback(func));
     }
 
     private static IEnumerator CoWaitCallback(WaitCallbackDelegate func)
     {
         bool wait = true;
-        func(() =>
-        {
-            wait = false;
-        });
+        func(() => { wait = false; });
         // ReSharper disable once LoopVariableIsNeverChangedInsideLoop
         while (wait)
         {
@@ -73,10 +85,10 @@ public class CWaitCo
 
     public static void Wait(IWaitable wait, Action okCallback)
     {
-        KEngine.AppEngine.EngineInstance.StartCoroutine(CoWaitTrue(new[] { wait }, okCallback));
+        KEngine.AppEngine.EngineInstance.StartCoroutine(CoWaitTrue(new[] {wait}, okCallback));
     }
 
-    static IEnumerator CoWaitTrue(IEnumerable<IWaitable> waits, Action okCallback)
+    private static IEnumerator CoWaitTrue(IEnumerable<IWaitable> waits, Action okCallback)
     {
         while (true)
         {
@@ -102,7 +114,7 @@ public class CWaitCo
 
     public static Coroutine TimeCallback(float time, Action callback)
     {
-        return KEngine.AppEngine.EngineInstance.StartCoroutine((IEnumerator)CoTimeCallback(time, callback));
+        return KEngine.AppEngine.EngineInstance.StartCoroutine((IEnumerator) CoTimeCallback(time, callback));
     }
 
     private static IEnumerator CoTimeCallback(float time, Action callback)

@@ -1,18 +1,33 @@
-﻿//------------------------------------------------------------------------------
-//
-//      CosmosEngine - The Lightweight Unity3D Game Develop Framework
-//
-//                     Version 0.9.1 (20151010)
-//                     Copyright © 2011-2015
-//                   MrKelly <23110388@qq.com>
-//              https://github.com/mr-kelly/CosmosEngine
-//
-//------------------------------------------------------------------------------
-using UnityEngine;
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: KAssetBundleParser.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using KEngine;
+using UnityEngine;
 
 /// <summary>
 /// AssetBundle字节解析器
@@ -24,6 +39,7 @@ public class KAssetBundleParser
         Async,
         Sync,
     }
+
     /// <summary>
     /// 是异步解析，还是同步解析
     /// </summary>
@@ -32,7 +48,7 @@ public class KAssetBundleParser
     private bool IsDisposed = false;
     private bool UnloadAllAssets; // Dispose时赋值
 
-    readonly Action<AssetBundle> Callback;
+    private readonly Action<AssetBundle> Callback;
     public bool IsFinished;
     public AssetBundle Bundle;
 
@@ -41,7 +57,12 @@ public class KAssetBundleParser
     private static int _autoPriority = 1;
 
     private readonly AssetBundleCreateRequest CreateRequest;
-    public float Progress {get { return CreateRequest.progress; }}
+
+    public float Progress
+    {
+        get { return CreateRequest.progress; }
+    }
+
     public string RelativePath;
 
     private readonly float _startTime = 0;
@@ -73,7 +94,7 @@ public class KAssetBundleParser
         }
     }
 
-    void OnFinish(AssetBundle bundle)
+    private void OnFinish(AssetBundle bundle)
     {
         IsFinished = true;
         Bundle = bundle;
@@ -92,16 +113,16 @@ public class KAssetBundleParser
             var timeLimit = Mode == CAssetBundleParserMode.Async ? 1f : .3f;
             if (useTime > timeLimit) // 超过一帧时间肯定了
             {
-                Logger.LogWarning("[KAssetBundleParser] Parse Too long time: {0},  used time: {1}", RelativePath, useTime);
+                Logger.LogWarning("[KAssetBundleParser] Parse Too long time: {0},  used time: {1}", RelativePath,
+                    useTime);
             }
         }
-        
     }
 
-    IEnumerator WaitCreateAssetBundle(AssetBundleCreateRequest req)
+    private IEnumerator WaitCreateAssetBundle(AssetBundleCreateRequest req)
     {
         float startTime = Time.time;
-        
+
         while (!req.isDone)
         {
             yield return null;
@@ -112,14 +133,15 @@ public class KAssetBundleParser
             const float timeout = 5f;
             if (Time.time - startTime > timeout)
             {
-                Logger.LogWarning("[CAssetBundlerParser]{0} 解压/读取Asset太久了! 花了{1}秒, 超过 {2}秒", RelativePath, Time.time - startTime, timeout);
+                Logger.LogWarning("[CAssetBundlerParser]{0} 解压/读取Asset太久了! 花了{1}秒, 超过 {2}秒", RelativePath,
+                    Time.time - startTime, timeout);
             }
         }
         OnFinish(req.assetBundle);
     }
 
 
-    static byte[] DefaultParseAb(string relativePath, byte[] bytes)
+    private static byte[] DefaultParseAb(string relativePath, byte[] bytes)
     {
         return bytes;
     }

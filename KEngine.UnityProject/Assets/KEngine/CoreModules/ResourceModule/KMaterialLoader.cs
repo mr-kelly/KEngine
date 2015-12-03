@@ -1,27 +1,42 @@
-﻿//------------------------------------------------------------------------------
-//
-//      CosmosEngine - The Lightweight Unity3D Game Develop Framework
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
 // 
-//                     Version 0.8 (20140904)
-//                     Copyright © 2011-2014
-//                   MrKelly <23110388@qq.com>
-//              https://github.com/mr-kelly/CosmosEngine
-//
-//------------------------------------------------------------------------------
-using UnityEngine;
-using System;
+// Filename: KMaterialLoader.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
 using System.Collections;
 using System.Collections.Generic;
-using System.Security.Policy;
 using KEngine;
+using UnityEngine;
 
 /// <summary>
 /// 加载材质，通过CSerializeMaterial
 /// </summary>
-[CDependencyClass(typeof(KAssetFileLoader))]
+[CDependencyClass(typeof (KAssetFileLoader))]
 public class KMaterialLoader : KAbstractResourceLoader
 {
     public delegate void CCMaterialLoaderDelegate(bool isOk, Material mat);
+
     public Material Mat { get; private set; }
 
     private List<KTextureLoader> TextureLoaders;
@@ -42,7 +57,7 @@ public class KMaterialLoader : KAbstractResourceLoader
         KResourceModule.Instance.StartCoroutine(CoLoadSerializeMaterial());
     }
 
-    IEnumerator CoLoadSerializeMaterial()
+    private IEnumerator CoLoadSerializeMaterial()
     {
         var matLoadBridge = KAssetFileLoader.Load(Url);
         while (!matLoadBridge.IsFinished)
@@ -107,8 +122,9 @@ public class KMaterialLoader : KAbstractResourceLoader
 
         return texturePath;
     }
+
     // 加载材质的图片, 协程等待
-    IEnumerator CoGenerateMaterial(string matPath, KSerializeMaterial sMat)
+    private IEnumerator CoGenerateMaterial(string matPath, KSerializeMaterial sMat)
     {
         // 纹理全部加载完成后到这里
         //if (!CachedMaterials.TryGetValue(matPath, out mat))
@@ -118,7 +134,7 @@ public class KMaterialLoader : KAbstractResourceLoader
             {
                 yield return null;
             }
-            
+
             var shader = shaderLoader.ShaderAsset;
             if (shader == null)
             {
@@ -127,7 +143,7 @@ public class KMaterialLoader : KAbstractResourceLoader
                 if (shader == null)
                 {
                     Logger.LogWarning("找不到Shader: {0}, 使用Diffuse临时代替", sMat.ShaderName);
-                    shader = KTool.FindShader("Diffuse");    
+                    shader = KTool.FindShader("Diffuse");
                 }
             }
             Logger.Assert(shader);
@@ -175,24 +191,25 @@ public class KMaterialLoader : KAbstractResourceLoader
                     case KSerializeMaterialProperty.ShaderType.RenderTexture:
                         // RenderTextures, 不处理, 一般用在水，Water脚本会自动生成
                         break;
-
                 }
             }
         }
     }
 
-    void _SetMatVector(Material mat, string propName, string propValue)
+    private void _SetMatVector(Material mat, string propName, string propValue)
     {
         if (mat.HasProperty(propName))
         {
             propValue = propValue.Trim('(', ')'); // (1.0, 3.0, 4.0, 5.0)
             string[] vecArr = propValue.Split(',');
-            Vector4 vector = new Vector4(float.Parse(vecArr[0]), float.Parse(vecArr[1]), float.Parse(vecArr[2]), float.Parse(vecArr[3]));
+            Vector4 vector = new Vector4(float.Parse(vecArr[0]), float.Parse(vecArr[1]), float.Parse(vecArr[2]),
+                float.Parse(vecArr[3]));
 
             mat.SetVector(propName, vector);
         }
     }
-    void _SetMatRange(Material mat, string propName, string propValue)
+
+    private void _SetMatRange(Material mat, string propName, string propValue)
     {
         if (mat.HasProperty(propName))
         {
@@ -201,14 +218,16 @@ public class KMaterialLoader : KAbstractResourceLoader
         else
             Logger.LogError("[_SetMatRange]Cannot find shader property: {0}", propName);
     }
-    void _SetMatColor(Material mat, string colorPropName, string _colorStr) // 设置材质Shader的颜色
+
+    private void _SetMatColor(Material mat, string colorPropName, string _colorStr) // 设置材质Shader的颜色
     {
         if (mat.HasProperty(colorPropName))
         {
-            _colorStr = _colorStr.Replace("RGBA(", "").Replace(")", "");  // RGBA(0.5, 0.5,0.5, 1.0)
+            _colorStr = _colorStr.Replace("RGBA(", "").Replace(")", ""); // RGBA(0.5, 0.5,0.5, 1.0)
             string[] colorArr = _colorStr.Split(',');
 
-            Color color = new Color(float.Parse(colorArr[0]), float.Parse(colorArr[1]), float.Parse(colorArr[2]), float.Parse(colorArr[3]));
+            Color color = new Color(float.Parse(colorArr[0]), float.Parse(colorArr[1]), float.Parse(colorArr[2]),
+                float.Parse(colorArr[3]));
             if (mat.HasProperty(colorPropName))
                 mat.SetColor(colorPropName, color);
             else
@@ -216,7 +235,8 @@ public class KMaterialLoader : KAbstractResourceLoader
         }
     }
 
-    void _SetMatTex(Material mat, string matPropName, Texture tex, Vector2 tiling, Vector2 offset) // 设置材质指定属性的纹理
+    private void _SetMatTex(Material mat, string matPropName, Texture tex, Vector2 tiling, Vector2 offset)
+        // 设置材质指定属性的纹理
     {
         //if (!string.IsNullOrEmpty(texturePath))
         //{

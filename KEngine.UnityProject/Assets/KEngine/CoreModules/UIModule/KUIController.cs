@@ -1,16 +1,32 @@
-﻿//------------------------------------------------------------------------------
-//
-//      CosmosEngine - The Lightweight Unity3D Game Develop Framework
-//
-//                     Version 0.9.1 (20151010)
-//                     Copyright © 2011-2015
-//                   MrKelly <23110388@qq.com>
-//              https://github.com/mr-kelly/CosmosEngine
-//
-//------------------------------------------------------------------------------
-using UnityEngine;
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: KUIController.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
 using System;
 using KEngine;
+using UnityEngine;
 
 /// <summary>
 /// Abstract class of all UI Script
@@ -30,9 +46,13 @@ public abstract class KUIController : KBehaviour
         doOpen();
     }
 
-    public virtual void OnOpen(params object[] args) { }
+    public virtual void OnOpen(params object[] args)
+    {
+    }
 
-    public virtual void OnClose() { }
+    public virtual void OnClose()
+    {
+    }
 
     /// <summary>
     /// 输入uri搜寻控件
@@ -40,7 +60,7 @@ public abstract class KUIController : KBehaviour
     /// </summary>
     public T GetControl<T>(string uri, Transform findTrans = null, bool isLog = true) where T : UnityEngine.Object
     {
-        return (T)GetControl(typeof(T), uri, findTrans, isLog);
+        return (T) GetControl(typeof (T), uri, findTrans, isLog);
     }
 
     public object GetControl(Type type, string uri, Transform findTrans = null, bool isLog = true)
@@ -56,7 +76,7 @@ public abstract class KUIController : KBehaviour
             return null;
         }
 
-        if (type == typeof(GameObject))
+        if (type == typeof (GameObject))
             return trans.gameObject;
 
         return trans.GetComponent(type);
@@ -91,6 +111,7 @@ public abstract class KUIController : KBehaviour
 
         return obj;
     }
+
     /// <summary>
     /// 从parent下根据Name查找
     /// </summary>

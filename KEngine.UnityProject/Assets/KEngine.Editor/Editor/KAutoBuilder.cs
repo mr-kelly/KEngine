@@ -1,35 +1,46 @@
-﻿//------------------------------------------------------------------------------
-//
-//      CosmosEngine - The Lightweight Unity3D Game Develop Framework
-//
-//                     Version 0.9.1 (20151010)
-//                     Copyright © 2011-2015
-//                   MrKelly <23110388@qq.com>
-//              https://github.com/mr-kelly/CosmosEngine
-//
-//------------------------------------------------------------------------------
-using KEngine;
-using UnityEngine;
-using UnityEditor;
-using System;
-using System.Collections;
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: KAutoBuilder.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
 using System.Collections.Generic;
 using System.IO;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
 using KUnityEditorTools;
+using UnityEditor;
+using UnityEngine;
 
 namespace KEngine.Editor
 {
     public class KAutoBuilder
     {
-        static string GetProjectName()
+        private static string GetProjectName()
         {
             string[] s = Application.dataPath.Split('/');
             return s[s.Length - 2];
         }
 
-        static string[] GetScenePaths()
+        private static string[] GetScenePaths()
         {
             string[] scenes = new string[EditorBuildSettings.scenes.Length];
 
@@ -41,7 +52,7 @@ namespace KEngine.Editor
             return scenes;
         }
 
-        static void ParseArgs(ref BuildOptions opt, ref string outputpath)
+        private static void ParseArgs(ref BuildOptions opt, ref string outputpath)
         {
             string[] args = System.Environment.GetCommandLineArgs();
 
@@ -81,14 +92,14 @@ namespace KEngine.Editor
                             PlayerSettings.Android.keyaliasPass = item.Value;
                             break;
                         case "BuildOptions":
+                        {
+                            opt = BuildOptions.None;
+                            string[] opts = item.Value.Split('|');
+                            foreach (string o in opts)
                             {
-                                opt = BuildOptions.None;
-                                string[] opts = item.Value.Split('|');
-                                foreach (string o in opts)
-                                {
-                                    opt = opt | (BuildOptions)System.Enum.Parse(typeof(BuildOptions), o);
-                                }
+                                opt = opt | (BuildOptions) System.Enum.Parse(typeof (BuildOptions), o);
                             }
+                        }
                             break;
                         case "Outputpath":
                             outputpath = item.Value;
@@ -106,13 +117,14 @@ namespace KEngine.Editor
         /// <param name="tag"></param>
         /// <param name="opt"></param>
         /// <returns></returns>
-        static string PerformBuild(string outputpath, BuildTarget tag, BuildOptions opt)
+        private static string PerformBuild(string outputpath, BuildTarget tag, BuildOptions opt)
         {
             EditorUserBuildSettings.SwitchActiveBuildTarget(tag);
 
             ParseArgs(ref opt, ref outputpath);
 
-            string fullPath = System.IO.Path.Combine(Application.dataPath, System.IO.Path.Combine(KEngine.AppEngine.GetConfig("ProductRelPath"), outputpath));
+            string fullPath = System.IO.Path.Combine(Application.dataPath,
+                System.IO.Path.Combine(KEngine.AppEngine.GetConfig("ProductRelPath"), outputpath));
 
             string fullDir = System.IO.Path.GetDirectoryName(fullPath);
 
@@ -140,10 +152,11 @@ namespace KEngine.Editor
         //    return programVersionFile;
         //}
 
-        [MenuItem("KEngine/AutoBuilder/WindowsX86D")]  // 注意，PC版本放在不一样的目录的！
+        [MenuItem("KEngine/AutoBuilder/WindowsX86D")] // 注意，PC版本放在不一样的目录的！
         public static void PerformWinBuild()
         {
-            PerformBuild("ClientX86D.exe", BuildTarget.StandaloneWindows, BuildOptions.Development | BuildOptions.AllowDebugging | BuildOptions.ConnectWithProfiler);
+            PerformBuild("ClientX86D.exe", BuildTarget.StandaloneWindows,
+                BuildOptions.Development | BuildOptions.AllowDebugging | BuildOptions.ConnectWithProfiler);
         }
 
         //[MenuItem("File/AutoBuilder/WindowsX86")]
@@ -193,6 +206,7 @@ namespace KEngine.Editor
                 File.Delete(file);
             }
         }
+
         [MenuItem("KEngine/Open PC PersitentDataPath Folder")]
         public static void OpenPersistentDataPath()
         {
@@ -210,21 +224,25 @@ namespace KEngine.Editor
 
     public class CSymbolLinkHelper
     {
-
         public static string AssetBundlesLinkPath
         {
             get
             {
                 // StreamingAssetsPath
                 if (KResourceModule.DefaultInAppPathType == KResourceInAppPathType.StreamingAssetsPath)
-                    return "Assets/StreamingAssets/" + KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.StreamingBundlesFolderName) + "/"; // hold asset bundles
+                    return "Assets/StreamingAssets/" +
+                           KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.StreamingBundlesFolderName) + "/";
+                        // hold asset bundles
                 if (KResourceModule.DefaultInAppPathType == KResourceInAppPathType.ResourcesAssetsPath)
-                    return "Assets/Resources/" + KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.StreamingBundlesFolderName) + "/"; // hold asset bundles"
+                    return "Assets/Resources/" +
+                           KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.StreamingBundlesFolderName) + "/";
+                        // hold asset bundles"
 
                 Logger.LogError("[AssetBundlesLinkPath]Invalid {0}", KResourceModule.DefaultInAppPathType);
                 return null;
             }
         }
+
         public static string GetLinkPath()
         {
             if (!Directory.Exists(AssetBundlesLinkPath))
@@ -234,7 +252,8 @@ namespace KEngine.Editor
 
         public static string GetResourceExportPath()
         {
-            var resourcePath = KBuildTools.GetExportPath(EditorUserBuildSettings.activeBuildTarget, KResourceModule.Quality);
+            var resourcePath = KBuildTools.GetExportPath(EditorUserBuildSettings.activeBuildTarget,
+                KResourceModule.Quality);
             return resourcePath;
         }
 
@@ -247,9 +266,8 @@ namespace KEngine.Editor
             var linkPath = GetLinkPath();
 
             KSymbolLinkHelper.SymbolLinkFolder(exportPath, linkPath);
-            
+
             AssetDatabase.Refresh();
         }
     }
-
 }

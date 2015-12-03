@@ -1,4 +1,30 @@
-﻿using System;
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: KAssetDep.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using KEngine;
@@ -12,7 +38,7 @@ public abstract class KAssetDep : MonoBehaviour
     /// <summary>
     /// 所有AssetDep的引用容器
     /// </summary>
-    static LinkedList<KAssetDep> AssetDepsContainer = new LinkedList<KAssetDep>();
+    private static LinkedList<KAssetDep> AssetDepsContainer = new LinkedList<KAssetDep>();
 
     /// <summary>
     /// AssetDep相对容器的位置
@@ -38,12 +64,12 @@ public abstract class KAssetDep : MonoBehaviour
     private GameObject _cacheGameObject;
     protected bool _NewIsInit = false;
 
-    public Component DependencyComponent;  // 依赖的脚本控件，完整依赖加载后会用到它
+    public Component DependencyComponent; // 依赖的脚本控件，完整依赖加载后会用到它
     public string ResourcePath;
-    public string AssetName;  // 没用了！保留的序列化字段
+    public string AssetName; // 没用了！保留的序列化字段
     public object[] Args;
 
-    public bool IsFinishDependency = false;  // 默认不完成
+    public bool IsFinishDependency = false; // 默认不完成
     public UnityEngine.Object DependencyObject;
 
     protected static bool IsQuitApplication = false;
@@ -52,12 +78,15 @@ public abstract class KAssetDep : MonoBehaviour
     public static event Action<KAssetDep> BeforeEvent; // 前置依赖加载时调用的事件，用于修改它的依赖哦!!!
     public static event Action<KAssetDep> FinishEvent; // 完成依赖加载时调用的事件，只执行一次哦
 
-    [System.NonSerialized]
-    protected int TexturesWaitLoadCount = 0;
+    [System.NonSerialized] protected int TexturesWaitLoadCount = 0;
     [System.NonSerialized] protected readonly List<Action> TexturesLoadedCallback = new List<Action>();
-    [System.NonSerialized] protected readonly Queue<Action<KAssetDep, UnityEngine.Object>> LoadedDependenciesCallback = new Queue<Action<KAssetDep, UnityEngine.Object>>(); // 所有依赖加载完毕后的回调， 暂时用在SpriteCollection、UIAtlas加载完、Sprite加载完后, 会多次被用，跟FinishEvent不同
-    [System.NonSerialized]
-    protected readonly List<KAbstractResourceLoader> ResourceLoaders = new List<KAbstractResourceLoader>();
+
+    [System.NonSerialized] protected readonly Queue<Action<KAssetDep, UnityEngine.Object>> LoadedDependenciesCallback =
+        new Queue<Action<KAssetDep, UnityEngine.Object>>();
+        // 所有依赖加载完毕后的回调， 暂时用在SpriteCollection、UIAtlas加载完、Sprite加载完后, 会多次被用，跟FinishEvent不同
+
+    [System.NonSerialized] protected readonly List<KAbstractResourceLoader> ResourceLoaders =
+        new List<KAbstractResourceLoader>();
 
     protected KAssetDep()
     {
@@ -66,16 +95,15 @@ public abstract class KAssetDep : MonoBehaviour
     // TODO: 现在只支持MainAsset
     public static T Create<T>(Component dependencyComponent, string path, string assetName = null) where T : KAssetDep
     {
-
         var dep = dependencyComponent.gameObject.AddComponent<T>();
         dep.DependencyComponent = dependencyComponent;
         dep.ResourcePath = path;
         // dep.Arg  // AssetName
 
-        return (T)dep;
+        return (T) dep;
     }
 
-    void Awake()
+    private void Awake()
     {
         _cacheGameObject = gameObject;
 
@@ -83,12 +111,13 @@ public abstract class KAssetDep : MonoBehaviour
             Init();
     }
 
-    void OnDisable()
+    private void OnDisable()
     {
         if (!_NewIsInit)
             Init();
     }
-    void OnEnable()
+
+    private void OnEnable()
     {
         if (!_NewIsInit)
             Init();
@@ -104,7 +133,7 @@ public abstract class KAssetDep : MonoBehaviour
         if (Application.isEditor && CheckErrorCoroutine == null)
         {
             CheckErrorCoroutine = CheckErrorUpdate();
-            AppEngine.EngineInstance.StartCoroutine(CheckErrorCoroutine);  // 一个不停检查状态的Coroutine，为了效率，不放Update函数，单独开辟循环协程
+            AppEngine.EngineInstance.StartCoroutine(CheckErrorCoroutine); // 一个不停检查状态的Coroutine，为了效率，不放Update函数，单独开辟循环协程
         }
 
         this._assetDepContainerNode = AssetDepsContainer.AddLast(this);
@@ -129,18 +158,17 @@ public abstract class KAssetDep : MonoBehaviour
             Logger.LogWarning("[ExistCustomUpdate != null");
         }
         ExistCustomUpdate = CustomUpdate();
-        AppEngine.EngineInstance.StartCoroutine(ExistCustomUpdate);  // 可以无视对象是否处于inactive状态，避免Update不反应的问题
-
+        AppEngine.EngineInstance.StartCoroutine(ExistCustomUpdate); // 可以无视对象是否处于inactive状态，避免Update不反应的问题
     }
 
-    IEnumerator CustomUpdate()
+    private IEnumerator CustomUpdate()
     {
         float startTime = Time.time;
         while (true)
         {
             if (IsFinishDependency)
             {
-                if (LoadedDependenciesCallback.Count > 0)  // 处理多依赖，要多回调
+                if (LoadedDependenciesCallback.Count > 0) // 处理多依赖，要多回调
                 {
                     while (LoadedDependenciesCallback.Count > 0)
                     {
@@ -166,7 +194,7 @@ public abstract class KAssetDep : MonoBehaviour
     /// 不停的检查AssetDep状态是否正常, Editor Only
     /// </summary>
     /// <returns></returns>
-    static IEnumerator CheckErrorUpdate()
+    private static IEnumerator CheckErrorUpdate()
     {
         while (true)
         {
@@ -190,11 +218,10 @@ public abstract class KAssetDep : MonoBehaviour
                     }
                 }
                 yield return null;
-
             } while ((depNode = depNode.Next) != null);
-
         }
     }
+
     // 完成依赖加载后的回调
     public void AddFinishCallback(Action<KAssetDep, UnityEngine.Object> callback)
     {
@@ -210,7 +237,7 @@ public abstract class KAssetDep : MonoBehaviour
     {
         IsFinishDependency = true;
 
-        if (!IsDestroy)  // 删除的东西，不回调
+        if (!IsDestroy) // 删除的东西，不回调
         {
             //if (LoadedDependenciesCallback.Count > 0)
             //{
@@ -223,14 +250,13 @@ public abstract class KAssetDep : MonoBehaviour
 
                 if (DependencyObject == null)
                 {
-                    Debug.LogError(string.Format("[OnFinishLoadDependencies]Null ResultObject: {0}", this.ResourcePath), this);
+                    Debug.LogError(
+                        string.Format("[OnFinishLoadDependencies]Null ResultObject: {0}", this.ResourcePath), this);
                 }
                 if (FinishEvent != null)
                     FinishEvent(this);
             }
-
         }
-
     }
 
     protected void LoadMaterial(string path, Action<Material> callback)
@@ -267,12 +293,14 @@ public abstract class KAssetDep : MonoBehaviour
         }
         ResourceLoaders.Clear();
     }
+
     //private static readonly Dictionary<string, UIAtlas> CachedUIAtlas = new Dictionary<string, UIAtlas>();  // UIAtlas + StaticAssetLoader
 
     protected void OnApplicationQuit()
     {
         IsQuitApplication = true;
     }
+
     protected virtual void OnDestroy()
     {
         IsDestroy = true;
@@ -281,7 +309,7 @@ public abstract class KAssetDep : MonoBehaviour
             if (ExistCustomUpdate != null)
             {
                 AppEngine.EngineInstance.StopCoroutine(ExistCustomUpdate);
-                ExistCustomUpdate = null;    
+                ExistCustomUpdate = null;
             }
 
             AssetDepsContainer.Remove(_assetDepContainerNode); // 使用node移除更快
@@ -298,10 +326,7 @@ public abstract class KAssetDep : MonoBehaviour
     public static IEnumerator CoWaitDep(GameObject obj)
     {
         var wait = true;
-        WaitDep(obj, () =>
-        {
-            wait = false;
-        });
+        WaitDep(obj, () => { wait = false; });
 
         while (wait)
             yield return null;
@@ -376,7 +401,7 @@ public abstract class KAssetDep : MonoBehaviour
                 KResourceModule.Instance.StartCoroutine(CoDebug());
         }
 
-        IEnumerator CoDebug()
+        private IEnumerator CoDebug()
         {
             yield return new WaitForSeconds(20f);
             foreach (var dep in AssetDeps)
@@ -387,8 +412,7 @@ public abstract class KAssetDep : MonoBehaviour
                     Debug.LogError("target: ", dep.gameObject);
                 }
             }
-        } 
-
+        }
     }
 
     /// <summary>

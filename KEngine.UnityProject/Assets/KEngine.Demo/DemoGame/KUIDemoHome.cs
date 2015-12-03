@@ -1,16 +1,32 @@
-﻿//------------------------------------------------------------------------------
-//
-//      CosmosEngine - The Lightweight Unity3D Game Develop Framework
-//
-//                     Version 0.9.1 (20151010)
-//                     Copyright © 2011-2015
-//                   MrKelly <23110388@qq.com>
-//              https://github.com/mr-kelly/CosmosEngine
-//
-//------------------------------------------------------------------------------
-using UnityEngine;
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: KUIDemoHome.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
 using System.Collections;
 using KEngine;
+using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
@@ -18,8 +34,9 @@ using UnityEngine.UI;
 /// </summary>
 public class KUIDemoHome : KUIController
 {
-    Button Button1;
+    private Button Button1;
     private Text HomeLabel;
+
     public override void OnInit()
     {
         base.OnInit();
@@ -30,7 +47,6 @@ public class KUIDemoHome : KUIController
         HomeLabel = GetControl<Text>("HomeText");
 
         Button1.onClick.AddListener(() => Logger.LogWarning("Click Home Button!"));
-
     }
 
     public override void OnOpen(params object[] args)
@@ -40,7 +56,7 @@ public class KUIDemoHome : KUIController
         StartCoroutine(DemoUIAnimate());
     }
 
-    IEnumerator DemoUIAnimate()
+    private IEnumerator DemoUIAnimate()
     {
         yield return new WaitForSeconds(1f);
         HomeLabel.text = "Change UI Label...... 1";

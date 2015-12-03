@@ -1,14 +1,4 @@
-﻿//------------------------------------------------------------------------------
-//
-//      CosmosEngine - The Lightweight Unity3D Game Develop Framework
-//
-//                     Version 0.9.1 (20151010)
-//                     Copyright © 2011-2015
-//                   MrKelly <23110388@qq.com>
-//              https://github.com/mr-kelly/CosmosEngine
-//
-//------------------------------------------------------------------------------
-// http://wiki.unity3d.com/index.php/TextureScale
+﻿// http://wiki.unity3d.com/index.php/TextureScale
 
 using UnityEngine;
 using System.Collections;

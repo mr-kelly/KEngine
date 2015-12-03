@@ -1,18 +1,34 @@
-﻿//------------------------------------------------------------------------------
-//
-//      CosmosEngine - The Lightweight Unity3D Game Develop Framework
-//
-//                     Version 0.9.1 (20151010)
-//                     Copyright © 2011-2015
-//                   MrKelly <23110388@qq.com>
-//              https://github.com/mr-kelly/CosmosEngine
-//
-//------------------------------------------------------------------------------
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: KActionRecord.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using KEngine;
 using UnityEngine;
-using System.Collections;
 
 /// <summary>
 /// 客户端版的行为记录仪, 类似服务器的records.js
@@ -26,6 +42,7 @@ public class KActionRecords : KBehaviour
     private bool _isDirty = false;
 
     private static KActionRecords _instance;
+
     protected static KActionRecords Instance
     {
         get
@@ -54,17 +71,18 @@ public class KActionRecords : KBehaviour
         public string SubType;
         //public object ExtraArg; // 附加的函数参数
         public int RecordCount; // 用于Mark和Count事件，计数
-        
     }
 
     private Dictionary<string, int> _records;
 
     private readonly Dictionary<string, HashSet<GenCoroutineDelegate>> _actionRecordCoroutine =
-        new Dictionary<string, HashSet<GenCoroutineDelegate>>();  // 委托不会重复！
+        new Dictionary<string, HashSet<GenCoroutineDelegate>>(); // 委托不会重复！
+
     private readonly Dictionary<string, HashSet<WaitCallbackDelegate>> _actionRecordWaitCallback =
-    new Dictionary<string, HashSet<WaitCallbackDelegate>>();  // 委托不会重复！
+        new Dictionary<string, HashSet<WaitCallbackDelegate>>(); // 委托不会重复！
 
     public delegate IEnumerator GenCoroutineDelegate(Enum type, string subType, int count);
+
     public delegate void WaitCallbackDelegate(Enum type, string subType, int count, Action next);
 
     public static Coroutine WaitCallback(Enum type, string subType, int count, WaitCallbackDelegate func)
@@ -75,10 +93,7 @@ public class KActionRecords : KBehaviour
     private static IEnumerator CoWaitCallback(Enum type, string subType, int count, WaitCallbackDelegate func)
     {
         bool wait = true;
-        func(type, subType, count, () =>
-        {
-            wait = false;
-        });
+        func(type, subType, count, () => { wait = false; });
         // ReSharper disable once LoopVariableIsNeverChangedInsideLoop
         while (wait)
         {
@@ -105,12 +120,14 @@ public class KActionRecords : KBehaviour
 
     private void Update()
     {
-        if (_isDirty && Time.frameCount % 500 == 0) // 每300帧保存一次
+        if (_isDirty && Time.frameCount%500 == 0) // 每300帧保存一次
         {
             Save();
         }
     }
+
     #region Event/Callback Add or Remove
+
     public static void UnBind(Enum type, string subType, WaitCallbackDelegate waitCallback)
     {
         var key = MakeKey(type, subType);
@@ -147,6 +164,7 @@ public class KActionRecords : KBehaviour
     {
         AddListener(type, null, emGentor);
     }
+
     public static void AddListener(Enum type, string subType, GenCoroutineDelegate emGentor)
     {
         if (emGentor == null)
@@ -162,6 +180,7 @@ public class KActionRecords : KBehaviour
         }
         emGentors.Add(emGentor);
     }
+
     public static void UnBind(Enum type, string subType, GenCoroutineDelegate emGentor)
     {
         var key = MakeKey(type, subType);
@@ -172,6 +191,7 @@ public class KActionRecords : KBehaviour
         }
         emGentors.Remove(emGentor);
     }
+
     #endregion
 
     /// <summary>
@@ -191,6 +211,7 @@ public class KActionRecords : KBehaviour
         var subType = extraArg == -1 ? null : extraArg.ToString();
         return Event(type, subType, extraArg);
     }
+
     private static string MakeKey(Enum type, string subType)
     {
         var nType = type.ToString();
@@ -199,7 +220,7 @@ public class KActionRecords : KBehaviour
         return nType;
     }
 
-    
+
     /// <summary>
     /// 增加次数
     /// </summary>
@@ -224,6 +245,7 @@ public class KActionRecords : KBehaviour
 
         return Instance.StartCoroutine(CoTriggerEventFuncs(type, subType, Instance._records[key]));
     }
+
     public static Coroutine AddCount(Enum type, int addCount)
     {
         return AddCount(type, null, addCount);

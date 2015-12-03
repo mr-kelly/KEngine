@@ -1,37 +1,51 @@
-﻿//------------------------------------------------------------------------------
-//
-//      CosmosEngine - The Lightweight Unity3D Game Develop Framework
-//
-//                     Version 0.9.1 (20151010)
-//                     Copyright © 2011-2015
-//                   MrKelly <23110388@qq.com>
-//              https://github.com/mr-kelly/CosmosEngine
-//
-//------------------------------------------------------------------------------
-using UnityEngine;
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: KAssetBundleLoader.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using KEngine;
+using UnityEngine;
 
 public enum KAssetBundleLoaderMode
 {
     Default,
     StreamingAssetsWww, // default, use WWW class -> StreamingAssets Path
-    ResourcesLoadAsync,  // -> Resources path
+    ResourcesLoadAsync, // -> Resources path
     ResourcesLoad, // -> Resources Path
-    
 }
 
 // 調用WWWLoader
 public class KAssetBundleLoader : KAbstractResourceLoader
 {
     public delegate void CAssetBundleLoaderDelegate(bool isOk, AssetBundle ab);
-    
+
     public static Action<string> NewAssetBundleLoaderEvent;
     public static Action<KAssetBundleLoader> AssetBundlerLoaderErrorEvent;
-    
+
     private KWWWLoader _wwwLoader;
     private KAssetBundleParser BundleParser;
     //private bool UnloadAllAssets; // Dispose时赋值
@@ -40,8 +54,8 @@ public class KAssetBundleLoader : KAbstractResourceLoader
         get { return ResultObject as AssetBundle; }
     }
 
-    string RelativeResourceUrl;
-    string FullUrl;
+    private string RelativeResourceUrl;
+    private string FullUrl;
 
     /// <summary>
     /// AssetBundle加载方式
@@ -52,12 +66,13 @@ public class KAssetBundleLoader : KAbstractResourceLoader
     /// AssetBundle读取原字节目录
     /// </summary>
     private KResourceInAppPathType _inAppPathType;
+
     //KAssetBundleLoaderMode DefaultKAssetBundleLoaderMode = KAssetBundleLoaderMode.StreamingAssetsWww;
 
     protected override void Init(string url, params object[] args)
     {
         base.Init(url);
-        
+
         _loaderMode = (KAssetBundleLoaderMode) args[0];
 
         // 如果是默认模式，则要判断ResourceModule.InAppPathType的默认为依据
@@ -110,7 +125,8 @@ public class KAssetBundleLoader : KAbstractResourceLoader
         }
     }
 
-    public static KAssetBundleLoader Load(string url, CAssetBundleLoaderDelegate callback = null, KAssetBundleLoaderMode loaderMode = KAssetBundleLoaderMode.Default)
+    public static KAssetBundleLoader Load(string url, CAssetBundleLoaderDelegate callback = null,
+        KAssetBundleLoaderMode loaderMode = KAssetBundleLoaderMode.Default)
     {
         CLoaderDelgate newCallback = null;
         if (callback != null)
@@ -123,7 +139,7 @@ public class KAssetBundleLoader : KAbstractResourceLoader
         return newLoader;
     }
 
-    IEnumerator LoadAssetBundle(string relativeUrl)
+    private IEnumerator LoadAssetBundle(string relativeUrl)
     {
         byte[] bundleBytes;
         if (_inAppPathType == KResourceInAppPathType.StreamingAssetsPath)
@@ -131,7 +147,7 @@ public class KAssetBundleLoader : KAbstractResourceLoader
             _wwwLoader = KWWWLoader.Load(FullUrl);
             while (!_wwwLoader.IsFinished)
             {
-                Progress = _wwwLoader.Progress / 2f;  // 最多50%， 要算上Parser的嘛
+                Progress = _wwwLoader.Progress/2f; // 最多50%， 要算上Parser的嘛
                 yield return null;
             }
 
@@ -148,9 +164,9 @@ public class KAssetBundleLoader : KAbstractResourceLoader
 
             bundleBytes = _wwwLoader.Www.bytes;
         }
-        else if (_inAppPathType == KResourceInAppPathType.ResourcesAssetsPath)  // 使用Resources文件夹模式
+        else if (_inAppPathType == KResourceInAppPathType.ResourcesAssetsPath) // 使用Resources文件夹模式
         {
-            var pathExt = Path.GetExtension(FullUrl);  // Resources.Load无需扩展名
+            var pathExt = Path.GetExtension(FullUrl); // Resources.Load无需扩展名
             var pathWithoutExt = FullUrl.Substring(0,
                 FullUrl.Length - pathExt.Length);
             if (_loaderMode == KAssetBundleLoaderMode.ResourcesLoad)
@@ -172,7 +188,7 @@ public class KAssetBundleLoader : KAbstractResourceLoader
                 var loadReq = Resources.LoadAsync<TextAsset>(pathWithoutExt);
                 while (!loadReq.isDone)
                 {
-                    Progress = loadReq.progress / 2f;  // 最多50%， 要算上Parser的嘛
+                    Progress = loadReq.progress/2f; // 最多50%， 要算上Parser的嘛
                 }
                 var loadAsset = loadReq.asset;
                 var loadTextAsset = loadAsset as TextAsset;
@@ -194,7 +210,6 @@ public class KAssetBundleLoader : KAbstractResourceLoader
                 OnFinish(null);
                 yield break;
             }
-
         }
         else
         {
@@ -203,17 +218,17 @@ public class KAssetBundleLoader : KAbstractResourceLoader
             yield break;
         }
 
-        Progress = 1 / 2f;
+        Progress = 1/2f;
 
         BundleParser = new KAssetBundleParser(RelativeResourceUrl, bundleBytes);
         while (!BundleParser.IsFinished)
         {
-            if (IsReadyDisposed)  // 中途释放
+            if (IsReadyDisposed) // 中途释放
             {
                 OnFinish(null);
                 yield break;
             }
-            Progress = BundleParser.Progress / 2f + 1/2f;  // 最多50%， 要算上WWWLoader的嘛
+            Progress = BundleParser.Progress/2f + 1/2f; // 最多50%， 要算上WWWLoader的嘛
             yield return null;
         }
 
@@ -240,7 +255,7 @@ public class KAssetBundleLoader : KAbstractResourceLoader
         base.OnFinish(resultObj);
     }
 
-    override protected void DoDispose()
+    protected override void DoDispose()
     {
         base.DoDispose();
 
@@ -250,7 +265,6 @@ public class KAssetBundleLoader : KAbstractResourceLoader
 
     public override void Release()
     {
-
         if (Application.isEditor)
         {
             if (Url.Contains("Arial"))
@@ -259,12 +273,11 @@ public class KAssetBundleLoader : KAbstractResourceLoader
                 //UnityEditor.EditorApplication.isPaused = true;
             }
         }
-        
+
         base.Release();
     }
 
     /// 舊的tips~忽略
     /// 原以为，每次都通过getter取一次assetBundle会有序列化解压问题，会慢一点，后用AddWatch调试过，发现如果把.assetBundle放到Dictionary里缓存，查询会更慢
     /// 因为，估计.assetBundle是一个纯Getter，没有做序列化问题。  （不保证.mainAsset）
-
 }

@@ -1,11 +1,33 @@
-﻿using System;
-using UnityEngine;
-using UnityEditor;
-using System.Collections;
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: KBuildTools_AsssetDepExtend.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
 using System.IO;
-using System.Collections.Generic;
-using Object = UnityEngine.Object;
 using KEngine;
+using UnityEditor;
+using UnityEngine;
 
 [InitializeOnLoad]
 public partial class KBuildTools_AssetDep
@@ -22,7 +44,7 @@ public partial class KBuildTools_AssetDep
     // svn版本記錄, 記錄版本號，MD5, 相对于Assets
     public static string GetSvnRevMd5Tab()
     {
-        return KEngineDef.ResourcesBuildInfosDir + "/ResourcesMD5_" + KResourceModule.BuildPlatformName+ ".txt";
+        return KEngineDef.ResourcesBuildInfosDir + "/ResourcesMD5_" + KResourceModule.BuildPlatformName + ".txt";
     }
 
 
@@ -45,7 +67,7 @@ public partial class KBuildTools_AssetDep
     }
 
     // relativePath是就是客戶端用來讀取的資源名
-    static void EncryptAssetBundle(string abPath, string relativePath)
+    private static void EncryptAssetBundle(string abPath, string relativePath)
     {
         if (!File.Exists(abPath))
         {
@@ -55,7 +77,6 @@ public partial class KBuildTools_AssetDep
 
         using (FileStream stream = File.Open(abPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
         {
-
             if (stream.Length <= 2)
             {
                 Logger.LogError("[EncryptAssetBundle]Stream大小过短！ ： {0}", relativePath);
@@ -72,24 +93,26 @@ public partial class KBuildTools_AssetDep
             byte[] getSome = new byte[1];
             stream.Read(getSome, 0, 1);
             if (getSome[0] == 0)
-                getSome[0] = 255;  // 第二位-1
+                getSome[0] = 255; // 第二位-1
             else
                 getSome[0]--;
 
             stream.Position = 1;
-            stream.Write(getSome, 0, 1);// re write in
+            stream.Write(getSome, 0, 1); // re write in
         }
     }
 
-
     #region Hook函數
-    static void BeforeBuildAssetBundle(Object asset, string path, string relativePath)
+
+    private static void BeforeBuildAssetBundle(Object asset, string path, string relativePath)
     {
         //Logger.Log("No Func in BeforeBuildAssetBundle");
     }
-    static void AfterBuildAssetBundle(Object asset, string path, string relativePath)
+
+    private static void AfterBuildAssetBundle(Object asset, string path, string relativePath)
     {
         //EncryptAssetBundle(path, relativePath);
     }
+
     #endregion
 }

@@ -1,8 +1,32 @@
-﻿using System;
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: KAssetVersionControl.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -17,6 +41,7 @@ namespace KEngine.Editor
         public static KAssetVersionControl Current;
 
         private bool _isRebuild = false;
+
         /// <summary>
         /// 资源打包周期版本管理
         /// </summary>
@@ -29,11 +54,11 @@ namespace KEngine.Editor
             }
 
             Current = this;
-            
+
             _isRebuild = rebuild;
 
             Logger.LogWarning("================== KAssetVersionControl Begin ======================");
-            
+
             SetupHistory();
 
             KDependencyBuild.Clear();
@@ -65,17 +90,20 @@ namespace KEngine.Editor
         }
 
         #region 资源版本管理相关
-        class BuildRecord
+
+        private class BuildRecord
         {
             public string MD5;
             public int ChangeCount;
             public string DateTime;
+
             public BuildRecord()
             {
                 MD5 = null;
                 DateTime = System.DateTime.Now.ToString();
                 ChangeCount = 0;
             }
+
             public BuildRecord(string md5, string dt, int changeCount)
             {
                 MD5 = md5;
@@ -94,12 +122,14 @@ namespace KEngine.Editor
         /// <summary>
         /// 持久化，硬盘的
         /// </summary>
-        static Dictionary<string, BuildRecord> StoreBuildVersion = new Dictionary<string, BuildRecord>();
-        static Dictionary<string, BuildRecord> InstanceBuildVersion = new Dictionary<string, BuildRecord>();
-        
+        private static Dictionary<string, BuildRecord> StoreBuildVersion = new Dictionary<string, BuildRecord>();
+
+        private static Dictionary<string, BuildRecord> InstanceBuildVersion = new Dictionary<string, BuildRecord>();
+
         public static void WriteVersion()
         {
-            string path = GetBuildVersionTab();// MakeSureExportPath(VerCtrlInfo.VerFile, EditorUserBuildSettings.activeBuildTarget);
+            string path = GetBuildVersionTab();
+                // MakeSureExportPath(VerCtrlInfo.VerFile, EditorUserBuildSettings.activeBuildTarget);
             KTabFile tabFile = new KTabFile();
             tabFile.NewColumn("AssetPath");
             tabFile.NewColumn("AssetMD5");
@@ -118,11 +148,12 @@ namespace KEngine.Editor
             tabFile.Save(path);
         }
 
-        static void SetupHistory()
+        private static void SetupHistory()
         {
             BuildCount = 0;
 
-            string verFile = GetBuildVersionTab(); //MakeSureExportPath(VerCtrlInfo.VerFile, EditorUserBuildSettings.activeBuildTarget);
+            string verFile = GetBuildVersionTab();
+                //MakeSureExportPath(VerCtrlInfo.VerFile, EditorUserBuildSettings.activeBuildTarget);
             KTabFile tabFile;
             if (File.Exists(verFile))
             {
@@ -151,12 +182,13 @@ namespace KEngine.Editor
             return "";
         }
 
-        public static int BuildCount = 0;  // 累计Build了多少次，用于版本控制时用的
+        public static int BuildCount = 0; // 累计Build了多少次，用于版本控制时用的
 
         // Prefab Asset打包版本號記錄
         public static string GetBuildVersionTab()
         {
-            return Application.dataPath + "/" + KEngineDef.ResourcesBuildInfosDir + "/ArtBuildResource_" + KResourceModule.BuildPlatformName + ".txt";
+            return Application.dataPath + "/" + KEngineDef.ResourcesBuildInfosDir + "/ArtBuildResource_" +
+                   KResourceModule.BuildPlatformName + ".txt";
         }
 
         public static bool TryCheckFileBuild(string filePath)
@@ -207,26 +239,29 @@ namespace KEngine.Editor
 
                 if (filePath.Contains("unity_builtin_extra"))
                 {
-                    Logger.LogError("[DoCheckBuild]Find unity_builtin_extra resource to build!! Please check it! current scene: {0}", EditorApplication.currentScene);
+                    Logger.LogError(
+                        "[DoCheckBuild]Find unity_builtin_extra resource to build!! Please check it! current scene: {0}",
+                        EditorApplication.currentScene);
                 }
                 return false;
             }
 
 
-            if (InstanceBuildVersion.ContainsKey(filePath))  // 本次打包已经处理过，就不用重复处理了
+            if (InstanceBuildVersion.ContainsKey(filePath)) // 本次打包已经处理过，就不用重复处理了
                 return false;
 
             if (_isRebuild) // 所有rebuild，不用判断，直接需要build, 保留change count的正确性
                 return true;
-            
+
             if (!StoreBuildVersion.TryGetValue(filePath, out assetMd5))
                 return true;
-            
+
             if (KTool.MD5_File(filePath) != assetMd5.MD5)
-                return true;  // different
+                return true; // different
 
             return false;
         }
+
         /// <summary>
         /// 标记一个路径为打包
         /// </summary>
@@ -271,7 +306,6 @@ namespace KEngine.Editor
                     }
 
                     StoreBuildVersion[metaFile] = InstanceBuildVersion[metaFile] = theMetaRecord; // ensure in dict
-
                 }
             }
         }
@@ -283,6 +317,7 @@ namespace KEngine.Editor
 
             Current.MarkBuildVersion(sourceFiles);
         }
+
         #endregion
 
         public static bool TryIsRebuild()
@@ -293,5 +328,4 @@ namespace KEngine.Editor
             return Current._isRebuild;
         }
     }
-
 }

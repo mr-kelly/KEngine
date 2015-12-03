@@ -1,36 +1,53 @@
-﻿//------------------------------------------------------------------------------
-//
-//      CosmosEngine - The Lightweight Unity3D Game Develop Framework
-//
-//                     Version 0.9.1 (20151010)
-//                     Copyright © 2011-2015
-//                   MrKelly <23110388@qq.com>
-//              https://github.com/mr-kelly/CosmosEngine
-//
-//------------------------------------------------------------------------------
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: KTabFile.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
 using System;
-using System.IO;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using KEngine;
 using UnityEngine;
 
 public class KTabFileDef
 {
-    public static char[] Separators = new char[] { '\t' };
+    public static char[] Separators = new char[] {'\t'};
 }
 
 public class KTabFile : IDisposable, IKTabReadble, IEnumerable<KTabFile.RowInterator>
 {
     private readonly RowInterator _rowInteratorCache;
+
     public KTabFile()
         : base()
     {
-        _rowInteratorCache = new RowInterator(this);  // 用來迭代的
+        _rowInteratorCache = new RowInterator(this); // 用來迭代的
     }
 
-    private int ColCount;  // 列数
+    private int ColCount; // 列数
 
     /// <summary>
     /// 表头信息
@@ -83,7 +100,6 @@ public class KTabFile : IDisposable, IKTabReadble, IEnumerable<KTabFile.RowInter
         using (FileStream fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             // 不会锁死, 允许其它程序打开
         {
-
             StreamReader oReader;
             try
             {
@@ -109,9 +125,10 @@ public class KTabFile : IDisposable, IKTabReadble, IEnumerable<KTabFile.RowInter
         Logger.Assert(defLine != null);
         var defLineArr = defLine.Split(KTabFileDef.Separators, StringSplitOptions.None);
 
-        string[] firstLineSplitString = headLine.Split(KTabFileDef.Separators, StringSplitOptions.None);  // don't remove RemoveEmptyEntries!
+        string[] firstLineSplitString = headLine.Split(KTabFileDef.Separators, StringSplitOptions.None);
+        // don't remove RemoveEmptyEntries!
         string[] firstLineDef = new string[firstLineSplitString.Length];
-        Array.Copy(defLineArr, 0, firstLineDef, 0, defLineArr.Length);  // 拷贝，确保不会超出表头的
+        Array.Copy(defLineArr, 0, firstLineDef, 0, defLineArr.Length); // 拷贝，确保不会超出表头的
 
         for (int i = 1; i <= firstLineSplitString.Length; i++)
         {
@@ -121,12 +138,12 @@ public class KTabFile : IDisposable, IKTabReadble, IEnumerable<KTabFile.RowInter
             {
                 ColumnIndex = i,
                 HeaderName = headerString,
-                HeaderDef = firstLineDef[i -1],
+                HeaderDef = firstLineDef[i - 1],
             };
 
             ColIndex[headerInfo.HeaderName] = headerInfo;
         }
-        ColCount = firstLineSplitString.Length;  // 標題
+        ColCount = firstLineSplitString.Length; // 標題
 
         // 读取内容
         string sLine = "";
@@ -164,7 +181,7 @@ public class KTabFile : IDisposable, IKTabReadble, IEnumerable<KTabFile.RowInter
         foreach (var header in ColIndex.Values)
             sb.Append(string.Format("{0}\t", header.HeaderName));
         sb.Append("\r\n");
-        
+
         foreach (var header in ColIndex.Values)
             sb.Append(string.Format("{0}\t", header.HeaderDef));
         sb.Append("\r\n");
@@ -227,7 +244,7 @@ public class KTabFile : IDisposable, IKTabReadble, IEnumerable<KTabFile.RowInter
         if (column == 0) // 没有此列
             return string.Empty;
         var rowStrings = TabInfo[row];
-        
+
         return column - 1 >= rowStrings.Length ? "" : rowStrings[column - 1].ToString();
     }
 
@@ -250,7 +267,7 @@ public class KTabFile : IDisposable, IKTabReadble, IEnumerable<KTabFile.RowInter
         try
         {
             string field = GetString(row, column);
-            return (int)float.Parse(field);
+            return (int) float.Parse(field);
         }
         catch
         {
@@ -263,7 +280,7 @@ public class KTabFile : IDisposable, IKTabReadble, IEnumerable<KTabFile.RowInter
         try
         {
             string field = GetString(row, columnName);
-            return (int)float.Parse(field);
+            return (int) float.Parse(field);
         }
         catch
         {
@@ -276,7 +293,7 @@ public class KTabFile : IDisposable, IKTabReadble, IEnumerable<KTabFile.RowInter
         try
         {
             string field = GetString(row, column);
-            return (uint)float.Parse(field);
+            return (uint) float.Parse(field);
         }
         catch
         {
@@ -289,13 +306,14 @@ public class KTabFile : IDisposable, IKTabReadble, IEnumerable<KTabFile.RowInter
         try
         {
             string field = GetString(row, columnName);
-            return (uint)float.Parse(field);
+            return (uint) float.Parse(field);
         }
         catch
         {
             return 0;
         }
     }
+
     public double GetDouble(int row, int column)
     {
         try
@@ -422,7 +440,7 @@ public class KTabFile : IDisposable, IKTabReadble, IEnumerable<KTabFile.RowInter
 
     public bool SetValue<T>(int row, int column, T value)
     {
-        if (row > TabInfo.Count || column > ColCount || row <= 0 || column <= 0)  //  || column > ColIndex.Count
+        if (row > TabInfo.Count || column > ColCount || row <= 0 || column <= 0) //  || column > ColIndex.Count
         {
             Logger.LogError("Wrong row-{0} or column-{1}", row, column);
             return false;
@@ -480,7 +498,7 @@ public class KTabFile : IDisposable, IKTabReadble, IEnumerable<KTabFile.RowInter
         }
     }
 
-    public class RowInterator  // 一行
+    public class RowInterator // 一行
     {
         internal KTabFile TabFile;
 
@@ -495,6 +513,7 @@ public class KTabFile : IDisposable, IKTabReadble, IEnumerable<KTabFile.RowInter
         {
             return TabFile.GetString(Row, colName);
         }
+
         public int GetInteger(string colName)
         {
             return TabFile.GetInteger(Row, colName);

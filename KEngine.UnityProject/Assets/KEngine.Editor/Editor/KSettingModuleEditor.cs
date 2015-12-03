@@ -1,8 +1,31 @@
-﻿using System;
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: KSettingModuleEditor.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using CosmosTable;
 using UnityEditor;
 using UnityEngine;
@@ -76,7 +99,7 @@ namespace {{ NameSpace }}
                 {
                     {GenCodeTemplate, "Assets/AppSettings.cs"}
                 },
-                NameSpace =  "AppSettings",
+                NameSpace = "AppSettings",
             });
 
             var excelExt = new HashSet<string>() {".xls", ".xlsx"};
@@ -98,10 +121,12 @@ namespace {{ NameSpace }}
                             relativePath = relativePath.Substring(1);
 
                         var compileBaseDir = Path.Combine(Application.dataPath, compilePath);
-                        var compileToPath = string.Format("{0}/{1}", compileBaseDir, Path.ChangeExtension(relativePath, ".bytes"));
+                        var compileToPath = string.Format("{0}/{1}", compileBaseDir,
+                            Path.ChangeExtension(relativePath, ".bytes"));
                         var srcFileInfo = new FileInfo(excelPath);
 
-                        EditorUtility.DisplayProgressBar("Compiling Excel to Tab...", string.Format("{0} -> {1}", excelPath, compilePath), nowFileIndex / (float)allFilesCount);
+                        EditorUtility.DisplayProgressBar("Compiling Excel to Tab...",
+                            string.Format("{0} -> {1}", excelPath, compilePath), nowFileIndex/(float) allFilesCount);
 
                         // 如果已经存在，判断修改时间是否一致，用此来判断是否无需compile，节省时间
                         if (File.Exists(compileToPath))
@@ -118,7 +143,6 @@ namespace {{ NameSpace }}
                         compiler.Compile(excelPath, compileToPath, compileBaseDir);
                         var compiledFileInfo = new FileInfo(compileToPath);
                         compiledFileInfo.LastWriteTime = srcFileInfo.LastWriteTime;
-
                     }
                 }
             }
@@ -126,7 +150,6 @@ namespace {{ NameSpace }}
             {
                 EditorUtility.ClearProgressBar();
             }
-            
         }
     }
 }

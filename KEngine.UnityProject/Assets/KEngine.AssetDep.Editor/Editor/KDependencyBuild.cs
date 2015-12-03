@@ -1,18 +1,44 @@
-﻿using System.Reflection;
-using UnityEngine;
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: KDependencyBuild.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
 using System;
 using System.Collections.Generic;
-using UnityEditor;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using KEngine;
 using KEngine.Editor;
+using UnityEditor;
+using UnityEngine;
 
 public class CDepCollectInfo
 {
-    public string Path;  // 依赖对象将要最终打包的位置
-    public UnityEngine.Object Asset;  // 打包的对象
+    public string Path; // 依赖对象将要最终打包的位置
+    public UnityEngine.Object Asset; // 打包的对象
     public bool HasBuild;
 
     public KAssetDep AssetDep;
@@ -29,14 +55,19 @@ public partial class KDependencyBuild
     [AttributeUsage(AttributeTargets.Method)]
     public class DepBuildAttribute : Attribute
     {
-        public DepBuildAttribute(Type type) { TheType = type; }
+        public DepBuildAttribute(Type type)
+        {
+            TheType = type;
+        }
+
         public Type TheType { get; set; }
     }
 
     public static event Action<string> AddCacheEvent;
     public static Dictionary<string, bool> BuildedCache = new Dictionary<string, bool>();
-    public static bool IsJustCollect = false;  // 是否只收集，不作打包（照旧可以拿到BuildedCache），只是没有实际执行Build而已
-    public static List<Action> ClearActions = new List<Action>();  // Clear时执行的委托
+    public static bool IsJustCollect = false; // 是否只收集，不作打包（照旧可以拿到BuildedCache），只是没有实际执行Build而已
+    public static List<Action> ClearActions = new List<Action>(); // Clear时执行的委托
+
     /// <summary>
     /// save the cache. which file builded
     /// </summary>
@@ -67,7 +98,6 @@ public partial class KDependencyBuild
             }
 
             CZipTool.SetZipFile(zipPath, string.Format("{0}.txt", buildActionCount), sbBuildAction.ToString());
-
         }
 
         // 所有尝试打包的资源记录
@@ -77,8 +107,8 @@ public partial class KDependencyBuild
         //    sbBuildActionFull.AppendLine(kv);
         //}
         //CZipTool.SetZipFile(zipPath, string.Format("{0}_full.txt", buildActionCount), sbBuildActionFull.ToString());
-
     }
+
     public static void Clear()
     {
         IsJustCollect = false;
@@ -109,7 +139,7 @@ public partial class KDependencyBuild
 
                 var prefabParent = PrefabUtility.GetPrefabParent(child.gameObject);
                 var prefabObject = PrefabUtility.GetPrefabObject(child.gameObject);
-                if (//PrefabUtility.GetPrefabParent(child.gameObject) == null &&
+                if ( //PrefabUtility.GetPrefabParent(child.gameObject) == null &&
                     PrefabUtility.GetPrefabObject(child.gameObject) != null)
                 {
                     Debug.LogWarning("一个Prefab中的Prefab保持引用,剥除。。。" + child.name);
@@ -117,11 +147,12 @@ public partial class KDependencyBuild
                 }
             }
         }
-
     }
+
     private static Dictionary<MethodInfo, DepBuildAttribute> _cachedDepBuildAttributes;
     // 可選擇是否打包自己，還是只打包依賴
-    public static void BuildGameObject(GameObject obj, string path, bool buildSelf = true, bool allInOne = false, bool keepCopyObjToDebug = false)  // TODO: All in One
+    public static void BuildGameObject(GameObject obj, string path, bool buildSelf = true, bool allInOne = false,
+        bool keepCopyObjToDebug = false) // TODO: All in One
     {
         GameObject copyObj = GameObject.Instantiate(obj) as GameObject;
 
@@ -129,13 +160,16 @@ public partial class KDependencyBuild
         {
             _cachedDepBuildAttributes = new Dictionary<MethodInfo, DepBuildAttribute>();
 
-            foreach (var methodInfo in typeof(KDependencyBuild).GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
+            foreach (
+                var methodInfo in
+                    typeof (KDependencyBuild).GetMethods(BindingFlags.Static | BindingFlags.Public |
+                                                         BindingFlags.NonPublic))
             {
-                var depAttrs = methodInfo.GetCustomAttributes(typeof(DepBuildAttribute), true);
+                var depAttrs = methodInfo.GetCustomAttributes(typeof (DepBuildAttribute), true);
                 Logger.Assert(depAttrs.Length <= 1); // 不会太大
                 foreach (var attrbute in depAttrs)
                 {
-                    var depAttr = (DepBuildAttribute)attrbute;
+                    var depAttr = (DepBuildAttribute) attrbute;
                     _cachedDepBuildAttributes[methodInfo] = depAttr;
                     break;
                 }
@@ -149,13 +183,13 @@ public partial class KDependencyBuild
 
             foreach (Component component in copyObj.GetComponentsInChildren(depAttr.TheType, true))
             {
-                methodInfo.Invoke(null, new object[] { Convert.ChangeType(component, depAttr.TheType) });
+                methodInfo.Invoke(null, new object[] {Convert.ChangeType(component, depAttr.TheType)});
             }
         }
 
 
         // Build主对象
-        DoBuildAssetBundle(path, copyObj, buildSelf);  // TODO: BuildResult...
+        DoBuildAssetBundle(path, copyObj, buildSelf); // TODO: BuildResult...
 
         if (!keepCopyObjToDebug)
             GameObject.DestroyImmediate(copyObj);
@@ -165,18 +199,16 @@ public partial class KDependencyBuild
     // 
     /// <summary>
     /// 如果非realBuild,僅返回最終路徑
-    /// 
     /// DoBuildAssetBundle和__DoBuildScriptableObject有两个开关，决定是否真的Build
     /// realBuildOrJustPath由外部传入，一般用于进行md5比较后，传入来的，【不收集Build缓存】 TODO：其实可以收集的。。
-    /// 
     /// IsJustCollect用于全局的否决真Build，【收集Build缓存】
-    /// 
     /// </summary>
     /// <param name="path"></param>
     /// <param name="asset"></param>
     /// <param name="realBuildOrJustPath"></param>
     /// <returns></returns>
-    public static CDepCollectInfo DoBuildAssetBundle(string path, UnityEngine.Object asset, bool realBuildOrJustPath = true)
+    public static CDepCollectInfo DoBuildAssetBundle(string path, UnityEngine.Object asset,
+        bool realBuildOrJustPath = true)
     {
         path = Path.ChangeExtension(path, AppEngine.GetConfig("AssetBundleExt"));
         //asset.name = fullAssetPath;
@@ -211,7 +243,8 @@ public partial class KDependencyBuild
             AddCacheEvent(res);
     }
 
-    public static CDepCollectInfo __DoBuildScriptableObject(string fullAssetPath, ScriptableObject so, bool realBuildOrJustPath = true)
+    public static CDepCollectInfo __DoBuildScriptableObject(string fullAssetPath, ScriptableObject so,
+        bool realBuildOrJustPath = true)
     {
         var hasBuilded = false;
         fullAssetPath = Path.ChangeExtension(fullAssetPath, AppEngine.GetConfig("AssetBundleExt"));
@@ -232,7 +265,6 @@ public partial class KDependencyBuild
                     hasBuilded = true;
                 }
             }
-
         }
 
         return new CDepCollectInfo
@@ -244,7 +276,7 @@ public partial class KDependencyBuild
     }
 
 
-    static string __GetPrefabBuildPath(string path)
+    private static string __GetPrefabBuildPath(string path)
     {
         // 层次太深，只取后两位
         string[] strs = path.Replace(" ", "").Split('/');
@@ -256,7 +288,7 @@ public partial class KDependencyBuild
         if (strs.Length == 2)
         {
             //if (strs.Length < 10)
-            path = strs[0] + "_" + strs[1];  // 连目录名并在一起，防文件名重复
+            path = strs[0] + "_" + strs[1]; // 连目录名并在一起，防文件名重复
             //else
             //    path = strs[1];
         }
@@ -267,7 +299,7 @@ public partial class KDependencyBuild
     }
 
     //static HashSet<string> _depTextureScaleList = new HashSet<string>();  // 进行过Scale的图片
-    static string BuildDepTexture(Texture tex, float scale = 1f)
+    private static string BuildDepTexture(Texture tex, float scale = 1f)
     {
         Logger.Assert(tex);
 
@@ -279,10 +311,10 @@ public partial class KDependencyBuild
         Texture newTex;
         if (tex is Texture2D)
         {
-            var tex2d = (Texture2D)tex;
+            var tex2d = (Texture2D) tex;
 
             if (needBuild &&
-                !scale.Equals(1f))  // 需要进行缩放，才进来拷贝
+                !scale.Equals(1f)) // 需要进行缩放，才进来拷贝
             {
                 var cacheDir = "Assets/" + KEngineDef.ResourcesBuildCacheDir + "/BuildDepTexture/";
                 var cacheFilePath = cacheDir + Path.GetFileName(assetPath);
@@ -296,7 +328,7 @@ public partial class KDependencyBuild
                 //    AddCache(actionName);
                 //}
 
-                newTex = AssetDatabase.LoadAssetAtPath(cacheFilePath, typeof(Texture2D)) as Texture2D;
+                newTex = AssetDatabase.LoadAssetAtPath(cacheFilePath, typeof (Texture2D)) as Texture2D;
                 if (newTex == null)
                 {
                     Logger.LogError("TexturePacker scale failed... {0}", assetPath);
@@ -332,7 +364,6 @@ public partial class KDependencyBuild
             {
                 newTex = tex2d;
             }
-
         }
         else
         {
@@ -358,7 +389,7 @@ public partial class KDependencyBuild
     /// </summary>
     /// <param name="font"></param>
     /// <returns></returns>
-    static string BuildFont(Font font)
+    private static string BuildFont(Font font)
     {
         string fontAssetPath = AssetDatabase.GetAssetPath(font);
 
@@ -377,35 +408,12 @@ public partial class KDependencyBuild
         var result = DoBuildAssetBundle("Font/Font_" + font.name, font, needBuild);
 
         return result.Path;
-
     }
 
 
     /// <summary>
     /// 图片打包工具，直接打包，不用弄成Texture!, 需要借助TexturePacker
     /// </summary>
-    //public static TextAsset GetImageFromPath(string imageSystemFullPath, string toImageFormat)
-    //{
-    //    var cleanPath = imageSystemFullPath.Replace("\\", "/");
-    //    var cacheDir = "Assets/" + CCosmosEngineDef.ResourcesBuildCacheDir + "/CacheImage/";
-    //    var cacheFilePath = cacheDir + Path.GetFileName(cleanPath);
-    //    cacheFilePath = cacheFilePath + ".bytes";
-    //    CFolderSyncTool.TexturePackerScaleImage(cleanPath, cacheFilePath, CResourceModule.TextureScale, toImageFormat);
-    //    var asset = AssetDatabase.LoadAssetAtPath(cacheFilePath, typeof (TextAsset)) as TextAsset;
-    //    return asset;
-    //}
-
-    ///// <summary>
-    ///// TODO:
-    ///// </summary>
-    ///// <param name="saveCacheFolderName"></param>
-    ///// <param name="imageSystemFullPath"></param>
-    ///// <returns></returns>
-    //public static string BuildImage(string saveCacheFolderName, string imageSystemFullPath)
-    //{
-    //    var asset = GetImageFromPath(imageSystemFullPath, "etc1");
-    //    return null;
-    //}
     /// <summary>
     /// 单独打包的纹理图片, 这种图片，不在Unity目录内，用bytes读取, 指定保存的目录
     /// </summary>
@@ -417,19 +425,21 @@ public partial class KDependencyBuild
         var cleanPath = imageSystemFullPath.Replace("\\", "/");
 
         var fileName = Path.GetFileNameWithoutExtension(cleanPath);
-        var buildPath = string.Format("{0}/{1}_{0}{2}", saveCacheFolderName, fileName, AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt));
+        var buildPath = string.Format("{0}/{1}_{0}{2}", saveCacheFolderName, fileName,
+            AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt));
         var needBuild = KAssetVersionControl.TryCheckNeedBuildWithMeta(cleanPath);
 
         var texture = new Texture2D(1, 1);
 
         if (needBuild && !IsJustCollect)
         {
-            var cacheDir = "Assets/" + KEngineDef.ResourcesBuildCacheDir + "/BuildIOTexture/" + saveCacheFolderName + "/";
+            var cacheDir = "Assets/" + KEngineDef.ResourcesBuildCacheDir + "/BuildIOTexture/" + saveCacheFolderName +
+                           "/";
             var cacheFilePath = cacheDir + Path.GetFileName(cleanPath);
 
             //CFolderSyncTool.TexturePackerScaleImage(cleanPath, cacheFilePath, Math.Min(1, GameDef.PictureScale * scale));  // TODO: do scale
 
-            texture = AssetDatabase.LoadAssetAtPath(cacheFilePath, typeof(Texture2D)) as Texture2D;
+            texture = AssetDatabase.LoadAssetAtPath(cacheFilePath, typeof (Texture2D)) as Texture2D;
             if (texture == null)
             {
                 Logger.LogError("[BuildIOTexture]TexturePacker scale failed... {0}", cleanPath);
@@ -465,9 +475,9 @@ public partial class KDependencyBuild
     // 同步两个纹理的导入设置
     public static void SyncTextureImportSetting(Texture2D srcTexture, Texture2D newTexture)
     {
-        var srcImporter = (TextureImporter)TextureImporter.GetAtPath(AssetDatabase.GetAssetPath(srcTexture));
+        var srcImporter = (TextureImporter) TextureImporter.GetAtPath(AssetDatabase.GetAssetPath(srcTexture));
         var newTexPath = AssetDatabase.GetAssetPath(newTexture);
-        var newImporter = (TextureImporter)TextureImporter.GetAtPath(newTexPath);
+        var newImporter = (TextureImporter) TextureImporter.GetAtPath(newTexPath);
         if (srcImporter == null || newImporter == null)
         {
             Logger.LogError("[SyncTextureImportSetting]Null Importer");
@@ -484,7 +494,8 @@ public partial class KDependencyBuild
 
         if (changed)
         {
-            AssetDatabase.ImportAsset(newTexPath, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport);
+            AssetDatabase.ImportAsset(newTexPath,
+                ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport);
         }
     }
 

@@ -1,25 +1,40 @@
-﻿//------------------------------------------------------------------------------
-//
-//      CosmosEngine - The Lightweight Unity3D Game Develop Framework
-// 
-//                     Version 0.8 (20140904)
-//                     Copyright © 2011-2014
-//                   MrKelly <23110388@qq.com>
-//              https://github.com/mr-kelly/CosmosEngine
-//
-//------------------------------------------------------------------------------
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
 
-using UnityEngine;
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: KNGUIBridge.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using KEngine;
+using UnityEngine;
+
 //public interface IUGUIWindow
 //{
 //}
 
 
-class GameDef
+internal class GameDef
 {
     public const float PictureScale = 1f;
     public const int ScreenPixelY = 1080;
@@ -37,7 +52,7 @@ public class KNGUIBridge : IKUIBridge
     // new UI
     //private Canvas UICanvas;
 
-    readonly Dictionary<string, Transform> AnchorSide = new Dictionary<string, Transform>();
+    private readonly Dictionary<string, Transform> AnchorSide = new Dictionary<string, Transform>();
 
     public static KNGUIBridge Instance;
 
@@ -104,15 +119,16 @@ public class KNGUIBridge : IKUIBridge
     //    evtSysObj.AddComponent<EventSystem>();
     //}
 
-    void CreateUIRoot()
+    private void CreateUIRoot()
     {
         GameObject uiRootobj = GameObject.Find("NGUIRoot") ?? new GameObject("NGUIRoot");
-        UiRoot = uiRootobj.GetComponent<UIRoot>() ??uiRootobj.AddComponent<UIRoot>();
+        UiRoot = uiRootobj.GetComponent<UIRoot>() ?? uiRootobj.AddComponent<UIRoot>();
         Logger.Assert(UiRoot);
         UiRoot.scalingStyle = UIRoot.Scaling.FixedSizeOnMobiles;
 
         // 尝试将NGUI转化成跟2dToolkit镜头一致显示
-        UiRoot.manualHeight = 1080; //GameDef.ScreenPixelY;//(int)(GameDef.ScreenPixelY / (GameDef.ScreenPixelY / 2f / GameDef.DefaultPixelPerMeters)); // fit width!
+        UiRoot.manualHeight = 1080;
+            //GameDef.ScreenPixelY;//(int)(GameDef.ScreenPixelY / (GameDef.ScreenPixelY / 2f / GameDef.DefaultPixelPerMeters)); // fit width!
         //UiRoot.manualWidth = 1920;//GameDef.ScreenPixelX;
 
         // 屏幕中间位置
@@ -136,14 +152,15 @@ public class KNGUIBridge : IKUIBridge
 
         KTool.SetChild(uiCamObj.transform, UiRoot.transform);
         UiCamera = uiCamObj.GetComponent<UICamera>() ?? uiCamObj.AddComponent<UICamera>();
-        UiCamera.cachedCamera.cullingMask = 1 << (int)UnityLayerDef.UI;
+        UiCamera.cachedCamera.cullingMask = 1 << (int) UnityLayerDef.UI;
         UiCamera.cachedCamera.clearFlags = CameraClearFlags.Depth;
         UiCamera.cachedCamera.orthographic = true;
-        UiCamera.cachedCamera.orthographicSize = GameDef.ScreenPixelY / GameDef.DefaultPixelPerMeters / 2f; // 9.6，一屏19.2米，跟GameCamera一致
+        UiCamera.cachedCamera.orthographicSize = GameDef.ScreenPixelY/GameDef.DefaultPixelPerMeters/2f;
+            // 9.6，一屏19.2米，跟GameCamera一致
         UiCamera.cachedCamera.nearClipPlane = -500;
         UiCamera.cachedCamera.farClipPlane = 500;
 
-        foreach (UIAnchor.Side side in Enum.GetValues(typeof(UIAnchor.Side)))
+        foreach (UIAnchor.Side side in Enum.GetValues(typeof (UIAnchor.Side)))
         {
             GameObject anchorObj = new GameObject(side.ToString());
             KTool.SetChild(anchorObj.transform, panelTrans);
@@ -155,11 +172,11 @@ public class KNGUIBridge : IKUIBridge
         AnchorSide["Null"] = nullAnchor.transform;
         AnchorSide[""] = AnchorSide[UIAnchor.Side.Center.ToString()]; // default
 
-        NGUITools.SetLayer(uiRootobj, (int)UnityLayerDef.UI);
+        NGUITools.SetLayer(uiRootobj, (int) UnityLayerDef.UI);
 
 
         PressWidget = new GameObject("PressWidget").AddComponent<UIWidget>();
-        NGUITools.SetLayer(PressWidget.gameObject, (int)UnityLayerDef.UI);
+        NGUITools.SetLayer(PressWidget.gameObject, (int) UnityLayerDef.UI);
         KTool.SetChild(PressWidget.gameObject, panelRootObj);
         PressWidget.SetDimensions(2000, 2000);
         var col = PressWidget.gameObject.AddComponent<BoxCollider>();
@@ -199,8 +216,5 @@ public class KNGUIBridge : IKUIBridge
         //    //    }
         //    //}
         //};
-
     }
-
-
 }

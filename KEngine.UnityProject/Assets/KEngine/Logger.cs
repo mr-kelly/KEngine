@@ -1,18 +1,33 @@
-﻿//------------------------------------------------------------------------------
-//
-//      CosmosEngine - The Lightweight Unity3D Game Develop Framework
-//
-//                     Version 0.9.1 (20151010)
-//                     Copyright © 2011-2015
-//                   MrKelly <23110388@qq.com>
-//              https://github.com/mr-kelly/CosmosEngine
-//
-//------------------------------------------------------------------------------
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: Logger.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
 using System;
-using System.IO;
 using System.Diagnostics;
+using System.IO;
 using System.Text;
-using System.Threading;
 using UnityEngine;
 
 namespace KEngine
@@ -33,7 +48,7 @@ namespace KEngine
     {
         public static KLogLevel LogLevel = KLogLevel.Info;
 
-        static event Application.LogCallback LogCallbackEvent;
+        private static event Application.LogCallback LogCallbackEvent;
         private static bool _hasRegisterLogCallback = false;
 
         /// <summary>
@@ -48,8 +63,8 @@ namespace KEngine
                 _hasRegisterLogCallback = true;
             }
             LogCallbackEvent += callback;
-
         }
+
         public static void RemoveLogCallback(Application.LogCallback callback)
         {
             if (!_hasRegisterLogCallback)
@@ -58,7 +73,6 @@ namespace KEngine
                 _hasRegisterLogCallback = true;
             }
             LogCallbackEvent -= callback;
-
         }
 
 
@@ -115,7 +129,6 @@ namespace KEngine
             {
                 LogToFile(string.Format("LogFileError: {0}, {1}", condition, e.Message));
             }
-
         }
 
         private static void OnLogCallback(string condition, string stacktrace, UnityEngine.LogType type)
@@ -125,10 +138,8 @@ namespace KEngine
                 lock (LogCallbackEvent)
                 {
                     LogCallbackEvent(condition, stacktrace, type);
-
                 }
             }
-
         }
 
         /// <summary>
@@ -202,6 +213,7 @@ namespace KEngine
         {
             Log(log, args);
         }
+
         public static void Log(string log, params object[] args)
         {
             DoLog(string.Format(log, args), KLogLevel.Info);
@@ -231,7 +243,8 @@ namespace KEngine
         public static void LogErrorWithStack(string err = "", int stack = 2)
         {
             StackFrame sf = GetTopStack(stack);
-            string log = string.Format("[ERROR]{0}\n\n{1}:{2}\t{3}", err, sf.GetFileName(), sf.GetFileLineNumber(), sf.GetMethod());
+            string log = string.Format("[ERROR]{0}\n\n{1}:{2}\t{3}", err, sf.GetFileName(), sf.GetFileLineNumber(),
+                sf.GetMethod());
             Console.Write(log);
             DoLog(log, KLogLevel.Error);
 
@@ -242,7 +255,8 @@ namespace KEngine
 
         public static StackFrame GetTopStack(int stack = 2)
         {
-            StackFrame[] stackFrames = new StackTrace(true).GetFrames(); ;
+            StackFrame[] stackFrames = new StackTrace(true).GetFrames();
+            ;
             StackFrame sf = stackFrames[Mathf.Min(stack, stackFrames.Length - 1)];
             return sf;
         }
@@ -267,7 +281,8 @@ namespace KEngine
         {
             if (LogLevel > emLevel)
                 return;
-            szMsg = string.Format("[{0}]{1}\n\n=================================================================\n\n", DateTime.Now.ToString("HH:mm:ss.ffff"), szMsg);
+            szMsg = string.Format("[{0}]{1}\n\n=================================================================\n\n",
+                DateTime.Now.ToString("HH:mm:ss.ffff"), szMsg);
 
             switch (emLevel)
             {
@@ -282,7 +297,6 @@ namespace KEngine
                     UnityEngine.Debug.Log(szMsg);
                     break;
             }
-
         }
 
         public static void LogToFile(string szMsg)
@@ -305,11 +319,13 @@ namespace KEngine
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
 
-            using (FileStream fileStream = new FileStream(fullPath, append ? FileMode.Append : FileMode.CreateNew, FileAccess.Write, FileShare.ReadWrite))  // 不会锁死, 允许其它程序打开
+            using (
+                FileStream fileStream = new FileStream(fullPath, append ? FileMode.Append : FileMode.CreateNew,
+                    FileAccess.Write, FileShare.ReadWrite)) // 不会锁死, 允许其它程序打开
             {
                 lock (fileStream)
                 {
-                    StreamWriter writer = new StreamWriter(fileStream);  // Append
+                    StreamWriter writer = new StreamWriter(fileStream); // Append
                     writer.Write(szMsg);
                     writer.Flush();
                     writer.Close();
@@ -334,9 +350,10 @@ namespace KEngine
         }
 
         #region Record Time
-        static float[] RecordTime = new float[10];
-        static string[] RecordKey = new string[10];
-        static int RecordPos = 0;
+
+        private static float[] RecordTime = new float[10];
+        private static string[] RecordKey = new string[10];
+        private static int RecordPos = 0;
 
         public static void BeginRecordTime(string key)
         {
@@ -376,13 +393,11 @@ namespace KEngine
             TimeSpan timespan = stopwatch.Elapsed; //  获取当前实例测量得出的总时间
             //double seconds = timespan.TotalSeconds;  //  总秒数
             double millseconds = timespan.TotalMilliseconds;
-            decimal seconds = (decimal)millseconds / 1000m;
+            decimal seconds = (decimal) millseconds/1000m;
 
             Logger.LogWarning(outputStr, seconds.ToString("F7")); // 7位精度
         }
+
         #endregion
-
     }
-
-
 }

@@ -1,17 +1,31 @@
-﻿//------------------------------------------------------------------------------
-//
-//      CosmosEngine - The Lightweight Unity3D Game Develop Framework
-//
-//                     Version 0.9.1 (20151010)
-//                     Copyright © 2011-2015
-//                   MrKelly <23110388@qq.com>
-//              https://github.com/mr-kelly/CosmosEngine
-//
-//------------------------------------------------------------------------------
-using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: KResourceLoaderDebuggers.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
 using System;
+using UnityEngine;
 
 /// <summary>
 /// 只在编辑器下出现，分别对应一个Loader~生成一个GameObject对象，为了方便调试！
@@ -41,24 +55,21 @@ public class KResourceLoaderDebugger : MonoBehaviour
             if (loader.RefCount > 0)
                 newHelpGameObject.name = getName();
         };
-        
 
-        loader.DisposeEvent += () =>
-        {
-            KDebuggerObjectTool.RemoveFromParent(bigType, type, newHelpGameObject);
-        };
-        
+
+        loader.DisposeEvent += () => { KDebuggerObjectTool.RemoveFromParent(bigType, type, newHelpGameObject); };
+
 
         return newHelp;
     }
 
-    void Update()
+    private void Update()
     {
         RefCount = TheLoader.RefCount;
         FinishUsedTime = TheLoader.FinishUsedTime;
     }
 
-    void OnApplicationQuit()
+    private void OnApplicationQuit()
     {
         IsApplicationQuit = true;
     }

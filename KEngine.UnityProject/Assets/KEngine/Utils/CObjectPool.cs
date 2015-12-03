@@ -1,24 +1,37 @@
-﻿//------------------------------------------------------------------------------
-//
-//      CosmosEngine - The Lightweight Unity3D Game Develop Framework
-//
-//                     Version 0.9.1 (20151010)
-//                     Copyright © 2011-2015
-//                   MrKelly <23110388@qq.com>
-//              https://github.com/mr-kelly/CosmosEngine
-//
-//------------------------------------------------------------------------------
-using UnityEngine;
-using System;
-using System.Collections;
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: CObjectPool.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
 using System.Collections.Generic;
 
 // TODO: 尚未做对象内存优化
 public class CObjectPool
 {
-    static Dictionary<int, object> Objects = new Dictionary<int, object>();
+    private static Dictionary<int, object> Objects = new Dictionary<int, object>();
 
-    static int ObjectIdGenerator = 100;  // Unique ID, 唯一的ID
+    private static int ObjectIdGenerator = 100; // Unique ID, 唯一的ID
 
     public static int GetObjectId()
     {
@@ -45,6 +58,6 @@ public class CObjectPool
 
     public static void RemoveObject(int uid)
     {
-        Objects.Remove(uid);  // TODO: 存起来
+        Objects.Remove(uid); // TODO: 存起来
     }
 }

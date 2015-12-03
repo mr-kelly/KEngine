@@ -1,17 +1,32 @@
-﻿//------------------------------------------------------------------------------
-//
-//      CosmosEngine - The Lightweight Unity3D Game Develop Framework
-//
-//                     Version 0.9.1 (20151010)
-//                     Copyright © 2011-2015
-//                   MrKelly <23110388@qq.com>
-//              https://github.com/mr-kelly/CosmosEngine
-//
-//------------------------------------------------------------------------------
-using UnityEngine;
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: KAssetFileLoader.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
 using System.Collections;
-using Object = UnityEngine.Object;
 using KEngine;
+using UnityEngine;
 
 /// <summary>
 /// 根據不同模式，從AssetBundle中獲取Asset或從Resources中獲取,两种加载方式同时实现的桥接类
@@ -20,9 +35,14 @@ using KEngine;
 public class KAssetFileLoader : KAbstractResourceLoader
 {
     public delegate void CAssetFileBridgeDelegate(bool isOk, UnityEngine.Object resultObj);
-    string AssetInBundleName;  // AssetBundle里的名字, Resources時不用  TODO: 暂时没用额
 
-    public UnityEngine.Object Asset { get { return ResultObject as UnityEngine.Object; } }
+    private string AssetInBundleName; // AssetBundle里的名字, Resources時不用  TODO: 暂时没用额
+
+    public UnityEngine.Object Asset
+    {
+        get { return ResultObject as UnityEngine.Object; }
+    }
+
     private bool IsLoadAssetBundle;
 
     public override float Progress
@@ -54,7 +74,7 @@ public class KAssetFileLoader : KAbstractResourceLoader
         KResourceModule.Instance.StartCoroutine(_Init(Url, null));
     }
 
-    IEnumerator _Init(string path, string assetName)
+    private IEnumerator _Init(string path, string assetName)
     {
         IsLoadAssetBundle = KEngine.AppEngine.GetConfig("IsLoadAssetBundle").ToInt32() != 0;
         AssetInBundleName = assetName;
@@ -63,7 +83,7 @@ public class KAssetFileLoader : KAbstractResourceLoader
         if (!IsLoadAssetBundle)
         {
             string extension = System.IO.Path.GetExtension(path);
-            path = path.Substring(0, path.Length - extension.Length);  // remove extensions
+            path = path.Substring(0, path.Length - extension.Length); // remove extensions
 
             getAsset = Resources.Load<UnityEngine.Object>(path);
             if (getAsset == null)
@@ -78,7 +98,7 @@ public class KAssetFileLoader : KAbstractResourceLoader
 
             while (!_bundleLoader.IsFinished)
             {
-                if (IsReadyDisposed)   // 中途释放
+                if (IsReadyDisposed) // 中途释放
                 {
                     _bundleLoader.Release();
                     OnFinish(null);
@@ -118,7 +138,7 @@ public class KAssetFileLoader : KAbstractResourceLoader
             else
             {
                 // TODO: 未测试过这几行!~~
-                AssetBundleRequest request = assetBundle.LoadAsync(AssetInBundleName, typeof(Object));
+                AssetBundleRequest request = assetBundle.LoadAsync(AssetInBundleName, typeof (Object));
                 while (!request.isDone)
                 {
                     yield return null;
@@ -134,7 +154,7 @@ public class KAssetFileLoader : KAbstractResourceLoader
                 Logger.LogError("Asset is NULL: {0}", path);
             }
 
-            _bundleLoader.Release();  // 释放Bundle(WebStream)
+            _bundleLoader.Release(); // 释放Bundle(WebStream)
         }
 
         if (Application.isEditor)
@@ -163,7 +183,7 @@ public class KAssetFileLoader : KAbstractResourceLoader
             else
             {
                 //Object.DestroyObject(ResultObject as UnityEngine.Object);
-                
+
                 // Destroying GameObjects immediately is not permitted during physics trigger/contact, animation event callbacks or OnValidate. You must use Destroy instead.
                 Object.DestroyImmediate(ResultObject as UnityEngine.Object, true);
             }

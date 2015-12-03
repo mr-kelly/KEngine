@@ -1,35 +1,48 @@
-﻿//------------------------------------------------------------------------------
-//
-//      CosmosEngine - The Lightweight Unity3D Game Develop Framework
-//
-//                     Version 0.9.1 (20151010)
-//                     Copyright © 2011-2015
-//                   MrKelly <23110388@qq.com>
-//              https://github.com/mr-kelly/CosmosEngine
-//
-//------------------------------------------------------------------------------
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: KTool.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Runtime.InteropServices;
-using System.Diagnostics;
-using SimpleJson;
-using UnityEngine;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Text.RegularExpressions;
 using KEngine;
+using SimpleJson;
+using UnityEngine;
 
 /// <summary>
 /// Some tool function for time, bytes, MD5, or something...
 /// </summary>
 public class KTool
 {
-    static readonly Dictionary<string, Shader> CacheShaders = new Dictionary<string, Shader>(); // Shader.Find是一个非常消耗的函数，因此尽量缓存起来
+    private static readonly Dictionary<string, Shader> CacheShaders = new Dictionary<string, Shader>();
+    // Shader.Find是一个非常消耗的函数，因此尽量缓存起来
 
     /// <summary>
     /// Whether In Wifi or Cable Network
@@ -48,8 +61,9 @@ public class KTool
     /// <returns></returns>
     public static int GetNearestPower2(int num)
     {
-        return (int)(Mathf.Pow(2, Mathf.Ceil(Mathf.Log(num) / Mathf.Log(2))));
+        return (int) (Mathf.Pow(2, Mathf.Ceil(Mathf.Log(num)/Mathf.Log(2))));
     }
+
     /// <summary>
     /// 判断一个数是否2的次方
     /// </summary>
@@ -64,7 +78,7 @@ public class KTool
                 return false;
             if (i == num)
                 return true;
-            i = i * 2;
+            i = i*2;
         }
     }
 
@@ -82,10 +96,15 @@ public class KTool
     // 最大公约数
     public static int GetGCD(int a, int b)
     {
-        if (a < b) { int t = a; a = b; b = t; }
+        if (a < b)
+        {
+            int t = a;
+            a = b;
+            b = t;
+        }
         while (b > 0)
         {
-            int t = a % b;
+            int t = a%b;
             a = b;
             b = t;
         }
@@ -111,7 +130,6 @@ public class KTool
                 // 预防触发对象的OnEnable，先Destroy
                 child.parent = null; // 清空父, 因为.Destroy非同步的
             }
-            
         }
     }
 
@@ -159,13 +177,11 @@ public class KTool
                     T valT = default(T);
                     if (strs2.Length > 0)
                     {
-                        valT = (T)Convert.ChangeType(strs2[0], typeof(T));
+                        valT = (T) Convert.ChangeType(strs2[0], typeof (T));
                     }
                     if (strs2.Length == 2)
                     {
-
-                        valK = (K)Convert.ChangeType(strs2[1], typeof(K));
-
+                        valK = (K) Convert.ChangeType(strs2[1], typeof (K));
                     }
                     dict[valT] = valK;
                 }
@@ -196,7 +212,7 @@ public class KTool
     {
         if (args.Length == 0)
         {
-            args = new[] { '|' }; // 默认
+            args = new[] {'|'}; // 默认
         }
 
         var retList = new List<T>();
@@ -209,13 +225,12 @@ public class KTool
                 string trimS = s.Trim();
                 if (!string.IsNullOrEmpty(trimS))
                 {
-                    T val = (T)Convert.ChangeType(trimS, typeof(T));
+                    T val = (T) Convert.ChangeType(trimS, typeof (T));
                     if (val != null)
                     {
                         retList.Add(val);
                     }
                 }
-
             }
         }
         return retList;
@@ -247,7 +262,6 @@ public class KTool
 
     /// <summary>
     /// 获取波浪随机数,   即填“1”或填“1~2”这样的字符串中返回一个数！
-    /// 
     /// 如填"1"，直接返回1
     /// 如果填"1~10"这样的，那么随机返回1~10中间一个数
     /// </summary>
@@ -293,6 +307,7 @@ public class KTool
         }
         return number;
     }
+
     /// <summary>
     /// 是否在波浪数之间
     /// </summary>
@@ -327,7 +342,7 @@ public class KTool
             return false;
 
         var strs = numberStr.Split(sp);
-        return  strs.CContains(testValue);
+        return strs.CContains(testValue);
     }
 
     public static Shader FindShader(string shaderName)
@@ -361,9 +376,9 @@ public class KTool
     public static T BytesToStruct<T>(byte[] bytes, int offset = 0)
     {
         GCHandle bytesHandle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
-        IntPtr bytesPtr = (IntPtr)(bytesHandle.AddrOfPinnedObject().ToInt32() + offset);
+        IntPtr bytesPtr = (IntPtr) (bytesHandle.AddrOfPinnedObject().ToInt32() + offset);
 
-        T structObject = (T)Marshal.PtrToStructure(bytesPtr, typeof(T));
+        T structObject = (T) Marshal.PtrToStructure(bytesPtr, typeof (T));
 
         if (bytesHandle.IsAllocated)
             bytesHandle.Free();
@@ -374,20 +389,20 @@ public class KTool
     // 将字符串转成指定类型的数组 , 单元测试在Test_StrBytesToArray
     public static T[] StrBytesToArray<T>(string str, int arraySize)
     {
-        int typeSize = Marshal.SizeOf(typeof(T));
+        int typeSize = Marshal.SizeOf(typeof (T));
         byte[] strBytes = Encoding.Unicode.GetBytes(str);
-        byte[] bytes = new byte[typeSize * arraySize];  // 强制数组大小
+        byte[] bytes = new byte[typeSize*arraySize]; // 强制数组大小
 
         for (int k = 0; k < strBytes.Length; k++)
-            bytes[k] = strBytes[k];  // copy
+            bytes[k] = strBytes[k]; // copy
 
-        T[] tArray = new T[bytes.Length / typeSize];  // 总字节 除以 类型长度 = 有多少个类型对象
+        T[] tArray = new T[bytes.Length/typeSize]; // 总字节 除以 类型长度 = 有多少个类型对象
 
         int offset = 0;
         for (int i = 0; i < tArray.Length; i++)
         {
             object convertedObj = null;
-            TypeCode typeCode = Type.GetTypeCode(typeof(T));
+            TypeCode typeCode = Type.GetTypeCode(typeof (T));
             switch (typeCode)
             {
                 case TypeCode.Byte:
@@ -417,40 +432,45 @@ public class KTool
                     break;
             }
 
-            tArray[i] = (T)(convertedObj);
+            tArray[i] = (T) (convertedObj);
             offset += typeSize;
         }
 
         return tArray;
     }
 
-    static public uint MakeDword(ushort high, ushort low)
+    public static uint MakeDword(ushort high, ushort low)
     {
-        return ((uint)(((ushort)(((uint)(low)) & 0xffff)) | ((uint)((ushort)(((uint)(high)) & 0xffff))) << 16));
+        return ((uint) (((ushort) (((uint) (low)) & 0xffff)) | ((uint) ((ushort) (((uint) (high)) & 0xffff))) << 16));
     }
-    static public ushort LoWord(uint low)
+
+    public static ushort LoWord(uint low)
     {
-        return ((ushort)(((uint)(low)) & 0xffff));
+        return ((ushort) (((uint) (low)) & 0xffff));
     }
-    static public ushort HiWord(uint high)
+
+    public static ushort HiWord(uint high)
     {
-        return ((ushort)((((uint)(high)) >> 16) & 0xffff));
+        return ((ushort) ((((uint) (high)) >> 16) & 0xffff));
     }
+
     #region Int + Int = Long
-    static public ulong MakeLong(uint high, uint low)
+
+    public static ulong MakeLong(uint high, uint low)
     {
-        return ((ulong)high) << 32 | low;
+        return ((ulong) high) << 32 | low;
     }
 
-    static public uint HiInt(ulong l)
+    public static uint HiInt(ulong l)
     {
-        return (uint)(l >> 32);
+        return (uint) (l >> 32);
     }
 
-    static public uint LowInt(ulong l)
+    public static uint LowInt(ulong l)
     {
-        return (uint)l;
+        return (uint) l;
     }
+
     #endregion
 
     public static string HumanizeTimeString(int seconds)
@@ -510,6 +530,7 @@ public class KTool
         DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
         return origin.AddMilliseconds(utcTime).AddHours(zone);
     }
+
     /// <summary>
     /// Utc秒转Utc时间
     /// </summary>
@@ -521,6 +542,7 @@ public class KTool
         DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
         return origin.AddSeconds(unixTimeStamp).AddHours(zone);
     }
+
     /// <summary>
     /// Unix時間總毫秒數
     /// </summary>
@@ -529,6 +551,7 @@ public class KTool
     {
         return GetUtcMilliseconds(DateTime.UtcNow);
     }
+
     /// <summary>
     /// Unix時間總毫秒數
     /// </summary>
@@ -576,6 +599,7 @@ public class KTool
         return span.TotalMinutes < 1;
     }
     */
+
     /// <summary>
     /// 人性化数字显示，百万，千万，亿
     /// </summary>
@@ -585,19 +609,19 @@ public class KTool
     {
         if (number > 100000000)
         {
-            return string.Format("{0}{1}", number / 100000000, "亿");
+            return string.Format("{0}{1}", number/100000000, "亿");
         }
         else if (number > 10000000)
         {
-            return string.Format("{0}{1}", number / 10000000, "千万");
+            return string.Format("{0}{1}", number/10000000, "千万");
         }
         else if (number > 1000000)
         {
-            return string.Format("{0}{1}", number / 1000000, "百万");
+            return string.Format("{0}{1}", number/1000000, "百万");
         }
         else if (number > 10000)
         {
-            return string.Format("{0}{1}", number / 10000, "万");
+            return string.Format("{0}{1}", number/10000, "万");
         }
 
         return number.ToString();
@@ -624,73 +648,19 @@ public class KTool
 
         return result;
     }
+
     /// <summary>
     /// 模板生成
     /// </summary>
     /// <param name="source">模板内容</param>
     /// <param name="data">数据来源[对象]</param>
     /// <returns></returns>
-    //public static string Template(string source, object data)
-    //{
-    //    if (data == null) return source;
-    //    var isJson = data is SimpleJson.SimpleJson.JsonObject;
-    //    var result = source;
-    //    var regex = new Regex(@"\{.+?\}");
-    //    var matches = regex.Matches(source);
-    //    foreach (Match match in matches)
-    //    {
-    //        var paramRex = match.Value;
-    //        var paramKey = paramRex.Substring(1, paramRex.Length - 2).Trim(); // 截头截尾
-    //        try
-    //        {
-    //            if (isJson)
-    //            {
-    //                object paramValue;
-    //                (data as SimpleJson.SimpleJson.JsonObject).TryGetValue(paramKey, out paramValue);
-    //                if (paramValue != null)
-    //                {
-    //                    result = result.Replace(paramRex, paramValue.ToString());
-    //                }
-    //            }
-    //            else
-    //            {
-    //                var field = data.GetType().GetField(paramKey);
-    //                if (field != null)
-    //                {
-    //                    var paramValue = field.GetValue(data).ToString();
-    //                    result = result.Replace(paramRex, paramValue);
-    //                }
-    //            }
-    //        }
-    //        catch (Exception)
-    //        {
-    //            Logger.LogError("not find field \"{0}\" for {1}", paramKey, data.GetType());
-    //        }
-    //    }
-
-    //    return result;
-    //}
     /// <summary>
     /// 模板生成
     /// </summary>
     /// <param name="source">模板内容</param>
     /// <param name="datas">模板键-值对应数组[key1,value1,key2,value2,...]</param>
     /// <returns></returns>
-    //public static string Template(string source, params object[] datas)
-    //{
-    //    // 最少需要两个元素
-    //    if (datas.Length == 0 || datas.Length % 2 != 0)
-    //    {
-    //        Logger.LogError("传入datas数量必须为偶数个!");
-    //        return source;
-    //    }
-    //    var json = new SimpleJson.SimpleJson.JsonObject();
-    //    for (var i = 0; i < datas.Length; i += 2)
-    //    {
-    //        json[datas[i].ToString()] = datas[i + 1];
-    //    }
-    //    return Template(source, json);
-    //}
     /// <summary>
     /// 混合模板
     /// </summary>
@@ -702,7 +672,6 @@ public class KTool
     //{
     //    return FormatArgs(Template(source, data), args);
     //}
-
     public static string Format(string source, params object[] args)
     {
         return FormatArgs(source, args);
@@ -745,7 +714,7 @@ public class KTool
     /// <summary>
     /// Recursively set the game object's layer.
     /// </summary>
-    static public void SetLayer(GameObject go, int layer)
+    public static void SetLayer(GameObject go, int layer)
     {
         go.layer = layer;
 
@@ -776,7 +745,7 @@ public class KTool
             return default(T);
         }
 
-        return (T)trans.GetComponent(typeof(T));
+        return (T) trans.GetComponent(typeof (T));
     }
 
     public static T GetChildComponent<T>(string uri, Transform findTrans, bool isLog = true) where T : Component
@@ -791,7 +760,7 @@ public class KTool
             return default(T);
         }
 
-        return (T)trans.GetComponent(typeof(T));
+        return (T) trans.GetComponent(typeof (T));
     }
 
     public static GameObject DFSFindObject(Transform parent, string name)
@@ -809,6 +778,7 @@ public class KTool
 
         return null;
     }
+
     public static GameObject GetGameObject(string name, Transform findTrans, bool isLog = true)
     {
         GameObject obj = DFSFindObject(findTrans, name);
@@ -825,11 +795,13 @@ public class KTool
     {
         SetChild(child.transform, parent.transform, selfRotation, selfScale);
     }
+
     public static void SetChild(Transform child, Transform parent, bool selfRotation = false, bool selfScale = false)
     {
         child.parent = parent;
         ResetTransform(child, selfRotation, selfScale);
     }
+
     public static void ResetTransform(UnityEngine.Transform transform, bool selfRotation = false, bool selfScale = false)
     {
         transform.localPosition = UnityEngine.Vector3.zero;
@@ -843,18 +815,20 @@ public class KTool
     //获取从父节点到自己的完整路径
     public static string GetRootPathName(UnityEngine.Transform transform)
     {
-        var pathName="/"+transform.name;
+        var pathName = "/" + transform.name;
         while (transform.parent != null)
         {
             transform = transform.parent;
-            pathName +="/"+ transform.name;
+            pathName += "/" + transform.name;
         }
         return pathName;
     }
+
     // 获取指定流的MD5
     public static string MD5_Stream(Stream stream)
     {
-        System.Security.Cryptography.MD5CryptoServiceProvider get_md5 = new System.Security.Cryptography.MD5CryptoServiceProvider();
+        System.Security.Cryptography.MD5CryptoServiceProvider get_md5 =
+            new System.Security.Cryptography.MD5CryptoServiceProvider();
 
         byte[] hash_byte = get_md5.ComputeHash(stream);
 
@@ -877,9 +851,9 @@ public class KTool
         catch (Exception e)
         {
             return e.ToString();
-
         }
     }
+
     public static byte[] MD5_bytes(string str)
     {
         // MD5 文件名
@@ -898,7 +872,7 @@ public class KTool
 
     public static T ToEnum<T>(string e)
     {
-        return (T)Enum.Parse(typeof(T), e);
+        return (T) Enum.Parse(typeof (T), e);
     }
 
 
@@ -955,6 +929,7 @@ public class KTool
                 particleSystem.renderer.sharedMaterial.renderQueue = renderQueue;
         }
     }
+
     public static void MoveAllCollidersToGameObject(GameObject srcGameObject, GameObject targetGameObject)
     {
         Logger.Assert(srcGameObject != targetGameObject);
@@ -986,8 +961,9 @@ public class KTool
             newCircle.isTrigger = oldCircle.isTrigger;
             newCircle.radius = oldCircle.radius;
 
-            Vector3 realLocalPos = targetGameObject.transform.InverseTransformPoint(oldCircle.gameObject.transform.position);
-            newCircle.center = oldCircle.center + (Vector2)realLocalPos;
+            Vector3 realLocalPos =
+                targetGameObject.transform.InverseTransformPoint(oldCircle.gameObject.transform.position);
+            newCircle.center = oldCircle.center + (Vector2) realLocalPos;
             return newCircle;
         }
         else if (collider2d is BoxCollider2D)
@@ -998,12 +974,13 @@ public class KTool
             newBox.size = oldBox.size;
             //newBox.center = oldBox.center;
             Vector3 realLocalPos = targetGameObject.transform.InverseTransformPoint(oldBox.gameObject.transform.position);
-            newBox.center = oldBox.center + (Vector2)realLocalPos;
+            newBox.center = oldBox.center + (Vector2) realLocalPos;
             return newBox;
         }
         Logger.LogError("Error Collider: {0}", collider2d);
         return null;
     }
+
     // 将3D碰撞强转2D
     public static void CopyColliderToGameObject(Collider collider, GameObject targetGameObject)
     {
@@ -1040,13 +1017,16 @@ public class KTool
         targetTrans.localRotation = sourceTrans.localRotation;
         targetTrans.localScale = sourceTrans.localScale;
     }
+
     // 测试有无写权限
     public static bool HasWriteAccessToFolder(string folderPath)
     {
         try
         {
             string tmpFilePath = Path.Combine(folderPath, Path.GetRandomFileName());
-            using (FileStream fs = new FileStream(tmpFilePath, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.ReadWrite))
+            using (
+                FileStream fs = new FileStream(tmpFilePath, FileMode.CreateNew, FileAccess.ReadWrite,
+                    FileShare.ReadWrite))
             {
                 StreamWriter writer = new StreamWriter(fs);
                 writer.Write("1");
@@ -1082,7 +1062,7 @@ public class KTool
     // 标准角度，角度负数会转正
     public static float GetNormalizedAngle(float _anyAngle)
     {
-        _anyAngle = _anyAngle % 360;
+        _anyAngle = _anyAngle%360;
         if (_anyAngle < 0)
         {
             _anyAngle += 360;
@@ -1098,13 +1078,13 @@ public class KTool
         {
             if (collider is BoxCollider)
             {
-                BoxCollider boxC = (BoxCollider)collider;
+                BoxCollider boxC = (BoxCollider) collider;
                 float gameObjectZ = boxC.center.z + collider.gameObject.transform.position.z - z;
-                boxC.center = new Vector3(boxC.center.x, boxC.center.y, -gameObjectZ);  // 对象深度-1，collider弄成1就平衡了
+                boxC.center = new Vector3(boxC.center.x, boxC.center.y, -gameObjectZ); // 对象深度-1，collider弄成1就平衡了
             }
             else if (collider is SphereCollider)
             {
-                SphereCollider sphereC = (SphereCollider)collider;
+                SphereCollider sphereC = (SphereCollider) collider;
                 float globalZ = sphereC.center.z + collider.gameObject.transform.position.z - z;
                 sphereC.center = new Vector3(sphereC.center.x, sphereC.center.y, -globalZ);
             }
@@ -1121,10 +1101,8 @@ public class KTool
     public static string ToSentenceCase(string str)
     {
         str = char.ToLower(str[0]) + str.Substring(1);
-        return Regex.Replace(str, "[a-z][A-Z]", (m) =>
-        {
-            return char.ToLower(m.Value[0]) + "_" + char.ToLower(m.Value[1]);
-        });
+        return Regex.Replace(str, "[a-z][A-Z]",
+            (m) => { return char.ToLower(m.Value[0]) + "_" + char.ToLower(m.Value[1]); });
     }
 
     // 概率，百分比, // 注意，0的时候当是100%
@@ -1132,7 +1110,7 @@ public class KTool
     {
         var chance = UnityEngine.Random.Range(0f, 100f);
 
-        if (chance <= chancePercent)  // 概率
+        if (chance <= chancePercent) // 概率
         {
             return true;
         }
@@ -1144,7 +1122,7 @@ public class KTool
     {
         int chance = UnityEngine.Random.Range(1, 101);
 
-        if (chance <= chancePercent)  // 概率
+        if (chance <= chancePercent) // 概率
         {
             return true;
         }
@@ -1180,12 +1158,13 @@ public class KTool
     /// <param name="fAngle">角度</param>
     /// <param name="nRadius">半径</param>
     /// <returns></returns>
-    public static Vector3[] GetSmartNpcPoints(Vector3 startDirection, int nNum, Vector3 pAnchorPos, float fAngle, float nRadius)
+    public static Vector3[] GetSmartNpcPoints(Vector3 startDirection, int nNum, Vector3 pAnchorPos, float fAngle,
+        float nRadius)
     {
-        bool bPlural = nNum % 2 == 0 ? true : false; // 是否复数模式
+        bool bPlural = nNum%2 == 0 ? true : false; // 是否复数模式
         Vector3 vDir = startDirection;
-        int nMidNum = bPlural ? nNum / 2 : nNum / 2 + 1; // 中间数, 循环过了中间数后，另一个方向起排布
-        Vector3 vRPos = vDir * nRadius; //// 计算直线在圆形上的顶点 半径是表现距离
+        int nMidNum = bPlural ? nNum/2 : nNum/2 + 1; // 中间数, 循环过了中间数后，另一个方向起排布
+        Vector3 vRPos = vDir*nRadius; //// 计算直线在圆形上的顶点 半径是表现距离
         Vector3[] targetPos = new Vector3[nNum];
         for (int i = 1; i <= nNum; i++)
         {
@@ -1194,26 +1173,26 @@ public class KTool
             if (bPlural) // 复数模式
             {
                 if (i > nMidNum)
-                    nAddAngle = fAngle * ((i % nMidNum) + 1) - fAngle / 2;
+                    nAddAngle = fAngle*((i%nMidNum) + 1) - fAngle/2;
                 else
-                    nAddAngle = -fAngle * ((i % nMidNum) + 1) + fAngle / 2; // 除以2，是为了顶端NPC均匀排布 by KK
+                    nAddAngle = -fAngle*((i%nMidNum) + 1) + fAngle/2; // 除以2，是为了顶端NPC均匀排布 by KK
             }
             else // 单数模式
             {
                 // 判断是否过了中间数
                 if (i > nMidNum)
                 {
-                    nAddAngle = fAngle * (i % nMidNum); // 添加NPC的角度
+                    nAddAngle = fAngle*(i%nMidNum); // 添加NPC的角度
                 }
                 else if (i < nMidNum) // 非复数模式， 中间数NPC 放在正方向
                 {
-                    nAddAngle = -fAngle * (i % nMidNum); // 反方向角度
+                    nAddAngle = -fAngle*(i%nMidNum); // 反方向角度
                 }
                 else
                     nAddAngle = 0; // 正方向
             }
 
-            Vector3 vTargetPos = pAnchorPos + Quaternion.AngleAxis(nAddAngle, Vector3.forward) * vRPos;
+            Vector3 vTargetPos = pAnchorPos + Quaternion.AngleAxis(nAddAngle, Vector3.forward)*vRPos;
             targetPos[i - 1] = vTargetPos;
         }
         return targetPos;
@@ -1222,8 +1201,8 @@ public class KTool
     /// 返回localPoint
     public static Vector3[] GetParallelPoints(Vector3 startPos, Vector3 startDirection, int nNum, float meterInterval)
     {
-        bool bPlural = nNum % 2 == 0 ? true : false; // 是否复数模式
-        int nMidNum = bPlural ? nNum / 2 : nNum / 2 + 1; // 中间数, 循环过了中间数后，另一个方向起排布
+        bool bPlural = nNum%2 == 0 ? true : false; // 是否复数模式
+        int nMidNum = bPlural ? nNum/2 : nNum/2 + 1; // 中间数, 循环过了中间数后，另一个方向起排布
         Vector3[] targetPos = new Vector3[nNum];
         for (int i = 1; i <= nNum; i++)
         {
@@ -1232,27 +1211,27 @@ public class KTool
             if (bPlural) // 复数模式
             {
                 if (i > nMidNum)
-                    fAddInterval = meterInterval * ((i % nMidNum) + 1) - meterInterval / 2;
+                    fAddInterval = meterInterval*((i%nMidNum) + 1) - meterInterval/2;
                 else
-                    fAddInterval = -meterInterval * ((i % nMidNum) + 1) + meterInterval / 2; // 除以2，是为了顶端NPC均匀排布 by KK
+                    fAddInterval = -meterInterval*((i%nMidNum) + 1) + meterInterval/2; // 除以2，是为了顶端NPC均匀排布 by KK
             }
             else // 单数模式
             {
                 // 判断是否过了中间数
                 if (i > nMidNum)
                 {
-                    fAddInterval = meterInterval * ((i % nMidNum) + 1); // 添加NPC的角度
+                    fAddInterval = meterInterval*((i%nMidNum) + 1); // 添加NPC的角度
                 }
                 else if (i < nMidNum) // 非复数模式， 中间数NPC 放在正方向
                 {
-                    fAddInterval = -meterInterval * ((i % nMidNum) + 1); // 反方向角度
+                    fAddInterval = -meterInterval*((i%nMidNum) + 1); // 反方向角度
                 }
                 else
                     fAddInterval = 0; // 正方向
             }
 
             // 90度旋转求垂直
-            Vector3 vTargetPos = startPos + Quaternion.AngleAxis(90, Vector3.forward) * startDirection * fAddInterval;
+            Vector3 vTargetPos = startPos + Quaternion.AngleAxis(90, Vector3.forward)*startDirection*fAddInterval;
             //Vector3 vTargetPos = direction*fAddInterval;
             targetPos[i - 1] = vTargetPos;
         }
@@ -1268,25 +1247,26 @@ public class KTool
         // Get A,B,C of first line - points : ps1 to pe1
         float A1 = pe1.y - ps1.y;
         float B1 = ps1.x - pe1.x;
-        float C1 = A1 * ps1.x + B1 * ps1.y;
+        float C1 = A1*ps1.x + B1*ps1.y;
 
         // Get A,B,C of second line - points : ps2 to pe2
         float A2 = pe2.y - ps2.y;
         float B2 = ps2.x - pe2.x;
-        float C2 = A2 * ps2.x + B2 * ps2.y;
+        float C2 = A2*ps2.x + B2*ps2.y;
 
         // Get delta and check if the lines are parallel
-        float delta = A1 * B2 - A2 * B1;
+        float delta = A1*B2 - A2*B1;
         if (delta == 0)
             return false;
 
         // now return the Vector2 intersection point
         intersectPoint = new Vector2(
-            (B2 * C1 - B1 * C2) / delta,
-            (A1 * C2 - A2 * C1) / delta
-        );
+            (B2*C1 - B1*C2)/delta,
+            (A1*C2 - A2*C1)/delta
+            );
         return true;
     }
+
     /// <summary>
     /// 判断字符串是否是数字
     /// </summary>
@@ -1313,8 +1293,8 @@ public class KTool
     /// <returns></returns>
     public static Vector2 GetRelativePositionOfEllipse(float 长半轴即目标距离, float 短半轴, float angle)
     {
-        var rad = angle * Mathf.Deg2Rad; // 弧度
-        var newPos = new Vector2(长半轴即目标距离 * Mathf.Cos(rad), 短半轴 * Mathf.Sin(rad));
+        var rad = angle*Mathf.Deg2Rad; // 弧度
+        var newPos = new Vector2(长半轴即目标距离*Mathf.Cos(rad), 短半轴*Mathf.Sin(rad));
         return newPos;
     }
 
@@ -1338,7 +1318,6 @@ public class KTool
     /// <returns></returns>
     public static IPAddress GetIpAddressFromIpHostEntry(IPHostEntry ipHostEntry)
     {
-
         var addresses = ipHostEntry.AddressList;
 
         foreach (var item in addresses)
@@ -1371,7 +1350,6 @@ public class KTool
                     callback(ipAddress);
                 }
             }), null);
-
         }
         else
         {
@@ -1383,10 +1361,10 @@ public class KTool
 
 public class XMemoryParser<T>
 {
-    readonly int MaxCount;
-    readonly byte[] SourceBytes;
-    readonly GCHandle SourceBytesHandle;
-    readonly IntPtr SourceBytesPtr;
+    private readonly int MaxCount;
+    private readonly byte[] SourceBytes;
+    private readonly GCHandle SourceBytesHandle;
+    private readonly IntPtr SourceBytesPtr;
 
     public XMemoryParser(byte[] bytes, int maxCount)
     {
@@ -1413,8 +1391,8 @@ public class XMemoryParser<T>
         get
         {
             Logger.Assert(index < MaxCount);
-            IntPtr p = (IntPtr)(SourceBytesPtr.ToInt32() + Marshal.SizeOf(typeof(T)) * index);
-            return (T)Marshal.PtrToStructure(p, typeof(T));
+            IntPtr p = (IntPtr) (SourceBytesPtr.ToInt32() + Marshal.SizeOf(typeof (T))*index);
+            return (T) Marshal.PtrToStructure(p, typeof (T));
         }
     }
 }
@@ -1436,6 +1414,7 @@ public static class XExtensions
             list[n] = value;
         }
     }
+
     public static T CFirstOrDefault<T>(this IEnumerable<T> source)
     {
         if (source != null)
@@ -1448,6 +1427,7 @@ public static class XExtensions
 
         return default(T);
     }
+
     public static List<T> CFirst<T>(this IEnumerable<T> source, int num)
     {
         var count = 0;
@@ -1466,7 +1446,9 @@ public static class XExtensions
 
         return items;
     }
+
     public delegate bool CFilterAction<T>(T t);
+
     public static List<T> CFilter<T>(this IEnumerable<T> source, CFilterAction<T> testAction)
     {
         var items = new List<T>();
@@ -1483,8 +1465,11 @@ public static class XExtensions
 
         return items;
     }
+
     public delegate bool CFilterAction<T, K>(T t, K k);
-    public static Dictionary<T, K> CFilter<T, K>(this IEnumerable<KeyValuePair<T, K>> source, CFilterAction<T, K> testAction)
+
+    public static Dictionary<T, K> CFilter<T, K>(this IEnumerable<KeyValuePair<T, K>> source,
+        CFilterAction<T, K> testAction)
     {
         var items = new Dictionary<T, K>();
         if (source != null)
@@ -1500,6 +1485,7 @@ public static class XExtensions
 
         return items;
     }
+
     public static T CLastOrDefault<T>(this IEnumerable<T> source)
     {
         var result = default(T);
@@ -1509,6 +1495,7 @@ public static class XExtensions
         }
         return result;
     }
+
     public static List<T> CLast<T>(this IEnumerable<T> source, int num)
     {
         // 开始读取的位置
@@ -1529,6 +1516,7 @@ public static class XExtensions
 
         return items;
     }
+
     public static T[] CToArray<T>(this IEnumerable<T> source)
     {
         var list = new List<T>();
@@ -1538,6 +1526,7 @@ public static class XExtensions
         }
         return list.ToArray();
     }
+
     public static List<T> CToList<T>(this IEnumerable<T> source)
     {
         var list = new List<T>();
@@ -1547,6 +1536,7 @@ public static class XExtensions
         }
         return list;
     }
+
     public static List<T> CUnion<T>(this List<T> first, List<T> second, IEqualityComparer<T> comparer)
     {
         var results = new List<T>();
@@ -1570,6 +1560,7 @@ public static class XExtensions
         }
         return results;
     }
+
     public static string CJoin<T>(this IEnumerable<T> source, string sp)
     {
         var result = new StringBuilder();
@@ -1586,6 +1577,7 @@ public static class XExtensions
         }
         return result.ToString();
     }
+
     public static bool CContains<TSource>(this IEnumerable<TSource> source, TSource value)
     {
         foreach (TSource item in source)
@@ -1618,6 +1610,4 @@ public static class XExtensions
 
     //    return null;
     //}
-
-
 }

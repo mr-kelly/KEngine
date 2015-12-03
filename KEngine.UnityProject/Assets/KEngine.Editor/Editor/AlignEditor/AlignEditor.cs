@@ -1,18 +1,33 @@
-﻿//------------------------------------------------------------------------------
-//
-//      CosmosEngine - The Lightweight Unity3D Game Develop Framework
-//
-//                     Version 0.9.1 (20151010)
-//                     Copyright © 2011-2015
-//                   MrKelly <23110388@qq.com>
-//              https://github.com/mr-kelly/CosmosEngine
-//
-//------------------------------------------------------------------------------
-using UnityEngine;
-using System.Collections;
-using UnityEditor;
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: AlignEditor.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
 using System;
 using System.Collections.Generic;
+using UnityEditor;
+using UnityEngine;
 
 /*
 /// <summary>
@@ -21,6 +36,7 @@ using System.Collections.Generic;
 /// ����x, y, z���ֽ��еȾ�����
 /// </summary>
 */
+
 public class AlignEditor : EditorWindow
 {
     public string alignX = "0";
@@ -31,11 +47,11 @@ public class AlignEditor : EditorWindow
     public static void Init()
     {
         // Init Editor Window
-        var alignEditor = EditorWindow.GetWindow(typeof(AlignEditor));
+        var alignEditor = EditorWindow.GetWindow(typeof (AlignEditor));
         alignEditor.Show();
-
     }
-    void OnGUI()
+
+    private void OnGUI()
     {
         GUILayout.Label("Distance Align Options");
         alignX = EditorGUILayout.TextField("X", alignX);
@@ -56,17 +72,17 @@ public class AlignEditor : EditorWindow
                     firstObjectVec = gameObjects[i].transform.localPosition;
                     continue;
                 }
-                
+
                 /*ѭ����������*/
                 gameObjects[i].transform.localPosition = new Vector3(
-                    firstObjectVec.x + Convert.ToSingle(alignX) * i,
-                    firstObjectVec.y + -Convert.ToSingle(alignY) * i,    /* �����Ӿ�������Ϊy����������Ϊx������ ����x */
-                    firstObjectVec.z + Convert.ToSingle(alignZ) * i);
+                    firstObjectVec.x + Convert.ToSingle(alignX)*i,
+                    firstObjectVec.y + -Convert.ToSingle(alignY)*i, /* �����Ӿ�������Ϊy����������Ϊx������ ����x */
+                    firstObjectVec.z + Convert.ToSingle(alignZ)*i);
             }
         }
 
         GUILayout.Label("Other Align");
-        
+
         GUILayout.BeginHorizontal("");
 
         if (GUILayout.Button("Left/Right Align"))
@@ -80,11 +96,10 @@ public class AlignEditor : EditorWindow
             this.PositionSelectionObjects(AlignType.TopAlign);
         }
         GUILayout.EndHorizontal();
-        
     }
 
 
-    enum AlignType
+    private enum AlignType
     {
         TopAlign,
         LeftAlign,
@@ -100,6 +115,7 @@ public class AlignEditor : EditorWindow
     /// <param name="x"></param>
     /// <param name="y"></param>
     */
+
     private int CompareGameObjectsByName(GameObject a, GameObject b)
     {
         /* ʹ��ϵͳ���ַ����Ƚ� */
@@ -118,21 +134,23 @@ public class AlignEditor : EditorWindow
 
         //}
     }
+
     /*
     /// <summary>
     ///  ��ȡ����������������� ��ѡ��Ϸ����
     /// </summary>
     /// <returns></returns>
     */
+
     private GameObject[] getSortedGameObjects()
     {
         List<GameObject> gameObjects = new List<GameObject>(Selection.gameObjects);
 
-        gameObjects.Sort(this.CompareGameObjectsByName);  /* ���� ί��*/
+        gameObjects.Sort(this.CompareGameObjectsByName); /* ���� ί��*/
 
         return gameObjects.ToArray();
-        
     }
+
     /*
     /// <summary>
     /// ͳһ��λ����ѡ�еĶ���
@@ -141,10 +159,11 @@ public class AlignEditor : EditorWindow
     /// <param name="y"></param>
     /// <param name="z"></param>
     */
-    void PositionSelectionObjects(AlignType alignType)
+
+    private void PositionSelectionObjects(AlignType alignType)
     {
         GameObject[] gameObjects = this.getSortedGameObjects();
-        
+
 
         /* ���뿪ʼ */
         if (gameObjects.Length > 0)
@@ -152,7 +171,7 @@ public class AlignEditor : EditorWindow
             /* ��ȡ��һ��Ԫ�أ�����Ԫ�ظ�������λ */
             if (alignType == AlignType.TopAlign)
             {
-                float firstY = gameObjects[0].transform.localPosition.y;  /*ͳһy, ������ */
+                float firstY = gameObjects[0].transform.localPosition.y; /*ͳһy, ������ */
 
                 foreach (GameObject obj in gameObjects)
                 {
@@ -162,7 +181,7 @@ public class AlignEditor : EditorWindow
                     obj.transform.localPosition = new Vector3(selfX, firstY, selfZ);
                 }
             }
-            else if (alignType == AlignType.LeftAlign)  /*�����*/
+            else if (alignType == AlignType.LeftAlign) /*�����*/
             {
                 float fisrtX = gameObjects[0].transform.localPosition.x;
 
@@ -174,7 +193,6 @@ public class AlignEditor : EditorWindow
                     obj.transform.localPosition = new Vector3(fisrtX, selfY, selfZ);
                 }
             }
-
         }
     }
 }

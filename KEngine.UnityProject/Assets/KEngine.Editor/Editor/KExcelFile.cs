@@ -1,22 +1,34 @@
-﻿//------------------------------------------------------------------------------
-//
-//      CosmosEngine - The Lightweight Unity3D Game Develop Framework
-//
-//                     Version 0.9.1 (20151010)
-//                     Copyright © 2011-2015
-//                   MrKelly <23110388@qq.com>
-//              https://github.com/mr-kelly/CosmosEngine
-//
-//------------------------------------------------------------------------------
-using NPOI.HSSF.Util;
-using NPOI.SS.UserModel;
-using UnityEditor;
-using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: KExcelFile.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
 using System;
+using System.Collections.Generic;
 using System.IO;
 using KEngine;
+using NPOI.SS.UserModel;
 
 /// <summary>
 /// 基于NPOI操作Excel文件
@@ -31,6 +43,7 @@ public class KExcelFile
     private IWorkbook Workbook;
     private ISheet Worksheet;
     public bool IsLoadSuccess = true;
+
     public KExcelFile(string excelPath)
     {
         Path = excelPath;
@@ -46,7 +59,6 @@ public class KExcelFile
                 Logger.LogError("无法打开Excel: {0}, 可能原因：正在打开？或是Office2007格式（尝试另存为）？ {1}", excelPath, e.Message);
                 IsLoadSuccess = false;
             }
-            
         }
         if (IsLoadSuccess)
         {
@@ -72,7 +84,6 @@ public class KExcelFile
                 ColName2Index[headerName] = columnIndex;
             }
         }
-        
     }
 
     /// <summary>
@@ -89,10 +100,12 @@ public class KExcelFile
     {
         return GetString(columnName, row).ToFloat();
     }
+
     public int GetInt(string columnName, int row)
     {
         return GetString(columnName, row).ToInt32();
     }
+
     public string GetString(string columnName, int row)
     {
         var theRow = Worksheet.GetRow(row);
@@ -112,6 +125,7 @@ public class KExcelFile
     }
 
     private ICellStyle GreyCellStyleCache;
+
     public void SetRowGrey(int row)
     {
         var theRow = Worksheet.GetRow(row);
@@ -144,12 +158,11 @@ public class KExcelFile
         if (cell == null)
             cell = theRow.CreateCell(ColName2Index[columnName]);
 
-        if (value.Length > (1 << 14))  // if too long
+        if (value.Length > (1 << 14)) // if too long
         {
             value = value.Substring(0, 1 << 14);
         }
         cell.SetCellValue(value);
-        
     }
 
     public void Save()
@@ -181,13 +194,11 @@ public class KExcelFile
                     fileStream.Flush();
                 }
             }
-
         }
         //catch (Exception e)
         //{
         //    Logger.LogError(e.Message);
         //    Logger.LogError("是否打开了Excel表？");
         //}
-
     }
 }

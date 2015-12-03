@@ -1,34 +1,38 @@
-﻿//------------------------------------------------------------------------------
-//
-//      CosmosEngine - The Lightweight Unity3D Game Develop Framework
-//
-//                     Version 0.9.1 (20151010)
-//                     Copyright © 2011-2015
-//                   MrKelly <23110388@qq.com>
-//              https://github.com/mr-kelly/CosmosEngine
-//
-//------------------------------------------------------------------------------
-/// Coroutine++
-/// 
-/// Unity's courinte is excellent, but YieldInstruction cannot let you custom your own coroutine Class.
-/// Start, Pause, Continue, Stop a Coroutine, Adjust Speed
-/// Also you can learn how the UnityCoroutine run in depth
-/// 
-/// 
-/// Author: Kelly
-/// Email: 23110388@qq.com
-/// 
-/// Created at a night that difficult to sleep, 2014/8/4, Zhuhai
-/// 
-using UnityEngine;
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: CFiber.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
 using System.Collections;
 using System.Collections.Generic;
 using KEngine;
-
+using UnityEngine;
 
 public class CFiber : MonoBehaviour
 {
     private static CFiber _Instance;
+
     public static CFiber Instance
     {
         get
@@ -43,27 +47,26 @@ public class CFiber : MonoBehaviour
         }
     }
 
-    Queue<CCoroutineWrapper> AddQueue = new Queue<CCoroutineWrapper>();
-    Queue<CCoroutineWrapper> DeleteQueue = new Queue<CCoroutineWrapper>();
+    private Queue<CCoroutineWrapper> AddQueue = new Queue<CCoroutineWrapper>();
+    private Queue<CCoroutineWrapper> DeleteQueue = new Queue<CCoroutineWrapper>();
 
-    Dictionary<int, CCoroutineWrapper> Coroutines = new Dictionary<int, CCoroutineWrapper>();
-    static int IdGen = 0;
+    private Dictionary<int, CCoroutineWrapper> Coroutines = new Dictionary<int, CCoroutineWrapper>();
+    private static int IdGen = 0;
 
-    int UpdateCount = 0;
+    private int UpdateCount = 0;
     public float TimeScale = 1; // 越小越慢, 越大越快
 
-    void Awake()
+    private void Awake()
     {
         _Instance = this;
-
     }
 
     public CCoroutineWrapper _NewCoroutine(IEnumerator coFunc)
     {
-        var co = new CCoroutineWrapper() { CoroutineId = IdGen, CoroutineFunc = coFunc };
+        var co = new CCoroutineWrapper() {CoroutineId = IdGen, CoroutineFunc = coFunc};
         IdGen++;
-        
-        co.UpdateMove();  // 開始立刻移動一下
+
+        co.UpdateMove(); // 開始立刻移動一下
         AddQueue.Enqueue(co);
 
         return co;
@@ -74,21 +77,21 @@ public class CFiber : MonoBehaviour
         return _NewCoroutine(coFunc).CoroutineId;
     }
 
-    void Update()
+    private void Update()
     {
         UpdateCount++;
 
-        int exeCount= 1;
+        int exeCount = 1;
         int interval = 0;
-        
+
         Logger.Assert(TimeScale > 0);
 
         if (TimeScale > 1)
             exeCount = Mathf.RoundToInt(TimeScale);
         else if (TimeScale < 1)
-            interval = Mathf.RoundToInt(1f / TimeScale);
+            interval = Mathf.RoundToInt(1f/TimeScale);
 
-        if (interval == 0 || UpdateCount % interval == 0)
+        if (interval == 0 || UpdateCount%interval == 0)
         {
             for (int count = 0; count < exeCount; count++)
             {
@@ -114,17 +117,16 @@ public class CFiber : MonoBehaviour
                 }
             }
         }
-
     }
 
-    IEnumerator _HandleUnityCoroutine(CCoroutineWrapper coWrapper, Coroutine co)
+    private IEnumerator _HandleUnityCoroutine(CCoroutineWrapper coWrapper, Coroutine co)
     {
         coWrapper.Suspend = true;
         yield return co;
         coWrapper.Suspend = false;
     }
 
-    IEnumerator _HandleCustomRoutine(int coId, CCoroutineWrapper coWrapper, CFiberBase wait)
+    private IEnumerator _HandleCustomRoutine(int coId, CCoroutineWrapper coWrapper, CFiberBase wait)
     {
         coWrapper.Suspend = true;
         _NewCoroutine(wait.DoRun()); // var co = 
@@ -134,9 +136,9 @@ public class CFiber : MonoBehaviour
     }
 
     /// for instance: Unity's WaitForSeconds...WaitForFixedFrame... so on....
-    IEnumerator _HandleUnityYieldInstruction(int coId, CCoroutineWrapper coWrapper, YieldInstruction wait)
+    private IEnumerator _HandleUnityYieldInstruction(int coId, CCoroutineWrapper coWrapper, YieldInstruction wait)
     {
-        coWrapper.Suspend = true;// Suspend coroutine, wait for seconds push it back
+        coWrapper.Suspend = true; // Suspend coroutine, wait for seconds push it back
         yield return wait;
         coWrapper.Suspend = false;
     }
@@ -163,16 +165,18 @@ public class CFiber : MonoBehaviour
         public bool Suspend = false;
         public int CoroutineId;
         public IEnumerator CoroutineFunc;
+
         public void UpdateMove()
         {
             if (CoroutineFunc.MoveNext())
             {
                 object yieldVal = CoroutineFunc.Current;
-                if (yieldVal is YieldInstruction)  // Unity Coroutine
+                if (yieldVal is YieldInstruction) // Unity Coroutine
                 {
-                    CFiber.Instance.StartCoroutine(CFiber.Instance._HandleUnityYieldInstruction(CoroutineId, this, yieldVal as YieldInstruction));
+                    CFiber.Instance.StartCoroutine(CFiber.Instance._HandleUnityYieldInstruction(CoroutineId, this,
+                        yieldVal as YieldInstruction));
                 }
-                if (yieldVal is Coroutine)  // StartCoroutine(xxx)
+                if (yieldVal is Coroutine) // StartCoroutine(xxx)
                 {
                     CFiber.Instance.StartCoroutine(CFiber.Instance._HandleUnityCoroutine(this, yieldVal as Coroutine));
                 }
@@ -180,7 +184,7 @@ public class CFiber : MonoBehaviour
                 {
                     CFiberBase customRoutine = yieldVal as CFiberBase;
                     CFiber.Instance.PlayCoroutine(CFiber.Instance._HandleCustomRoutine(CoroutineId, this, customRoutine));
-                }// else do nothing
+                } // else do nothing
 
                 // TODO: WWW, WaitForxxx, execute once at create  
             }
@@ -188,10 +192,8 @@ public class CFiber : MonoBehaviour
             {
                 CFiber.Instance.DeleteQueue.Enqueue(this);
             }
-
         }
     }
-
 }
 
 /// <summary>
@@ -200,6 +202,7 @@ public class CFiber : MonoBehaviour
 public abstract class CFiberBase
 {
     public bool IsFinish = false;
+
     public IEnumerator DoRun()
     {
         IsFinish = false;
@@ -210,7 +213,9 @@ public abstract class CFiberBase
 
         IsFinish = true;
     }
-    public abstract IEnumerator Wait();  // cannot execute yield return StartCoroutine(xxx) in it
+
+    public abstract IEnumerator Wait(); // cannot execute yield return StartCoroutine(xxx) in it
+
     protected Coroutine StartCoroutine(IEnumerator coFunc)
     {
         return CFiber.Instance.StartCoroutine(coFunc);

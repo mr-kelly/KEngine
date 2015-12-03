@@ -1,37 +1,59 @@
-﻿//------------------------------------------------------------------------------
-//
-//      CosmosEngine - The Lightweight Unity3D Game Develop Framework
-//
-//                     Version 0.9.1 (20151010)
-//                     Copyright © 2011-2015
-//                   MrKelly <23110388@qq.com>
-//              https://github.com/mr-kelly/CosmosEngine
-//
-//------------------------------------------------------------------------------
-using UnityEngine;
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: KWWWLoader.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using KEngine;
+using UnityEngine;
 
 /// <summary>
-/// Load www, A wrapper of WWW.  
+/// Load www, A wrapper of WWW.
 /// </summary>
-[CDependencyClass(typeof(KResourceModule))]
+[CDependencyClass(typeof (KResourceModule))]
 public class KWWWLoader : KAbstractResourceLoader
 {
     // 前几项用于监控器
     private static IEnumerator CachedWWWLoaderMonitorCoroutine; // 专门监控WWW的协程
-    const int MAX_WWW_COUNT = 15; // 同时进行的最大Www加载个数，超过的排队等待
+    private const int MAX_WWW_COUNT = 15; // 同时进行的最大Www加载个数，超过的排队等待
     private static int WWWLoadingCount = 0; // 有多少个WWW正在运作, 有上限的
-    private static readonly Stack<KWWWLoader> WWWLoadersStack = new Stack<KWWWLoader>();  // WWWLoader的加载是后进先出! 有一个协程全局自我管理. 后来涌入的优先加载！
+
+    private static readonly Stack<KWWWLoader> WWWLoadersStack = new Stack<KWWWLoader>();
+    // WWWLoader的加载是后进先出! 有一个协程全局自我管理. 后来涌入的优先加载！
 
     public static event Action<string> WWWFinishCallback;
 
     public float BeginLoadTime;
     public float FinishLoadTime;
     public WWW Www;
-    public int Size { get { return Www.size; } }
+
+    public int Size
+    {
+        get { return Www.size; }
+    }
 
     public float LoadSpeed
     {
@@ -42,6 +64,7 @@ public class KWWWLoader : KAbstractResourceLoader
             return Size/(FinishLoadTime - BeginLoadTime);
         }
     }
+
     //public int DownloadedSize { get { return Www != null ? Www.bytesDownloaded : 0; } }
 
     /// <summary>
@@ -57,7 +80,7 @@ public class KWWWLoader : KAbstractResourceLoader
     protected override void Init(string url, params object[] args)
     {
         base.Init(url, args);
-        WWWLoadersStack.Push(this);  // 不执行开始加载，由www监控器协程控制
+        WWWLoadersStack.Push(this); // 不执行开始加载，由www监控器协程控制
 
         if (CachedWWWLoaderMonitorCoroutine == null)
         {
@@ -68,8 +91,9 @@ public class KWWWLoader : KAbstractResourceLoader
 
     protected void StartLoad()
     {
-        KResourceModule.Instance.StartCoroutine(CoLoad(Url));//开启协程加载Assetbundle，执行Callback
+        KResourceModule.Instance.StartCoroutine(CoLoad(Url)); //开启协程加载Assetbundle，执行Callback
     }
+
     /// <summary>
     /// 协和加载Assetbundle，加载完后执行callback
     /// </summary>
@@ -77,7 +101,7 @@ public class KWWWLoader : KAbstractResourceLoader
     /// <param name="callback"></param>
     /// <param name="callbackArgs"></param>
     /// <returns></returns>
-    IEnumerator CoLoad(string url)
+    private IEnumerator CoLoad(string url)
     {
         KResourceModule.LogRequest("WWW", url);
         System.DateTime beginTime = System.DateTime.Now;
@@ -88,7 +112,7 @@ public class KWWWLoader : KAbstractResourceLoader
         WWWLoadingCount++;
 
         //设置AssetBundle解压缩线程的优先级
-        Www.threadPriority = Application.backgroundLoadingPriority;  // 取用全局的加载优先速度
+        Www.threadPriority = Application.backgroundLoadingPriority; // 取用全局的加载优先速度
         while (!Www.isDone)
         {
             Progress = Www.progress;
@@ -116,7 +140,6 @@ public class KWWWLoader : KAbstractResourceLoader
             {
                 string fileRealPath = url.Replace(fileProtocol, "");
                 Logger.LogError("File {0} Exist State: {1}", fileRealPath, System.IO.File.Exists(fileRealPath));
-
             }
             Logger.LogError("[KWWWLoader:Error]{0} {1}", Www.error, url);
 
@@ -164,12 +187,9 @@ public class KWWWLoader : KAbstractResourceLoader
     }
 
 
-
-
     /// <summary>
     /// 监视器协程
     /// 超过最大WWWLoader时，挂起~
-    /// 
     /// 后来的新loader会被优先加载
     /// </summary>
     /// <returns></returns>
@@ -197,5 +217,4 @@ public class KWWWLoader : KAbstractResourceLoader
         KResourceModule.Instance.StopCoroutine(CachedWWWLoaderMonitorCoroutine);
         CachedWWWLoaderMonitorCoroutine = null;
     }
-
 }

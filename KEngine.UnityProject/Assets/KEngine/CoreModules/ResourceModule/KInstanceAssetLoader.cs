@@ -1,18 +1,33 @@
-﻿//------------------------------------------------------------------------------
-//
-//      CosmosEngine - The Lightweight Unity3D Game Develop Framework
-//
-//                     Version 0.9.1 (20151010)
-//                     Copyright © 2011-2015
-//                   MrKelly <23110388@qq.com>
-//              https://github.com/mr-kelly/CosmosEngine
-//
-//------------------------------------------------------------------------------
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: KInstanceAssetLoader.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
 using System;
-using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
 using KEngine;
+using UnityEngine;
 using Object = UnityEngine.Object;
 
 /// <summary>
@@ -23,13 +38,11 @@ public class KInstanceAssetLoader : KAbstractResourceLoader
     public delegate void KAssetLoaderDelegate(bool isOk, UnityEngine.Object asset, object[] args);
 
     public GameObject InstanceAsset { get; private set; }
-    private KAssetFileLoader _assetFileBridge;  // 引用ResultObject
+    private KAssetFileLoader _assetFileBridge; // 引用ResultObject
+
     public override float Progress
     {
-        get
-        {
-            return _assetFileBridge.Progress;
-        }
+        get { return _assetFileBridge.Progress; }
     }
 
     // TODO: 无视AssetName暂时！
@@ -50,7 +63,7 @@ public class KInstanceAssetLoader : KAbstractResourceLoader
 
         _assetFileBridge = KAssetFileLoader.Load(url, (isOk, asset) =>
         {
-            if (IsReadyDisposed)  // 中途释放
+            if (IsReadyDisposed) // 中途释放
             {
                 OnFinish(null);
                 return;
@@ -64,7 +77,7 @@ public class KInstanceAssetLoader : KAbstractResourceLoader
 
             try
             {
-                InstanceAsset = (GameObject)GameObject.Instantiate(asset as UnityEngine.GameObject);
+                InstanceAsset = (GameObject) GameObject.Instantiate(asset as UnityEngine.GameObject);
             }
             catch (Exception e)
             {
@@ -93,7 +106,7 @@ public class KInstanceAssetLoader : KAbstractResourceLoader
     protected override void DoDispose()
     {
         base.DoDispose();
-        
+
         _assetFileBridge.Release();
         if (InstanceAsset != null)
         {
@@ -112,7 +125,6 @@ public class KInstanceAssetLoader : KAbstractResourceLoader
             yield return null;
 
         if (callback != null)
-            callback(!w.IsError);  // isOk?
+            callback(!w.IsError); // isOk?
     }
-
 }

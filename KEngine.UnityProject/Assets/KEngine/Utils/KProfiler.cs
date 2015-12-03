@@ -1,5 +1,29 @@
-﻿
-using UnityEngine;
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: KProfiler.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -26,10 +50,7 @@ namespace KEngine
         /// </summary>
         public static bool CanWatch
         {
-            get
-            {
-                return UnityEngine.Debug.isDebugBuild;
-            }
+            get { return UnityEngine.Debug.isDebugBuild; }
         }
 
         /// <summary>
@@ -53,6 +74,7 @@ namespace KEngine
                 return;
             EndWatch(emKey.ToString());
         }
+
         /// <summary>
         /// 使用Stopwatch， debug模式下无行为
         /// </summary>
@@ -83,7 +105,6 @@ namespace KEngine
 
             stopwatch.Reset();
             stopwatch.Start(); //  开始监视代码运行时间
-
         }
 
         /// <summary>
@@ -113,13 +134,13 @@ namespace KEngine
             TimeSpan timespan = stopwatch.Elapsed; //  获取当前实例测量得出的总时间
             //double seconds = timespan.TotalSeconds;  //  总秒数
             double millseconds = timespan.TotalMilliseconds;
-            decimal seconds = (decimal)millseconds / 1000m;
+            decimal seconds = (decimal) millseconds/1000m;
 
             string format = "[Watcher] {0}, Time: {1}s, MemDiff: {2}KB";
-            var memDiff = GC.GetTotalMemory(false) - lastMem;  // byte
+            var memDiff = GC.GetTotalMemory(false) - lastMem; // byte
             Logger.LogError(string.Format(format,
                 string.IsNullOrEmpty(name) ? key : name, seconds.ToString("F7"),
-                memDiff / 1000f)); // 7位精度
+                memDiff/1000f)); // 7位精度
         }
 
         public static void BeginSample(string strName)
@@ -136,5 +157,4 @@ namespace KEngine
             Profiler.EndSample();
         }
     }
-
 }

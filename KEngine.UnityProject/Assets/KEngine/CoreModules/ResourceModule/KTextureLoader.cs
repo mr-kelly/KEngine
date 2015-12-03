@@ -1,35 +1,49 @@
-﻿//------------------------------------------------------------------------------
-//
-//      CosmosEngine - The Lightweight Unity3D Game Develop Framework
-//
-//                     Version 0.9.1 (20151010)
-//                     Copyright © 2011-2015
-//                   MrKelly <23110388@qq.com>
-//              https://github.com/mr-kelly/CosmosEngine
-//
-//------------------------------------------------------------------------------
-using UnityEngine;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Security.Cryptography;
-using KEngine;
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
 
-[CDependencyClass(typeof(KAssetFileLoader))]
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: KTextureLoader.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
+using KEngine;
+using UnityEngine;
+
+[CDependencyClass(typeof (KAssetFileLoader))]
 public class KTextureLoader : KAbstractResourceLoader
 {
-    public Texture Asset { get { return ResultObject as Texture; } }
+    public Texture Asset
+    {
+        get { return ResultObject as Texture; }
+    }
 
     public delegate void CTextureLoaderDelegate(bool isOk, Texture tex);
 
     private KAssetFileLoader AssetFileBridge;
+
     public override float Progress
     {
-        get
-        {
-            return AssetFileBridge.Progress;
-        }
+        get { return AssetFileBridge.Progress; }
     }
+
     public string Path { get; private set; }
 
     public static KTextureLoader Load(string path, CTextureLoaderDelegate callback = null)
@@ -41,6 +55,7 @@ public class KTextureLoader : KAbstractResourceLoader
         }
         return AutoNew<KTextureLoader>(path, newCallback);
     }
+
     protected override void Init(string url, params object[] args)
     {
         base.Init(url, args);
@@ -49,7 +64,7 @@ public class KTextureLoader : KAbstractResourceLoader
         AssetFileBridge = KAssetFileLoader.Load(Path, OnAssetLoaded);
     }
 
-    void OnAssetLoaded(bool isOk, UnityEngine.Object obj)
+    private void OnAssetLoaded(bool isOk, UnityEngine.Object obj)
     {
         if (!isOk)
         {
@@ -60,7 +75,7 @@ public class KTextureLoader : KAbstractResourceLoader
 
         if (isOk)
         {
-            var tex = Asset as Texture2D;            
+            var tex = Asset as Texture2D;
 
             string format = tex != null ? tex.format.ToString() : "";
             Desc = string.Format("{0}*{1}-{2}-{3}", Asset.width, Asset.height, Asset.width*Asset.height, format);

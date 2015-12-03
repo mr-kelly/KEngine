@@ -1,32 +1,56 @@
-﻿//------------------------------------------------------------------------------
-//
-//      CosmosEngine - The Lightweight Unity3D Game Develop Framework
-//
-//                     Version 0.9.1 (20151010)
-//                     Copyright © 2011-2015
-//                   MrKelly <23110388@qq.com>
-//              https://github.com/mr-kelly/CosmosEngine
-//
-//------------------------------------------------------------------------------
-using KEngine;
-using UnityEngine;
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: KUIModule.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using KEngine;
+using UnityEngine;
 
 /// <summary>
 /// UI Module
 /// </summary>
-[CDependencyClass(typeof(KResourceModule))]
+[CDependencyClass(typeof (KResourceModule))]
 public class KUIModule : ICModule
 {
-    class _InstanceClass { public static KUIModule _Instance = new KUIModule();}
-    public static KUIModule Instance { get { return _InstanceClass._Instance; } }
+    private class _InstanceClass
+    {
+        public static KUIModule _Instance = new KUIModule();
+    }
+
+    public static KUIModule Instance
+    {
+        get { return _InstanceClass._Instance; }
+    }
 
     /// <summary>
     /// 正在加载的UI统计
     /// </summary>
     private int _loadingUICount = 0;
+
     public int LoadingUICount
     {
         get { return _loadingUICount; }
@@ -42,6 +66,7 @@ public class KUIModule : ICModule
     /// A bridge for different UI System, for instance, you can use NGUI or EZGUI or etc.. UI Plugin through UIBridge
     /// </summary>
     public IKUIBridge UiBridge;
+
     public Dictionary<string, CUILoadState> UIWindows = new Dictionary<string, CUILoadState>();
     public bool UIRootLoaded = false;
 
@@ -72,7 +97,7 @@ public class KUIModule : ICModule
                 Logger.LogError("Cannot find UIBridge Type: {0}", uiBridgeTypeName);
             }
         }
-        
+
         if (UiBridge == null)
         {
             UiBridge = new KUGUIBridge();
@@ -96,7 +121,7 @@ public class KUIModule : ICModule
 
     public CUILoadState OpenWindow<T>(params object[] args) where T : KUIController
     {
-        return OpenWindow(typeof(T), args);
+        return OpenWindow(typeof (T), args);
     }
 
     // 打开窗口（非复制）
@@ -116,9 +141,10 @@ public class KUIModule : ICModule
     // 隐藏时打开，打开时隐藏
     public void ToggleWindow<T>(params object[] args)
     {
-        string uiName = typeof(T).Name.Remove(0, 3); // 去掉"CUI"
+        string uiName = typeof (T).Name.Remove(0, 3); // 去掉"CUI"
         ToggleWindow(uiName, args);
     }
+
     public void ToggleWindow(string name, params object[] args)
     {
         if (IsOpen(name))
@@ -156,7 +182,8 @@ public class KUIModule : ICModule
         }
 
         CallUI(template, (_ui, _args) =>
-        {  // _args useless
+        {
+            // _args useless
 
             CUILoadState uiTemplateState = _GetUIState(template);
 
@@ -172,12 +199,12 @@ public class KUIModule : ICModule
         return uiInstanceState;
     }
 
-    void OnDynamicWindowCallback(KUIController _ui, object[] _args)
+    private void OnDynamicWindowCallback(KUIController _ui, object[] _args)
     {
-        string template = (string)_args[0];
-        string name = (string)_args[1];
+        string template = (string) _args[0];
+        string name = (string) _args[1];
 
-        GameObject uiObj = (GameObject)UnityEngine.Object.Instantiate(_ui.gameObject);
+        GameObject uiObj = (GameObject) UnityEngine.Object.Instantiate(_ui.gameObject);
 
         uiObj.name = name;
 
@@ -192,7 +219,7 @@ public class KUIModule : ICModule
 
         instanceUIState.UIWindow = uiBase;
 
-        object[] originArgs = new object[_args.Length - 2];  // 去除前2个参数
+        object[] originArgs = new object[_args.Length - 2]; // 去除前2个参数
         for (int i = 2; i < _args.Length; i++)
             originArgs[i - 2] = _args[i];
         InitWindow(instanceUIState, uiBase, instanceUIState.OpenWhenFinish, originArgs);
@@ -205,7 +232,7 @@ public class KUIModule : ICModule
 
     public void CloseWindow<T>()
     {
-        CloseWindow(typeof(T));
+        CloseWindow(typeof (T));
     }
 
     public void CloseWindow(string name)
@@ -218,7 +245,7 @@ public class KUIModule : ICModule
             return; // 未开始Load
         }
 
-        if (uiState.IsLoading)  // Loading中
+        if (uiState.IsLoading) // Loading中
         {
             if (Debug.isDebugBuild)
                 Logger.Log("[CloseWindow]IsLoading的{0}", name);
@@ -262,7 +289,6 @@ public class KUIModule : ICModule
 
         foreach (string item in LoadList)
             DestroyWindow(item);
-
     }
 
     [Obsolete("Deprecated: Please don't use this")]
@@ -284,7 +310,7 @@ public class KUIModule : ICModule
         }
     }
 
-    CUILoadState _GetUIState(string name)
+    private CUILoadState _GetUIState(string name)
     {
         CUILoadState uiState;
         UIWindows.TryGetValue(name, out uiState);
@@ -294,7 +320,7 @@ public class KUIModule : ICModule
         return null;
     }
 
-    KUIController GetUIBase(string name)
+    private KUIController GetUIBase(string name)
     {
         CUILoadState uiState;
         UIWindows.TryGetValue(name, out uiState);
@@ -306,7 +332,7 @@ public class KUIModule : ICModule
 
     public bool IsOpen<T>() where T : KUIController
     {
-        string uiName = typeof(T).Name.Remove(0, 3); // 去掉"CUI"
+        string uiName = typeof (T).Name.Remove(0, 3); // 去掉"CUI"
         return IsOpen(uiName);
     }
 
@@ -347,20 +373,20 @@ public class KUIModule : ICModule
         return openState;
     }
 
-    IEnumerator LoadUIAssetBundle(string path, string name, CUILoadState openState)
+    private IEnumerator LoadUIAssetBundle(string path, string name, CUILoadState openState)
     {
         LoadingUICount++;
         var assetLoader = KStaticAssetLoader.Load(path);
-        openState.UIResourceLoader = assetLoader;  // 基本不用手工释放的
+        openState.UIResourceLoader = assetLoader; // 基本不用手工释放的
         while (!assetLoader.IsFinished)
             yield return null;
 
-        GameObject uiObj = (GameObject)assetLoader.TheAsset;
+        GameObject uiObj = (GameObject) assetLoader.TheAsset;
 
         uiObj.SetActive(false);
         uiObj.name = openState.TemplateName;
 
-        KUIController uiBase = (KUIController)uiObj.AddComponent(openState.UIType);
+        KUIController uiBase = (KUIController) uiObj.AddComponent(openState.UIType);
 
         openState.UIWindow = uiBase;
 
@@ -368,7 +394,7 @@ public class KUIModule : ICModule
 
         UiBridge.UIObjectFilter(uiBase, uiObj);
 
-        openState.IsLoading = false;  // Load完
+        openState.IsLoading = false; // Load完
         InitWindow(openState, uiBase, openState.OpenWhenFinish, openState.OpenArgs);
         LoadingUICount--;
     }
@@ -393,7 +419,6 @@ public class KUIModule : ICModule
     /// <summary>
     /// 等待并获取UI实例，执行callback
     /// 源起Loadindg UI， 在加载过程中，进度条设置方法会失效
-    /// 
     /// 如果是DynamicWindow,，使用前务必先要Open!
     /// </summary>
     /// <param name="uiTemplateName"></param>
@@ -406,7 +431,7 @@ public class KUIModule : ICModule
         CUILoadState uiState;
         if (!UIWindows.TryGetValue(uiTemplateName, out uiState))
         {
-            uiState = LoadWindow(uiTemplateName, false);  // 加载，这样就有UIState了, 但注意因为没参数，不要随意执行OnOpen
+            uiState = LoadWindow(uiTemplateName, false); // 加载，这样就有UIState了, 但注意因为没参数，不要随意执行OnOpen
         }
 
         uiState.DoCallback(callback, args);
@@ -441,15 +466,12 @@ public class KUIModule : ICModule
     // 使用泛型方式
     public void CallUI<T>(Action<T, object[]> callback, params object[] args) where T : KUIController
     {
-        string uiName = typeof(T).Name.Remove(0, 3); // 去掉 "XUI"
+        string uiName = typeof (T).Name.Remove(0, 3); // 去掉 "XUI"
 
-        CallUI(uiName, (KUIController _uibase, object[] _args) =>
-        {
-            callback((T)_uibase, _args);
-        }, args);
+        CallUI(uiName, (KUIController _uibase, object[] _args) => { callback((T) _uibase, _args); }, args);
     }
 
-    void OnOpen(CUILoadState uiState, params object[] args)
+    private void OnOpen(CUILoadState uiState, params object[] args)
     {
         if (uiState.IsLoading)
         {
@@ -482,7 +504,7 @@ public class KUIModule : ICModule
     }
 
 
-    void InitWindow(CUILoadState uiState, KUIController uiBase, bool open, params object[] args)
+    private void InitWindow(CUILoadState uiState, KUIController uiBase, bool open, params object[] args)
     {
         uiBase.OnInit();
         if (OnInitEvent != null)
@@ -490,7 +512,6 @@ public class KUIModule : ICModule
         if (open)
         {
             OnOpen(uiState, args);
-
         }
 
         if (!open)
@@ -507,8 +528,6 @@ public class KUIModule : ICModule
         }
 
         uiState.OnUIWindowLoadedCallbacks(uiState, uiBase);
-
-
     }
 }
 
@@ -546,7 +565,6 @@ public class CUILoadState
         CallbacksArgsWhenFinish = new Queue<object[]>();
     }
 
-    
 
     /// <summary>
     /// 确保加载完成后的回调

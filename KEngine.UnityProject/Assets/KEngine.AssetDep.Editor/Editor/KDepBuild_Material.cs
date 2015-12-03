@@ -1,14 +1,38 @@
-﻿using System.Collections.Generic;
-using UnityEditor;
-using UnityEngine;
-using System.Collections;
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: KDepBuild_Material.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
+using System.Collections.Generic;
 using KEngine;
 using KEngine.Editor;
+using UnityEditor;
+using UnityEngine;
 
 public partial class KDependencyBuild
 {
-
-    static string BuildDepMaterial(Material mat, float scaleTexture = 1f)
+    private static string BuildDepMaterial(Material mat, float scaleTexture = 1f)
     {
         KSerializeMaterial sMat = __DoExportMaterial(mat, scaleTexture);
 
@@ -30,7 +54,7 @@ public partial class KDependencyBuild
     }
 
     // 只导出材质信息，不实际导出材质
-    static KSerializeMaterial __DoExportMaterial(Material mat, float scaleTexture = 1f)
+    private static KSerializeMaterial __DoExportMaterial(Material mat, float scaleTexture = 1f)
     {
         string matPath = AssetDatabase.GetAssetPath(mat).Replace("Assets/", "");
         if (string.IsNullOrEmpty(matPath))
@@ -60,7 +84,7 @@ public partial class KDependencyBuild
         return xMat;
     }
 
-    static string _BuildShader(Shader shader)
+    private static string _BuildShader(Shader shader)
     {
         Shader fileShader;
         string shaderAssetPath = AssetDatabase.GetAssetPath(shader);
@@ -68,12 +92,12 @@ public partial class KDependencyBuild
         {
             shaderAssetPath = "Assets/" + KEngineDef.ResourcesBuildCacheDir + "/BuiltinShader";
 
-            fileShader = AssetDatabase.LoadAssetAtPath(shaderAssetPath, typeof(Shader)) as Shader;
+            fileShader = AssetDatabase.LoadAssetAtPath(shaderAssetPath, typeof (Shader)) as Shader;
             if (fileShader == null)
             {
                 AssetDatabase.CreateAsset(shader, shaderAssetPath);
                 AssetDatabase.ImportAsset(shaderAssetPath);
-                fileShader = AssetDatabase.LoadAssetAtPath(shaderAssetPath, typeof(Shader)) as Shader;
+                fileShader = AssetDatabase.LoadAssetAtPath(shaderAssetPath, typeof (Shader)) as Shader;
 
                 if (fileShader == null)
                 {
@@ -85,7 +109,7 @@ public partial class KDependencyBuild
         {
             fileShader = shader;
         }
-        
+
         //var shaderFlag = string.Format("Shader:{0}:{1}", fileShader.name, shaderAssetPath);  // 构造一个标记
 
         bool needBuild = KAssetVersionControl.TryCheckFileBuild(shaderAssetPath);
@@ -97,12 +121,13 @@ public partial class KDependencyBuild
         return result.Path;
     }
 
-    static string GetShaderNameToBuild(Shader shader)
+    private static string GetShaderNameToBuild(Shader shader)
     {
         var cleanShaderName = shader.name.Replace(" ", "_").Replace("/", "_"); // 去空格，去斜杠
         return cleanShaderName;
     }
-    static IEnumerator<KSerializeMaterialProperty> _ShaderPropEnumtor(Material mat, float scaleTexture = 1f)
+
+    private static IEnumerator<KSerializeMaterialProperty> _ShaderPropEnumtor(Material mat, float scaleTexture = 1f)
     {
         var shader = mat.shader;
         if (shader != null)
@@ -110,7 +135,7 @@ public partial class KDependencyBuild
             for (var i = 0; i < ShaderUtil.GetPropertyCount(shader); i++)
             {
                 var shaderType = ShaderUtil.GetPropertyType(shader, i);
-                var shaderPropName  = ShaderUtil.GetPropertyName(shader, i);
+                var shaderPropName = ShaderUtil.GetPropertyName(shader, i);
                 switch (shaderType)
                 {
                     case ShaderUtil.ShaderPropertyType.TexEnv:
@@ -120,11 +145,11 @@ public partial class KDependencyBuild
                         yield return _GetMatColor(mat, shaderPropName);
                         break;
                     case ShaderUtil.ShaderPropertyType.Range:
-                    case ShaderUtil.ShaderPropertyType.Float:  // TODO: 未确定Mat.GetInt是float还是range
+                    case ShaderUtil.ShaderPropertyType.Float: // TODO: 未确定Mat.GetInt是float还是range
                         yield return _GetMatRange(mat, shaderPropName);
                         break;
                     case ShaderUtil.ShaderPropertyType.Vector:
-                        yield return  _GetShaderVectorProp(mat, shaderPropName);
+                        yield return _GetShaderVectorProp(mat, shaderPropName);
                         break;
                 }
             }
@@ -152,7 +177,7 @@ public partial class KDependencyBuild
         //yield return _GetShaderTexProp(mat, "_RefractionTex", buildToFolder, scaleTexture);
     }
 
-    static KSerializeMaterialProperty _GetShaderTexProp(Material mm, string texProp, float scaleTexture = 1f)
+    private static KSerializeMaterialProperty _GetShaderTexProp(Material mm, string texProp, float scaleTexture = 1f)
     {
         if (mm.HasProperty(texProp))
         {
@@ -164,7 +189,7 @@ public partial class KDependencyBuild
                 shaderProp.PropName = texProp;
                 if (tex is Texture2D)
                 {
-                    var texTiling = mm.GetTextureScale(texProp);  // 纹理+tiling+offset
+                    var texTiling = mm.GetTextureScale(texProp); // 纹理+tiling+offset
                     var texOffset = mm.GetTextureOffset(texProp);
                     var texPath = BuildDepTexture(tex, scaleTexture);
                     shaderProp.Type = KSerializeMaterialProperty.ShaderType.Texture;
@@ -175,7 +200,8 @@ public partial class KDependencyBuild
                 else
                 {
                     Logger.LogWarning("找到一个非Texture2D, Type:{0} Mat:{1} PropName:{2}", tex.GetType(), mm.name, texProp);
-                    shaderProp.Type = KSerializeMaterialProperty.ShaderType.RenderTexture; // Shader的RenderTexture不打包，一般由脚本动态生成
+                    shaderProp.Type = KSerializeMaterialProperty.ShaderType.RenderTexture;
+                        // Shader的RenderTexture不打包，一般由脚本动态生成
                     shaderProp.PropValue = null;
                 }
                 return shaderProp;
@@ -189,7 +215,7 @@ public partial class KDependencyBuild
         return null;
     }
 
-    static KSerializeMaterialProperty _GetShaderVectorProp(Material mm, string texProp)
+    private static KSerializeMaterialProperty _GetShaderVectorProp(Material mm, string texProp)
     {
         if (mm.HasProperty(texProp))
         {
@@ -204,7 +230,7 @@ public partial class KDependencyBuild
         return null;
     }
 
-    static KSerializeMaterialProperty _GetMatColor(Material mm, string colorProp)
+    private static KSerializeMaterialProperty _GetMatColor(Material mm, string colorProp)
     {
         if (mm.HasProperty(colorProp))
         {
@@ -219,7 +245,8 @@ public partial class KDependencyBuild
 
         return null; // 默认给个白
     }
-    static KSerializeMaterialProperty _GetMatRange(Material mm, string propName)
+
+    private static KSerializeMaterialProperty _GetMatRange(Material mm, string propName)
     {
         if (mm.HasProperty(propName))
         {

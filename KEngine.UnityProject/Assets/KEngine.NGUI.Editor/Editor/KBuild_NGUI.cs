@@ -1,33 +1,40 @@
-﻿//------------------------------------------------------------------------------
-//
-//      CosmosEngine - The Lightweight Unity3D Game Develop Framework
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
 // 
-//                     Version 0.8 (20140904)
-//                     Copyright © 2011-2014
-//                   MrKelly <23110388@qq.com>
-//              https://github.com/mr-kelly/CosmosEngine
-//
-//------------------------------------------------------------------------------
+// Filename: KBuild_NGUI.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
 
 using System;
-using UnityEngine;
-using UnityEditor;
 using System.IO;
-using System.Reflection;
-using System.Collections;
-using System.Collections.Generic;
 using KEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
+using UnityEditor;
+using UnityEngine;
 
 public partial class KBuild_NGUI : KBuild_Base
 {
     private string UIScenePath
     {
-        get
-        {
-            return EditorApplication.currentScene;
-        }
+        get { return EditorApplication.currentScene; }
     }
 
     //UIPanel PanelRoot;
@@ -37,8 +44,15 @@ public partial class KBuild_NGUI : KBuild_Base
     // 判断本次是否全局打包，是否剔除没用的UIlabel string
     public bool IsBuildAll = false;
 
-    public override string GetDirectory() { return "UI"; }
-    public override string GetExtention() { return "*.unity"; }
+    public override string GetDirectory()
+    {
+        return "UI";
+    }
+
+    public override string GetExtention()
+    {
+        return "*.unity";
+    }
 
     public static event Action<KBuild_NGUI> BeginExportEvent;
     public static event Action<KBuild_NGUI, string, string, GameObject> ExportCurrentUIEvent;
@@ -109,12 +123,11 @@ public partial class KBuild_NGUI : KBuild_Base
         {
             EndExportEvent(this);
         }
-
     }
 
-    GameObject CreateTempPrefab(GameObject windowAsset)
+    private GameObject CreateTempPrefab(GameObject windowAsset)
     {
-        var tempPanelObject = (GameObject)GameObject.Instantiate(windowAsset);
+        var tempPanelObject = (GameObject) GameObject.Instantiate(windowAsset);
 
         //if (WindowObject.GetComponent<UIPanel>() == null)
         //{
@@ -128,7 +141,8 @@ public partial class KBuild_NGUI : KBuild_Base
 
         foreach (UIButton go in tempPanelObject.GetComponentsInChildren<UIButton>(true))
         {
-            if (go.tweenTarget != null && go.transform.FindChild(go.tweenTarget.name) != null && go.tweenTarget != go.transform.FindChild(go.tweenTarget.name).gameObject)
+            if (go.tweenTarget != null && go.transform.FindChild(go.tweenTarget.name) != null &&
+                go.tweenTarget != go.transform.FindChild(go.tweenTarget.name).gameObject)
             {
                 Debug.LogWarning(windowAsset + " " + go.name + " UIButton 的Target 目标不是当前UIButton 子节点 ");
             }
@@ -137,7 +151,7 @@ public partial class KBuild_NGUI : KBuild_Base
         return tempPanelObject;
     }
 
-    void DestroyTempPrefab(GameObject tempPanelObject)
+    private void DestroyTempPrefab(GameObject tempPanelObject)
     {
         GameObject.DestroyImmediate(tempPanelObject);
         //AnchorObject = null;
@@ -147,7 +161,7 @@ public partial class KBuild_NGUI : KBuild_Base
     public static GameObject GetUIWindow()
     {
         //PanelRoot = GameObject.Find("UIRoot/PanelRoot").GetComponent<UIPanel>();
-        var AnchorObject = (GameObject)GameObject.Find("UIRoot/PanelRoot/Anchor");
+        var AnchorObject = (GameObject) GameObject.Find("UIRoot/PanelRoot/Anchor");
 
         if (AnchorObject == null)
         {
@@ -167,8 +181,8 @@ public partial class KBuild_NGUI : KBuild_Base
             return null;
         }
         return AnchorObject.transform.GetChild(0).gameObject;
-
     }
+
     public bool CheckUI(bool showMsg)
     {
         var windowAssets = GameObject.FindObjectsOfType<KUIWindowAsset>();
@@ -211,7 +225,7 @@ public partial class KBuild_NGUI : KBuild_Base
         if (uiRootObj == null)
         {
             uiRootObj = new GameObject("UIRoot");
-            uiRootObj.layer = (int)UnityLayerDef.UI;
+            uiRootObj.layer = (int) UnityLayerDef.UI;
         }
 
         UIRoot uiRoot = uiRootObj.GetComponent<UIRoot>() ?? uiRootObj.AddComponent<UIRoot>();
@@ -226,18 +240,17 @@ public partial class KBuild_NGUI : KBuild_Base
         if (cameraObj == null)
         {
             cameraObj = new GameObject("UICamera");
-            cameraObj.layer = (int)UnityLayerDef.UI;
+            cameraObj.layer = (int) UnityLayerDef.UI;
 
             Camera camera = cameraObj.AddComponent<Camera>();
             camera.clearFlags = CameraClearFlags.Skybox;
             camera.depth = 0;
             camera.backgroundColor = Color.grey;
-            camera.cullingMask = 1 << (int)UnityLayerDef.UI;
+            camera.cullingMask = 1 << (int) UnityLayerDef.UI;
             camera.orthographicSize = 1f;
             camera.orthographic = true;
             camera.nearClipPlane = -2f;
             camera.farClipPlane = 2f;
-
         }
         var aud = cameraObj.GetComponent<AudioListener>() ?? cameraObj.AddComponent<AudioListener>();
         var uiCam = cameraObj.GetComponent<UICamera>() ?? cameraObj.AddComponent<UICamera>();
@@ -258,7 +271,7 @@ public partial class KBuild_NGUI : KBuild_Base
         }
 
         GameObject windowObj = NGUITools.AddChild(anchorTran.gameObject);
-        windowObj.name = "UIWindow"+Path.GetRandomFileName();
+        windowObj.name = "UIWindow" + Path.GetRandomFileName();
         windowObj.AddComponent<KUIWindowAsset>();
 
         Selection.activeGameObject = windowObj;

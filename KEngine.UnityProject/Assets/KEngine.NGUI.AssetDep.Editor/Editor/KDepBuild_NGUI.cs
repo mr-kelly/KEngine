@@ -1,13 +1,34 @@
-﻿using System.Reflection;
-using UnityEngine;
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: KDepBuild_NGUI.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
-using System.IO;
-using System.Linq;
 using KEngine;
 using KEngine.Editor;
+using UnityEditor;
+using UnityEngine;
 
 public partial class KDependencyBuild
 {
@@ -29,7 +50,7 @@ public partial class KDependencyBuild
         var scale = 1f; // TODO: scale read
         GameObject atlasPrefab = PrefabUtility.FindPrefabRoot(atlas.gameObject) as GameObject;
         Logger.Assert(atlasPrefab);
-        string path = AssetDatabase.GetAssetPath(atlasPrefab);  // prefab只用来获取路径，不打包不挖空
+        string path = AssetDatabase.GetAssetPath(atlasPrefab); // prefab只用来获取路径，不打包不挖空
         bool needBuild = KAssetVersionControl.TryCheckNeedBuildWithMeta(path);
         if (needBuild)
             KAssetVersionControl.TryMarkBuildVersion(path);
@@ -51,22 +72,22 @@ public partial class KDependencyBuild
         string matPath = BuildDepMaterial(cacheMat, scale); // 缩放
 
         // 缩放
-        copyAtlas.pixelSize = 1 / PictureScale;
+        copyAtlas.pixelSize = 1/PictureScale;
         foreach (var spriteData in copyAtlas.spriteList)
         {
-            spriteData.x = Mathf.FloorToInt(spriteData.x * PictureScale);
-            spriteData.y = Mathf.FloorToInt(spriteData.y * PictureScale);
-            spriteData.width = Mathf.FloorToInt(spriteData.width * PictureScale);
-            spriteData.height = Mathf.FloorToInt(spriteData.height * PictureScale);
-            spriteData.borderLeft = Mathf.FloorToInt(spriteData.borderLeft * PictureScale);
-            spriteData.borderRight = Mathf.FloorToInt(spriteData.borderRight * PictureScale);
-            spriteData.borderTop = Mathf.FloorToInt(spriteData.borderTop * PictureScale);
-            spriteData.borderBottom = Mathf.FloorToInt(spriteData.borderBottom * PictureScale);
+            spriteData.x = Mathf.FloorToInt(spriteData.x*PictureScale);
+            spriteData.y = Mathf.FloorToInt(spriteData.y*PictureScale);
+            spriteData.width = Mathf.FloorToInt(spriteData.width*PictureScale);
+            spriteData.height = Mathf.FloorToInt(spriteData.height*PictureScale);
+            spriteData.borderLeft = Mathf.FloorToInt(spriteData.borderLeft*PictureScale);
+            spriteData.borderRight = Mathf.FloorToInt(spriteData.borderRight*PictureScale);
+            spriteData.borderTop = Mathf.FloorToInt(spriteData.borderTop*PictureScale);
+            spriteData.borderBottom = Mathf.FloorToInt(spriteData.borderBottom*PictureScale);
             // padding 不变， ngui bug
-            spriteData.paddingBottom = Mathf.FloorToInt(spriteData.paddingBottom * PictureScale);
-            spriteData.paddingTop = Mathf.FloorToInt(spriteData.paddingTop * PictureScale);
-            spriteData.paddingLeft = Mathf.FloorToInt(spriteData.paddingLeft * PictureScale);
-            spriteData.paddingRight = Mathf.FloorToInt(spriteData.paddingRight * PictureScale);
+            spriteData.paddingBottom = Mathf.FloorToInt(spriteData.paddingBottom*PictureScale);
+            spriteData.paddingTop = Mathf.FloorToInt(spriteData.paddingTop*PictureScale);
+            spriteData.paddingLeft = Mathf.FloorToInt(spriteData.paddingLeft*PictureScale);
+            spriteData.paddingRight = Mathf.FloorToInt(spriteData.paddingRight*PictureScale);
         }
 
         KAssetDep.Create<KUIAtlasDep>(copyAtlas, matPath);
@@ -85,8 +106,8 @@ public partial class KDependencyBuild
     }
 
 
-    [DepBuild(typeof(UISprite))]
-    static void ProcessUISprite(UISprite sprite)
+    [DepBuild(typeof (UISprite))]
+    private static void ProcessUISprite(UISprite sprite)
     {
         if (sprite.atlas != null)
         {
@@ -97,13 +118,12 @@ public partial class KDependencyBuild
         }
         else
             Logger.LogWarning("UISprite null Atlas: {0}", sprite.name);
-
     }
 
     /// <summary>
     /// NGUI 的字体集
     /// </summary>
-    static string BuildUIFont(UIFont uiFont)
+    private static string BuildUIFont(UIFont uiFont)
     {
         if (uiFont.atlas == null)
         {
@@ -119,7 +139,7 @@ public partial class KDependencyBuild
         var copyUIFont = copyUIFontObj.GetComponent<UIFont>();
 
         var uiAtlas = BuildUIAtlas(copyUIFont.atlas); // 依赖的UI Atlas
-        copyUIFont.atlas = null;  // 清空依赖
+        copyUIFont.atlas = null; // 清空依赖
         copyUIFont.material = null;
         //CResourceDependencies.Create(copyUIFont, CResourceDependencyType.NGUI_UIFONT, uiAtlas);
         KAssetDep.Create<KUIFontDep>(copyUIFont, uiAtlas);
@@ -129,12 +149,11 @@ public partial class KDependencyBuild
         GameObject.DestroyImmediate(copyUIFontObj);
 
         return result.Path;
-
     }
 
 
-    [DepBuild(typeof(UITexture))]
-    static void ProcessUITexture(UITexture tex)
+    [DepBuild(typeof (UITexture))]
+    private static void ProcessUITexture(UITexture tex)
     {
         if (tex.mainTexture != null)
         {
@@ -152,8 +171,8 @@ public partial class KDependencyBuild
         }
     }
 
-    [DepBuild(typeof(UILabel))]
-    static void ProcessUILabel(UILabel label)
+    [DepBuild(typeof (UILabel))]
+    private static void ProcessUILabel(UILabel label)
     {
         // 图片字体！ 打包字
         if (label.bitmapFont != null)
@@ -177,5 +196,4 @@ public partial class KDependencyBuild
             Logger.LogWarning("找不到Label的字体: {0}", label.name);
         }
     }
-
 }

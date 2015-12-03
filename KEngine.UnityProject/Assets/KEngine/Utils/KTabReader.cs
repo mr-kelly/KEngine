@@ -1,43 +1,61 @@
-﻿//------------------------------------------------------------------------------
-//
-//      CosmosEngine - The Lightweight Unity3D Game Develop Framework
-//
-//                     Version 0.9.1 (20151010)
-//                     Copyright © 2011-2015
-//                   MrKelly <23110388@qq.com>
-//              https://github.com/mr-kelly/CosmosEngine
-//
-//------------------------------------------------------------------------------
-// tab文件读写，参照c++库
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: KTabReader.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.IO;
-using UnityEngine;
 using System.Text;
+using UnityEngine;
 
 namespace KEngine
 {
-
     /// <summary>
     /// 性能更好，不能写入的Tab读取器
     /// </summary>
     [System.Obsolete("不支持行头定义类型！暂时不用了！")]
     public class KTabReader : IKTabReadble, IDisposable
     {
-        Stream m_tableStream;
-        StreamReader m_tableReader;
+        private Stream m_tableStream;
+        private StreamReader m_tableReader;
 
-        Dictionary<string, int> m_attrDict = null;  /*表格属性列 */
-        int m_RowCount = 0;
-        int m_CursorPos = 0;
-        string[] m_CachedColumns; // 当前行缓存(已拆分)
+        private Dictionary<string, int> m_attrDict = null; /*表格属性列 */
+        private int m_RowCount = 0;
+        private int m_CursorPos = 0;
+        private string[] m_CachedColumns; // 当前行缓存(已拆分)
 
-        private string m_FileName = "";  // LoadFromFile调用时才产生
+        private string m_FileName = ""; // LoadFromFile调用时才产生
 
         /** 构造器 */
-        private KTabReader() { }
+
+        private KTabReader()
+        {
+        }
 
         /*  从文件对象中创建 */
+
         public static KTabReader LoadFromFile(string path)
         {
             KTabReader tableFile = null;
@@ -54,18 +72,21 @@ namespace KEngine
             }
             return tableFile;
         }
+
         /* 从字符串中创建对象 */
+
         public static KTabReader LoadFromString(string filename, string str)
         {
             return LoadFromContent(filename, Encoding.UTF8.GetBytes(str));
         }
 
         /* 从字符串中创建对象 */
+
         public static KTabReader LoadFromContent(string filename, byte[] data)
         {
             KTabReader tableFile = new KTabReader();
 
-            tableFile.m_FileName = filename;  // 文件名保存，用于输出
+            tableFile.m_FileName = filename; // 文件名保存，用于输出
             //byte[] tableBytes = Convert.FromBase64String(txt);  // string -> bytes -> stream
             tableFile.m_tableStream = new MemoryStream(data);
             //tableFile.m_tableReader = new StreamReader(tableFile.m_tableStream);
@@ -80,6 +101,7 @@ namespace KEngine
         }
 
         /* 初始化实例对象的Reader，回到起点，用于下一次读取 */
+
         public void InitStreamReader()
         {
             this.m_tableStream.Seek(0, 0);
@@ -110,7 +132,7 @@ namespace KEngine
                 /* 列从1开始，  i+1所以 */
                 try
                 {
-                    this.m_attrDict.Add(attrArray[i], i + 1);  /* 放入字典 -> ( ColumnName,  ColumnNum ) (名字，列数）*/
+                    this.m_attrDict.Add(attrArray[i], i + 1); /* 放入字典 -> ( ColumnName,  ColumnNum ) (名字，列数）*/
                 }
                 catch (Exception e)
                 {
@@ -122,6 +144,7 @@ namespace KEngine
         }
 
         /* 根据列名获取列的数字 */
+
         private int findColumnByName(string columnName)
         {
             if (m_attrDict.ContainsKey(columnName))
@@ -134,6 +157,7 @@ namespace KEngine
         }
 
         /** 获取第一行第column列的名字， 即表头属性名 */
+
         public string GetColumnName(int column)
         {
             foreach (KeyValuePair<string, int> attr in this.m_attrDict)
@@ -159,12 +183,14 @@ namespace KEngine
         }
 
         /** 列数 */
+
         public int GetColumnsCount()
         {
             return m_attrDict.Count;
         }
 
         /* 设置值, 返回成功与否， 不抛出异常 */
+
         public string GetString(int row, string columnName)
         {
             string outVal = "";
@@ -183,6 +209,7 @@ namespace KEngine
         }
 
         /* 获取表格内容字符串 */
+
         public string GetString(int row, int column)
         {
             if (row < (m_CursorPos - 1))
@@ -210,7 +237,7 @@ namespace KEngine
                 {
                     m_CachedColumns = line.Split('\t');
 
-                    return m_CachedColumns[column - 1].Trim();  // 去空格
+                    return m_CachedColumns[column - 1].Trim(); // 去空格
                 }
             } while (true);
 
@@ -223,7 +250,7 @@ namespace KEngine
             try
             {
                 string field = GetString(row, column);
-                return (int)float.Parse(field);
+                return (int) float.Parse(field);
             }
             catch
             {
@@ -236,7 +263,7 @@ namespace KEngine
             try
             {
                 string field = GetString(row, columnName);
-                return (int)float.Parse(field);
+                return (int) float.Parse(field);
             }
             catch
             {
@@ -249,7 +276,7 @@ namespace KEngine
             try
             {
                 string field = GetString(row, column);
-                return (uint)float.Parse(field);
+                return (uint) float.Parse(field);
             }
             catch
             {
@@ -262,13 +289,14 @@ namespace KEngine
             try
             {
                 string field = GetString(row, columnName);
-                return (uint)float.Parse(field);
+                return (uint) float.Parse(field);
             }
             catch
             {
                 return 0;
             }
         }
+
         public double GetDouble(int row, int column)
         {
             try
@@ -393,5 +421,4 @@ namespace KEngine
             Close();
         }
     }
-
 }

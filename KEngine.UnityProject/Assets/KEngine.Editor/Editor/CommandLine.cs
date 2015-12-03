@@ -1,21 +1,33 @@
-﻿//------------------------------------------------------------------------------
-//
-//      CosmosEngine - The Lightweight Unity3D Game Develop Framework
-//
-//                     Version 0.9.1 (20151010)
-//                     Copyright © 2011-2015
-//                   MrKelly <23110388@qq.com>
-//              https://github.com/mr-kelly/CosmosEngine
-//
-//------------------------------------------------------------------------------
-using System;
-using System.Collections;
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: CommandLine.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
 using System.Collections.Generic;
 
 namespace KEngine.Editor
 {
-
-
     public class CommandArgs
     {
         public Dictionary<string, string> ArgPairs
@@ -28,16 +40,16 @@ namespace KEngine.Editor
             get { return mParams; }
         }
 
-        List<string> mParams = new List<string>();
-        Dictionary<string, string> mArgPairs = new Dictionary<string, string>();
+        private List<string> mParams = new List<string>();
+        private Dictionary<string, string> mArgPairs = new Dictionary<string, string>();
     }
 
     public class CommandLine
     {
         public static CommandArgs Parse(string[] args)
         {
-            char[] kEqual = new char[] { '=' };
-            char[] kArgStart = new char[] { '-', '\\' };
+            char[] kEqual = new char[] {'='};
+            char[] kArgStart = new char[] {'-', '\\'};
             CommandArgs ca = new CommandArgs();
 
             int ii = -1;
@@ -92,12 +104,12 @@ namespace KEngine.Editor
             return ca;
         }
 
-        static bool IsArg(string arg)
+        private static bool IsArg(string arg)
         {
             return (arg.StartsWith("-") || arg.StartsWith("\\"));
         }
 
-        static string NextToken(string[] args, ref int ii)
+        private static string NextToken(string[] args, ref int ii)
         {
             ii++;
             while (ii < args.Length)

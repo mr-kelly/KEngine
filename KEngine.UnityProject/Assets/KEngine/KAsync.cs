@@ -1,28 +1,41 @@
-﻿//------------------------------------------------------------------------------
-//
-//      CosmosEngine - The Lightweight Unity3D Game Develop Framework
-//
-//                     Version 0.9.1 (20151010)
-//                     Copyright © 2011-2015
-//                   MrKelly <23110388@qq.com>
-//              https://github.com/mr-kelly/CosmosEngine
-//
-//------------------------------------------------------------------------------
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: KAsync.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
-using KEngine;
 using UnityEngine;
 
 namespace KEngine
 {
     /// <summary>
     /// 链式操作，结合协程和DOTween, 并且支持真线程（用于密集运算，无法调用Unity大部分函数）
-    /// 
     /// 适合做动画、结合协程、回调一堆的情况
     /// </summary>
-    /// 
     /// <example>
     /// KAsync.Start(doSomething)
     ///         .WaitForSeconds(1f)
@@ -39,6 +52,7 @@ namespace KEngine
     public class KAsync
     {
         #region 核心调度
+
         private Queue<AsyncWaitNextDelegate> _cacheCallbacks;
         private bool _canNext;
 
@@ -54,7 +68,7 @@ namespace KEngine
             return KAsyncManager.Instance.StartCoroutine(EmWaitFinish());
         }
 
-        IEnumerator EmWaitFinish()
+        private IEnumerator EmWaitFinish()
         {
             while (!IsFinished)
                 yield return null;
@@ -75,7 +89,6 @@ namespace KEngine
                 _canNext = false;
                 callback(Next);
             }
-
         }
 
         private void Next()
@@ -86,6 +99,7 @@ namespace KEngine
             else
                 IsFinished = true;
         }
+
         #endregion
 
         /// <summary>
@@ -127,18 +141,16 @@ namespace KEngine
         }
 
         public delegate void AsyncThreadDelegateFull(object param, Action next);
+
         public delegate void AsyncThreadDelegate(Action next);
+
         public delegate void AsyncThenDelegateEasy(Action next);
+
         public delegate void AsyncThenDelegate(Action next, Action kill);
+
         public KAsync Then(AsyncThenDelegate thenFunc)
         {
-            WaitNext((next) =>
-            {
-                thenFunc(next, () =>
-                {
-                    Debug.LogError("TODO: kill!");
-                });
-            });
+            WaitNext((next) => { thenFunc(next, () => { Debug.LogError("TODO: kill!"); }); });
             return this;
         }
 
@@ -154,10 +166,7 @@ namespace KEngine
         /// <returns></returns>
         public KAsync When(Func<bool> retBool, float timeout = 20)
         {
-            WaitNext((next) =>
-            {
-                KAsyncManager.Instance.StartCoroutine(_CoWhen(retBool, timeout, next));
-            });
+            WaitNext((next) => { KAsyncManager.Instance.StartCoroutine(_CoWhen(retBool, timeout, next)); });
             return this;
         }
 
@@ -180,10 +189,7 @@ namespace KEngine
 
         public KAsync Then(AsyncThenDelegateEasy thenFunc)
         {
-            WaitNext((next) =>
-            {
-                thenFunc(next);
-            });
+            WaitNext((next) => { thenFunc(next); });
             return this;
         }
 
@@ -194,10 +200,7 @@ namespace KEngine
         /// <returns></returns>
         public KAsync Thread(AsyncThreadDelegate threadCalAction)
         {
-            return Coroutine(_Thread((thread, next) =>
-            {
-                threadCalAction(next);
-            }));
+            return Coroutine(_Thread((thread, next) => { threadCalAction(next); }));
         }
 
         public KAsync Thread(AsyncThreadDelegateFull threadCalAction, object param)
@@ -220,12 +223,8 @@ namespace KEngine
 
             var thread = new Thread(() =>
             {
-                Action customNext = () =>
-                {
-                    waitThreadFinish = true;
-                };
+                Action customNext = () => { waitThreadFinish = true; };
                 threadCalAction(param, customNext);
-
             });
 
             thread.Start();
@@ -235,6 +234,7 @@ namespace KEngine
                 yield return null;
             KAsyncManager.Instance._threads.Remove(thread);
         }
+
         /// <summary>
         /// 开启并等待一个协程
         /// </summary>
@@ -242,10 +242,7 @@ namespace KEngine
         /// <returns></returns>
         public KAsync Coroutine(IEnumerator enumtor)
         {
-            WaitNext((next) =>
-            {
-                KAsyncManager.Instance.StartCoroutine(_StartCoroutine(enumtor, next));
-            });
+            WaitNext((next) => { KAsyncManager.Instance.StartCoroutine(_StartCoroutine(enumtor, next)); });
             return this;
         }
 
@@ -254,6 +251,7 @@ namespace KEngine
             yield return KAsyncManager.Instance.StartCoroutine(enumtor);
             next();
         }
+
         /// <summary>
         /// 等待一个已经被其它MonoBehaviour开启的协程
         /// </summary>
@@ -261,10 +259,7 @@ namespace KEngine
         /// <returns></returns>
         public KAsync Coroutine(Coroutine co)
         {
-            WaitNext((next) =>
-            {
-                KAsyncManager.Instance.StartCoroutine(_Coroutine(co, next));
-            });
+            WaitNext((next) => { KAsyncManager.Instance.StartCoroutine(_Coroutine(co, next)); });
             return this;
         }
 
@@ -281,12 +276,10 @@ namespace KEngine
         /// <returns></returns>
         public KAsync WaitForFrames(int frameCount)
         {
-            WaitNext((next) =>
-            {
-                KAsyncManager.Instance.StartCoroutine(_WaitForFrames(frameCount, next));
-            });
+            WaitNext((next) => { KAsyncManager.Instance.StartCoroutine(_WaitForFrames(frameCount, next)); });
             return this;
         }
+
         private IEnumerator _WaitForFrames(int frameCount, Action next)
         {
             for (var i = 0; i < frameCount; i++)
@@ -301,10 +294,7 @@ namespace KEngine
         /// <returns></returns>
         public KAsync WaitForSeconds(float time)
         {
-            WaitNext((next) =>
-            {
-                KAsyncManager.Instance.StartCoroutine(_CoWaitForSeconds(time, next));
-            });
+            WaitNext((next) => { KAsyncManager.Instance.StartCoroutine(_CoWaitForSeconds(time, next)); });
             return this;
         }
 
@@ -320,10 +310,7 @@ namespace KEngine
         /// <returns></returns>
         public KAsync WaitForEndOfFrame()
         {
-            WaitNext((next) =>
-            {
-                KAsyncManager.Instance.StartCoroutine(_WaitForEndOfFrame(next));
-            });
+            WaitNext((next) => { KAsyncManager.Instance.StartCoroutine(_WaitForEndOfFrame(next)); });
             return this;
         }
 
@@ -342,9 +329,10 @@ namespace KEngine
 
     #region 管理器~用于开启协程，执行主线程回调等
 
-    class KAsyncManager : KBehaviour
+    internal class KAsyncManager : KBehaviour
     {
         private static KAsyncManager _instance;
+
         public static KAsyncManager Instance
         {
             get
@@ -362,9 +350,11 @@ namespace KEngine
                 return _instance;
             }
         }
-        public readonly List<Action> _mainThreadCallbacks = new List<Action>();  // 主線程調用Unity類，如StartCoroutine
-        public readonly HashSet<Thread> _threads = new HashSet<Thread>();  // 主線程調用Unity類，如StartCoroutine
-        void Update()
+
+        public readonly List<Action> _mainThreadCallbacks = new List<Action>(); // 主線程調用Unity類，如StartCoroutine
+        public readonly HashSet<Thread> _threads = new HashSet<Thread>(); // 主線程調用Unity類，如StartCoroutine
+
+        private void Update()
         {
             foreach (var i in _mainThreadCallbacks)
             {
@@ -373,7 +363,7 @@ namespace KEngine
             _mainThreadCallbacks.Clear();
         }
 
-        void StopAllThreads()
+        private void StopAllThreads()
         {
             foreach (var thread in _threads)
             {
@@ -385,7 +375,8 @@ namespace KEngine
 
             _threads.Clear();
         }
-        void OnApplicationQuit()
+
+        private void OnApplicationQuit()
         {
             StopAllThreads();
         }
@@ -396,6 +387,7 @@ namespace KEngine
             StopAllThreads();
         }
     }
+
     #endregion
 
     // 用于协程内部返回信息传递
