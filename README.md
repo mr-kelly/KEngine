@@ -12,6 +12,7 @@ CosmosEngine的官方改名、改进版
 # 特点 / Features
 
 * 精简的代码
+* AssetBundle的加载、打包、调试
 * 具备完整的策划->美术->程序工作流
 * 适用于PC/Android/IOS平台开发
 * 高性能，无反射
@@ -81,6 +82,7 @@ TODO:Excel的表编辑、编译
 
 * [资源模块/ResourceModule](Docs/Doc_ResourceModule.md)
 	* [简单资源版本控制/AssetVersionControl](Docs/Doc_AssetVersionControl.md)
+	* [资源运行时调试工具/ResourceModuleDebuggs]
 * [UI模块/UIModule](Docs/Doc_UIModule.md)
 * [配置表模块/SettingModule](Docs/Doc_SettingModule.md)
 
