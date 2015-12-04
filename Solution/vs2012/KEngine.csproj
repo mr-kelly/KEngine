@@ -228,6 +228,9 @@
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\UnityLayerDef.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\UnityLayerDef.cs</Link>
     </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\AppVersion.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Utils\AppVersion.cs</Link>
+    </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\CFiber.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\Utils\CFiber.cs</Link>
     </Compile>
@@ -251,9 +254,6 @@
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KActionRecord.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\Utils\KActionRecord.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KAppVersion.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Utils\KAppVersion.cs</Link>
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KCrypt.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\Utils\KCrypt.cs</Link>

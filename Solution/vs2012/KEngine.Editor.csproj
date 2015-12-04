@@ -11,7 +11,6 @@
     <AssemblyName>KEngine.Editor</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile>Unity Full v3.5</TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -91,8 +90,8 @@
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\KCommonProductPrefabExporter.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\KCommonProductPrefabExporter.cs</Link>
     </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\KEngineWindow.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\KEngineWindow.cs</Link>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\KEngineUtils.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\KEngineUtils.cs</Link>
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\KExcelFile.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\KExcelFile.cs</Link>

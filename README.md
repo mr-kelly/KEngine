@@ -86,29 +86,6 @@ TODO:Excel的表编辑、编译
 * [UI模块/UIModule](Docs/Doc_UIModule.md)
 * [配置表模块/SettingModule](Docs/Doc_SettingModule.md)
 
-
-
-# UI模块 / UI Module
-
-UI模块，以资源模块为基础，进行UI的编辑、打包、加载。
-
-* 约定优于配置，UI资源与UI脚本严格命名对应
-* UI资源Test, 严格对应脚本KUITest.cs
-
-## UI编辑与打包
-TODO:
-
-## UI脚本
-TODO：
-
-# 配置表模块
-
-![ExcelEdit](Docs/ExcelEdit.png)
-
-* 以Excel为配置表编辑工具, 可为Excel添加表头注释、表格图标
-* Excel将被编译成纯文本的Tab表格和C#类，
-* 运行端的Tab表格读取，为了性能避开使用Attribute、反射
-
 # 其它模块
 
 * TODO: CosmosTable
@@ -116,7 +93,8 @@ TODO：
 
 # 配置文件/Config
 
-Assets/Resources/KEngineConfig.txt为配置文件，可拖入Excel打开
+Assets/Resources/KEngineConfig.txt为配置文件，可拖入Excel打开, 也可通过菜单KEngine->Options进行配置
 
 # Demo
+
 ![KEngineDemo](Docs/KEngineDemo.png)
