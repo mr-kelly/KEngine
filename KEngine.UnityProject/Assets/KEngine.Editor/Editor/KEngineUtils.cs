@@ -25,6 +25,7 @@
 #endregion
 
 using System.IO;
+using KUnityEditorTools;
 using UnityEditor;
 using UnityEngine;
 
@@ -149,6 +150,21 @@ namespace KEngine.Editor
             EditorGUILayout.LabelField("KEngine Version:", KEngineVersion.ToString());
 
             EditorGUILayout.Space();
+
+            EditorGUILayout.LabelField("== Addon ==");
+            var isNgui = KDefineSymbolsHelper.HasDefineSymbol("NGUI");
+            var newIsNgui = EditorGUILayout.Toggle("NGUI", isNgui);
+            if (isNgui != newIsNgui)
+            {
+                if (newIsNgui)
+                {
+                    KDefineSymbolsHelper.AddDefineSymbols("NGUI");
+                }
+                else
+                {
+                    KDefineSymbolsHelper.RemoveDefineSymbols("NGUI");
+                }
+            }
 
             EditorGUILayout.LabelField("== KEngineConfig.txt ==");
             bool tabDirty = false;
