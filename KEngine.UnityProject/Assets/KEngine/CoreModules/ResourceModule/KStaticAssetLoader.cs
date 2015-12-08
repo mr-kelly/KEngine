@@ -46,7 +46,7 @@ public class KStaticAssetLoader : KAbstractResourceLoader
         get { return _assetFileLoader.Progress; }
     }
 
-    public static KStaticAssetLoader Load(string url, KAssetFileLoader.CAssetFileBridgeDelegate callback = null)
+    public static KStaticAssetLoader Load(string url, KAssetFileLoader.CAssetFileBridgeDelegate callback = null, KAssetBundleLoaderMode loaderMode = KAssetBundleLoaderMode.Default)
     {
         CLoaderDelgate newCallback = null;
         if (callback != null)
@@ -54,11 +54,13 @@ public class KStaticAssetLoader : KAbstractResourceLoader
             newCallback = (isOk, obj) => callback(isOk, obj as UnityEngine.Object);
         }
 
-        return AutoNew<KStaticAssetLoader>(url, newCallback);
+        return AutoNew<KStaticAssetLoader>(url, newCallback, false, loaderMode);
     }
 
     protected override void Init(string path, params object[] args)
     {
+        var loaderMode = (KAssetBundleLoaderMode) args[0];
+
         base.Init(path, args);
         if (string.IsNullOrEmpty(path))
             Logger.LogError("StaticAssetLoader 空资源路径!");
@@ -70,7 +72,7 @@ public class KStaticAssetLoader : KAbstractResourceLoader
             if (Application.isEditor)
                 if (TheAsset != null)
                     KResoourceLoadedAssetDebugger.Create("StaticAsset", path, TheAsset);
-        });
+        }, loaderMode);
     }
 
     protected override void OnFinish(object resultObj)

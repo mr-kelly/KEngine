@@ -168,12 +168,12 @@ PlayerSettings:
   spritePackerPolicy: 
   scriptingDefineSymbols:
     0: NGUI
-    1: 
+    1: NGUI
     2: NGUI
-    4: 
+    4: NGUI
     5: NGUI
     6: NGUI
-    7: 
+    7: NGUI
     9: NGUI
     11: NGUI
     12: NGUI
@@ -280,7 +280,7 @@ PlayerSettings:
   wp8UnprocessedPlugins: []
   intPropertyNames:
   - iOS::Architecture
-  iOS::Architecture: 2
+  iOS::Architecture: 0
   firstStreamedLevelWithResources: 0
   unityRebuildLibraryVersion: 9
   unityForwardCompatibleVersion: 39

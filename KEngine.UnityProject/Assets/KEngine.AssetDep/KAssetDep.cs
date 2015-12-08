@@ -208,8 +208,18 @@ public abstract class KAssetDep : MonoBehaviour
 
             do
             {
-                var dep = depNode.Value;
-                if (dep.IsFinishDependency)
+                KAssetDep dep = null;
+                try
+                {
+                    dep = depNode.Value;
+                }
+                catch
+                {
+                    // ignored
+					// prevent exeption when stop editor playing
+                }
+
+                 if (dep != null && dep.IsFinishDependency)
                 {
                     if (dep.DependencyObject == null)
                     {
@@ -217,7 +227,7 @@ public abstract class KAssetDep : MonoBehaviour
                             dep);
                     }
                 }
-                yield return null;
+               yield return null;
             } while ((depNode = depNode.Next) != null);
         }
     }

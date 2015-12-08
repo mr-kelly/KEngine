@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections;
 using System.IO;
 using System.Runtime.InteropServices;
+using KUnityEditorTools;
 using UnityEditor;
 
 namespace KEngine.Installer
@@ -45,7 +46,9 @@ namespace KEngine.Installer
         private static KEngineInstallType InstallType = KEngineInstallType.Dll;
         private static KEngineCopyType CopyType = KEngineCopyType.Hardlink;
 
-        private bool _withAssetDep = true;
+        private bool _addonAssetDep = true;
+        private bool _addonNGUI = true;
+        private bool _deleteKEngineConfigTxt = false;
 
         [MenuItem("KEngine/KEngine Installer")]
         public static void OpenWindow()
@@ -74,7 +77,9 @@ namespace KEngine.Installer
             InstallType = (KEngineInstallType)EditorGUILayout.EnumPopup("Install Type", InstallType);
             CopyType = (KEngineCopyType)EditorGUILayout.EnumPopup("Copy File Type", CopyType);
 
-            _withAssetDep = EditorGUILayout.Toggle("[Addon]Asset Dep", _withAssetDep);
+            _addonAssetDep = EditorGUILayout.Toggle("[Addon]Asset Dep", _addonAssetDep);
+            if (_addonAssetDep)
+                _addonNGUI = EditorGUILayout.Toggle("[Addon]NGUI AssetDep", _addonNGUI);
 
             EditorGUILayout.HelpBox("Select KEngine git source project to install", MessageType.Info);
 
@@ -82,9 +87,19 @@ namespace KEngine.Installer
             {
                 DynamicInstall();
             }
+
+            EditorGUILayout.Space();
+            GUILayout.Label("=== UnInstall ==");
+            _deleteKEngineConfigTxt = EditorGUILayout.Toggle("Uninstall with KEngineConfig.txt", _deleteKEngineConfigTxt);
+
             if (GUILayout.Button("UnInstall"))
             {
                 UnInstall();
+                if (_deleteKEngineConfigTxt)
+                {
+                    AssetDatabase.DeleteAsset("Assets/Resources/KEngineConfig.txt");
+                    _deleteKEngineConfigTxt = true;
+                }
             }
         }
 
@@ -100,14 +115,14 @@ namespace KEngine.Installer
         /// </summary>
         public void DynamicInstall()
         {
-            var path = EditorUtility.OpenFolderPanel("Select KEngine Build Folder", "./", "");
+            var gitPath = EditorUtility.OpenFolderPanel("Select KEngine Build Folder", "./", "");
 
-            Debug.Log("Using KEngine project: " + path);
+            Debug.Log("Using KEngine project: " + gitPath);
 
-            var srcEngineCodePath = Path.Combine(path, @"KEngine.UnityProject\Assets\KEngine");
-            var srcEngineDllPath = Path.Combine(path, "Build/Release/KEngine.dll");
-            var srcEngineEditorDllPath = Path.Combine(path, "Build/Release/KEngine.Editor.dll");
-            var srcEngineEditorCodePath = Path.Combine(path, @"KEngine.UnityProject\Assets\KEngine.Editor\Editor");
+            var srcEngineCodePath = Path.Combine(gitPath, @"KEngine.UnityProject\Assets\KEngine");
+            var srcEngineDllPath = Path.Combine(gitPath, "Build/Release/KEngine.dll");
+            var srcEngineEditorDllPath = Path.Combine(gitPath, "Build/Release/KEngine.Editor.dll");
+            var srcEngineEditorCodePath = Path.Combine(gitPath, @"KEngine.UnityProject\Assets\KEngine.Editor\Editor");
 
             var dlls = new string[]
         {
@@ -127,6 +142,15 @@ namespace KEngine.Installer
             // Start install!
             UnInstall();
 
+            // KEngineConfig.txt
+            var selfEngineConfigPath = "Assets/Resources/KEngineConfig.txt";
+            if (!File.Exists(selfEngineConfigPath))
+            {
+                var srcEngineConfig = Path.Combine(gitPath, @"KEngine.UnityProject\Assets\Resources\KEngineConfig.txt");
+                File.Copy(srcEngineCodePath, selfEngineConfigPath);
+                Debug.Log(string.Format("Copy EngineConfig.txt from {0}, to {1}", srcEngineConfig, selfEngineConfigPath));
+            }
+            
             if (InstallType == KEngineInstallType.Dll)
             {
                 CopyDll(srcEngineDllPath, KEngineInstallDirPath + "/KEngine.dll");
@@ -140,12 +164,12 @@ namespace KEngine.Installer
 
             Debug.Log("Install KEngine Successed!");
 
-
-            if (_withAssetDep)
+            // Asset Dep
+            if (_addonAssetDep)
             {
-                var srcAssetDepDirPath = Path.Combine(path, @"KEngine.UnityProject\Assets\KEngine.AssetDep");
-                var srcAssetDepDllPath = Path.Combine(path, "Build/Release/KEngine.AssetDep.dll");
-                var srcAssetDepEditorDirPath = Path.Combine(path, @"KEngine.UnityProject\Assets\KEngine.AssetDep.Editor\Editor");
+                var srcAssetDepDirPath = Path.Combine(gitPath, @"KEngine.UnityProject\Assets\KEngine.AssetDep");
+                var srcAssetDepDllPath = Path.Combine(gitPath, "Build/Release/KEngine.AssetDep.dll");
+                var srcAssetDepEditorDirPath = Path.Combine(gitPath, @"KEngine.UnityProject\Assets\KEngine.AssetDep.Editor\Editor");
 
                 if (InstallType == KEngineInstallType.Dll)
                 {
@@ -159,6 +183,29 @@ namespace KEngine.Installer
                 }
 
                 Debug.Log("Install KEngine.AssetDep Successed!");
+
+                if (_addonNGUI)
+                {
+                    var srcNGUIDirPath = Path.Combine(gitPath, @"KEngine.UnityProject\Assets\KEngine.NGUI");
+                    var srcNGUEditorDirPath = Path.Combine(gitPath,
+                        @"KEngine.UnityProject\Assets\KEngine.NGUI.Editor\Editor");
+                    var srcNGUIAssetDepDirPath = Path.Combine(gitPath,
+                        @"KEngine.UnityProject\Assets\KEngine.NGUI.AssetDep");
+                    var srcNGUIAssetDepEditorDirPath = Path.Combine(gitPath,
+                        @"KEngine.UnityProject\Assets\KEngine.NGUI.AssetDep.Editor\Editor");
+                    // NO Dll for NGUI
+                    CopyFolder(srcNGUIDirPath, KEngineInstallDirPath + "/KEngine.NGUI");
+                    CopyFolder(srcNGUEditorDirPath, KEngineEditorInstallDirPath + "/KEngine.NGUI.Editor");
+                    CopyFolder(srcNGUIAssetDepDirPath, KEngineInstallDirPath + "/KEngine.NGUI.AssetDep");
+                    CopyFolder(srcNGUIAssetDepEditorDirPath,
+                        KEngineEditorInstallDirPath + "/KEngine.NGUI.AssetDep.Editor");
+
+                    KDefineSymbolsHelper.AddDefineSymbols("NGUI");
+                }
+                else
+                {
+                    KDefineSymbolsHelper.RemoveDefineSymbols("NGUI");
+                }
             }
             AssetDatabase.Refresh();
         }

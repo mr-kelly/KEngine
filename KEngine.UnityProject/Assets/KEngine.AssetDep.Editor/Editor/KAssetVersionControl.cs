@@ -122,11 +122,11 @@ namespace KEngine.Editor
         /// <summary>
         /// 持久化，硬盘的
         /// </summary>
-        private static Dictionary<string, BuildRecord> StoreBuildVersion = new Dictionary<string, BuildRecord>();
+        private Dictionary<string, BuildRecord> StoreBuildVersion = new Dictionary<string, BuildRecord>();
 
-        private static Dictionary<string, BuildRecord> InstanceBuildVersion = new Dictionary<string, BuildRecord>();
+        private Dictionary<string, BuildRecord> InstanceBuildVersion = new Dictionary<string, BuildRecord>();
 
-        public static void WriteVersion()
+        public void WriteVersion()
         {
             string path = GetBuildVersionTab();
                 // MakeSureExportPath(VerCtrlInfo.VerFile, EditorUserBuildSettings.activeBuildTarget);
@@ -148,7 +148,7 @@ namespace KEngine.Editor
             tabFile.Save(path);
         }
 
-        private static void SetupHistory()
+        private void SetupHistory()
         {
             BuildCount = 0;
 
@@ -171,7 +171,7 @@ namespace KEngine.Editor
             }
         }
 
-        public static string GetAssetLastBuildMD5(string assetPath)
+        public string GetAssetLastBuildMD5(string assetPath)
         {
             BuildRecord md5;
             if (StoreBuildVersion.TryGetValue(assetPath, out md5))

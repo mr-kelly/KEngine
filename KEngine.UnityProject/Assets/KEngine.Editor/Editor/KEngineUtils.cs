@@ -24,6 +24,7 @@
 
 #endregion
 
+using System;
 using System.IO;
 using KUnityEditorTools;
 using UnityEditor;
@@ -33,7 +34,7 @@ namespace KEngine.Editor
 {
     public class KEngineUtils : EditorWindow
     {
-        public static readonly AppVersion KEngineVersion = new AppVersion("0.9.2.0.beta");
+        public static readonly Version KEngineVersion = new Version("0.9.2.0");
 
         static KEngineUtils()
         {
@@ -45,10 +46,15 @@ namespace KEngine.Editor
         // 默認的配置文件內容
         private static string[][] DefaultConfigs = new string[][]
         {
-            new string[] {"ProductRelPath", "BuildProduct/", ""},
-            new string[] {"AssetBundleBuildRelPath", "StreamingAssets/", "The Relative path to build assetbundles"},
-            new string[] {"AssetBundleExt", ".unity3d", "Asset bundle file extension"},
+            new string[] {"ProductRelPath", "../Product", ""},
+            new string[] {"AssetBundleBuildRelPath", "../Product/Bundles", "The Relative path to build assetbundles"},
+            new [] {"StreamingBundlesFolderName", "Bundles"},
+            new [] {"UIModuleBridge","UGUI"},
+            new string[] {"AssetBundleExt", ".bytes", "Asset bundle file extension"},
             new string[] {"IsLoadAssetBundle", "1", "Asset bundle or in resources?"},
+            new [] {"SettingSourcePath", "../Product/SettingSource"},
+            new [] {"SettingPath", "Resources/Setting"},
+
         };
 
         private static KEngineUtils Instance;
@@ -121,16 +127,21 @@ namespace KEngine.Editor
         /// Set AppVersion of KEngineConfig.txt
         /// </summary>
         /// <param name="appVersion"></param>
-        public static void SetAppVersion(AppVersion appVersion)
-        {
-            EnsureConfigFile();
+        //public static void SaveAppVersion(AppVersion appVersion)
+        //{
+        //    EnsureConfigFile();
 
-            SetConfValue(KEngineDefaultConfigs.AppVersion.ToString(), appVersion.ToString());
+        //    SetConfValue(KEngineDefaultConfigs.AppVersion.ToString(), appVersion.ToString());
 
-            Logger.Log("Save AppVersion to KEngineConfig.txt: {0}", appVersion.ToString());
-        }
+        //    Logger.Log("Save AppVersion to KEngineConfig.txt: {0}", appVersion.ToString());
+        //}
 
-        private static void SetConfValue(string key, string value)
+        /// <summary>
+        /// Set KEngineConfig.txt file,  and reload AppEngine's instance of EngineConfigs, (Editor only)
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        public static void SetConfValue(string key, string value)
         {
             foreach (KTabFile.RowInterator row in ConfFile)
             {
@@ -141,6 +152,9 @@ namespace KEngine.Editor
                 }
             }
             ConfFile.Save(ConfFilePath);
+
+            AppEngine.EnsureConfigTab(true); // reload current appengine instance
+
             AssetDatabase.Refresh();
         }
 

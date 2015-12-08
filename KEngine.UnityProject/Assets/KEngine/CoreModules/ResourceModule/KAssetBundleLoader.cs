@@ -67,7 +67,19 @@ public class KAssetBundleLoader : KAbstractResourceLoader
     /// </summary>
     private KResourceInAppPathType _inAppPathType;
 
-    //KAssetBundleLoaderMode DefaultKAssetBundleLoaderMode = KAssetBundleLoaderMode.StreamingAssetsWww;
+    public static KAssetBundleLoader Load(string url, CAssetBundleLoaderDelegate callback = null,
+        KAssetBundleLoaderMode loaderMode = KAssetBundleLoaderMode.Default)
+    {
+        CLoaderDelgate newCallback = null;
+        if (callback != null)
+        {
+            newCallback = (isOk, obj) => callback(isOk, obj as AssetBundle);
+        }
+        var newLoader = AutoNew<KAssetBundleLoader>(url, newCallback, false, loaderMode);
+
+
+        return newLoader;
+    }
 
     protected override void Init(string url, params object[] args)
     {
@@ -124,21 +136,6 @@ public class KAssetBundleLoader : KAbstractResourceLoader
             OnFinish(null);
         }
     }
-
-    public static KAssetBundleLoader Load(string url, CAssetBundleLoaderDelegate callback = null,
-        KAssetBundleLoaderMode loaderMode = KAssetBundleLoaderMode.Default)
-    {
-        CLoaderDelgate newCallback = null;
-        if (callback != null)
-        {
-            newCallback = (isOk, obj) => callback(isOk, obj as AssetBundle);
-        }
-        var newLoader = AutoNew<KAssetBundleLoader>(url, newCallback, false, loaderMode);
-
-
-        return newLoader;
-    }
-
     private IEnumerator LoadAssetBundle(string relativeUrl)
     {
         byte[] bundleBytes;

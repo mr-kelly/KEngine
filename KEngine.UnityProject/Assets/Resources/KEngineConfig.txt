@@ -1,6 +1,5 @@
 ﻿Key	Value	Comment		
 [string]	[string]	[string]		
-AppVersion	1.0.0.0.alpha		
 ProductRelPath	../Product			
 AssetBundleBuildRelPath	../Product/Bundles		
 StreamingBundlesFolderName	Bundles			

@@ -45,7 +45,7 @@ public class KUIAtlasDep : KAssetDep
         LoadMaterial(path, (mat) => { OnFinishLoadDependencies(mat); });
     }
 
-    public static KStaticAssetLoader LoadUIAtlas(string resourcePath, Action<UIAtlas> callback)
+    public static KStaticAssetLoader LoadUIAtlas(string resourcePath, Action<UIAtlas> callback, KAssetBundleLoaderMode loaderMode = KAssetBundleLoaderMode.Default)
     {
         //System.Func<bool> doCheckCache = () =>
         //{
@@ -100,7 +100,7 @@ public class KUIAtlasDep : KAssetDep
                 if (callback != null)
                     callback(atlas);
             }
-        });
+        }, loaderMode);
     }
 }
 #endif

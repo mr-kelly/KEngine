@@ -228,9 +228,6 @@
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\UnityLayerDef.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\UnityLayerDef.cs</Link>
     </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\AppVersion.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Utils\AppVersion.cs</Link>
-    </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\CFiber.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\Utils\CFiber.cs</Link>
     </Compile>

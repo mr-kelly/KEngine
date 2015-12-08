@@ -51,9 +51,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tests\AppVersionTest.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine.Tests\AppVersionTest.cs</Link>
-    </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tests\CFiber\CFiber_Demo.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Tests\CFiber\CFiber_Demo.cs</Link>
     </Compile>

@@ -57,7 +57,7 @@ public class KAssetFileLoader : KAbstractResourceLoader
 
     private KAssetBundleLoader _bundleLoader;
 
-    public static KAssetFileLoader Load(string path, CAssetFileBridgeDelegate assetFileLoadedCallback = null)
+    public static KAssetFileLoader Load(string path, CAssetFileBridgeDelegate assetFileLoadedCallback = null, KAssetBundleLoaderMode loaderMode = KAssetBundleLoaderMode.Default)
     {
         CLoaderDelgate realcallback = null;
         if (assetFileLoadedCallback != null)
@@ -65,16 +65,18 @@ public class KAssetFileLoader : KAbstractResourceLoader
             realcallback = (isOk, obj) => assetFileLoadedCallback(isOk, obj as UnityEngine.Object);
         }
 
-        return AutoNew<KAssetFileLoader>(path, realcallback);
+        return AutoNew<KAssetFileLoader>(path, realcallback, false, loaderMode);
     }
 
     protected override void Init(string url, params object[] args)
     {
+        var loaderMode = (KAssetBundleLoaderMode) args[0];
+
         base.Init(url, args);
-        KResourceModule.Instance.StartCoroutine(_Init(Url, null));
+        KResourceModule.Instance.StartCoroutine(_Init(Url, null, loaderMode));
     }
 
-    private IEnumerator _Init(string path, string assetName)
+    private IEnumerator _Init(string path, string assetName, KAssetBundleLoaderMode loaderMode)
     {
         IsLoadAssetBundle = KEngine.AppEngine.GetConfig("IsLoadAssetBundle").ToInt32() != 0;
         AssetInBundleName = assetName;
@@ -94,7 +96,7 @@ public class KAssetFileLoader : KAbstractResourceLoader
         }
         else
         {
-            _bundleLoader = KAssetBundleLoader.Load(path);
+            _bundleLoader = KAssetBundleLoader.Load(path, null, loaderMode);
 
             while (!_bundleLoader.IsFinished)
             {
