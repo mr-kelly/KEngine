@@ -253,8 +253,8 @@ public partial class KBuild_NGUI : KBuild_Base
             camera.nearClipPlane = -2f;
             camera.farClipPlane = 2f;
         }
-        var aud = cameraObj.GetComponent<AudioListener>() ?? cameraObj.AddComponent<AudioListener>();
-        var uiCam = cameraObj.GetComponent<UICamera>() ?? cameraObj.AddComponent<UICamera>();
+        //var aud = cameraObj.GetComponent<AudioListener>() ?? cameraObj.AddComponent<AudioListener>();
+        //var uiCam = cameraObj.GetComponent<UICamera>() ?? cameraObj.AddComponent<UICamera>();
         var panelRootTran = uiRootObj.transform.Find("PanelRoot");
         if (panelRootTran == null)
         {

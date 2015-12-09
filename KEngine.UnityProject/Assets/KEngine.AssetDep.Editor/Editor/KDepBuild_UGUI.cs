@@ -30,45 +30,58 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-public partial class KDependencyBuild
+[DepBuildClass(typeof(SpriteRenderer))]
+public class KDepBuild_SpriteRenderer : IDepBuildProcessor
 {
-    [DepBuild(typeof (SpriteRenderer))]
-    private static void ProcessSpriteRenderer(SpriteRenderer renderer)
+    public void Process(Component @object)
     {
+        var renderer = @object as SpriteRenderer;
+
         if (renderer.sprite != null)
         {
-            var spritePath = BuildSprite(renderer.sprite);
+            var spritePath = KDepBuild_UGUI.BuildSprite(renderer.sprite);
             KAssetDep.Create<KSpriteRendererDep>(renderer, spritePath);
             renderer.sprite = null; // 挖空依赖的数据
         }
         else
             Logger.LogWarning("SpriteRenderer null sprite: {0}", renderer.name);
     }
+}
 
-    [DepBuild(typeof (Text))]
-    private static void ProcessUGUIText(Text text)
+[DepBuildClass(typeof(Text))]
+public class KDepBuild_Text : IDepBuildProcessor
+{
+    public void Process(Component @object)
     {
+        var text = @object as Text;
         if (text.font != null)
         {
-            var fontPath = BuildFont(text.font);
+            var fontPath = KDependencyBuild.BuildFont(text.font);
             KAssetDep.Create<KTextDep>(text, fontPath);
             text.font = null; // 挖空依赖的数据
         }
         else
-            Logger.LogWarning("UISprite null Atlas: {0}", text.name);
+            Logger.LogWarning("UISprite null Atlas: {0}", text.name); ;
     }
+}
 
-    [DepBuild(typeof (Image))]
-    private static void ProcessUGUIImage(Image image)
+[DepBuildClass(typeof(Image))]
+public class KDepBuild_Image : IDepBuildProcessor
+{
+    public void Process(Component @object)
     {
+        var image = @object as Image;
         if (image.sprite != null)
         {
-            string spritePath = BuildSprite(image.sprite);
+            string spritePath = KDepBuild_UGUI.BuildSprite(image.sprite);
             KAssetDep.Create<KImageDep>(image, spritePath);
             image.sprite = null;
         }
     }
+}
 
+public class KDepBuild_UGUI
+{
     // Prefab ,  build
     public static string BuildSprite(Sprite sprite)
     {
@@ -80,10 +93,10 @@ public partial class KDependencyBuild
         if (needBuild)
             KAssetVersionControl.TryMarkBuildVersion(assetPath);
 
-        string path = __GetPrefabBuildPath(assetPath);
+        string path = KDependencyBuild.__GetPrefabBuildPath(assetPath);
         if (string.IsNullOrEmpty(path))
             Logger.LogWarning("[BuildSprite]不是文件的Texture, 估计是Material的原始Texture?");
-        var result = DoBuildAssetBundle("Common/Sprite_" + path, sprite, needBuild);
+        var result = KDependencyBuild.DoBuildAssetBundle("Common/Sprite_" + path, sprite, needBuild);
 
         return result.Path;
     }

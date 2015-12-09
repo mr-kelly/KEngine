@@ -27,15 +27,16 @@
 using KEngine;
 using UnityEngine;
 
-public partial class KDependencyBuild
+[DepBuildClass(typeof(ParticleSystem))]
+public class KDepBuild_ParticleSystem : IDepBuildProcessor
 {
-    [DepBuild(typeof (ParticleSystem))]
-    private static void ProcessParticleSystem(ParticleSystem particleCom)
+    public void Process(Component @object)
     {
+        var particleCom = (ParticleSystem) @object;
         var particle = particleCom;
         if (particle.renderer.sharedMaterial != null)
         {
-            string matPath = BuildDepMaterial(particle.renderer.sharedMaterial);
+            string matPath = KDepBuild_Material.BuildDepMaterial(particle.renderer.sharedMaterial);
             //CResourceDependencies.Create(particle, CResourceDependencyType.PARTICLE_SYSTEM, matPath);
             KAssetDep.Create<KParticleSystemDep>(particle, matPath);
 

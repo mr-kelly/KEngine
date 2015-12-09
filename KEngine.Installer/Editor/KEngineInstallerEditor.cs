@@ -1,10 +1,34 @@
-﻿using System;
-using UnityEngine;
-using System.Collections;
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: KSettingModuleEditor.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using KUnityEditorTools;
 using UnityEditor;
+using UnityEngine;
 
 namespace KEngine.Installer
 {
@@ -27,12 +51,15 @@ namespace KEngine.Installer
     public class KEngineInstallerEditor : EditorWindow
     {
         [DllImport("kernel32.dll")]
-        static extern bool CreateSymbolicLink(string lpSymlinkFileName, string lpTargetFileName, SymbolicLink dwFlags);
+        private static extern bool CreateSymbolicLink(string lpSymlinkFileName, string lpTargetFileName,
+            SymbolicLink dwFlags);
+
         [DllImport("kernel32.dll", EntryPoint = "CreateHardLinkW", CharSet = CharSet.Unicode)]
         public static extern bool CreateHardLink(string lpFileName,
-                                                 string lpExistingFileName,
-                                                 IntPtr mustBeNull);
-        enum SymbolicLink
+            string lpExistingFileName,
+            IntPtr mustBeNull);
+
+        private enum SymbolicLink
         {
             File = 0,
             Directory = 1
@@ -40,8 +67,21 @@ namespace KEngine.Installer
 
         private static KEngineInstallerEditor Instance;
 
-        private static string KEngineInstallDirPath = "Assets/KEngine";
-        private static string KEngineEditorInstallDirPath = "Assets/KEngine/Editor";
+        private static string KEngineInstallDirPath
+        {
+            get
+            {
+                return "Assets/KEngine";
+            }
+        }
+
+        private static string KEngineEditorInstallDirPath
+        {
+            get
+            {
+                return "Assets/KEngine/Editor";
+            }
+        }
 
         private static KEngineInstallType InstallType = KEngineInstallType.Dll;
         private static KEngineCopyType CopyType = KEngineCopyType.Hardlink;
@@ -60,7 +100,7 @@ namespace KEngine.Installer
             Instance.Show();
         }
 
-        GUIStyle headerStyle = new GUIStyle();
+        private GUIStyle headerStyle = new GUIStyle();
 
         private KEngineInstallerEditor()
         {
@@ -70,7 +110,7 @@ namespace KEngine.Installer
         }
 
 
-        void OnGUI()
+        private void OnGUI()
         {
             GUILayout.Label("KEngine Installer", headerStyle);
             EditorGUILayout.Separator();
@@ -110,6 +150,18 @@ namespace KEngine.Installer
             AssetDatabase.DeleteAsset(KEngineInstallDirPath);
             Debug.Log("UnInstall dir: " + KEngineInstallDirPath);
         }
+
+        /// <summary>
+        /// 拷贝Editor依赖的DLL
+        /// </summary>
+        private void CopyEditorLib(string gitPath, string toDir)
+        {
+            CopyDll(Path.Combine(gitPath, "Build/Release/DotLiquid.dll"), toDir);
+            CopyDll(Path.Combine(gitPath, "Build/Release/NPOI.dll"), toDir);
+            CopyDll(Path.Combine(gitPath, "Build/Release/NPOI.OOXML.dll"), toDir);
+            CopyDll(Path.Combine(gitPath, "Build/Release/NPOI.OpenXml4Net.dll"), toDir);
+            CopyDll(Path.Combine(gitPath, "Build/Release/NPOI.OpenXmlFormats.dll"), toDir);
+        }
         /// <summary>
         /// 选择目录，进行安装
         /// </summary>
@@ -125,10 +177,10 @@ namespace KEngine.Installer
             var srcEngineEditorCodePath = Path.Combine(gitPath, @"KEngine.UnityProject\Assets\KEngine.Editor\Editor");
 
             var dlls = new string[]
-        {
-            srcEngineDllPath,
-            srcEngineEditorDllPath,
-        };
+            {
+                srcEngineDllPath,
+                srcEngineEditorDllPath,
+            };
 
             foreach (var dllPath in dlls)
             {
@@ -150,11 +202,15 @@ namespace KEngine.Installer
                 File.Copy(srcEngineCodePath, selfEngineConfigPath);
                 Debug.Log(string.Format("Copy EngineConfig.txt from {0}, to {1}", srcEngineConfig, selfEngineConfigPath));
             }
-            
+
             if (InstallType == KEngineInstallType.Dll)
             {
-                CopyDll(srcEngineDllPath, KEngineInstallDirPath + "/KEngine.dll");
-                CopyFolder(srcEngineEditorCodePath, KEngineEditorInstallDirPath + "/KEngine.Editor");
+                CopyDll(srcEngineDllPath, KEngineInstallDirPath);
+                CopyDll(Path.Combine(gitPath, "Build/Release/ICSharpCode.SharpZipLib.dll"), KEngineInstallDirPath); // 3rd lib
+
+                CopyDll(srcEngineEditorDllPath, KEngineEditorInstallDirPath);
+                CopyEditorLib(gitPath, KEngineEditorInstallDirPath);// 3rd lib
+                //CopyFolder(srcEngineEditorCodePath, KEngineEditorInstallDirPath + "/KEngine.Editor");
             }
             else
             {
@@ -169,12 +225,15 @@ namespace KEngine.Installer
             {
                 var srcAssetDepDirPath = Path.Combine(gitPath, @"KEngine.UnityProject\Assets\KEngine.AssetDep");
                 var srcAssetDepDllPath = Path.Combine(gitPath, "Build/Release/KEngine.AssetDep.dll");
-                var srcAssetDepEditorDirPath = Path.Combine(gitPath, @"KEngine.UnityProject\Assets\KEngine.AssetDep.Editor\Editor");
+                var srcAssetDepEditorDllPath = Path.Combine(gitPath, "Build/Release/KEngine.AssetDep.Editor.dll");
+                var srcAssetDepEditorDirPath = Path.Combine(gitPath,
+                    @"KEngine.UnityProject\Assets\KEngine.AssetDep.Editor\Editor");
 
                 if (InstallType == KEngineInstallType.Dll)
                 {
-                    CopyDll(srcAssetDepDllPath, KEngineInstallDirPath + "/KEngine.AssetDep.dll");
-                    CopyFolder(srcAssetDepEditorDirPath, KEngineEditorInstallDirPath + "/KEngine.AssetDep");
+                    CopyDll(srcAssetDepDllPath, KEngineInstallDirPath);
+                    CopyDll(srcAssetDepEditorDllPath, KEngineEditorInstallDirPath);
+                    //CopyFolder(srcAssetDepEditorDirPath, KEngineEditorInstallDirPath + "/KEngine.AssetDep");
                 }
                 else
                 {
@@ -211,7 +270,7 @@ namespace KEngine.Installer
         }
 
 
-        void CopyFolder(string src, string target)
+        private void CopyFolder(string src, string target)
         {
             //if (CopyType == KEngineCopyType.CopyFile)
             {
@@ -224,24 +283,31 @@ namespace KEngine.Installer
             }
             //else
             //{
-            //    CreateSymbolicLink(target, src, SymbolicLink.Directory);
+            //    CreateSymbolicLink(targetFolder, src, SymbolicLink.Directory);
             //}
             Debug.Log(string.Format("Copy Folder {0} -> {1}", src, target));
         }
-        void CopyDll(string src, string target)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="src"></param>
+        /// <param name="targetFolder">注意这是文件夹目录</param>
+        private void CopyDll(string src, string targetFolder)
         {
-            CopyFile(src, target);
+            var targetPath = Path.Combine(targetFolder, Path.GetFileName(src));
+
+            CopyFile(src, targetPath);
 
             var srcPdb = Path.ChangeExtension(src, ".pdb");
-            var targetPdb = Path.ChangeExtension(target, ".pdb");
+            var targetPdb = Path.ChangeExtension(targetPath, ".pdb");
 
             if (File.Exists(targetPdb))
                 CopyFile(srcPdb, targetPdb);
 
-            Debug.Log(string.Format("Copy Dll {0} -> {1}", src, target));
+            Debug.Log(string.Format("Copy Dll {0} -> {1}", src, targetFolder));
         }
 
-        void CopyFile(string src, string target)
+        private void CopyFile(string src, string target)
         {
             if (!Directory.Exists(Path.GetDirectoryName(target)))
                 Directory.CreateDirectory(Path.GetDirectoryName(target));
@@ -255,5 +321,4 @@ namespace KEngine.Installer
             }
         }
     }
-
 }

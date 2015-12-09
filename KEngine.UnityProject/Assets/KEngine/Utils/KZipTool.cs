@@ -3,7 +3,7 @@
 // KEngine - Toolset and framework for Unity3D
 // ===================================
 // 
-// Filename: CZipTool.cs
+// Filename: KZipTool.cs
 // Date:     2015/12/03
 // Author:  Kelly
 // Email: 23110388@qq.com
@@ -28,7 +28,7 @@ using System.IO;
 using System.Text;
 using ICSharpCode.SharpZipLib.Zip;
 
-public class CZipTool
+public class KZipTool
 {
     public static void SetZipFile(string zipPath, string fileName, string content)
     {

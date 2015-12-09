@@ -58,7 +58,7 @@ namespace CosmosTable
         public string ExportTabExt = ".bytes";
 
         // 被认为是注释的表头
-        public string[] CommentColumnStartsWith = {"Comment", "#"};
+        public string[] CommentColumnStartsWith = { "Comment", "#" };
 
         public string NameSpace = "AppConfigs";
 
@@ -93,7 +93,7 @@ namespace CosmosTable
 
         private Hash DoCompiler(string path, SimpleExcelFile excelFile, string compileToFilePath = null, string compileBaseDir = null)
         {
-            var fileExt = Path.GetExtension(path);
+            //var fileExt = Path.GetExtension(path);
             //IExcelDataReader excelReader = null;
             //if (fileExt == ".xlsx" || fileExt == ".xml")
             //{
@@ -155,12 +155,12 @@ namespace CosmosTable
             var strBuilder = new StringBuilder();
 
             var ignoreColumns = new HashSet<int>();
-            var ignoreRows = new HashSet<int>();
+            //var ignoreRows = new HashSet<int>();
 
             //// 寻找注释行，1,或2行
             //var hasStatementRow = false;
             //var statementRow = sheet1.Rows[0].ItemArray;
-            var regExCheckStatement = new Regex(@"\[(.*)\]");
+            //var regExCheckStatement = new Regex(@"\[(.*)\]"); // 不要[ xx ]符号了
             //foreach (var cellVal in statementRow)
             //{
             //    if ((cellVal is string))
@@ -189,7 +189,7 @@ namespace CosmosTable
                 var colIndex = excelFile.ColName2Index[colNameStr];
                 if (!string.IsNullOrEmpty(colNameStr))
                 {
-                    var isCommentColumn = CheckCommentColumn(colNameStr);
+                    var isCommentColumn = CheckCommentString(colNameStr);
                     if (isCommentColumn)
                     {
                         ignoreColumns.Add(colIndex);
@@ -263,7 +263,12 @@ namespace CosmosTable
                     if (loopColumn > 0)
                         strBuilder.Append("\t");
                     var columnName = excelFile.Index2ColName[loopColumn];
+                    
                     var cellStr = excelFile.GetString(columnName, startRow);
+
+                    if (loopColumn == 0 && CheckCommentString(cellStr)) // 如果行首为#注释字符，忽略这一行
+                        continue;
+
                     //        // 如果单元格是字符串，换行符改成\\n
                     //        if (item is string)
                     //        {
@@ -350,7 +355,7 @@ namespace CosmosTable
 
             renderVars.ClassName = string.Join("",
                 (from name in fileName.Split('_')
-                    select System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(name)).ToArray());
+                 select System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(name)).ToArray());
             renderVars.TabFilePath = tabFilePath;
 
             return Hash.FromAnonymousObject(renderVars);
@@ -358,10 +363,11 @@ namespace CosmosTable
 
         /// <summary>
         /// 检查一个表头名，是否是可忽略的注释
+        /// 或检查一个字符串
         /// </summary>
         /// <param name="colNameStr"></param>
         /// <returns></returns>
-        private bool CheckCommentColumn(string colNameStr)
+        private bool CheckCommentString(string colNameStr)
         {
             foreach (var commentStartsWith in _config.CommentColumnStartsWith)
             {
@@ -375,9 +381,18 @@ namespace CosmosTable
 
         public bool Compile(string path, string compileToFilePath = null, string compileBaseDir = null)
         {
-            //using (FileStream stream = File.Open(path, FileMode.Open, FileAccess.Read))
-            //using (
+            // 确保目录存在
+            var compileToFileDirPath = Path.GetDirectoryName(compileToFilePath);
+
+            if (!Directory.Exists(compileToFileDirPath))
+                Directory.CreateDirectory(compileToFileDirPath);
+
             var excelFile = new SimpleExcelFile(path);
+            var files = new List<Hash>();
+            var hash = DoCompiler(path, excelFile, compileToFilePath, compileBaseDir);
+            files.Add(hash);
+
+            if (_config.CodeTemplates != null)
             {
                 foreach (var kv in _config.CodeTemplates)
                 {
@@ -388,11 +403,7 @@ namespace CosmosTable
                     var template = Template.Parse(templateStr);
                     var topHash = new Hash();
                     topHash["NameSpace"] = _config.NameSpace;
-                    var files = new List<Hash>();
                     topHash["Files"] = files;
-
-                    var hash = DoCompiler(path, excelFile, compileToFilePath, compileBaseDir);
-                    files.Add(hash);
 
                     if (!string.IsNullOrEmpty(exportPath))
                         File.WriteAllText(exportPath, template.Render(topHash));

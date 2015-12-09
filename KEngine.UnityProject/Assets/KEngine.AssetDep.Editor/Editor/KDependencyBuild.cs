@@ -47,21 +47,35 @@ public class CDepCollectInfo
     public CDepCollectInfo Child; // 子依赖
 }
 
+public interface IDepBuildProcessor
+{
+    void Process(Component @object);
+}
+
+[AttributeUsage(AttributeTargets.Class)]
+public class DepBuildClassAttribute : Attribute
+{
+    public Type ClassType;
+    public DepBuildClassAttribute(Type type)
+    {
+        ClassType = type;
+    }
+}
 // 处理依赖关系的打包工具
-public partial class KDependencyBuild
+public class KDependencyBuild
 {
     //public static string DepBuildToFolder = "Common"; // 图片等依赖资源打包的地方, 运行时临时改变
 
-    [AttributeUsage(AttributeTargets.Method)]
-    public class DepBuildAttribute : Attribute
-    {
-        public DepBuildAttribute(Type type)
-        {
-            TheType = type;
-        }
+    //[AttributeUsage(AttributeTargets.Method)]
+    //public class DepBuildAttribute : Attribute
+    //{
+    //    public DepBuildAttribute(Type type)
+    //    {
+    //        TheType = type;
+    //    }
 
-        public Type TheType { get; set; }
-    }
+    //    public Type TheType { get; set; }
+    //}
 
     public static event Action<string> AddCacheEvent;
     public static Dictionary<string, bool> BuildedCache = new Dictionary<string, bool>();
@@ -81,14 +95,14 @@ public partial class KDependencyBuild
                 Directory.CreateDirectory(zipDirPath);
             var zipPath = zipDirPath + "/BuildAction_" + KResourceModule.BuildPlatformName + ".zip";
             var buildActionCount = 0;
-            var actionCountStr = CZipTool.GetFileContentFromZip(zipPath, "BuildActionCount.txt");
+            var actionCountStr = KZipTool.GetFileContentFromZip(zipPath, "BuildActionCount.txt");
             if (!string.IsNullOrEmpty(actionCountStr))
             {
                 buildActionCount = actionCountStr.ToInt32();
             }
             buildActionCount++;
             Logger.Log(" DepBuild Now Action Version: {0}", buildActionCount);
-            CZipTool.SetZipFile(zipPath, "BuildActionCount.txt", buildActionCount.ToString());
+            KZipTool.SetZipFile(zipPath, "BuildActionCount.txt", buildActionCount.ToString());
 
             // 真实打包的资源记录
             var sbBuildAction = new StringBuilder();
@@ -97,7 +111,7 @@ public partial class KDependencyBuild
                 sbBuildAction.AppendLine(kv.Key);
             }
 
-            CZipTool.SetZipFile(zipPath, string.Format("{0}.txt", buildActionCount), sbBuildAction.ToString());
+            KZipTool.SetZipFile(zipPath, string.Format("{0}.txt", buildActionCount), sbBuildAction.ToString());
         }
 
         // 所有尝试打包的资源记录
@@ -106,7 +120,7 @@ public partial class KDependencyBuild
         //{
         //    sbBuildActionFull.AppendLine(kv);
         //}
-        //CZipTool.SetZipFile(zipPath, string.Format("{0}_full.txt", buildActionCount), sbBuildActionFull.ToString());
+        //KZipTool.SetZipFile(zipPath, string.Format("{0}_full.txt", buildActionCount), sbBuildActionFull.ToString());
     }
 
     public static void Clear()
@@ -121,72 +135,81 @@ public partial class KDependencyBuild
         ClearActions.Clear();
     }
 
-    /// <summary>
-    /// 移除一个GameObject里所存在的Prefab引用
-    /// </summary>
-    /// <param name="copyGameObject"></param>
-    [Obsolete]
-    private static void RemoveGameObjectChildPrefab(GameObject copyGameObject)
-    {
-        // Prefab检查
-        //var gameObjectAsset = AssetDatabase.LoadAssetAtPath(assetPath, typeof(GameObject)) as GameObject;
-        //if (gameObjectAsset != null)
-        {
-            // 遍历是否存在Prefab
-            foreach (var child in copyGameObject.GetComponentsInChildren<Transform>(true))
-            {
-                if (child == copyGameObject.transform) continue; // 忽略自己
+    //private static Dictionary<MethodInfo, DepBuildAttribute> _cachedDepBuildAttributes;
 
-                var prefabParent = PrefabUtility.GetPrefabParent(child.gameObject);
-                var prefabObject = PrefabUtility.GetPrefabObject(child.gameObject);
-                if ( //PrefabUtility.GetPrefabParent(child.gameObject) == null &&
-                    PrefabUtility.GetPrefabObject(child.gameObject) != null)
-                {
-                    Debug.LogWarning("一个Prefab中的Prefab保持引用,剥除。。。" + child.name);
-                    PrefabUtility.DisconnectPrefabInstance(child.gameObject);
-                }
-            }
-        }
-    }
+    private static Dictionary<IDepBuildProcessor, DepBuildClassAttribute> _cachedDepBuildClassAttributes;
 
-    private static Dictionary<MethodInfo, DepBuildAttribute> _cachedDepBuildAttributes;
     // 可選擇是否打包自己，還是只打包依賴
     public static void BuildGameObject(GameObject obj, string path, bool buildSelf = true, bool allInOne = false,
         bool keepCopyObjToDebug = false) // TODO: All in One
     {
         GameObject copyObj = GameObject.Instantiate(obj) as GameObject;
 
-        if (_cachedDepBuildAttributes == null)
-        {
-            _cachedDepBuildAttributes = new Dictionary<MethodInfo, DepBuildAttribute>();
+        //if (_cachedDepBuildAttributes == null)
+        //{
+        //    _cachedDepBuildAttributes = new Dictionary<MethodInfo, DepBuildAttribute>();
 
-            foreach (
-                var methodInfo in
-                    typeof (KDependencyBuild).GetMethods(BindingFlags.Static | BindingFlags.Public |
-                                                         BindingFlags.NonPublic))
+        //    foreach (
+        //        var methodInfo in
+        //            typeof(KDependencyBuild).GetMethods(BindingFlags.Static | BindingFlags.Public |
+        //                                                 BindingFlags.NonPublic))
+        //    {
+        //        var depAttrs = methodInfo.GetCustomAttributes(typeof(DepBuildAttribute), true);
+        //        Logger.Assert(depAttrs.Length <= 1); // 不会太大
+        //        foreach (var attrbute in depAttrs)
+        //        {
+        //            var depAttr = (DepBuildAttribute)attrbute;
+        //            _cachedDepBuildAttributes[methodInfo] = depAttr;
+        //            break;
+        //        }
+        //    }
+        //}
+        if (_cachedDepBuildClassAttributes == null)
+        {
+            _cachedDepBuildClassAttributes = new Dictionary<IDepBuildProcessor, DepBuildClassAttribute>();
+            foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
             {
-                var depAttrs = methodInfo.GetCustomAttributes(typeof (DepBuildAttribute), true);
-                Logger.Assert(depAttrs.Length <= 1); // 不会太大
-                foreach (var attrbute in depAttrs)
+                foreach (var processorType in asm.GetTypes())
                 {
-                    var depAttr = (DepBuildAttribute) attrbute;
-                    _cachedDepBuildAttributes[methodInfo] = depAttr;
-                    break;
+                    var depBuildClassAttrs = processorType.GetCustomAttributes(typeof(DepBuildClassAttribute), false);
+                    if (depBuildClassAttrs.Length > 0)
+                    {
+                        foreach (var attr in depBuildClassAttrs)
+                        {
+                            var depBuildAttr = (DepBuildClassAttribute)attr;
+                            var depBuildProcessor =
+                                Activator.CreateInstance(processorType) as IDepBuildProcessor;
+                            _cachedDepBuildClassAttributes[depBuildProcessor] = depBuildAttr;
+                            break;
+                        }
+                    }
                 }
             }
         }
 
-        foreach (var kv in _cachedDepBuildAttributes)
+        //foreach (var kv in _cachedDepBuildAttributes)
+        //{
+        //    var depAttr = kv.Value;
+        //    var methodInfo = kv.Key;
+
+        //    foreach (Component component in copyObj.GetComponentsInChildren(depAttr.TheType, true))
+        //    {
+        //        methodInfo.Invoke(null, new object[] { Convert.ChangeType(component, depAttr.TheType) });
+        //    }
+        //}
+
+        foreach (var kv in _cachedDepBuildClassAttributes)
         {
             var depAttr = kv.Value;
-            var methodInfo = kv.Key;
+            var processor = kv.Key;
 
-            foreach (Component component in copyObj.GetComponentsInChildren(depAttr.TheType, true))
+            foreach (Component component in copyObj.GetComponentsInChildren(depAttr.ClassType, true))
             {
-                methodInfo.Invoke(null, new object[] {Convert.ChangeType(component, depAttr.TheType)});
+                processor.Process(component);
             }
-        }
 
+
+        }
 
         // Build主对象
         DoBuildAssetBundle(path, copyObj, buildSelf); // TODO: BuildResult...
@@ -276,7 +299,7 @@ public partial class KDependencyBuild
     }
 
 
-    private static string __GetPrefabBuildPath(string path)
+    public static string __GetPrefabBuildPath(string path)
     {
         // 层次太深，只取后两位
         string[] strs = path.Replace(" ", "").Split('/');
@@ -299,7 +322,7 @@ public partial class KDependencyBuild
     }
 
     //static HashSet<string> _depTextureScaleList = new HashSet<string>();  // 进行过Scale的图片
-    private static string BuildDepTexture(Texture tex, float scale = 1f)
+    public static string BuildDepTexture(Texture tex, float scale = 1f)
     {
         Logger.Assert(tex);
 
@@ -311,7 +334,7 @@ public partial class KDependencyBuild
         Texture newTex;
         if (tex is Texture2D)
         {
-            var tex2d = (Texture2D) tex;
+            var tex2d = (Texture2D)tex;
 
             if (needBuild &&
                 !scale.Equals(1f)) // 需要进行缩放，才进来拷贝
@@ -328,7 +351,7 @@ public partial class KDependencyBuild
                 //    AddCache(actionName);
                 //}
 
-                newTex = AssetDatabase.LoadAssetAtPath(cacheFilePath, typeof (Texture2D)) as Texture2D;
+                newTex = AssetDatabase.LoadAssetAtPath(cacheFilePath, typeof(Texture2D)) as Texture2D;
                 if (newTex == null)
                 {
                     Logger.LogError("TexturePacker scale failed... {0}", assetPath);
@@ -389,7 +412,7 @@ public partial class KDependencyBuild
     /// </summary>
     /// <param name="font"></param>
     /// <returns></returns>
-    private static string BuildFont(Font font)
+    public static string BuildFont(Font font)
     {
         string fontAssetPath = AssetDatabase.GetAssetPath(font);
 
@@ -439,7 +462,7 @@ public partial class KDependencyBuild
 
             //CFolderSyncTool.TexturePackerScaleImage(cleanPath, cacheFilePath, Math.Min(1, GameDef.PictureScale * scale));  // TODO: do scale
 
-            texture = AssetDatabase.LoadAssetAtPath(cacheFilePath, typeof (Texture2D)) as Texture2D;
+            texture = AssetDatabase.LoadAssetAtPath(cacheFilePath, typeof(Texture2D)) as Texture2D;
             if (texture == null)
             {
                 Logger.LogError("[BuildIOTexture]TexturePacker scale failed... {0}", cleanPath);
@@ -475,9 +498,9 @@ public partial class KDependencyBuild
     // 同步两个纹理的导入设置
     public static void SyncTextureImportSetting(Texture2D srcTexture, Texture2D newTexture)
     {
-        var srcImporter = (TextureImporter) TextureImporter.GetAtPath(AssetDatabase.GetAssetPath(srcTexture));
+        var srcImporter = (TextureImporter)TextureImporter.GetAtPath(AssetDatabase.GetAssetPath(srcTexture));
         var newTexPath = AssetDatabase.GetAssetPath(newTexture);
-        var newImporter = (TextureImporter) TextureImporter.GetAtPath(newTexPath);
+        var newImporter = (TextureImporter)TextureImporter.GetAtPath(newTexPath);
         if (srcImporter == null || newImporter == null)
         {
             Logger.LogError("[SyncTextureImportSetting]Null Importer");

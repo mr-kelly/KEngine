@@ -82,11 +82,9 @@ public class KDebuggerObjectTool
                 GameObject.Destroy(obj);
 
             var newCount = --Counts[GetUri(bigType, smallType)];
-            if (!KBehaviour.IsApplicationQuited)
-            {
-                var parent = GetParent(bigType, smallType);
-                parent.name = GetNameWithCount(smallType, newCount);
-            }
+
+            var parent = GetParent(bigType, smallType);
+            parent.name = GetNameWithCount(smallType, newCount);
         }
     }
 

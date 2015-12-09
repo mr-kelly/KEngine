@@ -29,12 +29,12 @@ using KEngine.Editor;
 using UnityEditor;
 using UnityEngine;
 
-public partial class KDependencyBuild
+[DepBuildClass(typeof (AudioSource))]
+public class KDepBuild_AudioSource : IDepBuildProcessor
 {
-    [DepBuild(typeof (AudioSource))]
-    private static void ProcessAudioSource(AudioSource com)
+    public void Process(Component @object)
     {
-        var audioSource = com;
+        var audioSource = @object as AudioSource;
         if (audioSource.clip != null)
         {
             string audioPath = BuildAudioClip(audioSource.clip);
@@ -47,14 +47,14 @@ public partial class KDependencyBuild
         }
     }
 
-    private static string BuildAudioClip(AudioClip audioClip)
+    public static string BuildAudioClip(AudioClip audioClip)
     {
         string assetPath = AssetDatabase.GetAssetPath(audioClip);
         bool needBuild = KAssetVersionControl.TryCheckNeedBuildWithMeta(assetPath);
         if (needBuild)
             KAssetVersionControl.TryMarkBuildVersion(assetPath);
 
-        var result = DoBuildAssetBundle("Audio/Audio_" + audioClip.name, audioClip, needBuild);
+        var result = KDependencyBuild.DoBuildAssetBundle("Audio/Audio_" + audioClip.name, audioClip, needBuild);
 
         return result.Path;
     }

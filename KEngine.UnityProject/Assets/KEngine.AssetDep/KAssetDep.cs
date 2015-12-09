@@ -394,10 +394,10 @@ public abstract class KAssetDep : MonoBehaviour
             count--;
 
 //            AssetDeps.Remove(assetDep);
-//#if UNITY_EDITOR
+//if UNITY_EDITOR
             //if (Application.isEditor)
             //    Logger.Assert(count == AssetDeps.Count);
-//#endif
+//endif
             if (count <= 0)
             {
                 if (DepCallback != null)

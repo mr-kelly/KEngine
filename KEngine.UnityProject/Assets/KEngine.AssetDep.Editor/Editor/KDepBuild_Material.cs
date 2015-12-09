@@ -30,9 +30,9 @@ using KEngine.Editor;
 using UnityEditor;
 using UnityEngine;
 
-public partial class KDependencyBuild
+public class KDepBuild_Material
 {
-    private static string BuildDepMaterial(Material mat, float scaleTexture = 1f)
+    public static string BuildDepMaterial(Material mat, float scaleTexture = 1f)
     {
         KSerializeMaterial sMat = __DoExportMaterial(mat, scaleTexture);
 
@@ -44,8 +44,8 @@ public partial class KDependencyBuild
             if (needBuild)
                 KAssetVersionControl.TryMarkBuildVersion(path);
 
-            path = __GetPrefabBuildPath(path);
-            var buildResult = __DoBuildScriptableObject("Material/Material_" + path, sMat, needBuild);
+            path = KDependencyBuild.__GetPrefabBuildPath(path);
+            var buildResult = KDependencyBuild.__DoBuildScriptableObject("Material/Material_" + path, sMat, needBuild);
 
             return buildResult.Path;
         }
@@ -117,7 +117,7 @@ public partial class KDependencyBuild
             KAssetVersionControl.TryMarkBuildVersion(shaderAssetPath);
 
         var cleanShaderName = GetShaderNameToBuild(fileShader);
-        var result = DoBuildAssetBundle("Shader/Shader_" + cleanShaderName, fileShader, needBuild);
+        var result = KDependencyBuild.DoBuildAssetBundle("Shader/Shader_" + cleanShaderName, fileShader, needBuild);
         return result.Path;
     }
 
@@ -191,7 +191,7 @@ public partial class KDependencyBuild
                 {
                     var texTiling = mm.GetTextureScale(texProp); // 纹理+tiling+offset
                     var texOffset = mm.GetTextureOffset(texProp);
-                    var texPath = BuildDepTexture(tex, scaleTexture);
+                    var texPath = KDependencyBuild.BuildDepTexture(tex, scaleTexture);
                     shaderProp.Type = KSerializeMaterialProperty.ShaderType.Texture;
 
                     shaderProp.PropValue = string.Format("{0}|{1}|{2}|{3}|{4}", texPath, texTiling.x, texTiling.y,

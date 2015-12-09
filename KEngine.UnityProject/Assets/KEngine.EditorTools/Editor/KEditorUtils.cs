@@ -1,4 +1,4 @@
-﻿#region Copyright(c) Kingsoft Xishanju 
+﻿#region Copyright(c) Kingsoft Xishanju
 
 // Company: Kingsoft Xishanju
 // Filename: KEditorUtils.cs
@@ -9,9 +9,11 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 
@@ -27,7 +29,7 @@ namespace KUnityEditorTools
         /// </summary>
         public static void ClearConsoleLog()
         {
-            Assembly assembly = Assembly.GetAssembly(typeof (ActiveEditorTracker));
+            Assembly assembly = Assembly.GetAssembly(typeof(ActiveEditorTracker));
             Type type = assembly.GetType("UnityEditorInternal.LogEntries");
             MethodInfo method = type.GetMethod("Clear");
             method.Invoke(new object(), null);
@@ -45,19 +47,19 @@ namespace KUnityEditorTools
 
             try
             {
-                string cmdName;
+                string cmd;
                 string preArg;
                 var os = Environment.OSVersion;
-                
+
                 Debug.Log(string.Format("[ExecuteCommand]Command on OS: {0}", os.ToString()));
                 if (os.ToString().Contains("Windows"))
                 {
-                    cmdName = "cmd.exe";
+                    cmd = "cmd.exe";
                     preArg = "/C ";
                 }
                 else
                 {
-                    cmdName = "sh";
+                    cmd = "sh";
                     preArg = "-c ";
                 }
                 Debug.Log("[ExecuteCommand]" + command);
@@ -66,7 +68,7 @@ namespace KUnityEditorTools
                 {
                     if (workingDirectory != null)
                         process.StartInfo.WorkingDirectory = workingDirectory;
-                    process.StartInfo.FileName = cmdName;
+                    process.StartInfo.FileName = cmd;
                     process.StartInfo.Arguments = preArg + "\"" + command + "\"";
                     process.StartInfo.UseShellExecute = false;
                     process.StartInfo.CreateNoWindow = true;
@@ -98,5 +100,61 @@ namespace KUnityEditorTools
                 EditorUtility.ClearProgressBar();
             }
         }
+
+        /// <summary>
+        /// 在指定目录中搜寻字符串并返回匹配}
+        /// </summary>
+        /// <param name="sourceFolder"></param>
+        /// <param name="searchWord"></param>
+        /// <param name="fileFilter"></param>
+        /// <returns></returns>
+        public static Dictionary<string, List<Match>> FindStrMatchesInFolderTexts(string sourceFolder, Regex searchWord,
+            Func<string, bool> fileFilter = null)
+        {
+            var retMatches = new Dictionary<string, List<Match>>();
+            var allFiles = new List<string>();
+            AddFileNamesToList(sourceFolder, allFiles);
+            foreach (string fileName in allFiles)
+            {
+                if (fileFilter != null && !fileFilter(fileName))
+                    continue;
+
+                retMatches[fileName] = new List<Match>();
+                string contents = File.ReadAllText(fileName);
+                var matches = searchWord.Matches(contents);
+                if (matches.Count > 0)
+                {
+                    for (int i = 0; i < matches.Count; i++)
+                    {
+                        retMatches[fileName].Add(matches[i]);
+                    }
+
+                }
+            }
+            return retMatches;
+        }
+
+        static void AddFileNamesToList(string sourceDir, List<string> allFiles)
+        {
+
+            string[] fileEntries = Directory.GetFiles(sourceDir);
+            foreach (string fileName in fileEntries)
+            {
+                allFiles.Add(fileName);
+            }
+
+            //Recursion    
+            string[] subdirectoryEntries = Directory.GetDirectories(sourceDir);
+            foreach (string item in subdirectoryEntries)
+            {
+                // Avoid "reparse points"
+                if ((File.GetAttributes(item) & FileAttributes.ReparsePoint) != FileAttributes.ReparsePoint)
+                {
+                    AddFileNamesToList(item, allFiles);
+                }
+            }
+
+        }
     }
+
 }

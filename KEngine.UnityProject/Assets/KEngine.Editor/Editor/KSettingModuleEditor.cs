@@ -76,33 +76,19 @@ namespace {{ NameSpace }}
 }
 ";
 
-        [MenuItem("KEngine/Compile Settings")]
-        public static void CompileTabConfigs()
+        public static void CompileTabConfigs(string sourcePath, string compilePath, bool withCodeTemplate = true, string changeExtension = ".bytes")
         {
-            var sourcePath = AppEngine.GetConfig("SettingSourcePath");
-            if (string.IsNullOrEmpty(sourcePath))
-            {
-                Logger.LogError("Need to KEngineConfig: SettingSourcePath");
-                return;
-            }
-            var compilePath = AppEngine.GetConfig("SettingPath");
-            if (string.IsNullOrEmpty(compilePath))
-            {
-                Logger.LogError("Need to KEngineConfig: SettingPath");
-                return;
-            }
-
             // excel compiler
             var compiler = new Compiler(new CompilerConfig()
             {
-                CodeTemplates = new Dictionary<string, string>()
+                CodeTemplates = !withCodeTemplate ? null : new Dictionary<string, string>()
                 {
                     {GenCodeTemplate, "Assets/AppSettings.cs"}
                 },
                 NameSpace = "AppSettings",
             });
 
-            var excelExt = new HashSet<string>() {".xls", ".xlsx"};
+            var excelExt = new HashSet<string>() { ".xls", ".xlsx" };
             var findDir = Path.Combine(Application.dataPath, sourcePath);
             try
             {
@@ -121,12 +107,13 @@ namespace {{ NameSpace }}
                             relativePath = relativePath.Substring(1);
 
                         var compileBaseDir = Path.Combine(Application.dataPath, compilePath);
+
                         var compileToPath = string.Format("{0}/{1}", compileBaseDir,
-                            Path.ChangeExtension(relativePath, ".bytes"));
+                            Path.ChangeExtension(relativePath, changeExtension));
                         var srcFileInfo = new FileInfo(excelPath);
 
                         EditorUtility.DisplayProgressBar("Compiling Excel to Tab...",
-                            string.Format("{0} -> {1}", excelPath, compilePath), nowFileIndex/(float) allFilesCount);
+                            string.Format("{0} -> {1}", excelPath, compilePath), nowFileIndex / (float)allFilesCount);
 
                         // 如果已经存在，判断修改时间是否一致，用此来判断是否无需compile，节省时间
                         if (File.Exists(compileToPath))
@@ -150,6 +137,24 @@ namespace {{ NameSpace }}
             {
                 EditorUtility.ClearProgressBar();
             }
+        }
+
+        [MenuItem("KEngine/Compile Settings")]
+        public static void CompileTabConfigs()
+        {
+            var sourcePath = AppEngine.GetConfig("SettingSourcePath");
+            if (string.IsNullOrEmpty(sourcePath))
+            {
+                Logger.LogError("Need to KEngineConfig: SettingSourcePath");
+                return;
+            }
+            var compilePath = AppEngine.GetConfig("SettingPath");
+            if (string.IsNullOrEmpty(compilePath))
+            {
+                Logger.LogError("Need to KEngineConfig: SettingPath");
+                return;
+            }
+            CompileTabConfigs(sourcePath, compilePath);
         }
     }
 }

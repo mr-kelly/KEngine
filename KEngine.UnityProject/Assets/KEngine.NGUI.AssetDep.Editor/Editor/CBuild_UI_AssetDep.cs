@@ -26,28 +26,30 @@
 
 using System.Text.RegularExpressions;
 using KEngine.Editor;
+using UnityEditor;
 using UnityEngine;
 #if NGUI
-public partial class KBuild_NGUI : KBuild_Base
+[InitializeOnLoad]
+public class KBuild_NGUI_AssetDep
 {
-    static KBuild_NGUI()
+    static KBuild_NGUI_AssetDep()
     {
-        BeginExportEvent -= Custom_BeginExport;
-        BeginExportEvent += Custom_BeginExport;
-        EndExportEvent -= Custom_EndExport;
-        EndExportEvent += Custom_EndExport;
+        KBuild_NGUI.BeginExportEvent -= Custom_BeginExport;
+        KBuild_NGUI.BeginExportEvent += Custom_BeginExport;
+        KBuild_NGUI.EndExportEvent -= Custom_EndExport;
+        KBuild_NGUI.EndExportEvent += Custom_EndExport;
 
-        ExportCurrentUIEvent -= Custom_ExportCurrentUI;
-        ExportCurrentUIEvent += Custom_ExportCurrentUI;
+        KBuild_NGUI.ExportCurrentUIEvent -= Custom_ExportCurrentUI;
+        KBuild_NGUI.ExportCurrentUIEvent += Custom_ExportCurrentUI;
 
-        ExportUIMenuEvent -= Custom_ExportUIMenu;
-        ExportUIMenuEvent += Custom_ExportUIMenu;
+        KBuild_NGUI.ExportUIMenuEvent -= Custom_ExportUIMenu;
+        KBuild_NGUI.ExportUIMenuEvent += Custom_ExportUIMenu;
         //EndExportEvent -= Custom_
     }
 
-    //private const string UILabelStringsFile = CLocalizationEditor.UI_LABEL_STRINGS_FILE;
-    //private readonly CLocalizationItems UILabelStrings = new CLocalizationItems();
-    //private readonly CLocalizationItems UILabelStrings2 = new CLocalizationItems();
+    //private const string UILabelStringsFile = KI18NEditor.UI_LABEL_STRINGS_FILE;
+    //private readonly KI18NItems UILabelStrings = new KI18NItems();
+    //private readonly KI18NItems UILabelStrings2 = new KI18NItems();
 
 
     //readonly HashSet<string> UILabelStrings = new HashSet<string>();
@@ -57,12 +59,12 @@ public partial class KBuild_NGUI : KBuild_Base
     private static readonly Regex TemplateRegex = new Regex(@"\{(.+)\}");
 
     // 针对当前打开的单个UI
-    public static void Custom_ExportCurrentUI(KBuild_NGUI uiBuilder, string uiScenepath, string uiName,
+    static void Custom_ExportCurrentUI(KBuild_NGUI uiBuilder, string uiScenepath, string uiName,
         GameObject objToBuild)
     {
         bool reBuildPanel = KAssetVersionControl.TryCheckNeedBuildWithMeta(uiScenepath);
 
-        KDependencyBuild.BuildGameObject(objToBuild, GetBuildRelPath(uiName), reBuildPanel);
+        KDependencyBuild.BuildGameObject(objToBuild, KBuild_NGUI.GetBuildRelPath(uiName), reBuildPanel);
 
         if (reBuildPanel)
             KAssetVersionControl.TryMarkBuildVersion(uiScenepath);
@@ -71,7 +73,7 @@ public partial class KBuild_NGUI : KBuild_Base
     }
 
 
-    public static void Custom_BeginExport(KBuild_NGUI uiBuilder)
+    static void Custom_BeginExport(KBuild_NGUI uiBuilder)
     {
         // 读取字符串
         //uiBuilder.UILabelStrings.Clear();
@@ -94,7 +96,7 @@ public partial class KBuild_NGUI : KBuild_Base
     // big export
     private static void Custom_EndExport(KBuild_NGUI uiBuilder)
     {
-        //CLocalizationItems exportHashSet;
+        //KI18NItems exportHashSet;
         //if (uiBuilder.IsBuildAll)
         //{
         //    exportHashSet = uiBuilder.UILabelStrings2;  // 使用全局的，精确的
@@ -151,7 +153,7 @@ public partial class KBuild_NGUI : KBuild_Base
         }
     }
 
-    public static void Custom_ExportUIMenu()
+    static void Custom_ExportUIMenu()
     {
         KDependencyBuild.Clear();
     }

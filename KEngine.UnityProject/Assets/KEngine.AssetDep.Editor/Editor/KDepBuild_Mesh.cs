@@ -27,6 +27,6 @@
 /// <summary>
 /// TODO: Mesh
 /// </summary>
-public partial class KDependencyBuild
-{
-}
+//public partial class KDependencyBuild
+//{
+//}

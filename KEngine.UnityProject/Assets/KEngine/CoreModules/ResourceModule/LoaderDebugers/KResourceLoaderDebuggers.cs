@@ -57,7 +57,11 @@ public class KResourceLoaderDebugger : MonoBehaviour
         };
 
 
-        loader.DisposeEvent += () => { KDebuggerObjectTool.RemoveFromParent(bigType, type, newHelpGameObject); };
+        loader.DisposeEvent += () =>
+        {
+            if (!IsApplicationQuit)
+                KDebuggerObjectTool.RemoveFromParent(bigType, type, newHelpGameObject);
+        };
 
 
         return newHelp;
@@ -73,4 +77,5 @@ public class KResourceLoaderDebugger : MonoBehaviour
     {
         IsApplicationQuit = true;
     }
+    
 }
