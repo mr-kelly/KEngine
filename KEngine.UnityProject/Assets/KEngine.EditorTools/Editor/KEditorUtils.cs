@@ -101,6 +101,54 @@ namespace KUnityEditorTools
             }
         }
 
+        public delegate void EachDirectoryDelegate(string fileFullPath, string fileRelativePath);
+
+        /// <summary>
+        /// 递归一个目录所有文件，callback
+        /// </summary>
+        /// <param name="dirPath"></param>
+        /// <param name="eachCallback"></param>
+        public static void EachDirectoryFiles(string dirPath, EachDirectoryDelegate eachCallback)
+        {
+            foreach (var filePath in Directory.GetFiles(dirPath, "*", SearchOption.AllDirectories))
+            {
+                var fileRelativePath = filePath.Replace(dirPath, "");
+                if (fileRelativePath.StartsWith("/") || fileRelativePath.StartsWith("\\"))
+                    fileRelativePath = fileRelativePath.Substring(1, fileRelativePath.Length - 1);
+
+                var cleanFilePath = filePath.Replace("\\", "/");
+                fileRelativePath = fileRelativePath.Replace("\\", "/");
+                eachCallback(cleanFilePath, fileRelativePath);
+            }
+        }
+        /// <summary>
+        /// 将丑陋的windows路径，替换掉\字符
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string GetCleanPath(string path)
+        {
+            return path.Replace("\\", "/");
+        }
+        /// <summary>
+        /// 监视一个目录，如果有修改则触发事件函数, 包含其子目录！
+        /// </summary>
+        /// <param name="dirPath"></param>
+        /// <param name="handler"></param>
+        /// <returns></returns>
+        public static FileSystemWatcher DirectoryWatch(string dirPath, FileSystemEventHandler handler)
+        {
+            var watcher = new FileSystemWatcher();
+            watcher.IncludeSubdirectories = true;
+            watcher.Path = dirPath;
+            watcher.NotifyFilter = NotifyFilters.LastWrite;
+            watcher.Filter = "*";
+            watcher.Changed += handler;
+            watcher.EnableRaisingEvents = true;
+            watcher.InternalBufferSize = 62400;
+            return watcher;
+        }
+
         /// <summary>
         /// 在指定目录中搜寻字符串并返回匹配}
         /// </summary>

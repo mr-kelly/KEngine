@@ -90,7 +90,7 @@ public class KDependencyBuild
     {
         if (BuildedCache.Count > 0)
         {
-            var zipDirPath = "Assets/" + KEngineDef.ResourcesBuildInfosDir;
+            var zipDirPath = KEngineDef.ResourcesBuildInfosDir;
             if (!Directory.Exists(zipDirPath))
                 Directory.CreateDirectory(zipDirPath);
             var zipPath = zipDirPath + "/BuildAction_" + KResourceModule.BuildPlatformName + ".zip";

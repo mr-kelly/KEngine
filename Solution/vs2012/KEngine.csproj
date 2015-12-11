@@ -243,9 +243,6 @@
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\CWaitCo.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\Utils\CWaitCo.cs</Link>
     </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\CZipTool.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Utils\CZipTool.cs</Link>
-    </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\IKTabReadble.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\Utils\IKTabReadble.cs</Link>
     </Compile>
@@ -284,6 +281,9 @@
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KTool.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\Utils\KTool.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KZipTool.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Utils\KZipTool.cs</Link>
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\Singleton.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\Utils\Singleton.cs</Link>

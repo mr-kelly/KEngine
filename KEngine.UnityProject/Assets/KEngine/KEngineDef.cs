@@ -32,7 +32,7 @@ public class KEngineDef
     // 打包缓存，一些不同步的资源，在打包时拷到这个目录，并进行打包
     public const string ResourcesBuildCacheDir = "_ResourcesCache_";
 
-    public const string ResourcesBuildInfosDir = "_ResourcesBuildInfos_";
+    public const string ResourcesBuildInfosDir = "ResourcesBuildInfos";
 
     public const string RedundaciesDir = "_Redundancies_";
 }
