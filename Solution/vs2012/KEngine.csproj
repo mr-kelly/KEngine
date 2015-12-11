@@ -216,11 +216,14 @@
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\CosmosTable\TableRowInfo.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\Lib\CosmosTable\TableRowInfo.cs</Link>
     </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\KLzmaUtil.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Lib\KLzmaUtil.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\KZipTool.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Lib\KZipTool.cs</Link>
+    </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\SimpleJson.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\Lib\SimpleJson.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\TextureScaler.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Lib\TextureScaler.cs</Link>
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Logger.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\Logger.cs</Link>
@@ -264,9 +267,6 @@
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KHook.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\Utils\KHook.cs</Link>
     </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KLzmaUtil.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Utils\KLzmaUtil.cs</Link>
-    </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KPrefs.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\Utils\KPrefs.cs</Link>
     </Compile>
@@ -282,11 +282,11 @@
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KTool.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\Utils\KTool.cs</Link>
     </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KZipTool.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Utils\KZipTool.cs</Link>
-    </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\Singleton.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\Utils\Singleton.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\TextureScaler.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Utils\TextureScaler.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>

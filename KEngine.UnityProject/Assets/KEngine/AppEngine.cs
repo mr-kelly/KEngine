@@ -39,7 +39,7 @@ namespace KEngine
     public class AppEngine : MonoBehaviour
     {
         public static bool IsDebugBuild { get; private set; } // cache Debug.isDebugBuild for multi thread
-        public static bool ShowFps = Debug.isDebugBuild;
+        public bool ShowFps = Debug.isDebugBuild;
 
         /// <summary>
         /// To Display FPS in the Debug Mode (Debug.isDebugBuild is true)
@@ -133,11 +133,6 @@ namespace KEngine
         {
             IsRootUser = KTool.HasWriteAccessToFolder(Application.dataPath); // Root User运行时，能穿越沙盒写DataPath, 以此为依据
 
-            if (ShowFps)
-            {
-                RenderWatcher = new CFpsWatcher(0.95f);
-            }
-
             if (Debug.isDebugBuild)
             {
                 Logger.Log("====================================================================================");
@@ -209,9 +204,11 @@ namespace KEngine
         {
             if (ShowFps)
             {
+                if (RenderWatcher == null)
+                    RenderWatcher = new CFpsWatcher(0.95f);
                 GUILayout.BeginVertical(GUILayout.Width(300));
-                GUILayout.Label(string.Format("Memory: {0:F3}KB", UnityEngine.Profiler.GetMonoUsedSize()/1024f));
-                GUILayout.Label(RenderWatcher.Watch("FPS: {0:N0}", 1f/Time.deltaTime));
+                GUILayout.Label(string.Format("Memory: {0:F3}KB", UnityEngine.Profiler.GetMonoUsedSize() / 1024f));
+                GUILayout.Label(RenderWatcher.Watch("FPS: {0:N0}", 1f / Time.deltaTime));
                 GUILayout.EndVertical();
             }
         }
@@ -296,7 +293,7 @@ namespace KEngine
 
         public string Watch(string format, float value)
         {
-            Value = Value*Sensitivity + value*(1f - Sensitivity);
+            Value = Value * Sensitivity + value * (1f - Sensitivity);
             return string.Format(format, Value);
         }
     }

@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <doc>
     <assembly>
         <name>NPOI</name>
@@ -3830,9 +3830,9 @@
             A <see cref="T:System.String"/> that represents the current <see cref="T:System.Object"/>.
             </returns>
         </member>
-        <member name="M:NPOI.DDF.EscherBlipWMFRecord.Compress(System.Byte[])">
+        <member name="M:NPOI.DDF.EscherBlipWMFRecord.CompressFile(System.Byte[])">
             <summary>
-            Compress the contents of the provided array
+            CompressFile the contents of the provided array
             </summary>
             <param name="data">An uncompressed byte array</param>
             <returns></returns>
@@ -3912,7 +3912,7 @@
             </summary>
             <value>the cache of the saved size.</value>
         </member>
-        <member name="P:NPOI.DDF.EscherBlipWMFRecord.CompressionFlag">
+        <member name="P:NPOI.DDF.EscherBlipWMFRecord.CompressFileionFlag">
             <summary>
             Is the contents of the blip compressed?
             </summary>
@@ -4843,13 +4843,13 @@
             </summary>
             <value>The size EMU.</value>
         </member>
-        <member name="P:NPOI.DDF.EscherMetafileBlip.CompressedSize">
+        <member name="P:NPOI.DDF.EscherMetafileBlip.CompressFileedSize">
             <summary>
             Gets or sets the size of the compressed.
             </summary>
             <value>The size of the compressed.</value>
         </member>
-        <member name="P:NPOI.DDF.EscherMetafileBlip.IsCompressed">
+        <member name="P:NPOI.DDF.EscherMetafileBlip.IsCompressFileed">
             <summary>
             Gets or sets a value indicating whether this instance is compressed.
             </summary>
@@ -4953,13 +4953,13 @@
             </summary>
             <value>The size EMU.</value>
         </member>
-        <member name="P:NPOI.DDF.EscherPictBlip.CompressedSize">
+        <member name="P:NPOI.DDF.EscherPictBlip.CompressFileedSize">
             <summary>
             Gets or sets the size of the compressed.
             </summary>
             <value>The size of the compressed.</value>
         </member>
-        <member name="P:NPOI.DDF.EscherPictBlip.IsCompressed">
+        <member name="P:NPOI.DDF.EscherPictBlip.IsCompressFileed">
             <summary>
             Gets a value indicating whether this instance is compressed.
             </summary>
@@ -39887,7 +39887,7 @@
               http://en.wikipedia.org/wiki/LZW
               http://marknelson.us/1989/10/01/lzw-data-compression/
         </member>
-        <member name="F:NPOI.Util.LZWDecompresser.maskMeansCompressed">
+        <member name="F:NPOI.Util.LZWDecompresser.maskMeansCompressFileed">
             Does the mask bit mean it's compressed or uncompressed?
         </member>
         <member name="F:NPOI.Util.LZWDecompresser.codeLengthIncrease">
@@ -41155,7 +41155,7 @@
             <param name="str">the byte array to be converted</param>
             <returns>the converted string</returns>      
         </member>
-        <member name="M:NPOI.Util.StringUtil.GetFromCompressedUnicode(System.Byte[],System.Int32,System.Int32)">
+        <member name="M:NPOI.Util.StringUtil.GetFromCompressFileedUnicode(System.Byte[],System.Int32,System.Int32)">
             <summary>
             Read 8 bit data (in IsO-8859-1 codepage) into a (unicode) Java
             String and return.
@@ -41166,7 +41166,7 @@
             <param name="len">Length to read byte array</param>
             <returns>generated String instance by reading byte array</returns>
         </member>
-        <member name="M:NPOI.Util.StringUtil.PutCompressedUnicode(System.String,System.Byte[],System.Int32)">
+        <member name="M:NPOI.Util.StringUtil.PutCompressFileedUnicode(System.String,System.Byte[],System.Int32)">
             <summary>
             Takes a unicode (java) string, and returns it as 8 bit data (in IsO-8859-1
             codepage).

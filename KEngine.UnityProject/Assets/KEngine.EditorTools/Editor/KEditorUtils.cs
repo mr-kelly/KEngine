@@ -130,22 +130,26 @@ namespace KUnityEditorTools
         {
             return path.Replace("\\", "/");
         }
+
         /// <summary>
         /// 监视一个目录，如果有修改则触发事件函数, 包含其子目录！
+        /// <para>使用更大的buffer size确保及时触发事件</para>
+        /// <para>不用includesubdirect参数，使用自己的子目录扫描，更稳健</para>
         /// </summary>
         /// <param name="dirPath"></param>
         /// <param name="handler"></param>
+        /// <param name="includeSubdirectories">是否包含子目录</param>
         /// <returns></returns>
-        public static FileSystemWatcher DirectoryWatch(string dirPath, FileSystemEventHandler handler)
+        public static FileSystemWatcher DirectoryWatch(string dirPath, FileSystemEventHandler handler, bool includeSubdirectories = false)
         {
             var watcher = new FileSystemWatcher();
-            watcher.IncludeSubdirectories = true;
+            watcher.IncludeSubdirectories = includeSubdirectories;
             watcher.Path = dirPath;
-            watcher.NotifyFilter = NotifyFilters.LastWrite;
+            watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size;
             watcher.Filter = "*";
             watcher.Changed += handler;
             watcher.EnableRaisingEvents = true;
-            watcher.InternalBufferSize = 62400;
+            watcher.InternalBufferSize = 10240;
             return watcher;
         }
 

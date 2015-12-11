@@ -28,73 +28,75 @@ using System.IO;
 using System.Text;
 using ICSharpCode.SharpZipLib.Zip;
 
-public class KZipTool
+namespace KEngine.Lib
 {
-    public static void SetZipFile(string zipPath, string fileName, string content)
+    public class KZipTool
     {
-        using (var zipFile = CreateReadZipFile(zipPath))
+        public static void SetZipFile(string zipPath, string fileName, string content)
         {
-            zipFile.BeginUpdate();
-            zipFile.Add(new StringDataSource(content), fileName);
-            zipFile.CommitUpdate();
-        }
-        ;
-    }
-
-    public static string GetFileContentFromZip(string zipPath, string fileName)
-    {
-        var bytes = GetFileBytesFromZip(zipPath, fileName);
-        if (bytes == null) return null;
-
-        return Encoding.UTF8.GetString(bytes);
-    }
-
-    public static byte[] GetFileBytesFromZip(string zipPath, string fileName)
-    {
-        using (var zipFile = CreateReadZipFile(zipPath))
-        {
-            var entry = zipFile.GetEntry(fileName);
-            if (entry != null)
+            using (var zipFile = CreateReadZipFile(zipPath))
             {
-                var stream = zipFile.GetInputStream(entry);
-                var bytes = new byte[entry.Size];
-                stream.Read(bytes, 0, bytes.Length);
-                return bytes;
+                zipFile.BeginUpdate();
+                zipFile.Add(new StringDataSource(content), fileName);
+                zipFile.CommitUpdate();
             }
-            return null;
-        }
-        ;
-    }
-
-    private static ZipFile CreateReadZipFile(string filePath)
-    {
-        ZipFile zip;
-        if (File.Exists(filePath))
-            zip = new ZipFile(filePath);
-        else
-        {
-            zip = ZipFile.Create(filePath);
-            zip.BeginUpdate();
-            zip.Add(new StringDataSource("Copyright KEngine, created zip by Kelly's ZipTool"), ".KEngine");
-            // must have a file on init, or a Exception
-            zip.CommitUpdate();
-        }
-        return zip;
-    }
-
-    private class StringDataSource : IStaticDataSource
-    {
-        public string Str { get; set; }
-
-        public StringDataSource(string str)
-        {
-            this.Str = str;
         }
 
-        public Stream GetSource()
+        public static string GetFileContentFromZip(string zipPath, string fileName)
         {
-            Stream s = new MemoryStream(Encoding.Default.GetBytes(Str));
-            return s;
+            var bytes = GetFileBytesFromZip(zipPath, fileName);
+            if (bytes == null) return null;
+
+            return Encoding.UTF8.GetString(bytes);
+        }
+
+        public static byte[] GetFileBytesFromZip(string zipPath, string fileName)
+        {
+            using (var zipFile = CreateReadZipFile(zipPath))
+            {
+                var entry = zipFile.GetEntry(fileName);
+                if (entry != null)
+                {
+                    var stream = zipFile.GetInputStream(entry);
+                    var bytes = new byte[entry.Size];
+                    stream.Read(bytes, 0, bytes.Length);
+                    return bytes;
+                }
+                return null;
+            }
+            ;
+        }
+
+        private static ZipFile CreateReadZipFile(string filePath)
+        {
+            ZipFile zip;
+            if (File.Exists(filePath))
+                zip = new ZipFile(filePath);
+            else
+            {
+                zip = ZipFile.Create(filePath);
+                zip.BeginUpdate();
+                zip.Add(new StringDataSource("Copyright KEngine, created zip by Kelly's ZipTool"), ".KEngine");
+                // must have a file on init, or a Exception
+                zip.CommitUpdate();
+            }
+            return zip;
+        }
+
+        private class StringDataSource : IStaticDataSource
+        {
+            public string Str { get; set; }
+
+            public StringDataSource(string str)
+            {
+                this.Str = str;
+            }
+
+            public Stream GetSource()
+            {
+                Stream s = new MemoryStream(Encoding.Default.GetBytes(Str));
+                return s;
+            }
         }
     }
 }
