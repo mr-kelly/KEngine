@@ -1,8 +1,15 @@
 <?xml version="1.0" ?>
-<project name="Tvg1" default="build">
+<!--
+Author: Mrkelly http://github.com/mr-kelly/KEngine
+-->
+<project name="Tvg1" default="build" basedir=".">
 
-    <property name="MSBuild" value="MSBuild.exe" />
+    <!--MSBuild Build KEngine windows only-->
+    <property name="MSBuild" value="C:\Program Files\MSBuild\14.0\Bin\MSBuild.exe" />
     <target name="build">
+        <!--make project & solution -->
+        <exec program="Tools/Premake/do_premake.bat" />
+        <!-- MSBuild the Solution -->
         <exec program="${MSBuild}">
             <arg line='"Solution/vs2012/KEngine.Solution.sln"' />
             <arg line='/property:Configuration="Release";DeployOnBuild=true;PublishProfile=Deployment' />
