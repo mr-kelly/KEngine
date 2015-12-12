@@ -22,7 +22,7 @@ Author: Mrkelly http://github.com/mr-kelly/KEngine
         <!-- MSBuild the Solution -->
         <exec program="${MSBuild}">
             <arg line='"Solution/vs2012/KEngine.Solution.sln"' />
-            <arg line='/property:Configuration="Release";DeployOnBuild=true;PublishProfile=Deployment' />
+            <arg line='/property:Configuration="Release";GenerateDocumentation=true;DeployOnBuild=true;PublishProfile=Deployment' /> <!--DocumentationFile="$(MSBuildProjectName).xml";-->
             <arg value="/target:Rebuild" />
             <!-- normal / diag / detailed -->
             <arg value="/verbosity:diag" />
