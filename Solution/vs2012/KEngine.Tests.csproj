@@ -47,7 +47,7 @@
       <HintPath>C:\Program Files (x86)\Unity\Editor\Data\Managed\UnityEditor.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
-      <HintPath>..\..\Premake\packages\NUnit.3.0.0\lib\net20\nunit.framework.dll</HintPath>
+      <HintPath>..\..\Tools\packages\NUnit.3.0.0\lib\net20\nunit.framework.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

@@ -8,7 +8,10 @@ Author: Mrkelly http://github.com/mr-kelly/KEngine
     <property name="MSBuild" value="C:\Program Files\MSBuild\14.0\Bin\MSBuild.exe" />
     <target name="build">
         <!--make project & solution -->
-        <exec program="Tools/Premake/do_premake.bat" />
+        <exec program="Tools/Premake/premake5.exe">
+            <arg value="--file=Tools/premake_script.lua" />
+            <arg value="vs2012" />
+        </exec>
         <!-- MSBuild the Solution -->
         <exec program="${MSBuild}">
             <arg line='"Solution/vs2012/KEngine.Solution.sln"' />
