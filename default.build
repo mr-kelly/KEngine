@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<project name="Tvg1" default="build">
+
+    <property name="MSBuild" value="MSBuild.exe" />
+    <target name="build">
+        <exec program="${MSBuild}">
+            <arg line='"Solution/vs2012/KEngine.Solution.sln"' />
+            <arg line='/property:Configuration="Release";DeployOnBuild=true;PublishProfile=Deployment' />
+            <arg value="/target:Build" />
+            <arg value="/verbosity:normal" />
+            <arg value="/nologo" />
+        </exec>
+    </target>
+
+</project>
