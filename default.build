@@ -6,18 +6,24 @@ Author: Mrkelly http://github.com/mr-kelly/KEngine
 
     <!--MSBuild Build KEngine windows only-->
     <property name="MSBuild" value="C:\Program Files\MSBuild\14.0\Bin\MSBuild.exe" />
-    <target name="build">
-        <!--make project & solution -->
+    
+    <target name="premake">
+        <echo message="Premake: make project + solution" />
         <exec program="Tools/Premake/premake5.exe">
             <arg value="--file=Tools/premake_script.lua" />
             <arg value="vs2012" />
         </exec>
+    </target>
+
+    <target name="build">
+        <call target="premake" />
         <!-- MSBuild the Solution -->
         <exec program="${MSBuild}">
             <arg line='"Solution/vs2012/KEngine.Solution.sln"' />
             <arg line='/property:Configuration="Release";DeployOnBuild=true;PublishProfile=Deployment' />
-            <arg value="/target:Build" />
-            <arg value="/verbosity:normal" />
+            <arg value="/target:Rebuild" />
+            <!-- normal / diag / detailed -->
+            <arg value="/verbosity:diag" />
             <arg value="/nologo" />
         </exec>
     </target>
