@@ -1,0 +1,302 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{062D043A-720C-83D5-7B24-0EACE782E936}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>KEngine</RootNamespace>
+    <AssemblyName>KEngine</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\Build\Debug\</OutputPath>
+    <BaseIntermediateOutputPath>obj\Debug\KEngine\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants>_DEBUG;DEBUG;TRACE;MS_DOTNET</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\Build\Release\</OutputPath>
+    <BaseIntermediateOutputPath>obj\Release\KEngine\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants>MS_DOTNET</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="UnityEngine">
+      <HintPath>C:\Program Files (x86)\Unity\Editor\Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>C:\Program Files (x86)\Unity\Editor\Data\UnityExtensions\Unity\GUISystem\4.6.9\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\..\KEngine.UnityProject\Assets\KEngine\Lib\SharpZipLib\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\AppEngine.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\AppEngine.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\GameSettings\CGameSettingFiles.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\GameSettings\CGameSettingFiles.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\GameSettings\KGameSettings.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\GameSettings\KGameSettings.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KAbstractResourceLoader.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KAbstractResourceLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KAssetBundleLoader.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KAssetBundleLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KAssetBundleParser.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KAssetBundleParser.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KAssetFileLoader.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KAssetFileLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KAudioLoader.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KAudioLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KFontLoader.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KFontLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KHttpDownloader.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KHttpDownloader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KInstanceAssetLoader.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KInstanceAssetLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KMaterialLoader.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KMaterialLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KResourceModule.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KResourceModule.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KSerializeMaterial.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KSerializeMaterial.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KSerializeMaterialProperty.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KSerializeMaterialProperty.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KSettingManager.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KSettingManager.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KShaderLoader.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KShaderLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KSpriteLoader.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KSpriteLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KStaticAssetLoader.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KStaticAssetLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KTextureLoader.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KTextureLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KWWWLoader.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KWWWLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\LoaderDebugers\KDebuggerObjectTool.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\LoaderDebugers\KDebuggerObjectTool.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\LoaderDebugers\KResourceLoadedAssetDebugger.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\LoaderDebugers\KResourceLoadedAssetDebugger.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\LoaderDebugers\KResourceLoaderDebuggers.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\LoaderDebugers\KResourceLoaderDebuggers.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\SettingModule\SettingModule.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\SettingModule\SettingModule.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\UIModule\IKUIBridge.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\UIModule\IKUIBridge.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\UIModule\KUGUIBridge.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\UIModule\KUGUIBridge.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\UIModule\KUIController.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\UIModule\KUIController.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\UIModule\KUIModule.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\UIModule\KUIModule.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\ICModule.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\ICModule.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\KAsync.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\KAsync.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\KBehaviour.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\KBehaviour.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\KEngineDef.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\KEngineDef.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\KObject.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\KObject.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Common\CRC.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Common\CRC.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Common\CommandLineParser.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Common\CommandLineParser.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Common\InBuffer.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Common\InBuffer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Common\OutBuffer.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Common\OutBuffer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LZ\IMatchFinder.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LZ\IMatchFinder.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LZ\LzBinTree.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LZ\LzBinTree.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LZ\LzInWindow.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LZ\LzInWindow.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LZ\LzOutWindow.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LZ\LzOutWindow.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LZMA\LzmaBase.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LZMA\LzmaBase.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LZMA\LzmaDecoder.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LZMA\LzmaDecoder.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LZMA\LzmaEncoder.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LZMA\LzmaEncoder.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LzmaAlone\LzmaAlone.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LzmaAlone\LzmaAlone.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LzmaAlone\LzmaBench.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LzmaAlone\LzmaBench.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LzmaAlone\Properties\AssemblyInfo.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LzmaAlone\Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LzmaAlone\Properties\Resources.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LzmaAlone\Properties\Resources.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\RangeCoder\RangeCoder.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\RangeCoder\RangeCoder.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\RangeCoder\RangeCoderBit.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\RangeCoder\RangeCoderBit.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\RangeCoder\RangeCoderBitTree.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\RangeCoder\RangeCoderBitTree.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\ICoder.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\ICoder.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\CosmosTable\TabFileWriter.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Lib\CosmosTable\TabFileWriter.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\CosmosTable\TableFile.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Lib\CosmosTable\TableFile.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\CosmosTable\TableRowInfo.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Lib\CosmosTable\TableRowInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\KLzmaUtil.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Lib\KLzmaUtil.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\KZipTool.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Lib\KZipTool.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\SimpleJson.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Lib\SimpleJson.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Logger.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Logger.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\UnityLayerDef.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\UnityLayerDef.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\CFiber.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Utils\CFiber.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\CObjectPool.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Utils\CObjectPool.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\CStateMachine.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Utils\CStateMachine.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\CUnityObjectPool.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Utils\CUnityObjectPool.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\CWaitCo.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Utils\CWaitCo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\IKTabReadble.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Utils\IKTabReadble.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KActionRecord.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Utils\KActionRecord.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KCrypt.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Utils\KCrypt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KDelegateList.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Utils\KDelegateList.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KEngineExtensions.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Utils\KEngineExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KFileCacheList.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Utils\KFileCacheList.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KHook.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Utils\KHook.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KPrefs.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Utils\KPrefs.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KProfiler.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Utils\KProfiler.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KTabFile.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Utils\KTabFile.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KTabReader.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Utils\KTabReader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KTool.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Utils\KTool.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\Singleton.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Utils\Singleton.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\TextureScaler.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Utils\TextureScaler.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

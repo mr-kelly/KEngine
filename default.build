@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+<!--
+Author: Mrkelly http://github.com/mr-kelly/KEngine
+
+因为MSBuild和Premake都是Windows程序，本脚本Windows only!
+-->
+<project name="Tvg1" default="build" basedir=".">
+
+    <!--MSBuild Build KEngine windows only-->
+    <property name="MSBuild" value="C:\Program Files\MSBuild\14.0\Bin\MSBuild.exe" />
+
+    <target name="premake">
+        <echo message="Premake: make project + solution" />
+        <exec program="Tools/Premake/premake5.exe">
+            <arg value="--file=Tools/premake_script.lua" />
+            <arg value="vs2012" />
+        </exec>
+    </target>
+
+    <target name="build">
+        <call target="premake" />
+        <!-- MSBuild the Solution -->
+        <exec program="${MSBuild}">
+            <arg line='"Solution/vs2012/KEngine.Solution.sln"' />
+            <arg line='/property:Configuration="Release";GenerateDocumentation=true;DeployOnBuild=true;PublishProfile=Deployment' /> <!--DocumentationFile="$(MSBuildProjectName).xml";-->
+            <arg value="/target:Rebuild" />
+            <!-- normal / diag / detailed -->
+            <arg value="/verbosity:diag" />
+            <arg value="/nologo" />
+        </exec>
+    </target>
+
+</project>

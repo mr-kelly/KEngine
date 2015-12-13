@@ -1,0 +1,141 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{BB8AB2E6-A758-A6EC-90EC-16137C598251}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>KEngine.Editor</RootNamespace>
+    <AssemblyName>KEngine.Editor</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\Build\Debug\</OutputPath>
+    <BaseIntermediateOutputPath>obj\Debug\KEngine.Editor\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants>_DEBUG;DEBUG;TRACE;MS_DOTNET</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\Build\Release\</OutputPath>
+    <BaseIntermediateOutputPath>obj\Release\KEngine.Editor\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants>MS_DOTNET</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="UnityEngine">
+      <HintPath>C:\Program Files (x86)\Unity\Editor\Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>C:\Program Files (x86)\Unity\Editor\Data\UnityExtensions\Unity\GUISystem\4.6.9\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\..\KEngine.UnityProject\Assets\KEngine\Lib\SharpZipLib\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor">
+      <HintPath>C:\Program Files (x86)\Unity\Editor\Data\Managed\UnityEditor.dll</HintPath>
+    </Reference>
+    <Reference Include="DotLiquid">
+      <HintPath>..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\CosmosTable.Compiler\DotLiquid.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI">
+      <HintPath>..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\NPOI\NPOI.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI.OOXML">
+      <HintPath>..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\NPOI\NPOI.OOXML.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI.OpenXml4Net">
+      <HintPath>..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\NPOI\NPOI.OpenXml4Net.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI.OpenXmlFormats">
+      <HintPath>..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\NPOI\NPOI.OpenXmlFormats.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\AlignEditor\AlignEditor.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\AlignEditor\AlignEditor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\AppEngineInspector.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\AppEngineInspector.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\CommandLine.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\CommandLine.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\CosmosTable.Compiler\Compiler.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\CosmosTable.Compiler\Compiler.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\CosmosTable.Compiler\SimpleExcelFile.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\CosmosTable.Compiler\SimpleExcelFile.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\KAutoBuilder.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\KAutoBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\KBuildTools.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\KBuildTools.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\KCommonProductPrefabExporter.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\KCommonProductPrefabExporter.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\KEngineUtils.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\KEngineUtils.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\KExcelFile.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\KExcelFile.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\KObjectDebuggerEditor.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\KObjectDebuggerEditor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\KSettingModuleEditor.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\KSettingModuleEditor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\ResourcesBuild\CBuild_UGUI.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\ResourcesBuild\CBuild_UGUI.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\ResourcesBuild\KResourceBuilder.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\ResourcesBuild\KResourceBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\UnityLock\UnityLock.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\UnityLock\UnityLock.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.EditorTools\Editor\KDefineSymbolsHelper.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.EditorTools\Editor\KDefineSymbolsHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.EditorTools\Editor\KEditorUtils.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.EditorTools\Editor\KEditorUtils.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.EditorTools\Editor\KSymbolLinkHelper.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.EditorTools\Editor\KSymbolLinkHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.EditorTools\Editor\KUnityEditorEventCatcher.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.EditorTools\Editor\KUnityEditorEventCatcher.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="KEngine.csproj">
+      <Project>{062D043A-720C-83D5-7B24-0EACE782E936}</Project>
+      <Name>KEngine</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
