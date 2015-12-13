@@ -7,8 +7,9 @@ Author: Mrkelly http://github.com/mr-kelly/KEngine
 <project name="Tvg1" default="build" basedir=".">
 
     <!--MSBuild Build KEngine windows only-->
-    <property name="MSBuild" value="C:\Program Files\MSBuild\14.0\Bin\MSBuild.exe" />
-
+    <!--<property name="MSBuild" value="C:\Program Files\MSBuild\14.0\Bin\MSBuild.exe" />-->
+    <property name="MSBuild" value="C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe" />
+    
     <target name="premake">
         <echo message="Premake: make project + solution" />
         <exec program="Tools/Premake/premake5.exe">
@@ -25,7 +26,7 @@ Author: Mrkelly http://github.com/mr-kelly/KEngine
             <arg line='/property:Configuration="Release";GenerateDocumentation=true;DeployOnBuild=true;PublishProfile=Deployment' /> <!--DocumentationFile="$(MSBuildProjectName).xml";-->
             <arg value="/target:Rebuild" />
             <!-- normal / diag / detailed -->
-            <arg value="/verbosity:diag" />
+            <arg value="/verbosity:normal" />
             <arg value="/nologo" />
         </exec>
     </target>

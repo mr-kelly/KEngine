@@ -19,7 +19,7 @@ configuration "vs*"
 
 
 local UNITY_ENGINE_DLL = "C:/Program Files (x86)/Unity/Editor/Data/Managed/UnityEngine.dll"
-local UNITY_UI_DLL = "C:/Program Files (x86)/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/4.6.9/UnityEngine.UI.dll"
+local UNITY_UI_DLL = "C:/Program Files (x86)/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/4.6.4/UnityEngine.UI.dll"
 local SharpZipLib_DLL = "../KEngine.UnityProject/Assets/KEngine/Lib/SharpZipLib/ICSharpCode.SharpZipLib.dll"
 local UNITY_EDITOR_DLL = "C:/Program Files (x86)/Unity/Editor/Data/Managed/UnityEditor.dll"
 
