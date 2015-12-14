@@ -1,21 +1,38 @@
-﻿#region Copyright(c) Kingsoft Xishanju
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
 
-// Company: Kingsoft Xishanju
-// Filename: KEditorUtils.cs
-// Date:     2015/11/07
-// Author:   Kelly / chenpeilin1
-// Email: chenpeilin1@kingsoft.com / 23110388@qq.com
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: KEngineUtils.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
 
 #endregion
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using UnityEditor;
-using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace KUnityEditorTools
 {
@@ -24,6 +41,39 @@ namespace KUnityEditorTools
     /// </summary>
     public class KEditorUtils
     {
+        /// <summary>
+        /// 用于非主线程里执行主线程的函数
+        /// </summary>
+        internal static Queue<Action> _mainThreadActions = new Queue<Action>();
+
+        static KEditorUtils()
+        {
+            KUnityEditorEventCatcher.OnEditorUpdateEvent -= OnEditorUpdate;
+            KUnityEditorEventCatcher.OnEditorUpdateEvent += OnEditorUpdate;
+        }
+
+        /// <summary>
+        /// 捕获Unity Editor update事件
+        /// </summary>
+        private static void OnEditorUpdate()
+        {
+            // 主线程委托
+            while (_mainThreadActions.Count > 0)
+            {
+                var action = _mainThreadActions.Dequeue();
+                if (action != null) action();
+            }
+        }
+
+        /// <summary>
+        /// 异步线程回到主线程进行回调
+        /// </summary>
+        /// <param name="action"></param>
+        public static void CallMainThread(Action action)
+        {
+            _mainThreadActions.Enqueue(action);
+        }
+
         /// <summary>
         /// 清除Console log
         /// </summary>
@@ -51,7 +101,7 @@ namespace KUnityEditorTools
                 string preArg;
                 var os = Environment.OSVersion;
 
-                Debug.Log(string.Format("[ExecuteCommand]Command on OS: {0}", os.ToString()));
+                Debug.Log(String.Format("[ExecuteCommand]Command on OS: {0}", os.ToString()));
                 if (os.ToString().Contains("Windows"))
                 {
                     cmd = "cmd.exe";
@@ -64,7 +114,7 @@ namespace KUnityEditorTools
                 }
                 Debug.Log("[ExecuteCommand]" + command);
                 var allOutput = new StringBuilder();
-                using (var process = new System.Diagnostics.Process())
+                using (var process = new Process())
                 {
                     if (workingDirectory != null)
                         process.StartInfo.WorkingDirectory = workingDirectory;
@@ -87,9 +137,9 @@ namespace KUnityEditorTools
                     }
 
                     var err = process.StandardError.ReadToEnd();
-                    if (!string.IsNullOrEmpty(err))
+                    if (!String.IsNullOrEmpty(err))
                     {
-                        Debug.LogError(string.Format("[ExecuteCommand] {0}", err));
+                        Debug.LogError(String.Format("[ExecuteCommand] {0}", err));
                     }
                     process.WaitForExit();
                 }
@@ -129,28 +179,6 @@ namespace KUnityEditorTools
         public static string GetCleanPath(string path)
         {
             return path.Replace("\\", "/");
-        }
-
-        /// <summary>
-        /// 监视一个目录，如果有修改则触发事件函数, 包含其子目录！
-        /// <para>使用更大的buffer size确保及时触发事件</para>
-        /// <para>不用includesubdirect参数，使用自己的子目录扫描，更稳健</para>
-        /// </summary>
-        /// <param name="dirPath"></param>
-        /// <param name="handler"></param>
-        /// <param name="includeSubdirectories">是否包含子目录</param>
-        /// <returns></returns>
-        public static FileSystemWatcher DirectoryWatch(string dirPath, FileSystemEventHandler handler, bool includeSubdirectories = false)
-        {
-            var watcher = new FileSystemWatcher();
-            watcher.IncludeSubdirectories = includeSubdirectories;
-            watcher.Path = dirPath;
-            watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size;
-            watcher.Filter = "*";
-            watcher.Changed += handler;
-            watcher.EnableRaisingEvents = true;
-            watcher.InternalBufferSize = 10240;
-            return watcher;
         }
 
         /// <summary>
@@ -207,6 +235,7 @@ namespace KUnityEditorTools
             }
 
         }
+
     }
 
 }

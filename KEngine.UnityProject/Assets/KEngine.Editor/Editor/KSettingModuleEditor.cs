@@ -27,6 +27,7 @@
 using System.Collections.Generic;
 using System.IO;
 using CosmosTable;
+using KUnityEditorTools;
 using UnityEditor;
 using UnityEngine;
 
@@ -35,8 +36,19 @@ namespace KEngine.Editor
     /// <summary>
     /// For SettingModule
     /// </summary>
+    [InitializeOnLoad]
     public class KSettingModuleEditor
     {
+        /// <summary>
+        /// 编译出的后缀名
+        /// </summary>
+        public static string SettingExtension = ".bytes";
+
+        /// <summary>
+        /// 生成代码吗？它的路径配置
+        /// </summary>
+        public static string SettingCodePath = "Assets/AppSettings.cs";
+
         public static string GenCodeTemplate = @"
 using CosmosTable;
 
@@ -75,13 +87,40 @@ namespace {{ NameSpace }}
 {% endfor %}
 }
 ";
+        /// <summary>
+        /// 标记，是否正在打开提示配置变更对话框
+        /// </summary>
+        private static bool _isPopUpConfirm = false;
 
-        public static void CompileTabConfigs(string sourcePath, string compilePath, bool withCodeTemplate = true, string changeExtension = ".bytes")
+        static KSettingModuleEditor()
+        {
+            var path = Path.Combine(Application.dataPath, SettingSourcePath);
+            if (Directory.Exists(path))
+            {
+                new KDirectoryWatcher(path, (o, args) =>
+                {
+                    if (_isPopUpConfirm) return;
+
+                    _isPopUpConfirm = true;
+                    KEditorUtils.CallMainThread(() =>
+                    {
+                        if (EditorUtility.DisplayDialog("Excel Setting Changed!", "ReCompiler All?", "Yes", "No"))
+                        {
+                            CompileTabConfigs();
+                            _isPopUpConfirm = false;
+                        }
+
+                    });
+                });
+                Debug.Log("[KSettingModuleEditor]Watching directory: " + SettingSourcePath);
+            }
+        }
+        public static void CompileTabConfigs(string sourcePath, string compilePath, string genCodeFilePath, string changeExtension = ".bytes")
         {
             // excel compiler
             var compiler = new Compiler(new CompilerConfig()
             {
-                CodeTemplates = !withCodeTemplate ? null : new Dictionary<string, string>()
+                CodeTemplates = string.IsNullOrEmpty(genCodeFilePath) ? null : new Dictionary<string, string>()
                 {
                     {GenCodeTemplate, "Assets/AppSettings.cs"}
                 },
@@ -139,10 +178,19 @@ namespace {{ NameSpace }}
             }
         }
 
-        [MenuItem("KEngine/Compile Settings")]
+        static string SettingSourcePath
+        {
+            get
+            {
+                var sourcePath = AppEngine.GetConfig("SettingSourcePath");
+                return sourcePath;
+            }
+        }
+
+        [MenuItem("KEngine/Force ReCompile Settings")]
         public static void CompileTabConfigs()
         {
-            var sourcePath = AppEngine.GetConfig("SettingSourcePath");
+            var sourcePath = SettingSourcePath;//AppEngine.GetConfig("SettingSourcePath");
             if (string.IsNullOrEmpty(sourcePath))
             {
                 Logger.LogError("Need to KEngineConfig: SettingSourcePath");
@@ -154,7 +202,7 @@ namespace {{ NameSpace }}
                 Logger.LogError("Need to KEngineConfig: SettingPath");
                 return;
             }
-            CompileTabConfigs(sourcePath, compilePath);
+            CompileTabConfigs(sourcePath, compilePath, SettingCodePath, SettingExtension);
         }
     }
 }

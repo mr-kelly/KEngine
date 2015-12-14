@@ -1,4 +1,4 @@
-﻿#region Copyright(c) Kingsoft Xishanju 
+﻿#region Copyright(c) Kingsoft Xishanju
 
 // Company: Kingsoft Xishanju
 // Filename: KUnityEditorEventCatcher.cs
@@ -8,6 +8,8 @@
 
 #endregion
 
+using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.Callbacks;
 
@@ -37,7 +39,7 @@ namespace KUnityEditorTools
             {
                 _OnEditorUpdateEvent = value;
                 if (IsInited && _OnEditorUpdateEvent != null)
-                    _OnEditorUpdateEvent();                
+                    _OnEditorUpdateEvent();
             }
         }
         /// <summary>
@@ -78,7 +80,7 @@ namespace KUnityEditorTools
         private static System.Action _OnWillStopEvent;
         private static System.Action OnWillStopEvent
         {
-            get {return _OnWillStopEvent;}
+            get { return _OnWillStopEvent; }
             set
             {
                 _OnWillStopEvent = value;
@@ -101,7 +103,7 @@ namespace KUnityEditorTools
                     _OnLockingAssembly();
             }
         }
-         
+
         /// <summary>
         /// 编译完成后事件
         /// </summary>
@@ -123,7 +125,7 @@ namespace KUnityEditorTools
             EditorApplication.playmodeStateChanged += OnPlayModeStateChanged;
 
 
-            
+
             if (OnLockingAssembly != null)
             {
                 EditorApplication.LockReloadAssemblies();
@@ -131,7 +133,7 @@ namespace KUnityEditorTools
                 EditorApplication.UnlockReloadAssemblies();
             }
 
-            
+
             IsInited = true;
         }
 
