@@ -187,7 +187,7 @@ namespace {{ NameSpace }}
             }
         }
 
-        [MenuItem("KEngine/Force ReCompile Settings")]
+        [MenuItem("KEngine/Settings/Force Compile Settings")]
         public static void CompileTabConfigs()
         {
             var sourcePath = SettingSourcePath;//AppEngine.GetConfig("SettingSourcePath");

@@ -162,6 +162,7 @@ namespace KEngine.Installer
             CopyDll(Path.Combine(gitPath, "Build/Release/NPOI.OpenXml4Net.dll"), toDir);
             CopyDll(Path.Combine(gitPath, "Build/Release/NPOI.OpenXmlFormats.dll"), toDir);
         }
+
         /// <summary>
         /// 选择目录，进行安装
         /// </summary>
@@ -272,19 +273,12 @@ namespace KEngine.Installer
 
         private void CopyFolder(string src, string target)
         {
-            //if (CopyType == KEngineCopyType.CopyFile)
+            foreach (var srcFile in Directory.GetFiles(src, "*", SearchOption.AllDirectories))
             {
-                foreach (var srcFile in Directory.GetFiles(src, "*", SearchOption.AllDirectories))
-                {
-                    var relativeSrcFilePath = srcFile.Replace(src, "");
-                    var targetPath = target + relativeSrcFilePath;
-                    CopyFile(srcFile, targetPath);
-                }
+                var relativeSrcFilePath = srcFile.Replace(src, "");
+                var targetPath = target + relativeSrcFilePath;
+                CopyFile(srcFile, targetPath);
             }
-            //else
-            //{
-            //    CreateSymbolicLink(targetFolder, src, SymbolicLink.Directory);
-            //}
             Debug.Log(string.Format("Copy Folder {0} -> {1}", src, target));
         }
         /// <summary>
@@ -304,7 +298,6 @@ namespace KEngine.Installer
             if (File.Exists(targetPdb))
                 CopyFile(srcPdb, targetPdb);
 
-            Debug.Log(string.Format("Copy Dll {0} -> {1}", src, targetFolder));
         }
 
         private void CopyFile(string src, string target)
@@ -312,12 +305,19 @@ namespace KEngine.Installer
             if (!Directory.Exists(Path.GetDirectoryName(target)))
                 Directory.CreateDirectory(Path.GetDirectoryName(target));
             if (CopyType == KEngineCopyType.CopyFile)
+            {
                 File.Copy(src, target, true);
+                Debug.Log(string.Format("Copy {0} -> {1}", src, target));
+            }
             else if (CopyType == KEngineCopyType.Hardlink)
+            {
                 CreateHardLink(target, src, IntPtr.Zero);
+                Debug.Log(string.Format("Harlink {0} -> {1}", src, target));
+            }
             else
             {
                 CreateSymbolicLink(target, src, SymbolicLink.File);
+                Debug.Log(string.Format("Symbol {0} -> {1}", src, target));
             }
         }
     }
