@@ -24,7 +24,9 @@
 
 #endregion
 
+using System.Collections;
 using System.IO;
+using AppSettings;
 using KEngine;
 using KEngine.CoreModules;
 using UnityEngine;
@@ -33,9 +35,13 @@ public class KUGUIDemoMain : MonoBehaviour
 {
     private void Awake()
     {
+    }
+
+    IEnumerator Start()
+    {
         KGameSettings.Instance.InitAction += OnGameSettingsInit;
 
-        KEngine.AppEngine.New(
+        var engine = KEngine.AppEngine.New(
             gameObject,
             new ICModule[]
             {
@@ -44,22 +50,29 @@ public class KUGUIDemoMain : MonoBehaviour
             null,
             null);
 
+        while (!engine.IsInited)
+            yield return null;
+
         KUIModule.Instance.OpenWindow<KUIDemoHome>();
 
         KUIModule.Instance.CallUI<KUIDemoHome>(ui =>
         {
             // Do some UI stuff
         });
-    }
 
+        Debug.Log("[SettingModule]Table: " + ExampleInfo.TabFilePath);
+        var exampleInfoTable = SettingModule.Get<ExampleInfo>(ExampleInfo.TabFilePath);
+        foreach (var info in exampleInfoTable.GetAll())
+        {
+            Debug.Log(string.Format("Name: {0}", info.Name));
+        }
+    }
     private void OnGameSettingsInit()
     {
         KGameSettings _ = KGameSettings.Instance;
 
         Logger.Log("Begin Load tab file...");
 
-        //var tabContent = File.ReadAllText("Assets/" + Engine.GetConfig("ProductRelPath") + "/Setting/test_tab.bytes");
-        //var path = KResourceModule.GetResourceFullPath("/Setting/test_tab.bytes");
         var tabContent =
             File.ReadAllText(Application.dataPath + "/" + KEngine.AppEngine.GetConfig("ProductRelPath") +
                              "/Setting/test_tab.bytes");

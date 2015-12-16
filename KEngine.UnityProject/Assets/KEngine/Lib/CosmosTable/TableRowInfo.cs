@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace CosmosTable
 {
@@ -67,6 +68,32 @@ namespace CosmosTable
         {
             var str = Get_string(value, defaultValue);
             return str.Split(',');
+        }
+
+        protected Dictionary<string, int> Get_Dictionary_string_int(string value, string defaultValue)
+        {
+            return GetDictionary<string, int>(value, defaultValue);
+        }
+
+        protected Dictionary<TKey, TValue> GetDictionary<TKey, TValue>(string value, string defaultValue)
+        {
+            var dict = new Dictionary<TKey, TValue>();
+            var str = Get_String(value, defaultValue);
+            var arr = str.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var item in arr)
+            {
+                var kv = item.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
+                var itemKey = ConvertString<TKey>(kv[0]);
+                var itemValue = ConvertString<TValue>(kv[1]);
+                dict[itemKey] = itemValue;
+            }
+            return dict;
+        }
+
+        protected T ConvertString<T>(string value)
+        {
+            return (T)Convert.ChangeType(value, typeof (T));
         }
     }
 

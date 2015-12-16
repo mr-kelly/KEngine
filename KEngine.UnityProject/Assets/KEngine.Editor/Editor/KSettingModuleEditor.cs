@@ -50,8 +50,8 @@ namespace KEngine.Editor
         public static string SettingCodePath = "Assets/AppSettings.cs";
 
         public static string GenCodeTemplate = @"
+using System.Collections.Generic;
 using CosmosTable;
-
 namespace {{ NameSpace }}
 {
 {% for file in Files %}
@@ -65,14 +65,14 @@ namespace {{ NameSpace }}
 		public override bool IsAutoParse { get { return false; } }
 
 		{% for field in file.Fields %}
-		public {{ field.Type }} {{ field.Name}} { get; internal set; }  // {{ field.Comment }}
+		public {{ field.FormatType }} {{ field.Name}} { get; internal set; }  // {{ field.Comment }}
 		{% endfor %}
 
 		public override void Parse(string[] values)
 		{
 		{% for field in file.Fields %}
 			// {{ field.Comment }}
-			{{ field.Name}} = Get_{{ field.Type | replace:'\[\]','_array' }}(values[{{ field.Index }}], ""{{ field.DefaultValue }}"");
+			{{ field.Name}} = Get_{{ field.TypeMethod }}(values[{{ field.Index }}], ""{{ field.DefaultValue }}"");
 		{% endfor %}
 		}
 

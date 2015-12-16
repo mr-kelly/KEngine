@@ -1,6 +1,6 @@
 
+using System.Collections.Generic;
 using CosmosTable;
-
 namespace AppSettings
 {
 
@@ -20,6 +20,8 @@ namespace AppSettings
 		
 		public string[] StrArray { get; internal set; }  // ArrayTest/测试数组
 		
+		public Dictionary<string,int> StrIntMap { get; internal set; }  // 字典测试
+		
 
 		public override void Parse(string[] values)
 		{
@@ -32,6 +34,9 @@ namespace AppSettings
 		
 			// ArrayTest/测试数组
 			StrArray = Get_string_array(values[2], "");
+		
+			// 字典测试
+			StrIntMap = Get_Dictionary_string_int(values[3], "");
 		
 		}
 

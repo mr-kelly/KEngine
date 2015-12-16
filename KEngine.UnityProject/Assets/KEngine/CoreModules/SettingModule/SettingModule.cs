@@ -25,7 +25,10 @@
 #endregion
 
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using CosmosTable;
+using UnityEngine;
 
 namespace KEngine.CoreModules
 {
@@ -51,7 +54,10 @@ namespace KEngine.CoreModules
             object tableFile;
             if (!useCache || !_tableFilesCache.TryGetValue(path, out tableFile))
             {
-                var tab = TableFile<T>.LoadFromString(path);
+                var fileContentAsset = Resources.Load("Setting/" + Path.GetFileNameWithoutExtension(path)) as TextAsset;
+                var fileContent = Encoding.UTF8.GetString(fileContentAsset.bytes);
+
+                var tab = TableFile<T>.LoadFromString(fileContent);
                 _tableFilesCache[path] = tableFile = tab;
                 return tab;
             }
