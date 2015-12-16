@@ -24,6 +24,7 @@
 
 #endregion
 
+using System.Collections.Generic;
 using CosmosTable;
 
 namespace KEngine.CoreModules
@@ -33,9 +34,29 @@ namespace KEngine.CoreModules
     /// </summary>
     public class SettingModule
     {
-        public static TableFile<T> Get<T>(string path) where T : TableRowInfo, new()
+        /// <summary>
+        /// table缓存
+        /// </summary>
+        private static readonly Dictionary<string, object> _tableFilesCache = new Dictionary<string, object>();
+
+        /// <summary>
+        /// 通过SettingModule拥有缓存与惰式加载
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="path"></param>
+        /// <param name="useCache">是否缓存起来？还是单独创建新的</param>
+        /// <returns></returns>
+        public static TableFile<T> Get<T>(string path, bool useCache = true) where T : TableRowInfo, new()
         {
-            return TableFile<T>.LoadFromString(path);
+            object tableFile;
+            if (!useCache || !_tableFilesCache.TryGetValue(path, out tableFile))
+            {
+                var tab = TableFile<T>.LoadFromString(path);
+                _tableFilesCache[path] = tableFile = tab;
+                return tab;
+            }
+
+            return tableFile as TableFile<T>;
         }
     }
 }
