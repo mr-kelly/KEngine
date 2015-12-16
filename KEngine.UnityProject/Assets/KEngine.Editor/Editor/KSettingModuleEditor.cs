@@ -104,12 +104,9 @@ namespace {{ NameSpace }}
                     _isPopUpConfirm = true;
                     KEditorUtils.CallMainThread(() =>
                     {
-                        if (EditorUtility.DisplayDialog("Excel Setting Changed!", "ReCompiler All?", "Yes", "No"))
-                        {
-                            CompileTabConfigs();
-                            _isPopUpConfirm = false;
-                        }
-
+                        EditorUtility.DisplayDialog("Excel Setting Changed!", "Ready to Recompile All!", "OK");
+                        CompileTabConfigs();
+                        _isPopUpConfirm = false;
                     });
                 });
                 Debug.Log("[KSettingModuleEditor]Watching directory: " + SettingSourcePath);
@@ -165,7 +162,7 @@ namespace {{ NameSpace }}
                                 continue;
                             }
                         }
-                        Logger.Log("Compile from {0} to {1}", excelPath, compileToPath);
+                        Logger.LogWarning("[SettingModule]Compile from {0} to {1}", excelPath, compileToPath);
                         compiler.Compile(excelPath, compileToPath, compileBaseDir);
                         var compiledFileInfo = new FileInfo(compileToPath);
                         compiledFileInfo.LastWriteTime = srcFileInfo.LastWriteTime;

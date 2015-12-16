@@ -50,7 +50,7 @@ AppEngine.Create函数可以传入继承IModule的类来实现模块添加。所
 
 # KEngine安装器
 
-KEngine安装器，用于对现有的Unity项目进行安装KEngine的快捷操作，提供一种比Unity Package更有效的导入操作。
+KEngine安装器，用于对现有的Unity项目进行安装KEngine的快捷操作，提供一种比Unity Package更有效的导入KEngine操作。
 
 ## KEngine.Installer操作
 
@@ -59,7 +59,7 @@ KEngine安装器，用于对现有的Unity项目进行安装KEngine的快捷操�
 * 点击Select Git Project to Install, 选择KEngine源码目录
 
 ## 3种拷贝模式
-* Hardlink，默认，方便对源码进行修改，立刻就反应到源码目录;
+* Hardlink，默认，方便对源码进行修改，立刻就到源码目录;
 * SymbolLink， 类似Hardlink
 * Copy, 拷贝文件，缺点是对安装后的KEngine代码修改，无法反应到源码目录，git提交不方便
 
@@ -68,30 +68,37 @@ KEngine安装器，用于对现有的Unity项目进行安装KEngine的快捷操�
 * DLL模式，使用KEngine编译后的DLL，Unity编译后的游戏产品将会产生KEngine.dll，编译更快
 * Code模式，使用KEngine源码，方便进行修改源码，断点调试
 
-
-# 针对美术人员的使用指南
-
-_ResourcesBuild_中依次建好产品化所需的目录，如UI、Effect、Audio目录，资源依序放入。
-
-构建系统写入适当的脚本对各个目录进行分别打包。
-
-# 针对策划人员的使用指南
-
-TODO:Excel的表编辑、编译
-
-# 针对开发人员的使用指南
+# 开发人员使用指南
 
 * [资源模块/ResourceModule](Docs/Doc_ResourceModule.md)
 	* [简单资源版本控制/AssetVersionControl](Docs/Doc_AssetVersionControl.md)
-	* 资源运行时调试工具/ResourceModuleDebuggs
+	* 资源运行时调试工具/ResourceModuleDebuggers
 	* [依赖处理系统/AssetDep](Docs/Doc_AssetDep.md)
 * [UI模块/UIModule](Docs/Doc_UIModule.md)
 * [配置表模块/SettingModule](Docs/Doc_SettingModule.md)
 
-# 其它模块
+# 策划人员使用指南
 
-* TODO: CosmosTable
+策划人员深度依赖配置表模块（SettingModule）进行Excel文件的编辑，KEngine在运行过程中会监测Excel配置表目录，当发现有改动时将对Excel进行编译。
 
+使用编译模式的最大好处，策划人员可以在Excel上进行注释、图表、批注等附加工作，甚至可以把一些文字描述文档，放到Sheet2。
+
+编译出的纯文本文件交由程序读取，同时编译出的纯文本文件，方便在svn进行合并、比较。
+
+![SettingModule Confirm](Docs/SettingModule_Watcher.png)
+> 在Unity打开情况下，修改Excel，将监测到改动，弹出提示框
+
+![SettingModule Tips](Docs/SettingModule_Log.png)
+> 关闭或确定提示框后，将进行表编译工作
+
+PS: 如果在Unity未打开情况下进行Excel表的修改保存，将无法自动监测到改动。这时候，需要在打开Unity后通过菜单"KEngine->Settings->Force compile settings"进行手工编译。
+
+
+# 美术人员使用指南
+
+_ResourcesBuild_中依次建好产品化所需的目录，如UI、Effect、Audio目录，资源依序放入。
+
+程序需要根据项目需求，在构建系统写入适当的脚本对各个目录进行分别打包。
 
 # 配置文件/Config
 
