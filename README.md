@@ -76,6 +76,7 @@ KEngine安装器，用于对现有的Unity项目进行安装KEngine的快捷操�
 	* [依赖处理系统/AssetDep](Docs/Doc_AssetDep.md)
 * [UI模块/UIModule](Docs/Doc_UIModule.md)
 * [配置表模块/SettingModule](Docs/Doc_SettingModule.md)
+	* 扩展表头类型
 
 # 策划人员使用指南
 

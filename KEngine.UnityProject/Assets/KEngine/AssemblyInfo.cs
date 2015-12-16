@@ -8,12 +8,12 @@ using System.Runtime.CompilerServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("LZMA#")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("KEngine")]
+[assembly: AssemblyDescription("KEngine - Asset Bundle Framework for Unity3D")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Igor Pavlov")]
-[assembly: AssemblyProduct("LZMA# SDK")]
-[assembly: AssemblyCopyright("Copyright @ Igor Pavlov 1999-2004")]
+[assembly: AssemblyCompany("Kelly")]
+[assembly: AssemblyProduct("KEngine AssetBundle Framework")]
+[assembly: AssemblyCopyright("Copyright @ Kelly<23110388@qq.com> 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

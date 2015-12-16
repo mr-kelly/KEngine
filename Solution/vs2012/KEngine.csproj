@@ -51,6 +51,9 @@
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\AppEngine.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\AppEngine.cs</Link>
     </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\AssemblyInfo.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\AssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\GameSettings\CGameSettingFiles.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\GameSettings\CGameSettingFiles.cs</Link>
     </Compile>
@@ -188,9 +191,6 @@
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LzmaAlone\LzmaBench.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LzmaAlone\LzmaBench.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LzmaAlone\Properties\AssemblyInfo.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LzmaAlone\Properties\AssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LzmaAlone\Properties\Resources.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LzmaAlone\Properties\Resources.cs</Link>

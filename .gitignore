@@ -28,6 +28,7 @@
 
 /KEngine.UnityProject/Assets/UnityVS*
 /KEngine.UnityProject/Assets/Resources/NGUIShaders
+/KEngine.UnityProject/Assets/Resources/Bundles*
 
 /SyncFromClient2.bat
 *SyncToy*
