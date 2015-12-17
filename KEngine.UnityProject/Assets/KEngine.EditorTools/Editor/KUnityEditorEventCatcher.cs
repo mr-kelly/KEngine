@@ -68,7 +68,7 @@ namespace KUnityEditorTools
             get { return _OnBeginPlayEvent; }
             set
             {
-                _OnBeginPlayEvent();
+                _OnBeginPlayEvent = value;
                 //if (IsInited && _OnBeginPlayEvent != null)
                 //    _OnBeginPlayEvent();
             }
@@ -104,10 +104,19 @@ namespace KUnityEditorTools
             }
         }
 
+
         /// <summary>
         /// 编译完成后事件
         /// </summary>
-        private static System.Action<BuildTarget, string> OnPostBuildPlayerEvent;
+        private static System.Action<BuildTarget, string> _OnPostBuildPlayerEvent;
+        public static System.Action<BuildTarget, string> OnPostBuildPlayerEvent
+        {
+            get { return _OnPostBuildPlayerEvent;}
+            set
+            {
+                _OnPostBuildPlayerEvent = value;
+            }
+        }
 
         /// <summary>
         /// 是否静态构造完成
