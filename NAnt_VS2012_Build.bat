@@ -10,4 +10,4 @@ cmd /c %~dp0Tools\nant.bat -buildfile:%~dp0default.build
 
 echo Build Success - Release
 
-pause
+@ping -n 5 127.1 >nul 2>nul
