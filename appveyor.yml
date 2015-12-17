@@ -1,0 +1,4 @@
+version: 0.9.{build}
+os: Windows Server 2012 R2
+build_script:
+- cmd: NAnt_VS2012_Build.bat
