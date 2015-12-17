@@ -9,4 +9,5 @@ deploy:
   release: KEngine
   auth_token:
     secure: XOqXXH7qSVQt13tVaPLATXthAaBKmQMnidLew9i966FHsvMtvzJayclHWWMAwX9S
+  draft: true
   prerelease: true
