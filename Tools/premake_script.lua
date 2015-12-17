@@ -1,3 +1,39 @@
+-- 辅助打印table
+function print_r ( t ) 
+    local print_r_cache={}
+    local function sub_print_r(t,indent)
+        if (print_r_cache[tostring(t)]) then
+            print(indent.."*"..tostring(t))
+        else
+            print_r_cache[tostring(t)]=true
+            if (type(t)=="table") then
+                for pos,val in pairs(t) do
+                    if (type(val)=="table") then
+                        print(indent.."["..pos.."] => "..tostring(t).." {")
+                        sub_print_r(val,indent..string.rep(" ",string.len(pos)+8))
+                        print(indent..string.rep(" ",string.len(pos)+6).."}")
+                    else
+                        print(indent.."["..pos.."] => "..tostring(val))
+                    end
+                end
+            else
+                print(indent..tostring(t))
+            end
+        end
+    end
+    sub_print_r(t,"  ")
+end
+
+-- 扩展，修改project生成xml doc
+local function WriteDocumentationFileXml(_premake, _prj, value)
+    _premake.w('<DocumentationFile>' .. string.gsub(_prj.buildtarget.relpath, "\.dll", ".xml") .. '</DocumentationFile>')
+end
+
+-- Write the current Premake version into our generated files, for reference
+premake.override(premake.vstudio.cs2005, "compilerProps", function(base, prj)
+    base(prj)
+    WriteDocumentationFileXml(premake, prj, XmlDocFileName)
+end)
 
 --- Premake5 Dev -----
 
@@ -14,9 +50,9 @@ configuration "Debug"
 configuration "Release"
     flags { "Optimize" }
     targetdir "../Build/Release"
+
 configuration "vs*"
 	defines { "MS_DOTNET" }
-
 
 local UNITY_ENGINE_DLL = "C:/Program Files (x86)/Unity/Editor/Data/Managed/UnityEngine.dll"
 local UNITY_UI_DLL = "C:/Program Files (x86)/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/4.6.4/UnityEngine.UI.dll"
@@ -37,7 +73,6 @@ files
 defines
 {
 }
-
 links
 {
     "System",
@@ -45,6 +80,8 @@ links
     UNITY_UI_DLL,
     SharpZipLib_DLL
 }
+
+
 ----------------------- KEngine Editor
 project "KEngine.Editor"
 language "C#"

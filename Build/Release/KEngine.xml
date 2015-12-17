@@ -1,0 +1,1682 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>KEngine</name>
+    </assembly>
+    <members>
+        <member name="T:KEngine.AppEngine">
+            <summary>
+            Cosmos Engine - Unity3D Game Develop Framework
+            </summary>
+        </member>
+        <member name="F:KEngine.AppEngine.IsRootUser">
+            <summary>
+            In Init func has a check if the user has the write privillige
+            </summary>
+        </member>
+        <member name="M:KEngine.AppEngine.New(UnityEngine.GameObject,KEngine.IModule[],KEngine.AppEngine.CoroutineDelegate,KEngine.AppEngine.CoroutineDelegate)">
+            <summary>
+            Engine entry.... all begins from here
+            </summary>
+        </member>
+        <!-- 对于成员“M:KEngine.AppEngine.DoInit”忽略有格式错误的 XML 注释 -->
+        <member name="M:KEngine.AppEngine.EnsureConfigTab(System.Boolean)">
+            <summary>
+            Ensure the CEngineConfig file loaded.
+            </summary>
+        </member>
+        <member name="M:KEngine.AppEngine.GetConfig(System.String,System.Boolean)">
+            <summary>
+            Get Config from the CEngineConfig file through key
+            </summary>
+        </member>
+        <member name="P:KEngine.AppEngine.RenderWatcher">
+            <summary>
+            To Display FPS in the Debug Mode (Debug.isDebugBuild is true)
+            </summary>
+        </member>
+        <member name="P:KEngine.AppEngine.GameModules">
+            <summary>
+            Read Tab file (CEngineConfig.txt), cache to here
+            </summary>
+            <summary>
+            Modules passed from the CosmosEngine.New function. All your custom game logic modules
+            </summary>
+        </member>
+        <member name="P:KEngine.AppEngine.IsInited">
+            <summary>
+            是否初始化完成
+            </summary>
+        </member>
+        <member name="T:KEngine.CCosmosEngineInfo">
+            <summary>
+            Engine Config
+            </summary>
+        </member>
+        <member name="P:CosmosTable.TableRowInfo.IsAutoParse">
+            <summary>
+            When true, will use reflection to map the Tab File
+            </summary>
+        </member>
+        <member name="T:KEngine.IModule">
+            <summary>
+            CosmosEngine's Module must has IEnumerator Init method
+            </summary>
+        </member>
+        <member name="M:KEngine.CoreModules.KGameSettings.EnsureLoad(System.Type)">
+            <summary>
+            确保读取完
+            </summary>
+            <param name="type"></param>
+        </member>
+        <member name="M:KEngine.CoreModules.KGameSettings.ForceLoadTab(System.Type,System.String[])">
+            <summary>
+            外部人工手动读取
+            </summary>
+            <param name="type"></param>
+            <param name="contents"></param>
+        </member>
+        <member name="M:KEngine.CoreModules.KGameSettings.DoLoadTab(System.Type,System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            真正进行读取
+            </summary>
+            <param name="type"></param>
+            <param name="contents"></param>
+        </member>
+        <member name="M:KEngine.CoreModules.CBaseInfo.ClearCache">
+            <summary>
+            清理一些缓存起来的运算配置
+            </summary>
+        </member>
+        <member name="M:KEngine.CoreModules.CBaseInfo.Parse">
+            <summary>
+            某些值的特殊解析
+            </summary>
+        </member>
+        <member name="M:KEngine.CoreModules.CBaseInfo.CustomReadLine(IKTabReadble,System.Int32)">
+            <summary>
+            可自定义对表进行附加解释.... 在Parse执行前...
+            tabFile后边会被释放掉
+            </summary>
+            <param name="tabFile"></param>
+        </member>
+        <member name="P:KEngine.CoreModules.CBaseInfo.IntId">
+            <summary>
+            Id是一個字符串, 嘗試Id轉成Int
+            </summary>
+        </member>
+        <member name="T:KEngine.KAbstractResourceLoader">
+            <summary>
+            所有资源Loader继承这个
+            </summary>
+        </member>
+        <member name="T:KEngine.IAsyncObject">
+            <summary>
+            用于协程，线程，结果调度类
+            </summary>
+        </member>
+        <member name="P:KEngine.IAsyncObject.AsyncResult">
+            <summary>
+            最终加载结果的资源
+            </summary>
+        </member>
+        <member name="P:KEngine.IAsyncObject.IsCompleted">
+            <summary>
+            是否已经完成，它的存在令Loader可以用于协程StartCoroutine
+            </summary>
+        </member>
+        <member name="P:KEngine.IAsyncObject.IsError">
+            <summary>
+            类似WWW, IsFinished再判断是否有错误对吧
+            </summary>
+        </member>
+        <member name="P:KEngine.IAsyncObject.AsyncMessage">
+            <summary>
+            过程信息
+            </summary>
+        </member>
+        <member name="P:KEngine.IAsyncObject.IsSuccess">
+            <summary>
+            是否成功
+            </summary>
+        </member>
+        <member name="F:KEngine.KAbstractResourceLoader.LoaderDisposeTime">
+            <summary>
+            Loader延迟Dispose
+            </summary>
+        </member>
+        <member name="F:KEngine.KAbstractResourceLoader._lastGcTime">
+            <summary>
+            上次做GC的时间
+            </summary>
+        </member>
+        <member name="F:KEngine.KAbstractResourceLoader.CacheLoaderToRemoveFromUnUsed">
+            <summary>
+            缓存起来要删掉的，供DoGarbageCollect函数用, 避免重复的new List
+            </summary>
+        </member>
+        <member name="F:KEngine.KAbstractResourceLoader.UnUsesLoaders">
+            <summary>
+            进行垃圾回收
+            </summary>
+        </member>
+        <member name="F:KEngine.KAbstractResourceLoader._isQuitApplication">
+            <summary>
+            是否处于Application退出状态
+            </summary>
+        </member>
+        <member name="F:KEngine.KAbstractResourceLoader.IsForceNew">
+            <summary>
+            ForceNew的，非AutoNew
+            </summary>
+        </member>
+        <member name="M:KEngine.KAbstractResourceLoader.AutoNew``1(System.String,KEngine.KAbstractResourceLoader.CLoaderDelgate,System.Boolean,System.Object[])">
+            <summary>
+            统一的对象工厂
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="url"></param>
+            <param name="callback"></param>
+            <param name="forceCreateNew"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KEngine.KAbstractResourceLoader.CheckGcCollect">
+            <summary>
+            是否进行垃圾收集
+            </summary>
+        </member>
+        <member name="M:KEngine.KAbstractResourceLoader.DoGarbageCollect">
+            <summary>
+            进行垃圾回收
+            </summary>
+        </member>
+        <member name="M:KEngine.KAbstractResourceLoader.Revive">
+            <summary>
+            复活
+            </summary>
+        </member>
+        <member name="M:KEngine.KAbstractResourceLoader.AddCallback(KEngine.KAbstractResourceLoader.CLoaderDelgate)">
+            <summary>
+            在IsFinisehd后悔执行的回调
+            </summary>
+            <param name="callback"></param>
+        </member>
+        <member name="M:KEngine.KAbstractResourceLoader.Dispose">
+            <summary>
+            Dispose是有引用检查的， DoDispose一般用于继承重写
+            </summary>
+        </member>
+        <member name="M:KEngine.KAbstractResourceLoader.ForceDispose">
+            <summary>
+            强制进行Dispose，无视Ref引用数，建议用在RefCount为1的Loader上
+            </summary>
+        </member>
+        <member name="M:KEngine.KAbstractResourceLoader.OnApplicationQuit">
+            <summary>
+            By Unity Reflection
+            </summary>
+        </member>
+        <member name="P:KEngine.KAbstractResourceLoader.GcIntervalTime">
+            <summary>
+            间隔多少秒做一次GC(在AutoNew时)
+            </summary>
+        </member>
+        <member name="P:KEngine.KAbstractResourceLoader.ResultObject">
+            <summary>
+            最终加载结果的资源
+            </summary>
+        </member>
+        <member name="P:KEngine.KAbstractResourceLoader.IsCompleted">
+            <summary>
+            是否已经完成，它的存在令Loader可以用于协程StartCoroutine
+            </summary>
+        </member>
+        <member name="P:KEngine.KAbstractResourceLoader.IsError">
+            <summary>
+            类似WWW, IsFinished再判断是否有错误对吧
+            </summary>
+        </member>
+        <member name="P:KEngine.KAbstractResourceLoader.AsyncMessage">
+            <summary>
+            异步过程返回的信息
+            </summary>
+        </member>
+        <member name="P:KEngine.KAbstractResourceLoader.AsyncResult">
+            <summary>
+            同ResultObject
+            </summary>
+        </member>
+        <member name="P:KEngine.KAbstractResourceLoader.IsSuccess">
+            <summary>
+            是否可用
+            </summary>
+        </member>
+        <member name="P:KEngine.KAbstractResourceLoader.IsReadyDisposed">
+            <summary>
+            RefCount 为 0，进入预备状态
+            </summary>
+        </member>
+        <member name="E:KEngine.KAbstractResourceLoader.DisposeEvent">
+            <summary>
+             销毁事件
+            </summary>
+        </member>
+        <member name="P:KEngine.KAbstractResourceLoader.FinishUsedTime">
+            <summary>
+            用时
+            </summary>
+        </member>
+        <member name="P:KEngine.KAbstractResourceLoader.RefCount">
+            <summary>
+            引用计数
+            </summary>
+        </member>
+        <member name="P:KEngine.KAbstractResourceLoader.Progress">
+            <summary>
+            进度百分比~ 0-1浮点
+            </summary>
+        </member>
+        <member name="P:KEngine.KAbstractResourceLoader.Desc">
+            <summary>
+            描述, 额外文字, 一般用于资源Debugger用
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="F:KAssetBundleLoader._loaderMode">
+            <summary>
+            AssetBundle加载方式
+            </summary>
+        </member>
+        <member name="F:KAssetBundleLoader._inAppPathType">
+            <summary>
+            AssetBundle读取原字节目录
+            </summary>
+        </member>
+        <member name="T:KAssetBundleParser">
+            <summary>
+            AssetBundle字节解析器
+            </summary>
+        </member>
+        <member name="F:KAssetBundleParser.Mode">
+            <summary>
+            是异步解析，还是同步解析
+            </summary>
+        </member>
+        <member name="T:KAssetFileLoader">
+            <summary>
+            根據不同模式，從AssetBundle中獲取Asset或從Resources中獲取,两种加载方式同时实现的桥接类
+            读取一个文件的对象，不做拷贝和引用
+            </summary>
+        </member>
+        <member name="T:KEngine.KHttpDownloader">
+            <summary>
+            多线程+断点续传 http下载器, 注意用完后要Dispose
+            TODO: 线程的回调Callback有点难看，以后弄个KHttpDownloader2（本类稳定就不改本类）
+            </summary>
+        </member>
+        <member name="M:KEngine.KHttpDownloader.Load(System.String,System.String,System.Boolean,System.Boolean,System.Int32,System.Int32)">
+            <summary>
+            </summary>
+            <param name="fullUrl"></param>
+            <param name="saveFullPath">完整的保存路径！</param>
+            <param name="useContinue">是否断点续传</param>
+            <param name="useCache">如果存在则不下载了！</param>
+            <param name="expireDays"></param>
+            <param name="timeout"></param>
+        </member>
+        <member name="T:KInstanceAssetLoader">
+            <summary>
+            这是拷一份出来的
+            </summary>
+        </member>
+        <member name="T:KMaterialLoader">
+            <summary>
+            加载材质，通过CSerializeMaterial
+            </summary>
+        </member>
+        <member name="T:KResourceInAppPathType">
+            <summary>
+            In App Path, 指Streaming Assets目录或Resources目录，使用哪一种方式去加载AssetBundle
+            StreamingAssets目录，不能使用同步语法去加载，但Resources可以
+            使用StreamingAssets读取AssetBundle，还是使用Resources目录使用AssetBundle？
+            </summary>
+        </member>
+        <member name="F:KResourceInAppPathType.Default">
+            <summary>
+            将采用KResourceModule中的DefaultInAppPathType来设置
+            </summary>
+        </member>
+        <member name="T:KResourcePathPriorityType">
+            <summary>
+            资源路径优先级，优先使用
+            </summary>
+        </member>
+        <member name="F:KResourcePathPriorityType.InAppPathPriority">
+            <summary>
+            忽略PersitentDataPath, 优先寻找Resources或StreamingAssets路径 (取决于ResourcePathType)
+            </summary>
+        </member>
+        <member name="F:KResourcePathPriorityType.PersistentDataPathPriority">
+            <summary>
+            尝试在Persistent目錄尋找，找不到再去StreamingAssets,
+            这一般用于进行热更新版本号判断后，设置成该属性
+            </summary>
+        </member>
+        <member name="F:KResourceModule.StreamingPlatformPath">
+            <summary>
+            StreamingAssetsPath/Bundles/Android/ etc.
+            </summary>
+        </member>
+        <member name="F:KResourceModule.ResourceFolderPlatformPath">
+            <summary>
+            Resources/Bundles/Android/ etc...
+            </summary>
+        </member>
+        <member name="M:KResourceModule.GetAssetBundlePath(System.String,System.Object[])">
+            <summary>
+            统一在字符串后加上.box, 取决于配置的AssetBundle后缀
+            </summary>
+            <param name="path"></param>
+            <param name="formats"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KResourceModule.GetResourceFullPath(System.String,KResourceInAppPathType,System.Boolean)">
+            <summary>
+            完整路径，www加载
+            </summary>
+            <param name="url"></param>
+            <param name="inAppPathType"></param>
+            <param name="isLog"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KResourceModule.GetResourceFullPath(System.String,System.String@,KResourceInAppPathType,System.Boolean)">
+            <summary>
+            根据相对路径，获取到StreamingAssets完整路径，或Resources中的路径
+            </summary>
+            <param name="url"></param>
+            <param name="fullPath"></param>
+            <param name="inAppPathType"></param>
+            <param name="isLog"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KResourceModule.GetAppDataPath">
+            <summary>
+            獲取app數據目錄，可寫，同Application.PersitentDataPath，但在windows平台時為了避免www類中文目錄無法讀取問題，單獨實現
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:KResourceModule.TryGetInAppResourcesFolderUrl(System.String,System.String@)">
+            <summary>
+            使用Resources来放置AssetBundle
+            </summary>
+            <param name="relativePath"></param>
+            <param name="inAppUrl"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KResourceModule.TryGetInAppStreamingUrl(System.String,System.String@)">
+            <summary>
+            (not android ) only! Android资源不在目录！
+            Editor返回文件系统目录，运行时返回StreamingAssets目录
+            </summary>
+            <param name="url"></param>
+            <param name="newUrl"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KResourceModule.FileExistsWithDifferentCase(System.String)">
+            <summary>
+            大小写敏感地进行文件判断, Windows Only
+            </summary>
+            <param name="filePath"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KResourceModule.GetBuildPlatformName">
+            <summary>
+            Different platform's assetBundles is incompatible.
+            CosmosEngine put different platform's assetBundles in different folder.
+            Here, get Platform name that represent the AssetBundles Folder.
+            </summary>
+            <returns>Platform folder Name</returns>
+        </member>
+        <member name="M:KResourceModule.GetFileProtocol">
+            <summary>
+            On Windows, file protocol has a strange rule that has one more slash
+            </summary>
+            <returns>string, file protocol string</returns>
+        </member>
+        <member name="M:KResourceModule.InitResourcePath">
+            <summary>
+            Initialize the path of AssetBundles store place ( Maybe in PersitentDataPath or StreamingAssetsPath )
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:KResourceModule.ProductRelPath">
+            <summary>
+            Product Folder's Relative Path   -  Default: ../Product,   which means Assets/../Product
+            </summary>
+        </member>
+        <member name="P:KResourceModule.EditorProductFullPath">
+            <summary>
+            Product Folder Full Path , Default: C:\xxxxx\xxxx\../Product
+            </summary>
+        </member>
+        <member name="P:KResourceModule.UnityEditor_EditorUserBuildSettings_activeBuildTarget">
+            <summary>
+            UnityEditor.EditorUserBuildSettings.activeBuildTarget, Can Run in any platform~
+            </summary>
+        </member>
+        <member name="P:KResourceModule.EditorAssetBundlePath">
+            <summary>
+            Unity Editor load AssetBundle directly from the Asset Bundle Path,
+            whth file:// protocol
+            </summary>
+        </member>
+        <member name="T:KSerializeMaterial">
+            <summary>
+            序列化到AssetBundle的对象
+            需要和打包工程保持一致的目录，
+            当脚本所在目录改变，原打包的AssetBundle将失效，需要重新打包
+            </summary>
+        </member>
+        <member name="T:KSerializeMaterialProperty">
+            <summary>
+            材质所包含的Shader属性，如_MainTexture等的记录
+            </summary>
+        </member>
+        <member name="T:KSettingManager">
+            <summary>
+            Load from Local hard disk or
+            Load from a AssetBundles..
+            </summary>
+        </member>
+        <member name="T:KEngine.KShaderLoader">
+            <summary>
+            Shader加载器
+            </summary>
+        </member>
+        <member name="T:KStaticAssetLoader">
+            <summary>
+            静态对象加载，通常用于全局唯一的GameObject，
+            跟其它TextureLoader不一样的是,它会拷一份
+            原加载对象(AssetFileBridge)会被删除，节省内存
+            </summary>
+        </member>
+        <member name="T:KWWWLoader">
+            <summary>
+            Load www, A wrapper of WWW.
+            </summary>
+        </member>
+        <member name="M:KWWWLoader.Load(System.String,KEngine.KAbstractResourceLoader.CLoaderDelgate)">
+            <summary>
+            Use this to directly load WWW by Callback or Coroutine, pass a full URL.
+            A wrapper of Unity's WWW class.
+            </summary>
+        </member>
+        <member name="M:KWWWLoader.CoLoad(System.String)">
+            <summary>
+            协和加载Assetbundle，加载完后执行callback
+            </summary>
+            <param name="url">资源的url</param>
+            <param name="callback"></param>
+            <param name="callbackArgs"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KWWWLoader.WWWLoaderMonitorCoroutine">
+            <summary>
+            监视器协程
+            超过最大WWWLoader时，挂起~
+            后来的新loader会被优先加载
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:KDebuggerObjectTool">
+            <summary>
+            专门用于资源Debugger用到的父对象自动生成
+            DebuggerObject - 用于管理虚拟对象（只用于显示调试信息的对象）
+            </summary>
+        </member>
+        <member name="M:KDebuggerObjectTool.SetParent(System.String,System.String,UnityEngine.GameObject)">
+            <summary>
+            设置某个物件，在指定调试组下
+            </summary>
+            <param name="bigType"></param>
+            <param name="smallType"></param>
+            <param name="obj"></param>
+        </member>
+        <member name="M:KDebuggerObjectTool.GetNameWithCount(System.String,System.Int32)">
+            <summary>
+            设置Parent名字,带有数量
+            </summary>
+            <param name="obj"></param>
+            <param name="smallType"></param>
+            <param name="count"></param>
+        </member>
+        <member name="T:KResoourceLoadedAssetDebugger">
+            <summary>
+            对XXXLoader的结果Asset进行Debug显示
+            </summary>
+        </member>
+        <member name="T:KResourceLoaderDebugger">
+            <summary>
+            只在编辑器下出现，分别对应一个Loader~生成一个GameObject对象，为了方便调试！
+            </summary>
+        </member>
+        <member name="T:KEngine.CoreModules.SettingModule">
+            <summary>
+            使用CosmosTable的数据表加载器
+            </summary>
+        </member>
+        <member name="F:KEngine.CoreModules.SettingModule._tableFilesCache">
+            <summary>
+            table缓存
+            </summary>
+        </member>
+        <member name="M:KEngine.CoreModules.SettingModule.Get``1(System.String,System.Boolean)">
+            <summary>
+            通过SettingModule拥有缓存与惰式加载
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="path"></param>
+            <param name="useCache">是否缓存起来？还是单独创建新的</param>
+            <returns></returns>
+        </member>
+        <member name="T:KUGUIBridge">
+            <summary>
+            Unity原生UI桥接器
+            </summary>
+        </member>
+        <member name="T:KUIController">
+            <summary>
+            Abstract class of all UI Script
+            </summary>
+        </member>
+        <member name="T:KBehaviour">
+            <summary>
+            Without Update, With some cache
+            </summary>
+        </member>
+        <member name="M:KBehaviour.Delete(System.Single)">
+            <summary>
+            GameObject.Destory对象
+            </summary>
+        </member>
+        <member name="M:KUIController.GetControl``1(System.String,UnityEngine.Transform,System.Boolean)">
+            <summary>
+            输入uri搜寻控件
+            findTrans默认参数null时使用this.transform
+            </summary>
+        </member>
+        <member name="M:KUIController.FindControl``1(System.String)">
+            <summary>
+            默认在当前transfrom下根据Name查找子控件
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KUIController.DFSFindObject(UnityEngine.Transform,System.String)">
+            <summary>
+            从parent下根据Name查找
+            </summary>
+            <param name="parent"></param>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KUIController.DestroyGameObjectChildren(UnityEngine.GameObject)">
+            <summary>
+            清除一个GameObject下面所有的孩子
+            </summary>
+            <param name="go"></param>
+        </member>
+        <member name="M:KUIController.OpenWindow(System.String,System.Object[])">
+            <summary>
+            Shortcuts for UIModule's Open Window
+            </summary>
+        </member>
+        <member name="M:KUIController.CloseWindow(System.String)">
+            <summary>
+            Shortcuts for UIModule's Close Window
+            </summary>
+            <param name="uiName"></param>
+        </member>
+        <member name="M:KUIController.GetFromArgs``1(System.Object[],System.Int32,System.Boolean)">
+            <summary>
+            从数组获取参数，并且不报错，返回null, 一般用于OnOpen, OnClose的可变参数
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="openArgs"></param>
+            <param name="offset"></param>
+            <returns></returns>
+        </member>
+        <member name="T:KUIModule">
+            <summary>
+            UI Module
+            </summary>
+        </member>
+        <member name="F:KUIModule._loadingUICount">
+            <summary>
+            正在加载的UI统计
+            </summary>
+        </member>
+        <member name="F:KUIModule.UiBridge">
+            <summary>
+            A bridge for different UI System, for instance, you can use NGUI or EZGUI or etc.. UI Plugin through UIBridge
+            </summary>
+        </member>
+        <member name="M:KUIModule.OpenDynamicWindow(System.String,System.String,System.Object[])">
+            <summary>
+            // Dynamic动态窗口，复制基准面板
+            </summary>
+        </member>
+        <member name="M:KUIModule.DestroyAllWindows">
+            <summary>
+            Destroy all windows that has LoadState.
+            Be careful to use.
+            </summary>
+        </member>
+        <member name="M:KUIModule.CallUI(System.String,System.Action{KUIController,System.Object[]},System.Object[])">
+            <summary>
+            等待并获取UI实例，执行callback
+            源起Loadindg UI， 在加载过程中，进度条设置方法会失效
+            如果是DynamicWindow,，使用前务必先要Open!
+            </summary>
+            <param name="uiTemplateName"></param>
+            <param name="callback"></param>
+            <param name="args"></param>
+        </member>
+        <member name="M:KUIModule.CallDynamicUI(System.String,System.Action{KUIController,System.Object[]},System.Object[])">
+            <summary>
+            DynamicWindow专用, 不会自动加载，会提示报错
+            </summary>
+            <param name="uiName"></param>
+            <param name="callback"></param>
+            <param name="args"></param>
+        </member>
+        <member name="T:CUILoadState">
+            <summary>
+            UI Async Load State class
+            </summary>
+        </member>
+        <member name="M:CUILoadState.DoCallback(System.Action{KUIController,System.Object[]},System.Object[])">
+            <summary>
+            确保加载完成后的回调
+            </summary>
+            <param name="callback"></param>
+            <param name="args"></param>
+        </member>
+        <member name="T:KEngine.KAsync">
+            <summary>
+            链式操作，结合协程和DOTween, 并且支持真线程（用于密集运算，无法调用Unity大部分函数）
+            适合做动画、结合协程、回调一堆的情况
+            </summary>
+            <example>
+            KAsync.Start(doSomething)
+                    .WaitForSeconds(1f)
+                    .Coroutine(CGame.Instance.StartCoroutine(enumtor))
+                    .Then(logSomething)
+                    .Then((next)=>{
+                        DOTween.DO(tween).OnComplete(next);
+                    });
+                    .When(()=> booleanVarTrue)
+                    .Then(()=>{
+                        // Over!
+                    });
+            </example>
+        </member>
+        <member name="M:KEngine.KAsync.AddMainThreadCall(System.Action)">
+            <summary>
+            在子线程执行一个函数，让其回到主线程再执行的
+            </summary>
+            <param name="call"></param>
+        </member>
+        <member name="M:KEngine.KAsync.When(System.Func{System.Boolean},System.Single)">
+            <summary>
+            等待条件成立
+            </summary>
+            <param name="retBool"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KEngine.KAsync.Thread(KEngine.KAsync.AsyncThreadDelegate)">
+            <summary>
+            线程。注意大部分Unity函数不能使用！ 借用协程配合~
+            </summary>
+            <param name="threadCalAction"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KEngine.KAsync.Coroutine(System.Collections.IEnumerator)">
+            <summary>
+            开启并等待一个协程
+            </summary>
+            <param name="enumtor"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KEngine.KAsync.Coroutine(UnityEngine.Coroutine)">
+            <summary>
+            等待一个已经被其它MonoBehaviour开启的协程
+            </summary>
+            <param name="co"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KEngine.KAsync.WaitForFrames(System.Int32)">
+            <summary>
+            等待一定帧数
+            </summary>
+            <param name="frameCount"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KEngine.KAsync.WaitForSeconds(System.Single)">
+            <summary>
+            等待秒数
+            </summary>
+            <param name="time"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KEngine.KAsync.WaitForEndOfFrame">
+            <summary>
+            等到本帧结束
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:CVersionNumber">
+            <summary>
+            Version Number
+            </summary>
+            <example>
+            <code>
+            var versionNumber = CVersionNumber.Parse("1.0.0.alpha");
+            Console.Write(versionNumber.Major);
+            </code>
+            Output 1
+            </example>
+        </member>
+        <member name="M:CVersionNumber.Short">
+            <summary>
+            without build
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:KObject">
+            <summary>
+            CosmosEngine标准Object,，带有自动Debug~
+            </summary>
+        </member>
+        <member name="T:CObjectDebuggerExtensions">
+            <summary>
+            手动打开或关闭，用于任何object
+            </summary>
+        </member>
+        <member name="T:KObjectDebugger">
+            <summary>
+            对C#非MonoBehaviour对象以GameObject形式表现，方便调试
+            </summary>
+        </member>
+        <member name="M:KObjectDebugger.CoGlobalDebugCoroutine">
+            <summary>
+            主要为了清理和改名
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SevenZip.ICoder.Code(System.IO.Stream,System.IO.Stream,System.Int64,System.Int64,SevenZip.ICodeProgress)">
+            <summary>
+            Codes streams.
+            </summary>
+            <param name="inStream">
+            input Stream.
+            </param>
+            <param name="outStream">
+            output Stream.
+            </param>
+            <param name="inSize">
+            input Size. -1 if unknown.
+            </param>
+            <param name="outSize">
+            output Size. -1 if unknown.
+            </param>
+            <param name="progress">
+            callback progress reference.
+            </param>
+            <exception cref="T:SevenZip.DataErrorException">
+            if input stream is not valid
+            </exception>
+        </member>
+        <member name="T:SevenZip.LzmaBench">
+            <summary>
+            LZMA Benchmark
+            </summary>
+        </member>
+        <member name="M:SevenZip.ICodeProgress.SetProgress(System.Int64,System.Int64)">
+            <summary>
+            Callback progress.
+            </summary>
+            <param name="inSize">
+            input size. -1 if unknown.
+            </param>
+            <param name="outSize">
+            output size. -1 if unknown.
+            </param>
+        </member>
+        <member name="T:LzmaAlone.Properties.Resources">
+            <summary>
+               A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:LzmaAlone.Properties.Resources.ResourceManager">
+            <summary>
+               Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:LzmaAlone.Properties.Resources.Culture">
+            <summary>
+               Overrides the current thread's CurrentUICulture property for all
+               resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="T:SevenZip.DataErrorException">
+            <summary>
+            The exception that is thrown when an error in input stream occurs during decoding.
+            </summary>
+        </member>
+        <member name="T:SevenZip.InvalidParamException">
+            <summary>
+            The exception that is thrown when the value of an argument is outside the allowable range.
+            </summary>
+        </member>
+        <member name="T:SevenZip.CoderPropID">
+            <summary>
+            Provides the fields that represent properties idenitifiers for compressing.
+            </summary>
+        </member>
+        <member name="F:SevenZip.CoderPropID.DefaultProp">
+            <summary>
+            Specifies default property.
+            </summary>
+        </member>
+        <member name="F:SevenZip.CoderPropID.DictionarySize">
+            <summary>
+            Specifies size of dictionary.
+            </summary>
+        </member>
+        <member name="F:SevenZip.CoderPropID.UsedMemorySize">
+            <summary>
+            Specifies size of memory for PPM*.
+            </summary>
+        </member>
+        <member name="F:SevenZip.CoderPropID.Order">
+            <summary>
+            Specifies order for PPM methods.
+            </summary>
+        </member>
+        <member name="F:SevenZip.CoderPropID.BlockSize">
+            <summary>
+            Specifies Block Size.
+            </summary>
+        </member>
+        <!-- 对于成员“F:SevenZip.CoderPropID.PosStateBits”忽略有格式错误的 XML 注释 -->
+        <!-- 对于成员“F:SevenZip.CoderPropID.LitContextBits”忽略有格式错误的 XML 注释 -->
+        <!-- 对于成员“F:SevenZip.CoderPropID.LitPosBits”忽略有格式错误的 XML 注释 -->
+        <member name="F:SevenZip.CoderPropID.NumFastBytes">
+            <summary>
+            Specifies number of fast bytes for LZ*.
+            </summary>
+        </member>
+        <member name="F:SevenZip.CoderPropID.MatchFinder">
+            <summary>
+            Specifies match finder. LZMA: "BT2", "BT4" or "BT4B".
+            </summary>
+        </member>
+        <member name="F:SevenZip.CoderPropID.MatchFinderCycles">
+            <summary>
+            Specifies the number of match finder cyckes.
+            </summary>
+        </member>
+        <member name="F:SevenZip.CoderPropID.NumPasses">
+            <summary>
+            Specifies number of passes.
+            </summary>
+        </member>
+        <member name="F:SevenZip.CoderPropID.Algorithm">
+            <summary>
+            Specifies number of algorithm.
+            </summary>
+        </member>
+        <member name="F:SevenZip.CoderPropID.NumThreads">
+            <summary>
+            Specifies the number of threads.
+            </summary>
+        </member>
+        <member name="F:SevenZip.CoderPropID.EndMarker">
+            <summary>
+            Specifies mode with end marker.
+            </summary>
+        </member>
+        <member name="T:CosmosTable.TabFileWriter`1">
+            <summary>
+            Write the TabFile!
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="T:CosmosTable.HeaderInfo">
+            <summary>
+            表头信息
+            </summary>
+        </member>
+        <member name="F:CosmosTable.TableFile`1.Rows">
+            <summary>
+            Row Id to Rows , start from 1
+            </summary>
+        </member>
+        <member name="F:CosmosTable.TableFile`1.PrimaryKey2Row">
+            <summary>
+            Store the Primary Key to Rows
+            </summary>
+        </member>
+        <member name="T:CosmosTable.DefaultTableRowInfo">
+            <summary>
+            Default Tab Row
+            Store All column Values
+            </summary>
+        </member>
+        <member name="T:SimpleJson.JsonArray">
+            <summary>
+            Represents the json array.
+            </summary>
+        </member>
+        <member name="M:SimpleJson.JsonArray.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:SimpleJson.JsonArray"/> class. 
+            </summary>
+        </member>
+        <member name="M:SimpleJson.JsonArray.#ctor(System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SimpleJson.JsonArray"/> class. 
+            </summary>
+            <param name="capacity">The capacity of the json array.</param>
+        </member>
+        <member name="M:SimpleJson.JsonArray.ToString">
+            <summary>
+            The json representation of the array.
+            </summary>
+            <returns>The json representation of the array.</returns>
+        </member>
+        <member name="T:SimpleJson.JsonObject">
+            <summary>
+            Represents the json object.
+            </summary>
+        </member>
+        <member name="F:SimpleJson.JsonObject._members">
+            <summary>
+            The internal member dictionary.
+            </summary>
+        </member>
+        <member name="M:SimpleJson.JsonObject.#ctor">
+            <summary>
+            Initializes a new instance of <see cref="T:SimpleJson.JsonObject"/>.
+            </summary>
+        </member>
+        <member name="M:SimpleJson.JsonObject.#ctor(System.Collections.Generic.IEqualityComparer{System.String})">
+            <summary>
+            Initializes a new instance of <see cref="T:SimpleJson.JsonObject"/>.
+            </summary>
+            <param name="comparer">The <see cref="T:System.Collections.Generic.IEqualityComparer`1"/> implementation to use when comparing keys, or null to use the default <see cref="T:System.Collections.Generic.EqualityComparer`1"/> for the type of the key.</param>
+        </member>
+        <member name="M:SimpleJson.JsonObject.Add(System.String,System.Object)">
+            <summary>
+            Adds the specified key.
+            </summary>
+            <param name="key">The key.</param>
+            <param name="value">The value.</param>
+        </member>
+        <member name="M:SimpleJson.JsonObject.ContainsKey(System.String)">
+            <summary>
+            Determines whether the specified key contains key.
+            </summary>
+            <param name="key">The key.</param>
+            <returns>
+                <c>true</c> if the specified key contains key; otherwise, <c>false</c>.
+            </returns>
+        </member>
+        <member name="M:SimpleJson.JsonObject.Remove(System.String)">
+            <summary>
+            Removes the specified key.
+            </summary>
+            <param name="key">The key.</param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleJson.JsonObject.TryGetValue(System.String,System.Object@)">
+            <summary>
+            Tries the get value.
+            </summary>
+            <param name="key">The key.</param>
+            <param name="value">The value.</param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleJson.JsonObject.Add(System.Collections.Generic.KeyValuePair{System.String,System.Object})">
+            <summary>
+            Adds the specified item.
+            </summary>
+            <param name="item">The item.</param>
+        </member>
+        <member name="M:SimpleJson.JsonObject.Clear">
+            <summary>
+            Clears this instance.
+            </summary>
+        </member>
+        <member name="M:SimpleJson.JsonObject.Contains(System.Collections.Generic.KeyValuePair{System.String,System.Object})">
+            <summary>
+            Determines whether [contains] [the specified item].
+            </summary>
+            <param name="item">The item.</param>
+            <returns>
+            	<c>true</c> if [contains] [the specified item]; otherwise, <c>false</c>.
+            </returns>
+        </member>
+        <member name="M:SimpleJson.JsonObject.CopyTo(System.Collections.Generic.KeyValuePair{System.String,System.Object}[],System.Int32)">
+            <summary>
+            Copies to.
+            </summary>
+            <param name="array">The array.</param>
+            <param name="arrayIndex">Index of the array.</param>
+        </member>
+        <member name="M:SimpleJson.JsonObject.Remove(System.Collections.Generic.KeyValuePair{System.String,System.Object})">
+            <summary>
+            Removes the specified item.
+            </summary>
+            <param name="item">The item.</param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleJson.JsonObject.GetEnumerator">
+            <summary>
+            Gets the enumerator.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleJson.JsonObject.System#Collections#IEnumerable#GetEnumerator">
+            <summary>
+            Returns an enumerator that iterates through a collection.
+            </summary>
+            <returns>
+            An <see cref="T:System.Collections.IEnumerator"/> object that can be used to iterate through the collection.
+            </returns>
+        </member>
+        <member name="M:SimpleJson.JsonObject.ToString">
+            <summary>
+            Returns a json <see cref="T:System.String"/> that represents the current <see cref="T:System.Object"/>.
+            </summary>
+            <returns>
+            A json <see cref="T:System.String"/> that represents the current <see cref="T:System.Object"/>.
+            </returns>
+        </member>
+        <member name="P:SimpleJson.JsonObject.Item(System.Int32)">
+            <summary>
+            Gets the <see cref="T:System.Object"/> at the specified index.
+            </summary>
+            <value></value>
+        </member>
+        <member name="P:SimpleJson.JsonObject.Keys">
+            <summary>
+            Gets the keys.
+            </summary>
+            <value>The keys.</value>
+        </member>
+        <member name="P:SimpleJson.JsonObject.Values">
+            <summary>
+            Gets the values.
+            </summary>
+            <value>The values.</value>
+        </member>
+        <member name="P:SimpleJson.JsonObject.Item(System.String)">
+            <summary>
+            Gets or sets the <see cref="T:System.Object"/> with the specified key.
+            </summary>
+            <value></value>
+        </member>
+        <member name="P:SimpleJson.JsonObject.Count">
+            <summary>
+            Gets the count.
+            </summary>
+            <value>The count.</value>
+        </member>
+        <member name="P:SimpleJson.JsonObject.IsReadOnly">
+            <summary>
+            Gets a value indicating whether this instance is read only.
+            </summary>
+            <value>
+            	<c>true</c> if this instance is read only; otherwise, <c>false</c>.
+            </value>
+        </member>
+        <member name="T:SimpleJson.SimpleJson">
+            <summary>
+            This class encodes and decodes JSON strings.
+            Spec. details, see http://www.json.org/
+            
+            JSON uses Arrays and Objects. These correspond here to the datatypes JsonArray(IList&lt;object>) and JsonObject(IDictionary&lt;string,object>).
+            All numbers are parsed to doubles.
+            </summary>
+        </member>
+        <member name="M:SimpleJson.SimpleJson.DeserializeObject(System.String)">
+            <summary>
+            Parses the string json into a value
+            </summary>
+            <param name="json">A JSON string.</param>
+            <returns>An IList&lt;object>, a IDictionary&lt;string,object>, a double, a string, null, true, or false</returns>
+        </member>
+        <member name="M:SimpleJson.SimpleJson.TryDeserializeObject(System.String,System.Object@)">
+            <summary>
+            Try parsing the json string into a value.
+            </summary>
+            <param name="json">
+            A JSON string.
+            </param>
+            <param name="obj">
+            The object.
+            </param>
+            <returns>
+            Returns true if successfull otherwise false.
+            </returns>
+        </member>
+        <member name="M:SimpleJson.SimpleJson.SerializeObject(System.Object,SimpleJson.IJsonSerializerStrategy)">
+            <summary>
+            Converts a IDictionary&lt;string,object> / IList&lt;object> object into a JSON string
+            </summary>
+            <param name="json">A IDictionary&lt;string,object> / IList&lt;object></param>
+            <param name="jsonSerializerStrategy">Serializer strategy to use</param>
+            <returns>A JSON encoded string, or null if object 'json' is not serializable</returns>
+        </member>
+        <member name="M:SimpleJson.SimpleJson.IsNumeric(System.Object)">
+            <summary>
+            Determines if a given object is numeric in any way
+            (can be integer, double, null, etc).
+            </summary>
+        </member>
+        <member name="T:KEngine.Logger">
+            Frequent Used,
+            A File logger + Debug Tools
+        </member>
+        <member name="M:KEngine.Logger.AddLogCallback(UnityEngine.Application.LogCallback)">
+            <summary>
+            第一次使用时注册，之所以不放到静态构造器，因为多线程问题
+            </summary>
+            <param name="callback"></param>
+        </member>
+        <member name="M:KEngine.Logger.Check(System.Object,System.String,System.Object[])">
+            <summary>
+            Check if a object null
+            </summary>
+            <param name="obj"></param>
+            <param name="formatStr"></param>
+            <param name="args"></param>
+            <returns></returns>
+        </member>
+        <member name="T:UnityLayerDef">
+            <summary>
+            Unity Official Layer Define
+            </summary>
+        </member>
+        <member name="M:CFiber._HandleUnityYieldInstruction(System.Int32,CFiber.CCoroutineWrapper,UnityEngine.YieldInstruction)">
+            for instance: Unity's WaitForSeconds...WaitForFixedFrame... so on....
+        </member>
+        <member name="T:CFiberBase">
+            <summary>
+            use for custom a croutine for CRoutine
+            </summary>
+        </member>
+        <member name="T:CStateMachine`2">
+            <summary>
+            有限狀態機, TODO: 未 update (breath)
+            </summary>
+        </member>
+        <member name="T:CWaitCo">
+            <summary>
+            C Wait Coroutine...
+            一个用异步匿名函数来处理协程的工具。。。减少繁杂的代码
+            </summary>
+        </member>
+        <member name="M:CWaitCo.Wait(System.Collections.Generic.IEnumerable{IWaitable},System.Action)">
+            <summary>
+            等待回调返回true，再执行第二个回调
+            </summary>
+            <param name="waits"></param>
+            <param name="okCallback"></param>
+        </member>
+        <member name="T:KActionRecords">
+            <summary>
+            客户端版的行为记录仪, 类似服务器的records.js
+            本质是一个事件驱动管理器, 但是拥有传入计数参数功能
+            为了性能，5秒保存一次(或特殊情况)
+            </summary>
+        </member>
+        <member name="M:KActionRecords.Event(System.Enum,System.String,System.Int32)">
+            <summary>
+            触发事件，不记录
+            </summary>
+            <param name="type"></param>
+            <param name="subType"></param>
+            <param name="extraArg"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KActionRecords.AddCount(System.Enum,System.String,System.Int32)">
+            <summary>
+            增加次数
+            </summary>
+            <param name="type"></param>
+            <param name="subType"></param>
+            <param name="addCount"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KActionRecords.Mark(System.Enum,System.String)">
+            <summary>
+            标记1次
+            </summary>
+            <param name="type"></param>
+            <param name="subType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KActionRecords.GetCount(System.Enum,System.String)">
+            <summary>
+            获取指定行为的发生次数
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KActionRecords.GetDelegateCount(System.Enum,System.String)">
+            <summary>
+            获取委托函数数量
+            </summary>
+            <param name="type"></param>
+            <param name="subType"></param>
+            <returns></returns>
+        </member>
+        <member name="T:KActionRecords.ActionRecordArg">
+            <summary>
+            回调返回的参数
+            </summary>
+        </member>
+        <member name="T:KEngine.KCrypt">
+            <summary>
+            加密解密，依赖表CosmosEngineConfig DEC
+            </summary>
+        </member>
+        <member name="M:KEngine.KCrypt.EncryptDES(System.String)">
+            DES加密字符串        
+            待加密的字符串
+            加密密钥,要求为8位
+            加密成功返回加密后的字符串，失败返回源串
+        </member>
+        <member name="M:KEngine.KCrypt.DecryptDES(System.String)">
+            DES解密字符串        
+            待解密的字符串
+            解密密钥,要求为8位,和加密密钥相同
+            解密成功返回解密后的字符串，失败返源串
+        </member>
+        <member name="T:KEngine.KDelegateList`1">
+            <summary>
+            比 += delegate拥有更好的性能，更少的GC
+            </summary>
+        </member>
+        <member name="M:KEngine.KDelegateList`1.#cctor">
+            <summary>
+            因为C#不能使用delegate作为约束(where T : Delegate)，这里做个绕过
+            </summary>
+        </member>
+        <member name="M:KEngine.KDelegateList`1.EachNotNull(KEngine.KDelegateList{`0}.DelegateListAction)">
+            <summary>
+            迭代每一个不为空的元素
+            </summary>
+            <param name="doAction"></param>
+        </member>
+        <member name="T:KEngineExtensions">
+            <summary>
+            Extension Unity's function, to be more convinient
+            </summary>
+        </member>
+        <member name="M:KEngineExtensions.Get``1(System.Object[],System.Int32,System.Boolean)">
+            <summary>
+            Get from object Array
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="openArgs"></param>
+            <param name="offset"></param>
+            <param name="isLog"></param>
+            <returns></returns>
+        </member>
+        <member name="T:KFileCacheList">
+            <summary>
+            一个List，具有缓存在磁盘的功能！高性能写入！ 不重复的key, HashSet
+            会自动将上次写入错误的信息抹掉
+            不能做Delete的操作，只适合Add, 比CFileHashSet更好！后边替代它！
+            </summary>
+        </member>
+        <member name="M:KFileCacheList.Flush">
+            <summary>
+            主动刷新缓存区
+            </summary>
+        </member>
+        <member name="T:KEngine.KPrefs">
+            <summary>
+            CosmosEngine Prefs的封装，带有加密!
+            </summary>
+        </member>
+        <member name="F:KEngine.Profiler.m_WachterDictionary">
+            <summary>
+            缓存起来的监测器Wachter~
+            </summary>
+        </member>
+        <member name="F:KEngine.Profiler.m_WachterMems">
+            <summary>
+            Watcher内存埋点
+            </summary>
+        </member>
+        <member name="M:KEngine.Profiler.BeginWatch(System.Enum)">
+            <summary>
+            BeginWatch(string)的任意枚举版
+            </summary>
+            <param name="emKey"></param>
+        </member>
+        <member name="M:KEngine.Profiler.EndWatch(System.Enum)">
+            <summary>
+            EndWatch的任意枚举版
+            </summary>
+            <param name="emKey"></param>
+        </member>
+        <member name="M:KEngine.Profiler.BeginWatch(System.String)">
+            <summary>
+            使用Stopwatch， debug模式下无行为
+            </summary>
+            <param name="key"></param>
+            <param name="del"></param>
+        </member>
+        <member name="M:KEngine.Profiler.EndWatch(System.String,System.String)">
+            <summary>
+            结束性能监测，输出监测的时间消耗
+            </summary>
+            <param name="key"></param>
+        </member>
+        <member name="P:KEngine.Profiler.CanWatch">
+            <summary>
+            是否可以Watch监测，为了后续方便修改监测条件
+            当前设置成DebugBuild才进行监测和输出
+            </summary>
+        </member>
+        <member name="T:KTabFile.HeaderInfo">
+            <summary>
+            表头信息
+            </summary>
+        </member>
+        <member name="T:KEngine.KTabReader">
+            <summary>
+            性能更好，不能写入的Tab读取器
+            </summary>
+        </member>
+        <member name="M:KEngine.KTabReader.#ctor">
+            构造器 
+        </member>
+        <member name="M:KEngine.KTabReader.ParseColumnNames(System.IO.Stream)">
+            初始化列名表
+        </member>
+        <member name="M:KEngine.KTabReader.GetColumnName(System.Int32)">
+            获取第一行第column列的名字， 即表头属性名 
+        </member>
+        <member name="M:KEngine.KTabReader.GetColumnsCount">
+            列数 
+        </member>
+        <member name="M:KEngine.KTabReader.GetRowsCount">
+            获取行数（不含第一行的ColumnHeader）
+        </member>
+        <member name="T:KTool">
+            <summary>
+            Some tool function for time, bytes, MD5, or something...
+            </summary>
+        </member>
+        <member name="M:KTool.IsWifi">
+            <summary>
+            Whether In Wifi or Cable Network
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:KTool.GetNearestPower2(System.Int32)">
+            <summary>
+            获取最近的2次方
+            </summary>
+            <param name="num"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KTool.CheckPow2(System.Int32)">
+            <summary>
+            判断一个数是否2的次方
+            </summary>
+            <param name="num"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KTool.ResetLocalTransform(UnityEngine.Transform)">
+            <summary>
+            模仿 NGUISelectionTool的同名方法，将位置旋转缩放清零
+            </summary>
+            <param name="t"></param>
+        </member>
+        <member name="M:KTool.DictToSplitStr``2(System.Collections.Generic.Dictionary{``0,``1},System.Char,System.Char)">
+            <summary>
+            字典转到字符串A:1|B:2|C:3这类
+            </summary>
+            <typeparam name="T"></typeparam>
+            <typeparam name="K"></typeparam>
+            <param name="dict"></param>
+            <param name="delimeter1"></param>
+            <param name="delimeter2"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KTool.SplitToDict``2(System.String,System.Char,System.Char)">
+            <summary>
+            A:1|B:2|C:3这类字符串转成字典
+            </summary>
+            <typeparam name="T">string</typeparam>
+            <typeparam name="K">string</typeparam>
+            <param name="str">原始字符串</param>
+            <param name="delimeter1">分隔符1</param>
+            <param name="delimeter2">分隔符2</param>
+            <returns></returns>
+        </member>
+        <member name="M:KTool.Split``1(System.String,System.Char[])">
+            <summary>
+            截断字符串变成数组
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="str"></param>
+            <param name="args"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KTool.GetRandomItemFromList``1(System.Collections.Generic.IList{``0})">
+            <summary>
+            从一个List中随机获取
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="list"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KTool.GetWaveRandomNumberInt(System.String)">
+            <summary>
+            波浪随机数整数版
+            </summary>
+            <param name="waveNumberStr"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KTool.GetWaveRandomNumber(System.String)">
+            <summary>
+            获取波浪随机数,   即填“1”或填“1~2”这样的字符串中返回一个数！
+            如填"1"，直接返回1
+            如果填"1~10"这样的，那么随机返回1~10中间一个数
+            </summary>
+            <param name="waveNumberStr"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KTool.ParseMinMaxNumber(System.String)">
+            <summary>
+            获取波浪随机数的最大最小
+            </summary>
+            <param name="str"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KTool.IsBetweenWave(System.String,System.Int32)">
+            <summary>
+            是否在波浪数之间
+            </summary>
+            <param name="waveNumberStr"></param>
+            <param name="testNumber"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KTool.IsContains(System.String,System.String,System.Char)">
+            <summary>
+            是否包含在逗号数组内
+            </summary>
+            <param name="numberStr">数组字符串</param>
+            <param name="testValue">被测数值</param>
+            <param name="sp">数组分隔符</param>
+            <returns></returns>
+        </member>
+        <member name="M:KTool.GetDateTimeByUtcMilliseconds(System.Int64,System.Int32)">
+            <summary>
+            Utc毫秒转Utc时间
+            </summary>
+            <param name="utcTime"></param>
+            <param name="zone">默认0时区</param>
+            <returns></returns>
+        </member>
+        <member name="M:KTool.GetDateTimeByUtcSeconds(System.Double,System.Int32)">
+            <summary>
+            Utc秒转Utc时间
+            </summary>
+            <param name="unixTimeStamp"></param>
+            <param name="zone">默认0时区</param>
+            <returns></returns>
+        </member>
+        <member name="M:KTool.GetUtcMilliseconds">
+            <summary>
+            Unix時間總毫秒數
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:KTool.GetUtcMilliseconds(System.DateTime)">
+            <summary>
+            Unix時間總毫秒數
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:KTool.GetUtcSeconds">
+            <summary>
+            Unix時間總秒數
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:KTool.GetUtcSeconds(System.DateTime)">
+            <summary>
+            Unix時間總秒數
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:KTool.HumanizeNumber(System.Int32)">
+            <summary>
+            人性化数字显示，百万，千万，亿
+            </summary>
+            <param name="number"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KTool.Format(System.String,System.Object[])">
+            <summary>
+            模板生成
+            </summary>
+            <param name="source">模板内容</param>
+            <param name="data">数据来源[对象]</param>
+            <returns></returns>
+            <summary>
+            模板生成
+            </summary>
+            <param name="source">模板内容</param>
+            <param name="datas">模板键-值对应数组[key1,value1,key2,value2,...]</param>
+            <returns></returns>
+            <summary>
+            混合模板
+            </summary>
+            <param name="source">模板内容</param>
+            <param name="data">数据来源[对象]</param>
+            <param name="args">数据来源[数组]</param>
+            <returns></returns>
+        </member>
+        <member name="M:KTool.FormatArgs(System.String,System.Object[])">
+            <summary>
+            模板获取
+            </summary>
+            <param name="source">模板内容</param>
+            <param name="args">数据来源[数组]</param>
+            <returns></returns>
+        </member>
+        <member name="M:KTool.SetLayer(UnityEngine.GameObject,System.Int32)">
+            <summary>
+            Recursively set the game object's layer.
+            </summary>
+        </member>
+        <member name="M:KTool.GetChildComponent``1(UnityEngine.Transform,System.String,System.Boolean)">
+            <summary>
+            传入uri寻找指定控件
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="findTrans"></param>
+            <param name="uri"></param>
+            <param name="isLog"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KTool.CopyCollider2DToGameObject(UnityEngine.Collider2D,UnityEngine.GameObject)">
+            <summary>
+            return new Copy
+            </summary>
+            <param name="collider2d"></param>
+            <param name="targetGameObject"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KTool.GetSmartNpcPoints(UnityEngine.Vector3,System.Int32,UnityEngine.Vector3,System.Single,System.Single)">
+            <summary>
+            呈弧形，传入一个参考点根据角度和半径计算出其它位置的坐标
+            </summary>
+            <param name="nNum">需要的数量</param>
+            <param name="pAnchorPos">锚定点/参考点</param>
+            <param name="fAngle">角度</param>
+            <param name="nRadius">半径</param>
+            <returns></returns>
+        </member>
+        <member name="M:KTool.GetParallelPoints(UnityEngine.Vector3,UnityEngine.Vector3,System.Int32,System.Single)">
+            返回localPoint
+        </member>
+        <member name="M:KTool.IsNumber(System.String)">
+            <summary>
+            判断字符串是否是数字
+            </summary>
+            <param name="str"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KTool.GetRelativePositionOfEllipse(System.Single,System.Single,System.Single)">
+            <summary>
+            获取椭圆上的某一点，相对坐标
+            </summary>
+            <param name="长半轴即目标距离"></param>
+            <param name="短半轴"></param>
+            <param name="angle"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KTool.NumberFormatTo3(System.Int64,System.String)">
+            <summary>
+            把数字格式化成三位 , 分隔
+            </summary>
+        </member>
+        <member name="M:KTool.GetIpAddressFromIpHostEntry(System.Net.IPHostEntry)">
+            <summary>
+            Get IPAdress from IpHostEntry,  配合GetIpAddress
+            </summary>
+            <param name="ipHostEntry"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KTool.GetIpAddress(System.String,System.Action{System.Net.IPAddress})">
+            <summary>
+            Async Get IPAdress
+            </summary>
+            <param name="host"></param>
+            <param name="callback"></param>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>KEngine.AssetDep.Editor</name>
+    </assembly>
+    <members>
+        <member name="T:KEngine.Editor.KAssetVersionControl">
+            <summary>
+            基于Tab表格的纯文本简单资源差异管理器
+            </summary>
+        </member>
+        <member name="M:KEngine.Editor.KAssetVersionControl.#ctor(System.Boolean)">
+            <summary>
+            资源打包周期版本管理
+            </summary>
+            <param name="rebuild">如果是rebuild，将无视之前的差异打包信息</param>
+        </member>
+        <member name="F:KEngine.Editor.KAssetVersionControl.StoreBuildVersion">
+            <summary>
+            持久化，硬盘的
+            </summary>
+        </member>
+        <member name="M:KEngine.Editor.KAssetVersionControl.DoCheckBuild(System.String,System.Boolean)">
+            <summary>
+            检查是否需要build，
+            文件，要进行MD5校验
+            </summary>
+            <param name="filePath"></param>
+            <param name="isFile"></param>
+            <param name="log"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KEngine.Editor.KAssetVersionControl.MarkBuildVersion(System.String[])">
+            <summary>
+            标记一个路径为打包
+            </summary>
+        </member>
+        <member name="M:KDependencyBuild.SaveBuildAction">
+            <summary>
+            save the cache. which file builded
+            </summary>
+        </member>
+        <member name="M:KDependencyBuild.DoBuildAssetBundle(System.String,UnityEngine.Object,System.Boolean)">
+            <summary>
+            如果非realBuild,僅返回最終路徑
+            DoBuildAssetBundle和__DoBuildScriptableObject有两个开关，决定是否真的Build
+            realBuildOrJustPath由外部传入，一般用于进行md5比较后，传入来的，【不收集Build缓存】 TODO：其实可以收集的。。
+            IsJustCollect用于全局的否决真Build，【收集Build缓存】
+            </summary>
+            <param name="path"></param>
+            <param name="asset"></param>
+            <param name="realBuildOrJustPath"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KDependencyBuild.BuildFont(UnityEngine.Font)">
+            <summary>
+            对依赖的字体进行打包，返回打包结果路径
+            </summary>
+            <param name="font"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KDependencyBuild.BuildIOTexture(System.String,System.String,System.Single)">
+            <summary>
+            图片打包工具，直接打包，不用弄成Texture!, 需要借助TexturePacker
+            </summary>
+            <summary>
+            单独打包的纹理图片, 这种图片，不在Unity目录内，用bytes读取, 指定保存的目录
+            </summary>
+            <param name="saveCacheFolderName"></param>
+            <param name="tex"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KDependencyBuild.BuildPureGameObject(UnityEngine.GameObject,System.String,System.Boolean)">
+            <summary>
+            不用依赖判断，整个打包！
+            </summary>
+            <param name="tmpSpineObj"></param>
+            <param name="path"></param>
+            <param name="checkNeedBuild"></param>
+        </member>
+    </members>
+</doc>

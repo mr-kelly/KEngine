@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>KEngine.AssetDep</name>
+    </assembly>
+    <members>
+        <member name="T:KAssetDep">
+            <summary>
+            基础依赖组件, 由AssetDepBuilder派发
+            </summary>
+        </member>
+        <member name="F:KAssetDep.AssetDepsContainer">
+            <summary>
+            所有AssetDep的引用容器
+            </summary>
+        </member>
+        <member name="F:KAssetDep._assetDepContainerNode">
+            <summary>
+            AssetDep相对容器的位置
+            </summary>
+        </member>
+        <member name="M:KAssetDep.CheckErrorUpdate">
+            <summary>
+            不停的检查AssetDep状态是否正常, Editor Only
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:KAssetDep.WaitDep(UnityEngine.GameObject,System.Action)">
+            <summary>
+            等待一个对象完整的依赖加载完毕，包括其孩子的依赖
+            </summary>
+            <param name="obj"></param>
+            <param name="c"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KAssetDep.DoProcess(System.String)">
+            <summary>
+            处理加载事宜
+            </summary>
+            <param name="resourcePath"></param>
+        </member>
+        <member name="T:KMaterialDep">
+            <summary>
+            TODO:
+            </summary>
+        </member>
+        <member name="M:KParticleSystemDep.ProcessParticleSystem(System.String)">
+            <summary>
+            加载粒子系统以来的材质
+            </summary>
+            <param name="path"></param>
+        </member>
+    </members>
+</doc>
