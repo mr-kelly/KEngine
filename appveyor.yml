@@ -3,7 +3,7 @@ os: Windows Server 2012 R2
 build_script:
 - cmd: NAnt_VS2012_Build.bat
 test: off
-deploy:
+#deploy:
 # - provider: GitHub
 #   tag: KEngine.$(appveyor_build_version)
 #   auth_token:
