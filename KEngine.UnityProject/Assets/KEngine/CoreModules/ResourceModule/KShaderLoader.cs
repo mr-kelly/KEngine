@@ -60,7 +60,7 @@ namespace KEngine
         private IEnumerator CoLoadShader()
         {
             var loader = KAssetBundleLoader.Load(Url);
-            while (!loader.IsFinished)
+            while (!loader.IsCompleted)
             {
                 Progress = loader.Progress;
                 yield return null;

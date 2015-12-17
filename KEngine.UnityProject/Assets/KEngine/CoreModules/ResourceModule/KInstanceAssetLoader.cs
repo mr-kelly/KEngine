@@ -121,7 +121,7 @@ public class KInstanceAssetLoader : KAbstractResourceLoader
     {
         var w = KAssetFileLoader.Load(path, null);
 
-        while (!w.IsFinished)
+        while (!w.IsCompleted)
             yield return null;
 
         if (callback != null)

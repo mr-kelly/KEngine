@@ -25,6 +25,7 @@
 #endregion
 #if NGUI
 using System;
+using KEngine;
 
 [Obsolete("KUILabelDep Instead")]
 public class KFontDep : KUILabelDep

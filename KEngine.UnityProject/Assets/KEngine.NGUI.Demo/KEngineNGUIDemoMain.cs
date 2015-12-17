@@ -24,6 +24,7 @@
 
 #endregion
 
+using KEngine;
 using KEngine.CoreModules;
 using UnityEngine;
 
@@ -36,7 +37,7 @@ public class KEngineNGUIDemoMain : MonoBehaviour
 
         KEngine.AppEngine.New(
             gameObject,
-            new ICModule[]
+            new IModule[]
             {
                 KGameSettings.Instance,
             },

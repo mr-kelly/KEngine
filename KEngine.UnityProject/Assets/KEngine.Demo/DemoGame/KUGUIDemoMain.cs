@@ -43,7 +43,7 @@ public class KUGUIDemoMain : MonoBehaviour
 
         var engine = KEngine.AppEngine.New(
             gameObject,
-            new ICModule[]
+            new IModule[]
             {
                 //KGameSettings.Instance,
             },

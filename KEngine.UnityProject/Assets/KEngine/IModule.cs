@@ -3,7 +3,7 @@
 // KEngine - Toolset and framework for Unity3D
 // ===================================
 // 
-// Filename: ICModule.cs
+// Filename: IModule.cs
 // Date:     2015/12/03
 // Author:  Kelly
 // Email: 23110388@qq.com
@@ -27,14 +27,17 @@
 using System;
 using System.Collections;
 
-/// <summary>
-/// CosmosEngine's Module must has IEnumerator Init method
-/// </summary>
-public interface ICModule
+namespace KEngine
 {
-    IEnumerator Init();
-}
+    /// <summary>
+    /// CosmosEngine's Module must has IEnumerator Init method
+    /// </summary>
+    public interface IModule
+    {
+        IEnumerator Init();
+    }
 
+}
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
 public class CDependencyClass : Attribute
 {

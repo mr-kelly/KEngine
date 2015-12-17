@@ -138,8 +138,11 @@
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\UIModule\KUIModule.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\UIModule\KUIModule.cs</Link>
     </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\ICModule.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\ICModule.cs</Link>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\IAsyncObject.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\IAsyncObject.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\IModule.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\IModule.cs</Link>
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\KAsync.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\KAsync.cs</Link>

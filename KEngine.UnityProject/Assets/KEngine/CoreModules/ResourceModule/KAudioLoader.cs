@@ -26,41 +26,45 @@
 
 using UnityEngine;
 
-public class KAudioLoader : KAbstractResourceLoader
+namespace KEngine
 {
-    private AudioClip ResultAudioClip
+    public class KAudioLoader : KAbstractResourceLoader
     {
-        get { return ResultObject as AudioClip; }
-    }
-
-    private KAssetFileLoader AssetFileBridge;
-
-    public override float Progress
-    {
-        get { return AssetFileBridge.Progress; }
-    }
-
-    public static KAudioLoader Load(string url, System.Action<bool, AudioClip> callback = null)
-    {
-        CLoaderDelgate newCallback = null;
-        if (callback != null)
+        private AudioClip ResultAudioClip
         {
-            newCallback = (isOk, obj) => callback(isOk, obj as AudioClip);
+            get { return ResultObject as AudioClip; }
         }
-        return AutoNew<KAudioLoader>(url, newCallback);
+
+        private KAssetFileLoader AssetFileBridge;
+
+        public override float Progress
+        {
+            get { return AssetFileBridge.Progress; }
+        }
+
+        public static KAudioLoader Load(string url, System.Action<bool, AudioClip> callback = null)
+        {
+            CLoaderDelgate newCallback = null;
+            if (callback != null)
+            {
+                newCallback = (isOk, obj) => callback(isOk, obj as AudioClip);
+            }
+            return AutoNew<KAudioLoader>(url, newCallback);
+        }
+
+        protected override void Init(string url, params object[] args)
+        {
+            base.Init(url, args);
+
+            AssetFileBridge = KAssetFileLoader.Load(url, (bool isOk, UnityEngine.Object obj) => { OnFinish(obj); });
+        }
+
+        protected override void DoDispose()
+        {
+            base.DoDispose();
+
+            AssetFileBridge.Release();
+        }
     }
 
-    protected override void Init(string url, params object[] args)
-    {
-        base.Init(url, args);
-
-        AssetFileBridge = KAssetFileLoader.Load(url, (bool isOk, UnityEngine.Object obj) => { OnFinish(obj); });
-    }
-
-    protected override void DoDispose()
-    {
-        base.DoDispose();
-
-        AssetFileBridge.Release();
-    }
 }

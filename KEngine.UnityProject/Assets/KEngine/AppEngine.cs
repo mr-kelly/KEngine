@@ -84,7 +84,7 @@ namespace KEngine
         /// <summary>
         /// Modules passed from the CosmosEngine.New function. All your custom game logic modules
         /// </summary>
-        public ICModule[] GameModules { get; private set; }
+        public IModule[] GameModules { get; private set; }
 
         /// <summary>
         /// 是否初始化完成
@@ -96,7 +96,7 @@ namespace KEngine
         private CoroutineDelegate BeforeInitModules = null;
         private CoroutineDelegate AfterInitModules = null;
 
-        public static AppEngine New(GameObject gameObjectToAttach, ICModule[] modules)
+        public static AppEngine New(GameObject gameObjectToAttach, IModule[] modules)
         {
             return New(gameObjectToAttach, modules, null, null);
         }
@@ -104,7 +104,7 @@ namespace KEngine
         /// <summary>
         /// Engine entry.... all begins from here
         /// </summary>
-        public static AppEngine New(GameObject gameObjectToAttach, ICModule[] modules, CoroutineDelegate before,
+        public static AppEngine New(GameObject gameObjectToAttach, IModule[] modules, CoroutineDelegate before,
             CoroutineDelegate after)
         {
             Logger.Assert(gameObjectToAttach != null && modules != null);
@@ -157,7 +157,7 @@ namespace KEngine
         /// </summary>
         private IEnumerator DoInit()
         {
-            var baseModules = new ICModule[]
+            var baseModules = new IModule[]
             {
                 // 基础2件套
                 KResourceModule.Instance,
@@ -179,11 +179,11 @@ namespace KEngine
             IsInited = true;
         }
 
-        private IEnumerator DoInitModules(IList<ICModule> modules)
+        private IEnumerator DoInitModules(IList<IModule> modules)
         {
             var startInitTime = 0f;
             var startMem = 0f;
-            foreach (ICModule initModule in modules)
+            foreach (IModule initModule in modules)
             {
                 if (Debug.isDebugBuild)
                 {

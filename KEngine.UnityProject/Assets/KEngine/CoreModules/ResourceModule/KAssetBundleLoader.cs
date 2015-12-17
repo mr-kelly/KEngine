@@ -142,13 +142,13 @@ public class KAssetBundleLoader : KAbstractResourceLoader
         if (_inAppPathType == KResourceInAppPathType.StreamingAssetsPath)
         {
             _wwwLoader = KWWWLoader.Load(FullUrl);
-            while (!_wwwLoader.IsFinished)
+            while (!_wwwLoader.IsCompleted)
             {
                 Progress = _wwwLoader.Progress/2f; // 最多50%， 要算上Parser的嘛
                 yield return null;
             }
 
-            if (!_wwwLoader.IsOk)
+            if (!_wwwLoader.IsSuccess)
             {
                 if (AssetBundlerLoaderErrorEvent != null)
                 {

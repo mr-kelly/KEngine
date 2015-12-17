@@ -98,7 +98,7 @@ public class KAssetFileLoader : KAbstractResourceLoader
         {
             _bundleLoader = KAssetBundleLoader.Load(path, null, loaderMode);
 
-            while (!_bundleLoader.IsFinished)
+            while (!_bundleLoader.IsCompleted)
             {
                 if (IsReadyDisposed) // 中途释放
                 {
@@ -109,7 +109,7 @@ public class KAssetFileLoader : KAbstractResourceLoader
                 yield return null;
             }
 
-            if (!_bundleLoader.IsOk)
+            if (!_bundleLoader.IsSuccess)
             {
                 Logger.LogError("[KAssetFileLoader]Load BundleLoader Failed(Error) when Finished: {0}", path);
                 _bundleLoader.Release();

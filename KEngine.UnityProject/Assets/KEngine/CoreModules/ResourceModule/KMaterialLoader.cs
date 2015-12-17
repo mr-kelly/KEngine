@@ -60,7 +60,7 @@ public class KMaterialLoader : KAbstractResourceLoader
     private IEnumerator CoLoadSerializeMaterial()
     {
         var matLoadBridge = KAssetFileLoader.Load(Url);
-        while (!matLoadBridge.IsFinished)
+        while (!matLoadBridge.IsCompleted)
         {
             Progress = matLoadBridge.Progress;
             yield return null;
@@ -130,7 +130,7 @@ public class KMaterialLoader : KAbstractResourceLoader
         //if (!CachedMaterials.TryGetValue(matPath, out mat))
         {
             var shaderLoader = KShaderLoader.Load(sMat.ShaderPath);
-            while (!shaderLoader.IsFinished)
+            while (!shaderLoader.IsCompleted)
             {
                 yield return null;
             }
@@ -166,7 +166,7 @@ public class KMaterialLoader : KAbstractResourceLoader
 
                         var texLoader = KTextureLoader.Load(texturePath);
                         TextureLoaders.Add(texLoader);
-                        while (!texLoader.IsFinished)
+                        while (!texLoader.IsCompleted)
                             yield return null;
 
                         var tex = texLoader.Asset;

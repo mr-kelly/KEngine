@@ -75,7 +75,7 @@ public enum KResourcePathPriorityType
     PersistentDataPathPriority,
 }
 
-public class KResourceModule : MonoBehaviour, ICModule
+public class KResourceModule : MonoBehaviour, IModule
 {
     public delegate void ASyncLoadABAssetDelegate(Object asset, object[] args);
 

@@ -34,7 +34,7 @@ using UnityEngine;
 /// Load from a AssetBundles..
 /// </summary>
 [CDependencyClass(typeof (KResourceModule))]
-public class KSettingManager : ICModule
+public class KSettingManager : IModule
 {
     private static KSettingManager _Instance;
 
@@ -88,7 +88,7 @@ public class KSettingManager : ICModule
     private IEnumerator InitSetting()
     {
         var assetLoader = KStaticAssetLoader.Load("GameSetting" + KEngine.AppEngine.GetConfig("AssetBundleExt"), null);
-        while (!assetLoader.IsFinished)
+        while (!assetLoader.IsCompleted)
             yield return null;
 
         CGameSettingFiles gameSetting = (CGameSettingFiles) assetLoader.TheAsset;

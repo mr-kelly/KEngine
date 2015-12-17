@@ -26,50 +26,55 @@
 
 using UnityEngine;
 
-[CDependencyClass(typeof (KAssetFileLoader))]
-public class KSpriteLoader : KAbstractResourceLoader
+namespace KEngine
 {
-    public Sprite Asset
+
+    [CDependencyClass(typeof(KAssetFileLoader))]
+    public class KSpriteLoader : KAbstractResourceLoader
     {
-        get { return ResultObject as Sprite; }
-    }
-
-    public delegate void CSpriteLoaderDelegate(bool isOk, Sprite tex);
-
-    private KAssetFileLoader AssetFileBridge;
-
-    public override float Progress
-    {
-        get { return AssetFileBridge.Progress; }
-    }
-
-    public string Path { get; private set; }
-
-    public static KSpriteLoader Load(string path, CSpriteLoaderDelegate callback = null)
-    {
-        CLoaderDelgate newCallback = null;
-        if (callback != null)
+        public Sprite Asset
         {
-            newCallback = (isOk, obj) => callback(isOk, obj as Sprite);
+            get { return ResultObject as Sprite; }
         }
-        return AutoNew<KSpriteLoader>(path, newCallback);
+
+        public delegate void CSpriteLoaderDelegate(bool isOk, Sprite tex);
+
+        private KAssetFileLoader AssetFileBridge;
+
+        public override float Progress
+        {
+            get { return AssetFileBridge.Progress; }
+        }
+
+        public string Path { get; private set; }
+
+        public static KSpriteLoader Load(string path, CSpriteLoaderDelegate callback = null)
+        {
+            CLoaderDelgate newCallback = null;
+            if (callback != null)
+            {
+                newCallback = (isOk, obj) => callback(isOk, obj as Sprite);
+            }
+            return AutoNew<KSpriteLoader>(path, newCallback);
+        }
+
+        protected override void Init(string url, params object[] args)
+        {
+            base.Init(url, args);
+            Path = url;
+            AssetFileBridge = KAssetFileLoader.Load(Path, OnAssetLoaded);
+        }
+
+        private void OnAssetLoaded(bool isOk, UnityEngine.Object obj)
+        {
+            OnFinish(obj);
+        }
+
+        protected override void DoDispose()
+        {
+            base.DoDispose();
+            AssetFileBridge.Release(); // all, Texture is singleton!
+        }
     }
 
-    protected override void Init(string url, params object[] args)
-    {
-        base.Init(url, args);
-        Path = url;
-        AssetFileBridge = KAssetFileLoader.Load(Path, OnAssetLoaded);
-    }
-
-    private void OnAssetLoaded(bool isOk, UnityEngine.Object obj)
-    {
-        OnFinish(obj);
-    }
-
-    protected override void DoDispose()
-    {
-        base.DoDispose();
-        AssetFileBridge.Release(); // all, Texture is singleton!
-    }
 }

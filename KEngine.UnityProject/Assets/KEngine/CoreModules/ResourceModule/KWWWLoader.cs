@@ -59,7 +59,7 @@ public class KWWWLoader : KAbstractResourceLoader
     {
         get
         {
-            if (!IsFinished)
+            if (!IsCompleted)
                 return 0;
             return Size/(FinishLoadTime - BeginLoadTime);
         }

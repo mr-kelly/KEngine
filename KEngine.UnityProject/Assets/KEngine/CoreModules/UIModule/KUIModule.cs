@@ -34,7 +34,7 @@ using UnityEngine;
 /// UI Module
 /// </summary>
 [CDependencyClass(typeof (KResourceModule))]
-public class KUIModule : ICModule
+public class KUIModule : IModule
 {
     private class _InstanceClass
     {
@@ -378,7 +378,7 @@ public class KUIModule : ICModule
         LoadingUICount++;
         var assetLoader = KStaticAssetLoader.Load(path);
         openState.UIResourceLoader = assetLoader; // 基本不用手工释放的
-        while (!assetLoader.IsFinished)
+        while (!assetLoader.IsCompleted)
             yield return null;
 
         GameObject uiObj = (GameObject) assetLoader.TheAsset;

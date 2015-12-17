@@ -27,36 +27,39 @@
 using System;
 using UnityEngine;
 
-public class KFontLoader : KAbstractResourceLoader
+namespace KEngine
 {
-    private KAssetFileLoader _bridge;
-
-    public override float Progress
+    public class KFontLoader : KAbstractResourceLoader
     {
-        get { return _bridge.Progress; }
-    }
+        private KAssetFileLoader _bridge;
 
-    public static KFontLoader Load(string path, Action<bool, Font> callback = null)
-    {
-        CLoaderDelgate realcallback = null;
-        if (callback != null)
+        public override float Progress
         {
-            realcallback = (isOk, obj) => callback(isOk, obj as Font);
+            get { return _bridge.Progress; }
         }
 
-        return AutoNew<KFontLoader>(path, realcallback);
-    }
+        public static KFontLoader Load(string path, Action<bool, Font> callback = null)
+        {
+            CLoaderDelgate realcallback = null;
+            if (callback != null)
+            {
+                realcallback = (isOk, obj) => callback(isOk, obj as Font);
+            }
 
-    protected override void Init(string url, params object[] args)
-    {
-        base.Init(url, args);
+            return AutoNew<KFontLoader>(path, realcallback);
+        }
 
-        _bridge = KAssetFileLoader.Load(Url, (_isOk, _obj) => { OnFinish(_obj); });
-    }
+        protected override void Init(string url, params object[] args)
+        {
+            base.Init(url, args);
 
-    protected override void DoDispose()
-    {
-        base.DoDispose();
-        _bridge.Release();
+            _bridge = KAssetFileLoader.Load(Url, (_isOk, _obj) => { OnFinish(_obj); });
+        }
+
+        protected override void DoDispose()
+        {
+            base.DoDispose();
+            _bridge.Release();
+        }
     }
 }

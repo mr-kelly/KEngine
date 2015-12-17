@@ -36,7 +36,7 @@ namespace KEngine.CoreModules
 {
     [CDependencyClass(typeof (KResourceModule))]
     [CDependencyClass(typeof (KSettingManager))]
-    public class KGameSettings : ICModule
+    public class KGameSettings : IModule
     {
         private class _InstanceClass
         {
