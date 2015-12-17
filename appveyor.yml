@@ -6,7 +6,6 @@ test: off
 deploy:
 - provider: GitHub
   tag: KEngine.$(appveyor_build_version)
-  release: KEngine
   auth_token:
     secure: XOqXXH7qSVQt13tVaPLATXthAaBKmQMnidLew9i966FHsvMtvzJayclHWWMAwX9S
   draft: true
