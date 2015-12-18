@@ -15,6 +15,9 @@ build_script:
 after_build:
   - cmd: 7z a Build/KEngineArtifact.zip Build/Release/
   - cmd: 7z a Build/KEngineArtifact.zip KEngine.Installer/
+  - cmd: 7z a Build/KEngineArtifact.zip KEngine.UnityProject/
+  - cmd: 7z a Build/KEngineArtifact.zip README.md
+  - cmd: 7z a Build/KEngineArtifact.zip LICENSE.md
 test: off
 deploy:
 - provider: Environment
