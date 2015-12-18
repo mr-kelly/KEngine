@@ -38,6 +38,4 @@ _gsdata_
 /Solution/vs2012/*.user
 
 # Unity Dll
-/Build/*/UnityEditor.dll
-/Build/*/UnityEngine.dll
-/Build/*/UnityEngine.UI.dll
+/Build/*
