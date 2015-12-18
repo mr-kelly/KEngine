@@ -1,5 +1,7 @@
 # KEngine
 
+[![Build status](https://ci.appveyor.com/api/projects/status/7x08hdfflwemq60h?svg=true)](https://ci.appveyor.com/project/mr-kelly/kengine)
+
 KEngine是一个用于Unity3D引擎的AssetBundle框架。
 
 她的核心，资源模块（ResourceModule）为AssetBundle的资源加载、打包提供完整的一套工程规范，减少在项目开发过程中踩坑的时间;

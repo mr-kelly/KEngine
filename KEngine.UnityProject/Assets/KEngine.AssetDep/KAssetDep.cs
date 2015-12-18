@@ -61,7 +61,7 @@ public abstract class KAssetDep : MonoBehaviour
         }
     }
 
-    private GameObject _cacheGameObject;
+//    private GameObject _cacheGameObject;
     protected bool _NewIsInit = false;
 
     public Component DependencyComponent; // 依赖的脚本控件，完整依赖加载后会用到它
@@ -105,7 +105,7 @@ public abstract class KAssetDep : MonoBehaviour
 
     private void Awake()
     {
-        _cacheGameObject = gameObject;
+//        _cacheGameObject = gameObject;
 
         if (!_NewIsInit)
             Init();
@@ -198,7 +198,7 @@ public abstract class KAssetDep : MonoBehaviour
     {
         while (true)
         {
-            const int maxShowCount = 30;
+//            const int maxShowCount = 30;
             LinkedListNode<KAssetDep> depNode = AssetDepsContainer.First;
             if (depNode == null)
             {
