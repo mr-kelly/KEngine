@@ -1678,5 +1678,22 @@
             <param name="host"></param>
             <param name="callback"></param>
         </member>
+        <member name="M:KEngineToolExtensions.KFirstOrDefault``1(System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            
+            </summary>
+            <param name="source"></param>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:KEngineToolExtensions.KLast``1(System.Collections.Generic.IEnumerable{``0},System.Int32)">
+            <summary>
+            == Linq Last
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="source"></param>
+            <param name="num"></param>
+            <returns></returns>
+        </member>
     </members>
 </doc>

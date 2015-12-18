@@ -332,7 +332,7 @@
             程序集锁定事件，事件中可以进行DLL的注入修改
             </summary>
         </member>
-        <member name="F:KUnityEditorTools.KUnityEditorEventCatcher.OnPostBuildPlayerEvent">
+        <member name="F:KUnityEditorTools.KUnityEditorEventCatcher._OnPostBuildPlayerEvent">
             <summary>
             编译完成后事件
             </summary>
