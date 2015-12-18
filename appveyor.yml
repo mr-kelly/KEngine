@@ -8,10 +8,13 @@ assembly_info:
   assembly_file_version: "{version}"
   assembly_informational_version: "{version}"
 artifacts:
-  - path: Build/Release/*
+  - path: Build/KEngineArtifact.zip
     name: KEngineArtifact
 build_script:
 - cmd: NAnt_VS2012_Build.bat
+after_build:
+  - cmd: 7z a Build/KEngineArtifact.zip Build/Release/
+  - cmd: 7z a Build/KEngineArtifact.zip KEngine.Installer/
 test: off
 deploy:
 - provider: Environment
