@@ -294,9 +294,14 @@ namespace KEngine.Installer
 
             var srcPdb = Path.ChangeExtension(src, ".pdb");
             var targetPdb = Path.ChangeExtension(targetPath, ".pdb");
+            var srcXml = Path.ChangeExtension(src, ".xml");
+            var targetXml = Path.ChangeExtension(targetPath, ".xml");
 
-            if (File.Exists(targetPdb))
+            if (File.Exists(srcPdb))
                 CopyFile(srcPdb, targetPdb);
+
+            if (File.Exists(srcXml))
+                CopyFile(srcXml, targetXml);
 
         }
 

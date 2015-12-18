@@ -342,7 +342,7 @@ public class KTool
             return false;
 
         var strs = numberStr.Split(sp);
-        return strs.CContains(testValue);
+        return strs.KContains(testValue);
     }
 
     public static Shader FindShader(string shaderName)
@@ -1398,7 +1398,7 @@ public class XMemoryParser<T>
 }
 
 // C# 扩展, 扩充C#类的功能
-public static class XExtensions
+public static class KEngineToolExtensions
 {
     // 扩展List/  
     public static void Shuffle<T>(this IList<T> list)
@@ -1415,7 +1415,13 @@ public static class XExtensions
         }
     }
 
-    public static T CFirstOrDefault<T>(this IEnumerable<T> source)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="source"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static T KFirstOrDefault<T>(this IEnumerable<T> source)
     {
         if (source != null)
         {
@@ -1428,7 +1434,7 @@ public static class XExtensions
         return default(T);
     }
 
-    public static List<T> CFirst<T>(this IEnumerable<T> source, int num)
+    public static List<T> KFirst<T>(this IEnumerable<T> source, int num)
     {
         var count = 0;
         var items = new List<T>();
@@ -1447,9 +1453,9 @@ public static class XExtensions
         return items;
     }
 
-    public delegate bool CFilterAction<T>(T t);
+    public delegate bool KFilterAction<T>(T t);
 
-    public static List<T> CFilter<T>(this IEnumerable<T> source, CFilterAction<T> testAction)
+    public static List<T> KFilter<T>(this IEnumerable<T> source, KFilterAction<T> testAction)
     {
         var items = new List<T>();
         if (source != null)
@@ -1466,10 +1472,10 @@ public static class XExtensions
         return items;
     }
 
-    public delegate bool CFilterAction<T, K>(T t, K k);
+    public delegate bool KFilterAction<T, K>(T t, K k);
 
-    public static Dictionary<T, K> CFilter<T, K>(this IEnumerable<KeyValuePair<T, K>> source,
-        CFilterAction<T, K> testAction)
+    public static Dictionary<T, K> KFilter<T, K>(this IEnumerable<KeyValuePair<T, K>> source,
+        KFilterAction<T, K> testAction)
     {
         var items = new Dictionary<T, K>();
         if (source != null)
@@ -1486,7 +1492,7 @@ public static class XExtensions
         return items;
     }
 
-    public static T CLastOrDefault<T>(this IEnumerable<T> source)
+    public static T KLastOrDefault<T>(this IEnumerable<T> source)
     {
         var result = default(T);
         foreach (T item in source)
@@ -1495,11 +1501,17 @@ public static class XExtensions
         }
         return result;
     }
-
-    public static List<T> CLast<T>(this IEnumerable<T> source, int num)
+    /// <summary>
+    /// == Linq Last
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="num"></param>
+    /// <returns></returns>
+    public static List<T> KLast<T>(this IEnumerable<T> source, int num)
     {
         // 开始读取的位置
-        var startIndex = Math.Max(0, source.CToList().Count - num);
+        var startIndex = Math.Max(0, source.KToList().Count - num);
         var index = 0;
         var items = new List<T>();
         if (source != null)
@@ -1517,7 +1529,7 @@ public static class XExtensions
         return items;
     }
 
-    public static T[] CToArray<T>(this IEnumerable<T> source)
+    public static T[] KToArray<T>(this IEnumerable<T> source)
     {
         var list = new List<T>();
         foreach (T item in source)
@@ -1527,7 +1539,7 @@ public static class XExtensions
         return list.ToArray();
     }
 
-    public static List<T> CToList<T>(this IEnumerable<T> source)
+    public static List<T> KToList<T>(this IEnumerable<T> source)
     {
         var list = new List<T>();
         foreach (T item in source)
@@ -1537,10 +1549,10 @@ public static class XExtensions
         return list;
     }
 
-    public static List<T> CUnion<T>(this List<T> first, List<T> second, IEqualityComparer<T> comparer)
+    public static List<T> KUnion<T>(this List<T> first, List<T> second, IEqualityComparer<T> comparer)
     {
         var results = new List<T>();
-        var list = first.CToList();
+        var list = first.KToList();
         list.AddRange(second);
         foreach (T item in list)
         {
@@ -1561,7 +1573,7 @@ public static class XExtensions
         return results;
     }
 
-    public static string CJoin<T>(this IEnumerable<T> source, string sp)
+    public static string KJoin<T>(this IEnumerable<T> source, string sp)
     {
         var result = new StringBuilder();
         foreach (T item in source)
@@ -1578,7 +1590,7 @@ public static class XExtensions
         return result.ToString();
     }
 
-    public static bool CContains<TSource>(this IEnumerable<TSource> source, TSource value)
+    public static bool KContains<TSource>(this IEnumerable<TSource> source, TSource value)
     {
         foreach (TSource item in source)
         {

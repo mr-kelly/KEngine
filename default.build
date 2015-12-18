@@ -18,6 +18,10 @@ Author: Mrkelly http://github.com/mr-kelly/KEngine
         </exec>
     </target>
 
+    <target name="doc">
+        
+        <echo message="Generating Document..." />
+    </target>
     <target name="build">
         <call target="premake" />
         <!-- MSBuild the Solution -->
@@ -29,6 +33,8 @@ Author: Mrkelly http://github.com/mr-kelly/KEngine
             <arg value="/verbosity:normal" />
             <arg value="/nologo" />
         </exec>
+
+        <call target="doc" />
     </target>
 
 </project>
