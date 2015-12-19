@@ -79,6 +79,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="KEngine.Lib.csproj">
+      <Project>{ABCAD9CA-1780-52C0-A074-4C970C2949C4}</Project>
+      <Name>KEngine.Lib</Name>
+    </ProjectReference>
     <ProjectReference Include="KEngine.csproj">
       <Project>{062D043A-720C-83D5-7B24-0EACE782E936}</Project>
       <Name>KEngine</Name>

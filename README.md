@@ -52,23 +52,10 @@ AppEngine.Create函数可以传入继承IModule的类来实现模块添加。所
 
 # KEngine安装器
 
-KEngine安装器，用于对现有的Unity项目进行安装KEngine的快捷操作，提供一种比Unity Package更有效的导入KEngine操作。
+KEngine.Installer安装器为现有项目嵌入KEngine提供方便的支持，可以以源码、DLL等不同形式导入。
 
-## KEngine.Installer操作
+[使用KEngine.Installer安装器](Docs/Doc_Installer.md)
 
-* 把KEngine.Installer目录拷贝到Unity工程的Assets目录;
-* 从菜单KEngine->KEngine Installer打开安装器界面;
-* 点击Select Git Project to Install, 选择KEngine源码目录
-
-## 3种拷贝模式
-* Hardlink，默认，方便对源码进行修改，立刻就到源码目录;
-* SymbolLink， 类似Hardlink
-* Copy, 拷贝文件，缺点是对安装后的KEngine代码修改，无法反应到源码目录，git提交不方便
-
-## 2种安装模式
-
-* DLL模式，使用KEngine编译后的DLL，Unity编译后的游戏产品将会产生KEngine.dll，编译更快
-* Code模式，使用KEngine源码，方便进行修改源码，断点调试
 
 # 开发人员使用指南
 

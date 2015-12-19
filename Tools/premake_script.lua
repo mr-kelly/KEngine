@@ -57,8 +57,28 @@ configuration "vs*"
 
 local UNITY_ENGINE_DLL = "./UnityEngine.dll"-- "C:/Program Files (x86)/Unity/Editor/Data/Managed/UnityEngine.dll"
 local UNITY_UI_DLL = "./UnityEngine.UI.dll" --C:/Program Files (x86)/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/4.6.4/UnityEngine.UI.dll"
-local SharpZipLib_DLL = "../KEngine.UnityProject/Assets/KEngine/Lib/SharpZipLib/ICSharpCode.SharpZipLib.dll"
+local SharpZipLib_DLL = "../KEngine.UnityProject/Assets/KEngine.Lib/SharpZipLib/ICSharpCode.SharpZipLib.dll"
 local UNITY_EDITOR_DLL = "./UnityEditor.dll" --C:/Program Files (x86)/Unity/Editor/Data/Managed/UnityEditor.dll"
+
+------------------KEngine Base Library --------------------
+project "KEngine.Lib"
+language "C#"
+kind "SharedLib"
+framework "3.5"
+
+files
+{
+    "../KEngine.UnityProject/Assets/KEngine.Lib/**.cs",
+}
+
+defines
+{
+}
+links
+{
+    "System",
+    SharpZipLib_DLL
+}
 
 ------------------KEngine Main--------------------
 project "KEngine"
@@ -76,10 +96,10 @@ defines
 }
 links
 {
+    "KEngine.Lib",
     "System",
     UNITY_ENGINE_DLL,
     UNITY_UI_DLL,
-    SharpZipLib_DLL
 }
 
 
@@ -101,6 +121,7 @@ defines
 
 links
 {
+    "KEngine.Lib",
     "KEngine",
     "System",
     UNITY_ENGINE_DLL,
@@ -154,6 +175,7 @@ defines
 
 links
 {
+    "KEngine.Lib",
     "KEngine",
     "KEngine.AssetDep",
     "KEngine.Editor",

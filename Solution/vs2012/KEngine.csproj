@@ -45,9 +45,6 @@
     <Reference Include="UnityEngine.UI">
       <HintPath>..\..\Tools\UnityEngine.UI.dll</HintPath>
     </Reference>
-    <Reference Include="ICSharpCode.SharpZipLib">
-      <HintPath>..\..\KEngine.UnityProject\Assets\KEngine\Lib\SharpZipLib\ICSharpCode.SharpZipLib.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\AppEngine.cs">
@@ -158,78 +155,6 @@
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\KObject.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\KObject.cs</Link>
     </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Common\CRC.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Common\CRC.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Common\CommandLineParser.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Common\CommandLineParser.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Common\InBuffer.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Common\InBuffer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Common\OutBuffer.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Common\OutBuffer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LZ\IMatchFinder.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LZ\IMatchFinder.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LZ\LzBinTree.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LZ\LzBinTree.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LZ\LzInWindow.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LZ\LzInWindow.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LZ\LzOutWindow.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LZ\LzOutWindow.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LZMA\LzmaBase.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LZMA\LzmaBase.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LZMA\LzmaDecoder.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LZMA\LzmaDecoder.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LZMA\LzmaEncoder.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LZMA\LzmaEncoder.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LzmaAlone\LzmaAlone.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LzmaAlone\LzmaAlone.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LzmaAlone\LzmaBench.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LzmaAlone\LzmaBench.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LzmaAlone\Properties\Resources.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\LzmaAlone\Properties\Resources.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\RangeCoder\RangeCoder.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\RangeCoder\RangeCoder.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\RangeCoder\RangeCoderBit.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\RangeCoder\RangeCoderBit.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\RangeCoder\RangeCoderBitTree.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\Compress\RangeCoder\RangeCoderBitTree.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\7zip\ICoder.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Lib\7zip\ICoder.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\CosmosTable\TabFileWriter.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Lib\CosmosTable\TabFileWriter.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\CosmosTable\TableFile.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Lib\CosmosTable\TableFile.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\CosmosTable\TableRowInfo.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Lib\CosmosTable\TableRowInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\KLzmaUtil.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Lib\KLzmaUtil.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\KZipTool.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Lib\KZipTool.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Lib\SimpleJson.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Lib\SimpleJson.cs</Link>
-    </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Logger.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\Logger.cs</Link>
     </Compile>
@@ -295,6 +220,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="KEngine.Lib.csproj">
+      <Project>{ABCAD9CA-1780-52C0-A074-4C970C2949C4}</Project>
+      <Name>KEngine.Lib</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
