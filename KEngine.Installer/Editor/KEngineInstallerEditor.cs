@@ -219,7 +219,7 @@ namespace KEngine.Installer
             }
             else
             {
-                CopyFolder(srcEngineLibCodePath, KEngineInstallerDirPath + "/KEngine.Lib");
+                CopyFolder(srcEngineLibCodePath, KEngineInstallDirPath + "/KEngine.Lib");
                 CopyFolder(srcEngineCodePath, KEngineInstallDirPath + "/KEngine");
                 CopyFolder(srcEngineEditorCodePath, KEngineEditorInstallDirPath + "/KEngine.Editor");
             }
