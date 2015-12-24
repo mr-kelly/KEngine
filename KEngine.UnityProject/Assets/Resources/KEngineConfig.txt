@@ -1,10 +1,10 @@
 ﻿Key	Value	Comment		
 [string]	[string]	[string]		
 ProductRelPath	../Product			
-AssetBundleBuildRelPath	../Product/Bundles		
+AssetBundleBuildRelPath	../Product/Bundles			
 StreamingBundlesFolderName	Bundles			
 AssetBundleExt	.bytes	base		
 IsLoadAssetBundle	1			
 UIModuleBridge	UGUI			
-SettingSourcePath	../Product/SettingSource		
-SettingPath	Resources/Setting		
+SettingSourcePath	../Product/SettingSource			
+SettingPath	Resources/Setting			

@@ -115,7 +115,12 @@ namespace CosmosTable
 
             return null;
         }
-        public int NewColumn(string colName, string defineStr = "")
+
+        public int NewColumn(string colName)
+        {
+            return NewColumn(colName, "");
+        }
+        public int NewColumn(string colName, string defineStr)
         {
             if (string.IsNullOrEmpty(colName))
                 throw new Exception("Null Col Name : " + colName);

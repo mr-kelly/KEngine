@@ -220,13 +220,22 @@ namespace KEngine
         {
             if (_configsTable == null || reload)
             {
-                TextAsset textAsset;
-                textAsset = Resources.Load<TextAsset>("KEngineConfig");
+                string configContent;
+                if (Application.isEditor && !Application.isPlaying)
+                {
+                    // prevent Resources.Load fail on Batch Mode
+                    configContent = System.IO.File.ReadAllText("Assets/Resources/KEngineConfig.txt");
+                }
+                else
+                {
+                    var textAsset = Resources.Load<TextAsset>("KEngineConfig");
+                    Logger.Assert(textAsset);
+                    configContent = textAsset.text;
+                }
 
-                Logger.Assert(textAsset);
                 _configsTable = new TableFile<CCosmosEngineInfo>(new TableFileConfig
                 {
-                    Content = textAsset.text,
+                    Content = configContent, 
                     OnExceptionEvent = (ex, args) =>
                     {
                         if (ex != TableFileExceptionType.DuplicatedKey)
