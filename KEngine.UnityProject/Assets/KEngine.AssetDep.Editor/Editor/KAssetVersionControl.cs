@@ -187,7 +187,7 @@ namespace KEngine.Editor
         // Prefab Asset打包版本號記錄
         public static string GetBuildVersionTab()
         {
-            return Application.dataPath + "../" + KEngineDef.ResourcesBuildInfosDir + "/ArtBuildResource_" +
+            return Application.dataPath + "/../" + KEngineDef.ResourcesBuildInfosDir + "/ArtBuildResource_" +
                    KResourceModule.BuildPlatformName + ".txt";
         }
 
