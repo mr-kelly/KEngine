@@ -104,8 +104,8 @@
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\KSettingModuleEditor.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\KSettingModuleEditor.cs</Link>
     </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\ResourcesBuild\CBuild_UGUI.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\ResourcesBuild\CBuild_UGUI.cs</Link>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\ResourcesBuild\KBuild_UGUI.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\ResourcesBuild\KBuild_UGUI.cs</Link>
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\ResourcesBuild\KResourceBuilder.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\ResourcesBuild\KResourceBuilder.cs</Link>

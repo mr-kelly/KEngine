@@ -140,7 +140,15 @@ public class KDependencyBuild
 
     private static Dictionary<IDepBuildProcessor, DepBuildClassAttribute> _cachedDepBuildClassAttributes;
 
-    // 可選擇是否打包自己，還是只打包依賴
+    /// <summary>
+    /// 可選擇是否打包自己，還是只打包依賴 
+    /// TODO: Bug,如果引用发生变化，理论上自己也应该强制打包，否则引用地址已经发生改变
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <param name="path"></param>
+    /// <param name="buildSelf"></param>
+    /// <param name="allInOne"></param>
+    /// <param name="keepCopyObjToDebug"></param>
     public static void BuildGameObject(GameObject obj, string path, bool buildSelf = true, bool allInOne = false,
         bool keepCopyObjToDebug = false) // TODO: All in One
     {

@@ -26,8 +26,12 @@
 
 using System.IO;
 using KEngine;
+using KEngine.Editor;
 using UnityEditor;
 
+/// <summary>
+/// Example of KBuild_Base
+/// </summary>
 public class KCommonProductPrefabExporter : KBuild_Base
 {
     public override string GetDirectory()
