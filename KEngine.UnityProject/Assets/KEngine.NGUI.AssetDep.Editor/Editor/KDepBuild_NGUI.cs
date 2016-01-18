@@ -25,6 +25,7 @@
 #endregion
 #if NGUI
 using System;
+using System.Collections.Generic;
 using KEngine;
 using KEngine.Editor;
 using UnityEditor;
@@ -118,63 +119,76 @@ namespace KEngine.AssetDep.Editor
         /// </summary>
         public static Action<UIAtlas> AfterBuildUIAtlasFilter;
 
-        // Prefab ,  build
+        /// <summary>
+        /// 图集 打包结果缓存起来加速
+        /// </summary>
+        /// <param name="atlas"></param>
+        /// <returns></returns>
         public static string BuildUIAtlas(UIAtlas atlas)
         {
-            var scale = 1f; // TODO: scale read
-            GameObject atlasPrefab = PrefabUtility.FindPrefabRoot(atlas.gameObject) as GameObject;
-            Logger.Assert(atlasPrefab);
-            string path = AssetDatabase.GetAssetPath(atlasPrefab); // prefab只用来获取路径，不打包不挖空
-            bool needBuild = KAssetVersionControl.TryCheckNeedBuildWithMeta(path);
-            if (needBuild)
-                KAssetVersionControl.TryMarkBuildVersion(path);
-
-            Logger.Assert(path);
-
-            path = KDependencyBuild.__GetPrefabBuildPath(path);
-
-            GameObject copyAtlasObj = GameObject.Instantiate(atlasPrefab) as GameObject;
-
-            UIAtlas copyAtlas = copyAtlasObj.GetComponent<UIAtlas>();
-
-            if (BeforeBuildUIAtlasFilter != null)
+            CDepCollectInfo result;
+            if (KDepBuildCaching.HasCache(atlas))
             {
-                BeforeBuildUIAtlasFilter(copyAtlas);
+                result = KDepBuildCaching.GetCache(atlas);
             }
-
-            Material cacheMat = copyAtlas.spriteMaterial;
-            string matPath = KDepBuild_Material.BuildDepMaterial(cacheMat, scale); // 缩放
-
-            // 缩放
-            copyAtlas.pixelSize = 1 / PictureScale;
-            foreach (var spriteData in copyAtlas.spriteList)
+            else
             {
-                spriteData.x = Mathf.FloorToInt(spriteData.x * PictureScale);
-                spriteData.y = Mathf.FloorToInt(spriteData.y * PictureScale);
-                spriteData.width = Mathf.FloorToInt(spriteData.width * PictureScale);
-                spriteData.height = Mathf.FloorToInt(spriteData.height * PictureScale);
-                spriteData.borderLeft = Mathf.FloorToInt(spriteData.borderLeft * PictureScale);
-                spriteData.borderRight = Mathf.FloorToInt(spriteData.borderRight * PictureScale);
-                spriteData.borderTop = Mathf.FloorToInt(spriteData.borderTop * PictureScale);
-                spriteData.borderBottom = Mathf.FloorToInt(spriteData.borderBottom * PictureScale);
-                // padding 不变， ngui bug
-                spriteData.paddingBottom = Mathf.FloorToInt(spriteData.paddingBottom * PictureScale);
-                spriteData.paddingTop = Mathf.FloorToInt(spriteData.paddingTop * PictureScale);
-                spriteData.paddingLeft = Mathf.FloorToInt(spriteData.paddingLeft * PictureScale);
-                spriteData.paddingRight = Mathf.FloorToInt(spriteData.paddingRight * PictureScale);
+                var scale = 1f; // TODO: scale read
+                GameObject atlasPrefab = PrefabUtility.FindPrefabRoot(atlas.gameObject) as GameObject;
+                Logger.Assert(atlasPrefab);
+                string path = AssetDatabase.GetAssetPath(atlasPrefab); // prefab只用来获取路径，不打包不挖空
+                bool needBuild = KAssetVersionControl.TryCheckNeedBuildWithMeta(path);
+                if (needBuild)
+                    KAssetVersionControl.TryMarkBuildVersion(path);
+
+                Logger.Assert(path);
+
+                path = KDependencyBuild.__GetPrefabBuildPath(path);
+
+                GameObject copyAtlasObj = GameObject.Instantiate(atlasPrefab) as GameObject;
+
+                UIAtlas copyAtlas = copyAtlasObj.GetComponent<UIAtlas>();
+
+                if (BeforeBuildUIAtlasFilter != null)
+                {
+                    BeforeBuildUIAtlasFilter(copyAtlas);
+                }
+
+                Material cacheMat = copyAtlas.spriteMaterial;
+                string matPath = KDepBuild_Material.BuildDepMaterial(cacheMat, scale); // 缩放
+
+                // 缩放
+                copyAtlas.pixelSize = 1 / PictureScale;
+                foreach (var spriteData in copyAtlas.spriteList)
+                {
+                    spriteData.x = Mathf.FloorToInt(spriteData.x * PictureScale);
+                    spriteData.y = Mathf.FloorToInt(spriteData.y * PictureScale);
+                    spriteData.width = Mathf.FloorToInt(spriteData.width * PictureScale);
+                    spriteData.height = Mathf.FloorToInt(spriteData.height * PictureScale);
+                    spriteData.borderLeft = Mathf.FloorToInt(spriteData.borderLeft * PictureScale);
+                    spriteData.borderRight = Mathf.FloorToInt(spriteData.borderRight * PictureScale);
+                    spriteData.borderTop = Mathf.FloorToInt(spriteData.borderTop * PictureScale);
+                    spriteData.borderBottom = Mathf.FloorToInt(spriteData.borderBottom * PictureScale);
+                    // padding 不变， ngui bug
+                    spriteData.paddingBottom = Mathf.FloorToInt(spriteData.paddingBottom * PictureScale);
+                    spriteData.paddingTop = Mathf.FloorToInt(spriteData.paddingTop * PictureScale);
+                    spriteData.paddingLeft = Mathf.FloorToInt(spriteData.paddingLeft * PictureScale);
+                    spriteData.paddingRight = Mathf.FloorToInt(spriteData.paddingRight * PictureScale);
+                }
+
+                KAssetDep.Create<KUIAtlasDep>(copyAtlas, matPath);
+
+                copyAtlas.spriteMaterial = null; // 挖空atlas
+
+                result = KDependencyBuild.DoBuildAssetBundle("UIAtlas/UIAtlas_" + path, copyAtlasObj, needBuild); // Build主对象, 被挖空Material了的
+
+                if (AfterBuildUIAtlasFilter != null)
+                {
+                    AfterBuildUIAtlasFilter(copyAtlas);
+                }
+                GameObject.DestroyImmediate(copyAtlasObj);
+
             }
-
-            KAssetDep.Create<KUIAtlasDep>(copyAtlas, matPath);
-
-            copyAtlas.spriteMaterial = null; // 挖空atlas
-
-            var result = KDependencyBuild.DoBuildAssetBundle("UIAtlas/UIAtlas_" + path, copyAtlasObj, needBuild); // Build主对象, 被挖空Material了的
-
-            if (AfterBuildUIAtlasFilter != null)
-            {
-                AfterBuildUIAtlasFilter(copyAtlas);
-            }
-            GameObject.DestroyImmediate(copyAtlasObj);
 
             return result.Path;
         }

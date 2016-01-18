@@ -62,6 +62,37 @@ public class DepBuildClassAttribute : Attribute
         ClassType = type;
     }
 }
+
+/// <summary>
+/// 专用于依赖打包的缓存机制
+/// </summary>
+/// <typeparam name="T"></typeparam>
+public class KDepCollectInfoCaching
+{
+    private static readonly Dictionary<object, CDepCollectInfo> _cache = new Dictionary<object, CDepCollectInfo>();
+
+    public static void Clear()
+    {
+        _cache.Clear();
+    }
+
+    public static bool HasCache<T>(T obj)
+    {
+        return _cache.ContainsKey(obj);
+    }
+
+    public static void SetCache<T>(T obj, CDepCollectInfo info)
+    {
+        _cache[obj] = info;
+
+    }
+
+    public static CDepCollectInfo GetCache<T>(T atlas)
+    {
+        return _cache[atlas];
+    }
+}
+
 // 处理依赖关系的打包工具
 public class KDependencyBuild
 {
@@ -79,7 +110,7 @@ public class KDependencyBuild
     //}
 
     public static event Action<string> AddCacheEvent;
-    public static Dictionary<string, bool> BuildedCache = new Dictionary<string, bool>();
+    public static Dictionary<string, bool> BuildRecord = new Dictionary<string, bool>();
     public static bool IsJustCollect = false; // 是否只收集，不作打包（照旧可以拿到BuildedCache），只是没有实际执行Build而已
     public static List<Action> ClearActions = new List<Action>(); // Clear时执行的委托
 
@@ -89,7 +120,7 @@ public class KDependencyBuild
     //[MenuItem("Game/TestSaveBuildAction")]
     public static void SaveBuildAction()
     {
-        if (BuildedCache.Count > 0)
+        if (BuildRecord.Count > 0)
         {
             var zipDirPath = KEngineDef.ResourcesBuildInfosDir;
             if (!Directory.Exists(zipDirPath))
@@ -107,7 +138,7 @@ public class KDependencyBuild
 
             // 真实打包的资源记录
             var sbBuildAction = new StringBuilder();
-            foreach (var kv in BuildedCache)
+            foreach (var kv in BuildRecord)
             {
                 sbBuildAction.AppendLine(kv.Key);
             }
@@ -127,13 +158,14 @@ public class KDependencyBuild
     public static void Clear()
     {
         IsJustCollect = false;
-        BuildedCache.Clear();
+        BuildRecord.Clear();
 
         foreach (var action in ClearActions)
         {
             action();
         }
         ClearActions.Clear();
+        KDepCollectInfoCaching.Clear();
     }
 
     //private static Dictionary<MethodInfo, DepBuildAttribute> _cachedDepBuildAttributes;
@@ -149,30 +181,12 @@ public class KDependencyBuild
     /// <param name="buildSelf"></param>
     /// <param name="allInOne"></param>
     /// <param name="keepCopyObjToDebug"></param>
+    /// <param name="instantiateObjecctToBuild ">是否拷贝一份，再进行打包？这样不会影响破坏源对象, 打包完成后会拷贝删除拷贝对象</param>
     public static void BuildGameObject(GameObject obj, string path, bool buildSelf = true, bool allInOne = false,
-        bool keepCopyObjToDebug = false) // TODO: All in One
+        bool keepCopyObjToDebug = false, bool instantiateObjectToBuild = true) // TODO: All in One
     {
-        GameObject copyObj = GameObject.Instantiate(obj) as GameObject;
+        GameObject buildObj = instantiateObjectToBuild ? (GameObject.Instantiate(obj) as GameObject) : obj;
 
-        //if (_cachedDepBuildAttributes == null)
-        //{
-        //    _cachedDepBuildAttributes = new Dictionary<MethodInfo, DepBuildAttribute>();
-
-        //    foreach (
-        //        var methodInfo in
-        //            typeof(KDependencyBuild).GetMethods(BindingFlags.Static | BindingFlags.Public |
-        //                                                 BindingFlags.NonPublic))
-        //    {
-        //        var depAttrs = methodInfo.GetCustomAttributes(typeof(DepBuildAttribute), true);
-        //        Logger.Assert(depAttrs.Length <= 1); // 不会太大
-        //        foreach (var attrbute in depAttrs)
-        //        {
-        //            var depAttr = (DepBuildAttribute)attrbute;
-        //            _cachedDepBuildAttributes[methodInfo] = depAttr;
-        //            break;
-        //        }
-        //    }
-        //}
         if (_cachedDepBuildClassAttributes == null)
         {
             _cachedDepBuildClassAttributes = new Dictionary<IDepBuildProcessor, DepBuildClassAttribute>();
@@ -207,12 +221,13 @@ public class KDependencyBuild
         //    }
         //}
 
+        // 依赖处理
         foreach (var kv in _cachedDepBuildClassAttributes)
         {
             var depAttr = kv.Value;
             var processor = kv.Key;
 
-            foreach (Component component in copyObj.GetComponentsInChildren(depAttr.ClassType, true))
+            foreach (Component component in buildObj.GetComponentsInChildren(depAttr.ClassType, true))
             {
                 processor.Process(component);
             }
@@ -221,10 +236,11 @@ public class KDependencyBuild
         }
 
         // Build主对象
-        DoBuildAssetBundle(path, copyObj, buildSelf); // TODO: BuildResult...
+        DoBuildAssetBundle(path, buildObj, buildSelf); // TODO: BuildResult...
 
-        if (!keepCopyObjToDebug)
-            GameObject.DestroyImmediate(copyObj);
+        if (instantiateObjectToBuild)
+            if (!keepCopyObjToDebug)
+                GameObject.DestroyImmediate(buildObj);
     }
 
 
@@ -246,7 +262,7 @@ public class KDependencyBuild
         //asset.name = fullAssetPath;
         var hasBuilded = false;
 
-        if (!BuildedCache.ContainsKey(path))
+        if (!BuildRecord.ContainsKey(path))
         {
             if (realBuildOrJustPath)
                 AddCache(path);
@@ -270,7 +286,7 @@ public class KDependencyBuild
 
     public static void AddCache(string res)
     {
-        BuildedCache[res] = true;
+        BuildRecord[res] = true;
         if (AddCacheEvent != null)
             AddCacheEvent(res);
     }
@@ -288,7 +304,7 @@ public class KDependencyBuild
         else
         {
             //so.name = fullAssetPath;
-            if (!BuildedCache.ContainsKey(fullAssetPath))
+            if (!BuildRecord.ContainsKey(fullAssetPath))
             {
                 AddCache(fullAssetPath);
                 if (!IsJustCollect && realBuildOrJustPath)

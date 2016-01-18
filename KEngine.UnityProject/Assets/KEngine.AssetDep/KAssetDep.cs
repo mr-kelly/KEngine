@@ -95,7 +95,16 @@ public abstract class KAssetDep : MonoBehaviour
     // TODO: 现在只支持MainAsset
     public static T Create<T>(Component dependencyComponent, string path, string assetName = null) where T : KAssetDep
     {
-        var dep = dependencyComponent.gameObject.AddComponent<T>();
+        var obj = dependencyComponent.gameObject;
+        var dep = obj.GetComponent<T>();
+        if (dep != null)
+        { 
+            Debug.LogWarning(string.Format("[KAssetDep.Create]Duplicate Component <{0}> found: {1}, please use `KDepCollectInfoCaching`", typeof(T), dependencyComponent));
+            return dep;
+        }
+
+        // check exist
+        dep = obj.AddComponent<T>();
         dep.DependencyComponent = dependencyComponent;
         dep.ResourcePath = path;
         // dep.Arg  // AssetName

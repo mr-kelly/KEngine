@@ -107,14 +107,18 @@ namespace KEngine.Editor
                         export.GetExtention()); // 不包括子文件夾
 
                 export.BeforeExport();
+                int okItemCount = 0;
                 foreach (string item in itemArray)
                 {
-                    if (!export.FilterPath(item))
+                    var cleanPath = item.Replace("\\", "/");
+
+                    if (!export.FilterPath(cleanPath))
                         continue;
-                    EditorUtility.DisplayCancelableProgressBar("[ProductExport]", item, .5f);
+                    okItemCount++;
+                    EditorUtility.DisplayCancelableProgressBar("[ProductExport]", cleanPath, .5f);
                     try
                     {
-                        export.Export(item.Replace('\\', '/'));
+                        export.Export(cleanPath);
                     }
                     finally
                     {
@@ -128,7 +132,7 @@ namespace KEngine.Editor
 
 
                 Logger.Log("Finish Auto Build: {0}, ItemsCount: {1}, Used Time: {2}", export.GetType().Name,
-                    itemArray.Length, DateTime.Now - time);
+                    okItemCount, DateTime.Now - time);
             }
             catch (Exception e)
             {

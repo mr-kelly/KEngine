@@ -222,6 +222,7 @@ namespace KEngine.Installer
                 CopyFolder(srcEngineLibCodePath, KEngineInstallDirPath + "/KEngine.Lib");
                 CopyFolder(srcEngineCodePath, KEngineInstallDirPath + "/KEngine");
                 CopyFolder(srcEngineEditorCodePath, KEngineEditorInstallDirPath + "/KEngine.Editor");
+                CopyFolder(srcEngineEditorCodePath, KEngineEditorInstallDirPath + "/KEngine.EditorTools");
             }
 
             Debug.Log("Install KEngine Successed!");

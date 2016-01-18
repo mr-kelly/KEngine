@@ -28,7 +28,7 @@ Author: Mrkelly http://github.com/mr-kelly/KEngine
         <exec program="${MSBuild}">
             <arg line='"Solution/vs2012/KEngine.Solution.sln"' />
             <arg line='/property:Configuration="Release";GenerateDocumentation=true;DeployOnBuild=true;PublishProfile=Deployment' /> <!--DocumentationFile="$(MSBuildProjectName).xml";-->
-            <arg value="/target:Rebuild" />
+            <arg value="/target:Build" />
             <!-- normal / diag / detailed -->
             <arg value="/verbosity:normal" />
             <arg value="/nologo" />
