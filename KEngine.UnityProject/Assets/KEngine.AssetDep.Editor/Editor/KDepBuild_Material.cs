@@ -34,6 +34,12 @@ public class KDepBuild_Material
 {
     public static string BuildDepMaterial(Material mat, float scaleTexture = 1f)
     {
+        CDepCollectInfo buildResult = KDepCollectInfoCaching.GetCache(mat);
+        if (buildResult != null)
+        {
+            return buildResult.Path;
+        }
+
         KSerializeMaterial sMat = __DoExportMaterial(mat, scaleTexture);
 
         if (sMat != null)
@@ -45,11 +51,14 @@ public class KDepBuild_Material
                 KAssetVersionControl.TryMarkBuildVersion(path);
 
             path = KDependencyBuild.__GetPrefabBuildPath(path);
-            var buildResult = KDependencyBuild.__DoBuildScriptableObject("Material/Material_" + path, sMat, needBuild);
+            buildResult = KDependencyBuild.__DoBuildScriptableObject("Material/Material_" + path, sMat, needBuild);
+
+            KDepCollectInfoCaching.SetCache(mat, buildResult);
 
             return buildResult.Path;
         }
 
+        // 可能没路径的材质，直接忽略
         return "";
     }
 

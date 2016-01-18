@@ -87,9 +87,11 @@ public class KDepCollectInfoCaching
 
     }
 
-    public static CDepCollectInfo GetCache<T>(T atlas)
+    public static CDepCollectInfo GetCache<T>(T obj)
     {
-        return _cache[atlas];
+        CDepCollectInfo info = null;
+        _cache.TryGetValue(obj, out info);
+        return info;
     }
 }
 
@@ -350,6 +352,11 @@ public class KDependencyBuild
     public static string BuildDepTexture(Texture tex, float scale = 1f)
     {
         Logger.Assert(tex);
+        CDepCollectInfo result = KDepCollectInfoCaching.GetCache(tex);
+        if (result != null)
+        {
+            return result.Path;
+        }
 
         string assetPath = AssetDatabase.GetAssetPath(tex);
         bool needBuild = KAssetVersionControl.TryCheckNeedBuildWithMeta(assetPath);
@@ -425,9 +432,9 @@ public class KDependencyBuild
         string path = __GetPrefabBuildPath(assetPath);
         if (string.IsNullOrEmpty(path))
             Logger.LogWarning("[BuildTexture]不是文件的Texture, 估计是Material的原始Texture?");
-        var result = DoBuildAssetBundle("Texture/Texture_" + path, newTex, needBuild);
+        result = DoBuildAssetBundle("Texture/Texture_" + path, newTex, needBuild);
 
-
+        KDepCollectInfoCaching.SetCache(tex, result);
         GC.Collect(0);
         return result.Path;
     }
