@@ -58,7 +58,7 @@ namespace KEngine.AssetDep.Editor
             }
             else
             {
-                Logger.LogWarning("找不到Label的字体: {0}", label.name);
+                Logger.LogWarning("找不到Label的字体: {0}, 场景: {1}", label.name, EditorApplication.currentScene);
             }
         }
     }
@@ -77,7 +77,7 @@ namespace KEngine.AssetDep.Editor
                 sprite.atlas = null;
             }
             else
-                Logger.LogWarning("UISprite null Atlas: {0}", sprite.name);
+                Logger.LogWarning("UISprite null Atlas: {0}, Scene: {1}", sprite.name, EditorApplication.currentScene);
         }
     }
 
@@ -127,69 +127,68 @@ namespace KEngine.AssetDep.Editor
         public static string BuildUIAtlas(UIAtlas atlas)
         {
             CDepCollectInfo result;
-            if (KDepBuildCaching.HasCache(atlas))
+            // 使用缓存，确保Atlas不会重复处理，浪费性能
+            if (KDepCollectInfoCaching.HasCache(atlas))
             {
-                result = KDepBuildCaching.GetCache(atlas);
+                result = KDepCollectInfoCaching.GetCache(atlas);
+                return result.Path;
             }
-            else
+            var scale = 1f; // TODO: scale read
+            GameObject atlasPrefab = PrefabUtility.FindPrefabRoot(atlas.gameObject) as GameObject;
+            Logger.Assert(atlasPrefab);
+            string path = AssetDatabase.GetAssetPath(atlasPrefab); // prefab只用来获取路径，不打包不挖空
+            bool needBuild = KAssetVersionControl.TryCheckNeedBuildWithMeta(path);
+            if (needBuild)
+                KAssetVersionControl.TryMarkBuildVersion(path);
+
+            Logger.Assert(path);
+
+            path = KDependencyBuild.__GetPrefabBuildPath(path);
+
+            GameObject copyAtlasObj = GameObject.Instantiate(atlasPrefab) as GameObject;
+
+            UIAtlas copyAtlas = copyAtlasObj.GetComponent<UIAtlas>();
+
+            if (BeforeBuildUIAtlasFilter != null)
             {
-                var scale = 1f; // TODO: scale read
-                GameObject atlasPrefab = PrefabUtility.FindPrefabRoot(atlas.gameObject) as GameObject;
-                Logger.Assert(atlasPrefab);
-                string path = AssetDatabase.GetAssetPath(atlasPrefab); // prefab只用来获取路径，不打包不挖空
-                bool needBuild = KAssetVersionControl.TryCheckNeedBuildWithMeta(path);
-                if (needBuild)
-                    KAssetVersionControl.TryMarkBuildVersion(path);
-
-                Logger.Assert(path);
-
-                path = KDependencyBuild.__GetPrefabBuildPath(path);
-
-                GameObject copyAtlasObj = GameObject.Instantiate(atlasPrefab) as GameObject;
-
-                UIAtlas copyAtlas = copyAtlasObj.GetComponent<UIAtlas>();
-
-                if (BeforeBuildUIAtlasFilter != null)
-                {
-                    BeforeBuildUIAtlasFilter(copyAtlas);
-                }
-
-                Material cacheMat = copyAtlas.spriteMaterial;
-                string matPath = KDepBuild_Material.BuildDepMaterial(cacheMat, scale); // 缩放
-
-                // 缩放
-                copyAtlas.pixelSize = 1 / PictureScale;
-                foreach (var spriteData in copyAtlas.spriteList)
-                {
-                    spriteData.x = Mathf.FloorToInt(spriteData.x * PictureScale);
-                    spriteData.y = Mathf.FloorToInt(spriteData.y * PictureScale);
-                    spriteData.width = Mathf.FloorToInt(spriteData.width * PictureScale);
-                    spriteData.height = Mathf.FloorToInt(spriteData.height * PictureScale);
-                    spriteData.borderLeft = Mathf.FloorToInt(spriteData.borderLeft * PictureScale);
-                    spriteData.borderRight = Mathf.FloorToInt(spriteData.borderRight * PictureScale);
-                    spriteData.borderTop = Mathf.FloorToInt(spriteData.borderTop * PictureScale);
-                    spriteData.borderBottom = Mathf.FloorToInt(spriteData.borderBottom * PictureScale);
-                    // padding 不变， ngui bug
-                    spriteData.paddingBottom = Mathf.FloorToInt(spriteData.paddingBottom * PictureScale);
-                    spriteData.paddingTop = Mathf.FloorToInt(spriteData.paddingTop * PictureScale);
-                    spriteData.paddingLeft = Mathf.FloorToInt(spriteData.paddingLeft * PictureScale);
-                    spriteData.paddingRight = Mathf.FloorToInt(spriteData.paddingRight * PictureScale);
-                }
-
-                KAssetDep.Create<KUIAtlasDep>(copyAtlas, matPath);
-
-                copyAtlas.spriteMaterial = null; // 挖空atlas
-
-                result = KDependencyBuild.DoBuildAssetBundle("UIAtlas/UIAtlas_" + path, copyAtlasObj, needBuild); // Build主对象, 被挖空Material了的
-
-                if (AfterBuildUIAtlasFilter != null)
-                {
-                    AfterBuildUIAtlasFilter(copyAtlas);
-                }
-                GameObject.DestroyImmediate(copyAtlasObj);
-
+                BeforeBuildUIAtlasFilter(copyAtlas);
             }
 
+            Material cacheMat = copyAtlas.spriteMaterial;
+            string matPath = KDepBuild_Material.BuildDepMaterial(cacheMat, scale); // 缩放
+
+            // 缩放
+            copyAtlas.pixelSize = 1 / PictureScale;
+            foreach (var spriteData in copyAtlas.spriteList)
+            {
+                spriteData.x = Mathf.FloorToInt(spriteData.x * PictureScale);
+                spriteData.y = Mathf.FloorToInt(spriteData.y * PictureScale);
+                spriteData.width = Mathf.FloorToInt(spriteData.width * PictureScale);
+                spriteData.height = Mathf.FloorToInt(spriteData.height * PictureScale);
+                spriteData.borderLeft = Mathf.FloorToInt(spriteData.borderLeft * PictureScale);
+                spriteData.borderRight = Mathf.FloorToInt(spriteData.borderRight * PictureScale);
+                spriteData.borderTop = Mathf.FloorToInt(spriteData.borderTop * PictureScale);
+                spriteData.borderBottom = Mathf.FloorToInt(spriteData.borderBottom * PictureScale);
+                // padding 不变， ngui bug
+                spriteData.paddingBottom = Mathf.FloorToInt(spriteData.paddingBottom * PictureScale);
+                spriteData.paddingTop = Mathf.FloorToInt(spriteData.paddingTop * PictureScale);
+                spriteData.paddingLeft = Mathf.FloorToInt(spriteData.paddingLeft * PictureScale);
+                spriteData.paddingRight = Mathf.FloorToInt(spriteData.paddingRight * PictureScale);
+            }
+
+            KAssetDep.Create<KUIAtlasDep>(copyAtlas, matPath);
+
+            copyAtlas.spriteMaterial = null; // 挖空atlas
+
+            result = KDependencyBuild.DoBuildAssetBundle("UIAtlas/UIAtlas_" + path, copyAtlasObj, needBuild); // Build主对象, 被挖空Material了的
+
+            if (AfterBuildUIAtlasFilter != null)
+            {
+                AfterBuildUIAtlasFilter(copyAtlas);
+            }
+            GameObject.DestroyImmediate(copyAtlasObj);
+
+            KDepCollectInfoCaching.SetCache(atlas, result);
             return result.Path;
         }
 
@@ -198,9 +197,15 @@ namespace KEngine.AssetDep.Editor
         /// </summary>
         public static string BuildUIFont(UIFont uiFont)
         {
+            CDepCollectInfo result;
+            if (KDepCollectInfoCaching.HasCache(uiFont))
+            {
+                result = KDepCollectInfoCaching.GetCache(uiFont);
+                return result.Path;
+            }
             if (uiFont.atlas == null)
             {
-                Logger.LogError("[BuildUIFont]uiFont Null Atlas: {0}", uiFont.name);
+                Logger.LogError("[BuildUIFont]uiFont Null Atlas: {0}, Scene: {1}", uiFont.name, EditorApplication.currentScene);
                 return "";
             }
             string uiFontPrefabPath = AssetDatabase.GetAssetPath(uiFont.gameObject);
@@ -217,10 +222,10 @@ namespace KEngine.AssetDep.Editor
             //CResourceDependencies.Create(copyUIFont, CResourceDependencyType.NGUI_UIFONT, uiAtlas);
             KAssetDep.Create<KUIFontDep>(copyUIFont, uiAtlas);
 
-            var result = KDependencyBuild.DoBuildAssetBundle("UIFont/UIFont_" + uiFont.name, copyUIFontObj, needBuild);
+            result = KDependencyBuild.DoBuildAssetBundle("UIFont/UIFont_" + uiFont.name, copyUIFontObj, needBuild);
 
             GameObject.DestroyImmediate(copyUIFontObj);
-
+            KDepCollectInfoCaching.SetCache(uiFont, result);
             return result.Path;
         }
 
