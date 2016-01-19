@@ -26,6 +26,7 @@
 
 using System.Text.RegularExpressions;
 using KEngine.Editor;
+using KEngine.ResourceDep;
 using UnityEditor;
 using UnityEngine;
 #if NGUI
@@ -62,14 +63,23 @@ public class KBuild_NGUI_AssetDep
     static void Custom_ExportCurrentUI(KBuild_NGUI uiBuilder, string uiScenepath, string uiName,
         GameObject objToBuild)
     {
-        bool reBuildPanel = KAssetVersionControl.TryCheckNeedBuildWithMeta(uiScenepath);
+        KResourceDepBuilder.Clear();
+        var info = KResourceDepBuilder.BuildGameObject(objToBuild);
 
-        KDependencyBuild.BuildGameObject(objToBuild, KBuild_NGUI.GetBuildRelPath(uiName), reBuildPanel);
+        foreach (var path in info.DepAssetPaths)
+        {
+            Debug.Log(path);
+        }
 
-        if (reBuildPanel)
-            KAssetVersionControl.TryMarkBuildVersion(uiScenepath);
+        KResourceDepBuilder.Clear();
+        //bool reBuildPanel = KAssetVersionControl.TryCheckNeedBuildWithMeta(uiScenepath);
 
-        _FindLabelLocalization(uiBuilder);
+        //KDependencyBuild.BuildGameObject(objToBuild, KBuild_NGUI.GetBuildRelPath(uiName), reBuildPanel);
+
+        //if (reBuildPanel)
+        //    KAssetVersionControl.TryMarkBuildVersion(uiScenepath);
+
+        //_FindLabelLocalization(uiBuilder);
     }
 
 
