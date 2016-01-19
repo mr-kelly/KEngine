@@ -34,7 +34,7 @@ using UnityEngine;
 /// Load from a AssetBundles..
 /// </summary>
 [CDependencyClass(typeof (KResourceModule))]
-public class KSettingManager : IModule
+public class KSettingManager : KEngine.IModule
 {
     private static KSettingManager _Instance;
 

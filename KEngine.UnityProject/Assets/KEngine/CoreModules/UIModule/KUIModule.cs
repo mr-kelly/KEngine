@@ -34,7 +34,7 @@ using UnityEngine;
 /// UI Module
 /// </summary>
 [CDependencyClass(typeof (KResourceModule))]
-public class KUIModule : IModule
+public class KUIModule : KEngine.IModule
 {
     private class _InstanceClass
     {

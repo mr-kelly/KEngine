@@ -178,6 +178,7 @@ namespace KEngine.Installer
             var srcEngineDllPath = Path.Combine(gitPath, "Build/Release/KEngine.dll");
             var srcEngineEditorDllPath = Path.Combine(gitPath, "Build/Release/KEngine.Editor.dll");
             var srcEngineEditorCodePath = Path.Combine(gitPath, @"KEngine.UnityProject\Assets\KEngine.Editor\Editor");
+            var srcEngineEditorToolCodePath = Path.Combine(gitPath, @"KEngine.UnityProject\Assets\KEngine.EditorTools\Editor");
 
             var dlls = new string[]
             {
@@ -210,8 +211,8 @@ namespace KEngine.Installer
             if (InstallType == KEngineInstallType.Dll)
             {
                 CopyDll(srcEngineLibDllPath, KEngineInstallDirPath);
-                CopyDll(srcEngineDllPath, KEngineInstallDirPath);
                 CopyDll(Path.Combine(gitPath, "Build/Release/ICSharpCode.SharpZipLib.dll"), KEngineInstallDirPath); // 3rd lib
+                CopyDll(srcEngineDllPath, KEngineInstallDirPath);
 
                 CopyDll(srcEngineEditorDllPath, KEngineEditorInstallDirPath);
                 CopyEditorLib(gitPath, KEngineEditorInstallDirPath);// 3rd lib
@@ -222,7 +223,9 @@ namespace KEngine.Installer
                 CopyFolder(srcEngineLibCodePath, KEngineInstallDirPath + "/KEngine.Lib");
                 CopyFolder(srcEngineCodePath, KEngineInstallDirPath + "/KEngine");
                 CopyFolder(srcEngineEditorCodePath, KEngineEditorInstallDirPath + "/KEngine.Editor");
-                CopyFolder(srcEngineEditorCodePath, KEngineEditorInstallDirPath + "/KEngine.EditorTools");
+                CopyFolder(srcEngineEditorToolCodePath, KEngineEditorInstallDirPath + "/KEngine.EditorTools");
+
+                CopyEditorLib(gitPath, KEngineEditorInstallDirPath);// 3rd lib
             }
 
             Debug.Log("Install KEngine Successed!");

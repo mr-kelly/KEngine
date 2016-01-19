@@ -352,6 +352,23 @@ public abstract class KAssetDep : MonoBehaviour
     }
 
     /// <summary>
+    /// 同步，立刻处理完依赖
+    /// </summary>
+    /// <param name="obj"></param>
+    //public static void WaitDepSync(GameObject obj)
+    //{
+    //    KAssetDep[] deps = obj.GetComponentsInChildren<KAssetDep>(true); // GetAll
+    //    var depsCount = deps.Length;
+    //    for (var i = 0; i < depsCount; i++)
+    //    {
+    //        var dep = deps[i];
+    //        if (!dep._NewIsInit)
+    //            dep.Init();
+    //    }
+
+    //}
+
+    /// <summary>
     /// 等待一个对象完整的依赖加载完毕，包括其孩子的依赖
     /// </summary>
     /// <param name="obj"></param>

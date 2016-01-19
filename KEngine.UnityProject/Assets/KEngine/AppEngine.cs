@@ -84,7 +84,7 @@ namespace KEngine
         /// <summary>
         /// Modules passed from the CosmosEngine.New function. All your custom game logic modules
         /// </summary>
-        public IModule[] GameModules { get; private set; }
+        public KEngine.IModule[] GameModules { get; private set; }
 
         /// <summary>
         /// 是否初始化完成
@@ -157,7 +157,7 @@ namespace KEngine
         /// </summary>
         private IEnumerator DoInit()
         {
-            var baseModules = new IModule[]
+            var baseModules = new KEngine.IModule[]
             {
                 // 基础2件套
                 KResourceModule.Instance,
