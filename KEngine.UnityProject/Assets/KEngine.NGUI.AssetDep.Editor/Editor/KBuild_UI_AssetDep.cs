@@ -26,25 +26,25 @@
 
 using System.Text.RegularExpressions;
 using KEngine.Editor;
-using KEngine.ResourceDep;
 using UnityEditor;
 using UnityEngine;
 #if NGUI
+using KEngine.ResourceDep;
 [InitializeOnLoad]
 public class KBuild_NGUI_AssetDep
 {
     static KBuild_NGUI_AssetDep()
     {
-        KBuild_NGUI.BeginExportEvent -= Custom_BeginExport;
-        KBuild_NGUI.BeginExportEvent += Custom_BeginExport;
-        KBuild_NGUI.EndExportEvent -= Custom_EndExport;
-        KBuild_NGUI.EndExportEvent += Custom_EndExport;
+        KBuild_NGUI_ResourceDep.BeginExportEvent -= Custom_BeginExport;
+        KBuild_NGUI_ResourceDep.BeginExportEvent += Custom_BeginExport;
+        KBuild_NGUI_ResourceDep.EndExportEvent -= Custom_EndExport;
+        KBuild_NGUI_ResourceDep.EndExportEvent += Custom_EndExport;
 
-        KBuild_NGUI.ExportCurrentUIEvent -= Custom_ExportCurrentUI;
-        KBuild_NGUI.ExportCurrentUIEvent += Custom_ExportCurrentUI;
+        KBuild_NGUI_ResourceDep.ExportCurrentUIEvent -= Custom_ExportCurrentUI;
+        KBuild_NGUI_ResourceDep.ExportCurrentUIEvent += Custom_ExportCurrentUI;
 
-        KBuild_NGUI.ExportUIMenuEvent -= Custom_ExportUIMenu;
-        KBuild_NGUI.ExportUIMenuEvent += Custom_ExportUIMenu;
+        KBuild_NGUI_ResourceDep.ExportUIMenuEvent -= Custom_ExportUIMenu;
+        KBuild_NGUI_ResourceDep.ExportUIMenuEvent += Custom_ExportUIMenu;
         //EndExportEvent -= Custom_
     }
 
@@ -60,10 +60,9 @@ public class KBuild_NGUI_AssetDep
     private static readonly Regex TemplateRegex = new Regex(@"\{(.+)\}");
 
     // 针对当前打开的单个UI
-    static void Custom_ExportCurrentUI(KBuild_NGUI uiBuilder, string uiScenepath, string uiName,
+    static void Custom_ExportCurrentUI(KBuild_NGUI_ResourceDep uiBuilder, string uiScenepath, string uiName,
         GameObject objToBuild)
     {
-        KResourceDepBuilder.Clear();
         var info = KResourceDepBuilder.BuildGameObject(objToBuild);
 
         foreach (var path in info.DepAssetPaths)
@@ -71,10 +70,9 @@ public class KBuild_NGUI_AssetDep
             Debug.Log(path);
         }
 
-        KResourceDepBuilder.Clear();
         //bool reBuildPanel = KAssetVersionControl.TryCheckNeedBuildWithMeta(uiScenepath);
 
-        //KDependencyBuild.BuildGameObject(objToBuild, KBuild_NGUI.GetBuildRelPath(uiName), reBuildPanel);
+        //KDependencyBuild.BuildGameObject(objToBuild, KBuild_NGUI_ResourceDep.GetBuildRelPath(uiName), reBuildPanel);
 
         //if (reBuildPanel)
         //    KAssetVersionControl.TryMarkBuildVersion(uiScenepath);
@@ -83,7 +81,7 @@ public class KBuild_NGUI_AssetDep
     }
 
 
-    static void Custom_BeginExport(KBuild_NGUI uiBuilder)
+    static void Custom_BeginExport(KBuild_NGUI_ResourceDep uiBuilder)
     {
         // 读取字符串
         //uiBuilder.UILabelStrings.Clear();
@@ -104,8 +102,9 @@ public class KBuild_NGUI_AssetDep
     }
 
     // big export
-    private static void Custom_EndExport(KBuild_NGUI uiBuilder)
+    private static void Custom_EndExport(KBuild_NGUI_ResourceDep uiBuilder)
     {
+        KResourceDepBuilder.Clear();
         //KI18NItems exportHashSet;
         //if (uiBuilder.IsBuildAll)
         //{
@@ -129,7 +128,7 @@ public class KBuild_NGUI_AssetDep
         //uiBuilder.UIStringsFile.Save(UILabelStringsFile);
     }
 
-    private static void _FindLabelLocalization(KBuild_NGUI uiBuilder)
+    private static void _FindLabelLocalization(KBuild_NGUI_ResourceDep uiBuilder)
     {
         // 收集UiLabel的字符串
         //if (uiBuilder.WindowObject.GetComponent<UIPanel>() == null)

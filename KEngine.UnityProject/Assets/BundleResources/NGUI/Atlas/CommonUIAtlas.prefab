@@ -42,7 +42,7 @@ MonoBehaviour:
   material: {fileID: 2100000, guid: aae11c35f37ee744baaacac45803edf5, type: 2}
   mSprites:
   - name: button_green
-    x: 230
+    x: 0
     y: 329
     width: 229
     height: 93
@@ -68,7 +68,7 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: button_red
-    x: 0
+    x: 230
     y: 329
     width: 229
     height: 93

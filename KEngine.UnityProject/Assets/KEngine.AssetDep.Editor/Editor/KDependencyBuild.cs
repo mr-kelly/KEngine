@@ -238,7 +238,7 @@ public class KDependencyBuild
         }
 
         // Build主对象
-        DoBuildAssetBundle(path, buildObj, buildSelf); // TODO: BuildResult...
+        DoBuildAssetBundle(path, buildObj, buildSelf); // TODO: BuildBundleResult...
 
         if (instantiateObjectToBuild)
             if (!keepCopyObjToDebug)

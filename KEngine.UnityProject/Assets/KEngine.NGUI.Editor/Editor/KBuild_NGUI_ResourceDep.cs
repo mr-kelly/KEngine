@@ -3,7 +3,7 @@
 // KEngine - Toolset and framework for Unity3D
 // ===================================
 // 
-// Filename: KBuild_NGUI.cs
+// Filename: KBuild_NGUI_ResourceDep.cs
 // Date:     2015/12/03
 // Author:  Kelly
 // Email: 23110388@qq.com
@@ -32,7 +32,7 @@ using KEngine.Editor;
 using UnityEditor;
 using UnityEngine;
 
-public partial class KBuild_NGUI : KBuild_Base
+public partial class KBuild_NGUI_ResourceDep : KBuild_Base
 {
     private string UIScenePath
     {
@@ -56,10 +56,10 @@ public partial class KBuild_NGUI : KBuild_Base
         return "*.unity";
     }
 
-    public static event Action<KBuild_NGUI> BeginExportEvent;
-    public static event Action<KBuild_NGUI, string, string, GameObject> ExportCurrentUIEvent;
+    public static event Action<KBuild_NGUI_ResourceDep> BeginExportEvent;
+    public static event Action<KBuild_NGUI_ResourceDep, string, string, GameObject> ExportCurrentUIEvent;
     public static event Action ExportUIMenuEvent;
-    public static event Action<KBuild_NGUI> EndExportEvent;
+    public static event Action<KBuild_NGUI_ResourceDep> EndExportEvent;
 
     public static string GetBuildRelPath(string uiName)
     {
@@ -129,7 +129,11 @@ public partial class KBuild_NGUI : KBuild_Base
 
     private GameObject CreateTempPrefab(GameObject windowAsset)
     {
-        var tempPanelObject = (GameObject) GameObject.Instantiate(windowAsset);
+        var sceneDir = Path.GetDirectoryName(EditorApplication.currentScene);
+
+        var prefabPath = sceneDir + "/" + windowAsset.name + ".prefab";
+        //var tempPanelObject = (GameObject) GameObject.Instantiate(windowAsset);
+        var tempPanelObject = PrefabUtility.CreatePrefab(prefabPath, windowAsset);
 
         //if (WindowObject.GetComponent<UIPanel>() == null)
         //{
@@ -153,9 +157,14 @@ public partial class KBuild_NGUI : KBuild_Base
         return tempPanelObject;
     }
 
+    /// <summary>
+    /// 删除Prefab
+    /// </summary>
+    /// <param name="tempPanelObject"></param>
     private void DestroyTempPrefab(GameObject tempPanelObject)
     {
-        GameObject.DestroyImmediate(tempPanelObject);
+        AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(tempPanelObject));
+        //GameObject.DestroyImmediate(tempPanelObject);
         //AnchorObject = null;
         //WindowObject = null;
     }
@@ -282,7 +291,7 @@ public partial class KBuild_NGUI : KBuild_Base
     [MenuItem("KEngine/NGUI/Create UI %&N")]
     public static void CreateUI()
     {
-        KBuild_NGUI.CreateNewUI();
+        KBuild_NGUI_ResourceDep.CreateNewUI();
     }
 
     [MenuItem("KEngine/NGUI/Export Current UI %&U")]
@@ -291,7 +300,7 @@ public partial class KBuild_NGUI : KBuild_Base
         if (ExportUIMenuEvent != null)
             ExportUIMenuEvent();
 
-        KBuild_NGUI uiBuild = new KBuild_NGUI();
+        KBuild_NGUI_ResourceDep uiBuild = new KBuild_NGUI_ResourceDep();
         uiBuild.IsBuildAll = false;
         if (!uiBuild.CheckUI(true))
             return;
@@ -307,7 +316,7 @@ public partial class KBuild_NGUI : KBuild_Base
     [MenuItem("KEngine/NGUI/Export All UI")]
     public static void ExportAllUI()
     {
-        var buildUI = new KBuild_NGUI();
+        var buildUI = new KBuild_NGUI_ResourceDep();
         buildUI.IsBuildAll = true;
         KResourceBuilder.ProductExport(buildUI);
     }

@@ -1,13 +1,13 @@
-﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+﻿#region Copyright (c) Kingsoft Xishanju
 
-// KEngine - Toolset and framework for Unity3D
+// KEngine - Asset Bundle framework for Unity3D
 // ===================================
 // 
 // Filename: KTool.cs
-// Date:     2015/12/03
-// Author:  Kelly
-// Email: 23110388@qq.com
-// Github: https://github.com/mr-kelly/KEngine
+// Date:        2016/01/20
+// Author:     Kelly
+// Email:       23110388@qq.com
+// Github:     https://github.com/mr-kelly/KEngine
 // 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -1416,7 +1416,6 @@ public static class KEngineToolExtensions
     }
 
     /// <summary>
-    /// 
     /// </summary>
     /// <param name="source"></param>
     /// <typeparam name="T"></typeparam>
@@ -1501,6 +1500,7 @@ public static class KEngineToolExtensions
         }
         return result;
     }
+
     /// <summary>
     /// == Linq Last
     /// </summary>
@@ -1527,6 +1527,23 @@ public static class KEngineToolExtensions
         }
 
         return items;
+    }
+
+    /// <summary>
+    /// HashSet AddRange
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="this"></param>
+    /// <param name="items"></param>
+    /// <returns></returns>
+    public static bool AddRange<T>(this HashSet<T> @this, IEnumerable<T> items)
+    {
+        bool allAdded = true;
+        foreach (T item in items)
+        {
+            allAdded &= @this.Add(item);
+        }
+        return allAdded;
     }
 
     public static T[] KToArray<T>(this IEnumerable<T> source)

@@ -124,98 +124,30 @@ public class KAssetBundleLoader : KAbstractResourceLoader
             NewAssetBundleLoaderEvent(url);
 
         RelativeResourceUrl = url;
-        if (KResourceModule.GetResourceFullPath(url, out FullUrl, _inAppPathType))
-        {
-            KResourceModule.LogRequest("AssetBundle", FullUrl);
-            KResourceModule.Instance.StartCoroutine(LoadAssetBundle(url));
-        }
-        else
-        {
-            if (Debug.isDebugBuild)
-                Logger.LogError("[KAssetBundleLoader]Error Path: {0}", url);
-            OnFinish(null);
-        }
+        KResourceModule.LogRequest("AssetBundle", FullUrl);
+        KResourceModule.Instance.StartCoroutine(LoadAssetBundle(url));
     }
     private IEnumerator LoadAssetBundle(string relativeUrl)
     {
-        byte[] bundleBytes;
-        if (_inAppPathType == KResourceInAppPathType.StreamingAssetsPath)
+        var bytesLoader = KBytesLoader.Load(relativeUrl, _inAppPathType, _loaderMode);
+        while (!bytesLoader.IsCompleted)
         {
-            _wwwLoader = KWWWLoader.Load(FullUrl);
-            while (!_wwwLoader.IsCompleted)
-            {
-                Progress = _wwwLoader.Progress/2f; // 最多50%， 要算上Parser的嘛
-                yield return null;
-            }
-
-            if (!_wwwLoader.IsSuccess)
-            {
-                if (AssetBundlerLoaderErrorEvent != null)
-                {
-                    AssetBundlerLoaderErrorEvent(this);
-                }
-                Logger.LogError("[KAssetBundleLoader]Error Load AssetBundle: {0}", relativeUrl);
-                OnFinish(null);
-                yield break;
-            }
-
-            bundleBytes = _wwwLoader.Www.bytes;
+            yield return null;
         }
-        else if (_inAppPathType == KResourceInAppPathType.ResourcesAssetsPath) // 使用Resources文件夹模式
+        if (!bytesLoader.IsSuccess)
         {
-            var pathExt = Path.GetExtension(FullUrl); // Resources.Load无需扩展名
-            var pathWithoutExt = FullUrl.Substring(0,
-                FullUrl.Length - pathExt.Length);
-            if (_loaderMode == KAssetBundleLoaderMode.ResourcesLoad)
+            if (AssetBundlerLoaderErrorEvent != null)
             {
-                var textAsset = Resources.Load<TextAsset>(pathWithoutExt);
-                if (textAsset == null)
-                {
-                    if (AssetBundlerLoaderErrorEvent != null)
-                        AssetBundlerLoaderErrorEvent(this);
-                    Logger.LogError("[LoadAssetBundle]Cannot Resources.Load from : {0}", pathWithoutExt);
-                    OnFinish(null);
-                    yield break;
-                }
-
-                bundleBytes = textAsset.bytes;
+                AssetBundlerLoaderErrorEvent(this);
             }
-            else if (_loaderMode == KAssetBundleLoaderMode.ResourcesLoadAsync)
-            {
-                var loadReq = Resources.LoadAsync<TextAsset>(pathWithoutExt);
-                while (!loadReq.isDone)
-                {
-                    Progress = loadReq.progress/2f; // 最多50%， 要算上Parser的嘛
-                }
-                var loadAsset = loadReq.asset;
-                var loadTextAsset = loadAsset as TextAsset;
-                if (loadTextAsset == null)
-                {
-                    if (AssetBundlerLoaderErrorEvent != null)
-                        AssetBundlerLoaderErrorEvent(this);
-                    Logger.LogError("[KAssetBundleLoader]Error Resources.LoadAsync: {0}", relativeUrl);
-                    OnFinish(null);
-                    yield break;
-                }
-                bundleBytes = loadTextAsset.bytes;
-            }
-            else
-            {
-                if (AssetBundlerLoaderErrorEvent != null)
-                    AssetBundlerLoaderErrorEvent(this);
-                Logger.LogError("[LoadAssetBundle]Unvalid LoaderMode on Resources Load Mode: {0}", _loaderMode);
-                OnFinish(null);
-                yield break;
-            }
-        }
-        else
-        {
-            Logger.LogError("[LoadAssetBundle]Error InAppPathType: {0}", KResourceModule.DefaultInAppPathType);
+            Logger.LogError("[KAssetBundleLoader]Error Load Bytes AssetBundle: {0}", relativeUrl);
             OnFinish(null);
-            yield break;
+            yield break; 
         }
 
+        byte[] bundleBytes = bytesLoader.Bytes;
         Progress = 1/2f;
+        bytesLoader.Release(); // 字节用完就释放
 
         BundleParser = new KAssetBundleParser(RelativeResourceUrl, bundleBytes);
         while (!BundleParser.IsFinished)

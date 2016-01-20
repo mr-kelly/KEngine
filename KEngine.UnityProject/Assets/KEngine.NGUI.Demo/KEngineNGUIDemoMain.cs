@@ -24,6 +24,7 @@
 
 #endregion
 
+using System.Collections;
 using KEngine;
 using KEngine.CoreModules;
 using UnityEngine;
@@ -31,11 +32,11 @@ using UnityEngine;
 public class KEngineNGUIDemoMain : MonoBehaviour
 {
     // Use this for initialization
-    private void Start()
+    private IEnumerator Start()
     {
         //KGameSettings.Instance.InitAction += OnGameSettingsInit;
 
-        KEngine.AppEngine.New(
+        var app = KEngine.AppEngine.New(
             gameObject,
             new IModule[]
             {
@@ -43,13 +44,18 @@ public class KEngineNGUIDemoMain : MonoBehaviour
             },
             null,
             null);
-
+        while (!app.IsInited)
+            yield return null;
         KUIModule.Instance.OpenWindow<KUITestWindow>();
 
         KUIModule.Instance.CallUI<KUITestWindow>(ui =>
         {
             // Do some UI stuff
         });
+
+        yield return new WaitForSeconds(2f);
+
+        KUIModule.Instance.OpenWindow<KUITestSubWindow>();
     }
 
     // Update is called once per frame

@@ -27,6 +27,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using KEngine;
 using UnityEngine;
 
@@ -357,8 +358,6 @@ public class KUIModule : KEngine.IModule
         }
         Logger.Assert(!UIWindows.ContainsKey(windowTemplateName));
 
-        string path = string.Format("UI/{0}_UI{1}", windowTemplateName, KEngine.AppEngine.GetConfig("AssetBundleExt"));
-
         CUILoadState openState = new CUILoadState(windowTemplateName, windowTemplateName);
         openState.IsStaticUI = true;
         openState.OpenArgs = args;
@@ -366,22 +365,47 @@ public class KUIModule : KEngine.IModule
         //if (openState.IsLoading)
         openState.OpenWhenFinish = openWhenFinish;
 
-        KResourceModule.Instance.StartCoroutine(LoadUIAssetBundle(path, windowTemplateName, openState));
+        KResourceModule.Instance.StartCoroutine(LoadUIAssetBundle(windowTemplateName, openState));
 
         UIWindows.Add(windowTemplateName, openState);
 
         return openState;
     }
 
-    private IEnumerator LoadUIAssetBundle(string path, string name, CUILoadState openState)
+    private IEnumerator LoadUIAssetBundle(string name, CUILoadState openState)
     {
         LoadingUICount++;
+
+        // 具体加载逻辑
+        // manifest
+        string manifestPath = string.Format("BundleResources/NGUI/{0}.prefab.manifest{1}", name,
+            AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt));
+        var manifestLoader = KBytesLoader.Load(manifestPath, KResourceInAppPathType.ResourcesAssetsPath, KAssetBundleLoaderMode.ResourcesLoad);
+        while (!manifestLoader.IsCompleted)
+            yield return null;
+        var manifestBytes = manifestLoader.Bytes;
+        manifestLoader.Release(); // 释放掉文本字节
+        var utf8NoBom = new UTF8Encoding(false);
+        var manifestList = utf8NoBom.GetString(manifestBytes).Split(new char[] {'\n'}, StringSplitOptions.RemoveEmptyEntries);
+        for (var i = 0; i < manifestList.Length; i++)
+        {
+            var depPath = manifestList[i] + AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt);
+            var depLoader = KAssetFileLoader.Load(depPath);
+            while (!depLoader.IsCompleted)
+            {
+                yield return null;
+            }
+
+        }
+        string path = string.Format("BundleResources/NGUI/{0}.prefab{1}", name, KEngine.AppEngine.GetConfig("AssetBundleExt"));
+
         var assetLoader = KStaticAssetLoader.Load(path);
         openState.UIResourceLoader = assetLoader; // 基本不用手工释放的
         while (!assetLoader.IsCompleted)
             yield return null;
 
         GameObject uiObj = (GameObject) assetLoader.TheAsset;
+        // 具体加载逻辑结束...这段应该放到Bridge里
 
         uiObj.SetActive(false);
         uiObj.name = openState.TemplateName;
@@ -396,6 +420,7 @@ public class KUIModule : KEngine.IModule
 
         openState.IsLoading = false; // Load完
         InitWindow(openState, uiBase, openState.OpenWhenFinish, openState.OpenArgs);
+
         LoadingUICount--;
     }
 

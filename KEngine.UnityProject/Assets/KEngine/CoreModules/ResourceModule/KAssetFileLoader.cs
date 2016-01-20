@@ -156,7 +156,6 @@ public class KAssetFileLoader : KAbstractResourceLoader
                 Logger.LogError("Asset is NULL: {0}", path);
             }
 
-            _bundleLoader.Release(); // 释放Bundle(WebStream)
         }
 
         if (Application.isEditor)
@@ -176,6 +175,8 @@ public class KAssetFileLoader : KAbstractResourceLoader
     protected override void DoDispose()
     {
         base.DoDispose();
+
+        _bundleLoader.Release(); // 释放Bundle(WebStream)
         //if (IsFinished)
         {
             if (!IsLoadAssetBundle)
