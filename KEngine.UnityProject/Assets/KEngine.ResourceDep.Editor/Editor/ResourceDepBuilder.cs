@@ -473,6 +473,13 @@ namespace KEngine.ResourceDep.Builder
         }
 
         /// <summary>
+        /// 过滤，可以从一个对象，到另一个对象
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public delegate UnityEngine.Object BuildFilter(UnityEngine.Object obj);
+
+        /// <summary>
         /// 打包一个UnityEngine.Object，会自动先设置成Prefab
         /// </summary>
         /// <param name="unityObject"></param>
@@ -481,12 +488,21 @@ namespace KEngine.ResourceDep.Builder
         {
             var type = unityObject.ToString();
 
-            //if (type.Contains("UnityEngine.SceneAsset"))
-            //{
-            //    Debug.Log("TODO: Scene " + AssetDatabase.GetAssetPath(unityObject));
-            //}
             if (type.Contains("UnityEngine.DefaultAsset"))
             {
+                var dirPath = AssetDatabase.GetAssetPath(unityObject);
+                foreach (var file in Directory.GetFiles(dirPath, "*", SearchOption.AllDirectories))
+                {
+                    var ext = Path.GetExtension(file);
+                    if (ext == ".meta") continue;
+                    var cleanPath = file.Replace("\\", "/");
+                    var obj = AssetDatabase.LoadAssetAtPath(cleanPath, typeof (UnityEngine.Object));
+                    if (obj == null)
+                    {
+                        throw new Exception("Not found asset: " + cleanPath);
+                    }
+                    BuildObject(obj);
+                }
                 Debug.Log("TODO: directory " + AssetDatabase.GetAssetPath(unityObject));
             }
             else
@@ -497,84 +513,10 @@ namespace KEngine.ResourceDep.Builder
         }
 
         /// <summary>
-        /// 打包一个GameObject，会自动先设置成Prefab
+        /// 获取资源后缀类型，这个类型还可用于排序、辨识
         /// </summary>
-        /// <param name="buildObj"></param>
+        /// <param name="obj"></param>
         /// <returns></returns>
-        //public static ResourceDepInfo BuildGameObject(GameObject buildObj)
-        //{
-        //    var assetPath = AssetDatabase.GetAssetPath(buildObj);
-
-        //    // 是否临时创建Prefab的标识变量，最后会对临时生成的文件或文件夹进行清理
-        //    string tmpDirPath = null;
-        //    string tmpPrefabPath = null;
-        //    if (string.IsNullOrEmpty(assetPath))
-        //    {
-        //        var scenePath = EditorApplication.currentScene;
-        //        tmpDirPath = Path.Combine(Path.GetDirectoryName(scenePath), Path.GetFileNameWithoutExtension(EditorApplication.currentScene));
-        //        if (!Directory.Exists(tmpDirPath))
-        //        {
-        //            Directory.CreateDirectory(tmpDirPath);
-        //            TempDirs.Add(tmpDirPath);
-        //        }
-        //        tmpPrefabPath = tmpDirPath + "/" + buildObj.name + ".prefab";
-
-        //        TempFiles.Add(tmpPrefabPath);
-
-        //        // 非Prefab创建Prefab
-        //        Logger.LogWarning("遇到场景GameObject，创建Prefab: {0}", tmpPrefabPath);
-        //        buildObj = PrefabUtility.CreatePrefab(tmpPrefabPath, buildObj);// 成prefab了
-        //        assetPath = AssetDatabase.GetAssetPath(buildObj); // get prefab asset path
-        //    }
-
-        //    var depInfo = new ResourceDepInfo();
-
-        //    if (_cachedDepBuildClassAttributes == null)
-        //    {
-        //        _cachedDepBuildClassAttributes = new Dictionary<IBuilderProcessor, ResourceBuildClassAttribute>();
-        //        foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
-        //        {
-        //            foreach (var processorType in asm.GetTypes())
-        //            {
-        //                var depBuildClassAttrs = processorType.GetCustomAttributes(typeof(ResourceBuildClassAttribute),
-        //                    false);
-        //                if (depBuildClassAttrs.Length > 0)
-        //                {
-        //                    foreach (var attr in depBuildClassAttrs)
-        //                    {
-        //                        var depBuildAttr = (ResourceBuildClassAttribute)attr;
-        //                        var depBuildProcessor =
-        //                            Activator.CreateInstance(processorType) as IBuilderProcessor;
-        //                        _cachedDepBuildClassAttributes[depBuildProcessor] = depBuildAttr;
-        //                        break;
-        //                    }
-        //                }
-        //            }
-        //        }
-        //    }
-
-        //    // 依赖处理
-        //    foreach (var kv in _cachedDepBuildClassAttributes)
-        //    {
-        //        var depAttr = kv.Value;
-        //        var processor = kv.Key;
-
-        //        foreach (Component component in buildObj.GetComponentsInChildren(depAttr.ClassType, true))
-        //        {
-        //            depInfo.DepAssetPaths.AddRange(processor.Process(component));
-        //        }
-        //    }
-
-        //    BuildPipeline.PushAssetDependencies();
-        //    BuildAssetBundle(buildObj, buildPath, depObjectsMap);
-        //    BuildPipeline.PopAssetDependencies();
-
-        //    Debug.Log(buildObj.name);
-
-        //    Debug.Log(string.Join("\n", depObjectsMap.ToArray()));
-
-        //    return depInfo;
-        //}
         public static AssetExtType GetAssetExtType(UnityEngine.Object obj)
         {
             var unityAssetPath = AssetDatabase.GetAssetPath(obj);
@@ -690,7 +632,7 @@ namespace KEngine.ResourceDep.Builder
             //t.Start();
         }
 
-        [MenuItem("Assets/Build Asset Bundles", false, 1000)]
+        [MenuItem("Assets/Build Asset Bundles with KEngine.ResourceDep", false, 1000)]
         public static void MenuBuildUnityObject()
         {
             var objs = Selection.objects;
@@ -705,7 +647,7 @@ namespace KEngine.ResourceDep.Builder
             Clear();
         }
 
-        [MenuItem("Assets/Build Asset Bundles (Rebuild Version)", false, 1001)]
+        [MenuItem("Assets/Build Asset Bundles with KEngine.ResourceDep (Rebuild Version)", false, 1001)]
         public static void MenuBuildUnityObjectRebuild()
         {
             using (new KAssetVersionControl(true))
@@ -714,7 +656,7 @@ namespace KEngine.ResourceDep.Builder
             }
         }
 
-        [MenuItem("Assets/Build Asset Bundles (Diff Version)", false, 1002)]
+        [MenuItem("Assets/Build Asset Bundles with KEngine.ResourceDep (Diff Version)", false, 1002)]
         public static void MenuBuildUnityObjectDiff()
         {
             using (new KAssetVersionControl(false))
