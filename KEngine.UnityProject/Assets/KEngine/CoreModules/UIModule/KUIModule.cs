@@ -29,6 +29,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using KEngine;
+using KEngine.ResourceDep;
 using UnityEngine;
 
 /// <summary>
@@ -378,8 +379,8 @@ public class KUIModule : KEngine.IModule
 
         // 具体加载逻辑
         // manifest
-        string manifestPath = string.Format("BundleResources/NGUI/{0}.prefab.manifest{1}", name,
-            AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt));
+        string manifestPath = ResourceDepUtils.GetBuildPath(string.Format("BundleResources/NGUI/{0}.prefab.manifest{1}", name,
+            AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt)));
         var manifestLoader = KBytesLoader.Load(manifestPath, KResourceInAppPathType.ResourcesAssetsPath, KAssetBundleLoaderMode.ResourcesLoad);
         while (!manifestLoader.IsCompleted)
             yield return null;
@@ -397,7 +398,7 @@ public class KUIModule : KEngine.IModule
             }
 
         }
-        string path = string.Format("BundleResources/NGUI/{0}.prefab{1}", name, KEngine.AppEngine.GetConfig("AssetBundleExt"));
+        string path = ResourceDepUtils.GetBuildPath(string.Format("BundleResources/NGUI/{0}.prefab{1}", name, KEngine.AppEngine.GetConfig("AssetBundleExt")));
 
         var assetLoader = KStaticAssetLoader.Load(path);
         openState.UIResourceLoader = assetLoader; // 基本不用手工释放的

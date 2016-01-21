@@ -108,6 +108,7 @@ namespace KEngine.ResourceDep.Builder
 
         /// <summary>
         /// Build Asset Path = Unity Asset Path去掉"Assets/"
+        /// 文件名需要特殊处理， 文件名等于前面的目录拼接起来，确保文件名唯一
         /// </summary>
         /// <param name="unityAssetPath"></param>
         /// <returns></returns>
@@ -124,8 +125,7 @@ namespace KEngine.ResourceDep.Builder
 
             var relativeAssetPath = cleanAssetPath.Substring(assetPrefix.Length,
                 cleanAssetPath.Length - assetPrefix.Length);
-
-            return relativeAssetPath;
+            return ResourceDepUtils.GetBuildPath(relativeAssetPath);
         }
 
         public static IList<string> GetBuildAssetPaths(IList<CollectedDepAssetInfo> depAssetInfos)
