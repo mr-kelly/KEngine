@@ -1,10 +1,10 @@
-﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+﻿#region  Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
 
-// KEngine - Toolset and framework for Unity3D
+// KEngine - Asset Bundle framework for Unity3D
 // ===================================
 // 
 // Filename: KAssetVersionControl.cs
-// Date:     2015/12/03
+// Date:     2016/01/21
 // Author:  Kelly
 // Email: 23110388@qq.com
 // Github: https://github.com/mr-kelly/KEngine
@@ -20,7 +20,7 @@
 // Lesser General Public License for more details.
 // 
 // You should have received a copy of the GNU Lesser General Public
-// License along with this library.
+// License along with this library
 
 #endregion
 
@@ -224,6 +224,7 @@ namespace KEngine.Editor
                 return false;
             return Current.DoCheckExistRecord(strKey);
         }
+
         /// <summary>
         /// 文件类型
         /// </summary>
@@ -260,11 +261,13 @@ namespace KEngine.Editor
         {
             return StoreBuildVersion.TryGetValue(strKey, out assetMd5);
         }
+
         private bool DoCheckExistRecord(string strKey)
         {
             BuildRecord assetMd5;
             return StoreBuildVersion.TryGetValue(strKey, out assetMd5);
         }
+
         /// <summary>
         /// 检查是否需要build，
         /// 文件，要进行MD5校验
