@@ -74,6 +74,9 @@
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KAudioLoader.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KAudioLoader.cs</Link>
     </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KBytesLoader.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KBytesLoader.cs</Link>
+    </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KFontLoader.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KFontLoader.cs</Link>
     </Compile>

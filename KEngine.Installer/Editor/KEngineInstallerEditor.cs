@@ -88,6 +88,7 @@ namespace KEngine.Installer
 
         private bool _addonAssetDep = true;
         private bool _addonNGUI = true;
+        private bool _addonResourceDep = true;
         private bool _deleteKEngineConfigTxt = false;
 
         [MenuItem("KEngine/KEngine Installer")]
@@ -120,6 +121,9 @@ namespace KEngine.Installer
             _addonAssetDep = EditorGUILayout.Toggle("[Addon]Asset Dep", _addonAssetDep);
             if (_addonAssetDep)
                 _addonNGUI = EditorGUILayout.Toggle("[Addon]NGUI AssetDep", _addonNGUI);
+
+            if (_addonResourceDep)
+                _addonResourceDep = EditorGUILayout.Toggle("[Addon]Resource Dep", _addonResourceDep);
 
             EditorGUILayout.HelpBox("Select KEngine git source project to install", MessageType.Info);
 
@@ -230,6 +234,15 @@ namespace KEngine.Installer
 
             Debug.Log("Install KEngine Successed!");
 
+            // Resource Dep
+            if (_addonResourceDep)
+            {
+                var srcResourceDepDirPath = Path.Combine(gitPath, @"KEngine.UnityProject\Assets\KEngine.ResourceDep");
+                var srcResourceDepEditorDirPath = Path.Combine(gitPath, @"KEngine.UnityProject\Assets\KEngine.ResourceDep.Editor\Editor"); 
+
+                CopyFolder(srcResourceDepDirPath, KEngineInstallDirPath + "/KEngine.ResourceDep");
+                CopyFolder(srcResourceDepEditorDirPath, KEngineEditorInstallDirPath + "/KEngine.ResourceDep");
+            }
             // Asset Dep
             if (_addonAssetDep)
             {

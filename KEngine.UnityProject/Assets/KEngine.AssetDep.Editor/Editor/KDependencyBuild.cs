@@ -408,10 +408,10 @@ public class KDependencyBuild
                 //}
 
                 //newTex2D.Apply();
-                //GC.Collect();
+                //GC.CollectMaterial();
                 //// 进行缩放
                 //TextureScaler.Bilinear(newTex2D, (int) (tex.width*scale), (int) (tex.height*scale));
-                //GC.Collect();
+                //GC.CollectMaterial();
 
                 //newTex = newTex2D;
             }
@@ -515,7 +515,7 @@ public class KDependencyBuild
             //// 多线程快速，图像缩放，双线性过滤插值
             //TextureScaler.Bilinear(texture, (int)(texture.width * GameDef.PictureScale),
             //    (int)(texture.height * GameDef.PictureScale));
-            //GC.Collect();
+            //GC.CollectMaterial();
         }
 
         // card/xxx_card.box

@@ -69,10 +69,10 @@ namespace KEngine.Editor
         public void Dispose()
         {
             WriteVersion();
-            if (BuildCount > 0)
+            if (BuildedList.Count > 0)
             {
                 //ProductMd5_CurPlatform();
-                Logger.Log("一共打包了{0}個資源", BuildCount);
+                Logger.Log("一共打包了{0}個資源:\n{1}", BuildedList.Count, string.Join("\n", BuildedList.ToArray()));
             }
             else
                 Logger.Log("没有任何需要打包的资源！");
@@ -86,7 +86,7 @@ namespace KEngine.Editor
 
         private void OnAfterBuildAssetBundleEvent(Object arg1, string arg2, string arg3)
         {
-            BuildCount++;
+            //BuildedList.Add(arg3);
         }
 
         #region 资源版本管理相关
@@ -129,7 +129,7 @@ namespace KEngine.Editor
         public void WriteVersion()
         {
             string path = GetBuildVersionTab();
-                // MakeSureExportPath(VerCtrlInfo.VerFile, EditorUserBuildSettings.activeBuildTarget);
+            // MakeSureExportPath(VerCtrlInfo.VerFile, EditorUserBuildSettings.activeBuildTarget);
             KTabFile tabFile = new KTabFile();
             tabFile.NewColumn("AssetPath");
             tabFile.NewColumn("AssetMD5");
@@ -150,10 +150,10 @@ namespace KEngine.Editor
 
         private void SetupHistory()
         {
-            BuildCount = 0;
+            BuildedList.Clear();
 
             string verFile = GetBuildVersionTab();
-                //MakeSureExportPath(VerCtrlInfo.VerFile, EditorUserBuildSettings.activeBuildTarget);
+            //MakeSureExportPath(VerCtrlInfo.VerFile, EditorUserBuildSettings.activeBuildTarget);
             KTabFile tabFile;
             if (File.Exists(verFile))
             {
@@ -182,7 +182,10 @@ namespace KEngine.Editor
             return "";
         }
 
-        public static int BuildCount = 0; // 累计Build了多少次，用于版本控制时用的
+        /// <summary>
+        /// 处理过的build文件列表
+        /// </summary>
+        private List<string> BuildedList = new List<string>(); // 累计Build了多少次，用于版本控制时用的
 
         // Prefab Asset打包版本號記錄
         public static string GetBuildVersionTab()
@@ -199,6 +202,33 @@ namespace KEngine.Editor
             return Current.DoCheckBuild(filePath, true);
         }
 
+
+        /// <summary>
+        /// 只标记，无MD5比较
+        /// </summary>
+        /// <param name="strKey"></param>
+        public static void TryMarkRecord(string strKey)
+        {
+            if (Current == null) return;
+            Current.MarkRecord(strKey);
+        }
+
+        /// <summary>
+        /// 不进行文件比较，只判断是否存在
+        /// </summary>
+        /// <param name="strKey"></param>
+        /// <returns></returns>
+        public static bool TryCheckExistRecord(string strKey)
+        {
+            if (Current == null)
+                return false;
+            return Current.DoCheckExistRecord(strKey);
+        }
+        /// <summary>
+        /// 文件类型
+        /// </summary>
+        /// <param name="sourceFiles"></param>
+        /// <returns></returns>
         public static bool TryCheckNeedBuildWithMeta(params string[] sourceFiles)
         {
             if (Current == null)
@@ -221,6 +251,20 @@ namespace KEngine.Editor
             return false;
         }
 
+        /// <summary>
+        /// 只检查是否存在记录，不进行文件检查
+        /// </summary>
+        /// <param name="strKey"></param>
+        /// <returns></returns>
+        private bool DoCheckExistRecord(string strKey, out BuildRecord assetMd5)
+        {
+            return StoreBuildVersion.TryGetValue(strKey, out assetMd5);
+        }
+        private bool DoCheckExistRecord(string strKey)
+        {
+            BuildRecord assetMd5;
+            return StoreBuildVersion.TryGetValue(strKey, out assetMd5);
+        }
         /// <summary>
         /// 检查是否需要build，
         /// 文件，要进行MD5校验
@@ -246,20 +290,29 @@ namespace KEngine.Editor
                 return false;
             }
 
-
             if (InstanceBuildVersion.ContainsKey(filePath)) // 本次打包已经处理过，就不用重复处理了
                 return false;
 
             if (_isRebuild) // 所有rebuild，不用判断，直接需要build, 保留change count的正确性
                 return true;
 
-            if (!StoreBuildVersion.TryGetValue(filePath, out assetMd5))
+            // 不存在记录，则需要打包吧
+            if (!DoCheckExistRecord(filePath, out assetMd5))
                 return true;
 
             if (KTool.MD5_File(filePath) != assetMd5.MD5)
                 return true; // different
 
             return false;
+        }
+
+        /// <summary>
+        /// 只标记，不做MD5比较
+        /// </summary>
+        /// <param name="strKey"></param>
+        public void MarkRecord(string strKey)
+        {
+            StoreBuildVersion[strKey] = InstanceBuildVersion[strKey] = new BuildRecord(); // ensure in dict
         }
 
         /// <summary>
@@ -307,6 +360,8 @@ namespace KEngine.Editor
 
                     StoreBuildVersion[metaFile] = InstanceBuildVersion[metaFile] = theMetaRecord; // ensure in dict
                 }
+                // meta不记录
+                Current.BuildedList.Add(file);
             }
         }
 
@@ -314,7 +369,6 @@ namespace KEngine.Editor
         {
             if (Current == null)
                 return;
-
             Current.MarkBuildVersion(sourceFiles);
         }
 

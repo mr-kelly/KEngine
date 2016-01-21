@@ -777,7 +777,7 @@ MonoBehaviour:
   autoResizeBoxCollider: 0
   hideIfOffScreen: 0
   keepAspectRatio: 0
-  aspectRatio: 6.75757599
+  aspectRatio: 6.5454545
   keepCrispWhenShrunk: 1
   mTrueTypeFont: {fileID: 12800000, guid: b1671af9dda8ea640a906e655748738e, type: 3}
   mFont: {fileID: 0}

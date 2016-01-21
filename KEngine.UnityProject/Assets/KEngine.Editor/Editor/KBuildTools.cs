@@ -258,20 +258,22 @@ public partial class KBuildTools
 
         // 输出依赖
         var depSb = new StringBuilder();
-        var depsArray = AssetDatabase.GetDependencies(new string[] {assetPath});
+        var asset = AssetDatabase.LoadAssetAtPath(assetPath, typeof (UnityEngine.Object));
+        var depsArray = EditorUtility.CollectDependencies(new [] {asset});
         if (depsArray != null && depsArray.Length > 0)
         {
-            if (depsArray.Length == 1 && depsArray[0] == assetPath)
+            if (depsArray.Length == 1 && depsArray[0] == asset)
             {
                 // 自己依赖自己的忽略掉
             }
             else
             {
-                foreach (var depAssetPath in depsArray)
+                foreach (var depAsset in depsArray)
                 {
-                    depSb.AppendLine(depAssetPath);
+                    var depAssetPath = AssetDatabase.GetAssetPath(depAsset);
+                    depSb.AppendLine(string.Format("{0} --> {1} <{2}>", depAssetPath, depAsset.name, depAsset.GetType()));
                 }
-                Logger.Log("[BuildAssetBundle]Asset: {0} has dependencies: {1}", assetPath, depSb.ToString());
+                Logger.Log("[BuildAssetBundle]Asset: {0} has dependencies: \n{1}", assetPath, depSb.ToString());
             }
         }
     }

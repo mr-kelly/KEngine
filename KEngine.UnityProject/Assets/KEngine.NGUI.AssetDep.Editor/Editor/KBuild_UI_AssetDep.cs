@@ -29,7 +29,7 @@ using KEngine.Editor;
 using UnityEditor;
 using UnityEngine;
 #if NGUI
-using KEngine.ResourceDep;
+using KEngine.ResourceDep.Builder;
 [InitializeOnLoad]
 public class KBuild_NGUI_AssetDep
 {
@@ -63,12 +63,12 @@ public class KBuild_NGUI_AssetDep
     static void Custom_ExportCurrentUI(KBuild_NGUI_ResourceDep uiBuilder, string uiScenepath, string uiName,
         GameObject objToBuild)
     {
-        var info = KResourceDepBuilder.BuildGameObject(objToBuild);
+        var info = ResourceDepBuilder.Build(objToBuild);
 
-        foreach (var path in info.DepAssetPaths)
-        {
-            Debug.Log(path);
-        }
+        //foreach (var path in info.DepAssetPaths)
+        //{
+        //    Debug.Log(path);
+        //}
 
         //bool reBuildPanel = KAssetVersionControl.TryCheckNeedBuildWithMeta(uiScenepath);
 
@@ -104,7 +104,7 @@ public class KBuild_NGUI_AssetDep
     // big export
     private static void Custom_EndExport(KBuild_NGUI_ResourceDep uiBuilder)
     {
-        KResourceDepBuilder.Clear();
+        ResourceDepBuilder.Clear();
         //KI18NItems exportHashSet;
         //if (uiBuilder.IsBuildAll)
         //{
