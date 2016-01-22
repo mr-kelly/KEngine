@@ -24,6 +24,8 @@
 
 #endregion
 
+using System.Collections;
+using KEngine.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -49,5 +51,17 @@ public class KUGUIBridge : IKUIBridge
 
     public void UIObjectFilter(KUIController ui, GameObject uiObject)
     {
+    }
+
+    public IEnumerator LoadUIAsset(CUILoadState loadState, UILoadRequest request)
+    {
+        string path = string.Format("UI/{0}_UI{1}", loadState.TemplateName, KEngine.AppEngine.GetConfig("AssetBundleExt"));
+        var assetLoader = KStaticAssetLoader.Load(path);
+        loadState.UIResourceLoader = assetLoader; // 基本不用手工释放的
+        while (!assetLoader.IsCompleted)
+            yield return null;
+
+        request.Asset = assetLoader.TheAsset;
+
     }
 }

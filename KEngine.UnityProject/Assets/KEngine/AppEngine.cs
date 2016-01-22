@@ -29,6 +29,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using CosmosTable;
+using KEngine.UI;
 using UnityEngine;
 
 namespace KEngine
@@ -161,7 +162,6 @@ namespace KEngine
             {
                 // 基础2件套
                 KResourceModule.Instance,
-                KUIModule.Instance,
             };
 
             yield return StartCoroutine(DoInitModules(baseModules));

@@ -24,15 +24,24 @@
 
 #endregion
 
+using System.Collections;
+using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 
-public interface IKUIBridge
+namespace KEngine.UI
 {
-    // Init the UI Bridge, necessary
-    void InitBridge();
 
-    // Get a component inside the UI Bridge
-    object GetUIComponent(string comName);
+    public interface IKUIBridge
+    {
+        // Init the UI Bridge, necessary
+        void InitBridge();
 
-    void UIObjectFilter(KUIController controller, GameObject uiObject);
+        // Get a component inside the UI Bridge
+        object GetUIComponent(string comName);
+
+        void UIObjectFilter(KUIController controller, GameObject uiObject);
+
+        IEnumerator LoadUIAsset(CUILoadState loadState, UILoadRequest request);
+
+    }
 }

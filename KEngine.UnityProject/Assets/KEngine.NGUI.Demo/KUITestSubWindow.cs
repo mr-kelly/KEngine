@@ -24,6 +24,8 @@
 
 #endregion
 
+using KEngine.UI;
+
 public class KUITestSubWindow : KUIController
 {
 }

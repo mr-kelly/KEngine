@@ -27,6 +27,7 @@
 using System.Collections;
 using KEngine;
 using KEngine.CoreModules;
+using KEngine.UI;
 using UnityEngine;
 
 public class KEngineNGUIDemoMain : MonoBehaviour
@@ -40,7 +41,9 @@ public class KEngineNGUIDemoMain : MonoBehaviour
             gameObject,
             new IModule[]
             {
+                KUIModule.Instance,
                 KGameSettings.Instance,
+                
             },
             null,
             null);

@@ -29,6 +29,7 @@ using System.IO;
 using AppSettings;
 using KEngine;
 using KEngine.CoreModules;
+using KEngine.UI;
 using UnityEngine;
 
 public class KUGUIDemoMain : MonoBehaviour
@@ -46,6 +47,7 @@ public class KUGUIDemoMain : MonoBehaviour
             new IModule[]
             {
                 //KGameSettings.Instance,
+                KUIModule.Instance,
             },
             null,
             null);

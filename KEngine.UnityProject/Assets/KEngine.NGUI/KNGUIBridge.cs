@@ -26,14 +26,13 @@
 
 #if NGUI
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using KEngine;
+using KEngine.ResourceDep;
+using KEngine.UI;
 using UnityEngine;
-
-//public interface IUGUIWindow
-//{
-//}
-
 
 internal class GameDef
 {
@@ -94,6 +93,39 @@ public class KNGUIBridge : IKUIBridge
         }
     }
 
+    public IEnumerator LoadUIAsset(CUILoadState openState, UILoadRequest request)
+    {
+        var name = openState.TemplateName;
+        // 具体加载逻辑
+        // manifest
+        string manifestPath = ResourceDepUtils.GetBuildPath(string.Format("BundleResources/NGUI/{0}.prefab.manifest{1}", name,
+            AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt)));
+        var manifestLoader = KBytesLoader.Load(manifestPath, KResourceInAppPathType.ResourcesAssetsPath, KAssetBundleLoaderMode.ResourcesLoad);
+        while (!manifestLoader.IsCompleted)
+            yield return null;
+        var manifestBytes = manifestLoader.Bytes;
+        manifestLoader.Release(); // 释放掉文本字节
+        var utf8NoBom = new UTF8Encoding(false);
+        var manifestList = utf8NoBom.GetString(manifestBytes).Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        for (var i = 0; i < manifestList.Length; i++)
+        {
+            var depPath = manifestList[i] + AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt);
+            var depLoader = KAssetFileLoader.Load(depPath);
+            while (!depLoader.IsCompleted)
+            {
+                yield return null;
+            }
+
+        }
+        string path = ResourceDepUtils.GetBuildPath(string.Format("BundleResources/NGUI/{0}.prefab{1}", name, KEngine.AppEngine.GetConfig("AssetBundleExt")));
+
+        var assetLoader = KStaticAssetLoader.Load(path);
+        openState.UIResourceLoader = assetLoader; // 基本不用手工释放的
+        while (!assetLoader.IsCompleted)
+            yield return null;
+        request.Asset = assetLoader.TheAsset;
+    }
+
     public object GetUIComponent(string comName)
     {
         if (comName == "Camera")
@@ -129,7 +161,7 @@ public class KNGUIBridge : IKUIBridge
 
         // 尝试将NGUI转化成跟2dToolkit镜头一致显示
         UiRoot.manualHeight = 1080;
-            //GameDef.ScreenPixelY;//(int)(GameDef.ScreenPixelY / (GameDef.ScreenPixelY / 2f / GameDef.DefaultPixelPerMeters)); // fit width!
+        //GameDef.ScreenPixelY;//(int)(GameDef.ScreenPixelY / (GameDef.ScreenPixelY / 2f / GameDef.DefaultPixelPerMeters)); // fit width!
         //UiRoot.manualWidth = 1920;//GameDef.ScreenPixelX;
 
         // 屏幕中间位置
@@ -153,15 +185,15 @@ public class KNGUIBridge : IKUIBridge
 
         KTool.SetChild(uiCamObj.transform, UiRoot.transform);
         UiCamera = uiCamObj.GetComponent<UICamera>() ?? uiCamObj.AddComponent<UICamera>();
-        UiCamera.cachedCamera.cullingMask = 1 << (int) UnityLayerDef.UI;
+        UiCamera.cachedCamera.cullingMask = 1 << (int)UnityLayerDef.UI;
         UiCamera.cachedCamera.clearFlags = CameraClearFlags.Depth;
         UiCamera.cachedCamera.orthographic = true;
-        UiCamera.cachedCamera.orthographicSize = GameDef.ScreenPixelY/GameDef.DefaultPixelPerMeters/2f;
-            // 9.6，一屏19.2米，跟GameCamera一致
+        UiCamera.cachedCamera.orthographicSize = GameDef.ScreenPixelY / GameDef.DefaultPixelPerMeters / 2f;
+        // 9.6，一屏19.2米，跟GameCamera一致
         UiCamera.cachedCamera.nearClipPlane = -500;
         UiCamera.cachedCamera.farClipPlane = 500;
 
-        foreach (UIAnchor.Side side in Enum.GetValues(typeof (UIAnchor.Side)))
+        foreach (UIAnchor.Side side in Enum.GetValues(typeof(UIAnchor.Side)))
         {
             GameObject anchorObj = new GameObject(side.ToString());
             KTool.SetChild(anchorObj.transform, panelTrans);
@@ -173,11 +205,11 @@ public class KNGUIBridge : IKUIBridge
         AnchorSide["Null"] = nullAnchor.transform;
         AnchorSide[""] = AnchorSide[UIAnchor.Side.Center.ToString()]; // default
 
-        NGUITools.SetLayer(uiRootobj, (int) UnityLayerDef.UI);
+        NGUITools.SetLayer(uiRootobj, (int)UnityLayerDef.UI);
 
 
         PressWidget = new GameObject("PressWidget").AddComponent<UIWidget>();
-        NGUITools.SetLayer(PressWidget.gameObject, (int) UnityLayerDef.UI);
+        NGUITools.SetLayer(PressWidget.gameObject, (int)UnityLayerDef.UI);
         KTool.SetChild(PressWidget.gameObject, panelRootObj);
         PressWidget.SetDimensions(2000, 2000);
         var col = PressWidget.gameObject.AddComponent<BoxCollider>();
@@ -219,5 +251,4 @@ public class KNGUIBridge : IKUIBridge
         //};
     }
 }
-
 #endif
