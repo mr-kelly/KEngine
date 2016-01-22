@@ -50,6 +50,11 @@ namespace KEngine.ResourceDep.Builder
         //private static HashSet<UnityEngine.Object> DependencyPool = new HashSet<Object>();
         private static HashSet<string> DependencyPool = new HashSet<string>();
 
+        /// <summary>
+        /// 记录打包过的对象的路径
+        /// </summary>
+        public static HashSet<string> BuildedPool = new HashSet<string>(); 
+
         private static HashSet<string> TempFiles = new HashSet<string>();
         private static HashSet<string> TempDirs = new HashSet<string>();
 
@@ -312,11 +317,14 @@ namespace KEngine.ResourceDep.Builder
             var unityAssetType = GetUnityAssetType(assetPath);
             if (unityAssetType == UnityAssetType.Builtin || unityAssetType == UnityAssetType.Memory)
             {
-                KAssetVersionControl.TryMarkRecord(GetBuildAssetPath(asset));
+                var buildAssetPath = GetBuildAssetPath(asset);
+                KAssetVersionControl.TryMarkRecord(buildAssetPath);
+                BuildedPool.Add(buildAssetPath);
             }
             else
             {
                 KAssetVersionControl.TryMarkBuildVersion(assetPath);
+                BuildedPool.Add(assetPath);
             }
 
             bool result = false;
@@ -640,7 +648,7 @@ namespace KEngine.ResourceDep.Builder
             {
                 BuildPipeline.PopAssetDependencies();
             }
-            Logger.Log("Clear ResourceDep pool count: {0}", DependencyPool.Count);
+            Logger.Log("Clear pushed ResourceDep pool count: {0}", DependencyPool.Count);
             DependencyPool.Clear();
 
 
@@ -669,8 +677,8 @@ namespace KEngine.ResourceDep.Builder
             Logger.Log("Clear Temp Dirs Count: {0}, Files: {1}", TempDirs.Count, string.Join("\n", TempDirs.ToArray()));
             TempDirs.Clear();
             AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
-            //});
-            //t.Start();
+
+            Logger.Log("Builded AssetBundle Count: {0}, They are: \n {1}", BuildedPool.Count, string.Join("\n", BuildedPool.KToArray()));
         }
 
         [MenuItem("Assets/Build Asset Bundles with KEngine.ResourceDep", false, 1000)]
