@@ -58,7 +58,7 @@ public partial class KBuildTools
         if (!System.IO.Directory.Exists(exportDirectory))
             System.IO.Directory.CreateDirectory(exportDirectory);
 
-        path = path.Replace("/", @"\");
+        path = path.Replace("\\", "/");
 
         return path;
     }

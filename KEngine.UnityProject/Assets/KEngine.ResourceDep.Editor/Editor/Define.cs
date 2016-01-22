@@ -56,6 +56,8 @@ namespace KEngine.ResourceDep.Builder
     {
         Png,
         Tga,
+        Bmp,
+
         Anim,
         Shader,
         Fbx,
