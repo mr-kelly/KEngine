@@ -13,7 +13,7 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Kelly")]
 [assembly: AssemblyProduct("KEngine AssetBundle Framework")]
-[assembly: AssemblyCopyright("Copyright @ Kelly<23110388@qq.com> 2015")]
+[assembly: AssemblyCopyright("Copyright @ Kelly<23110388@qq.com> 2015-2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -26,4 +26,4 @@ using System.Runtime.CompilerServices;
 //
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:
-[assembly: AssemblyVersion("0.9.*")]
+[assembly: AssemblyVersion("2.0.*")]
