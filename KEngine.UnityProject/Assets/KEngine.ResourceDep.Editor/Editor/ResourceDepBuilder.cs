@@ -53,7 +53,7 @@ namespace KEngine.ResourceDep.Builder
         /// <summary>
         /// 记录打包过的对象的路径
         /// </summary>
-        public static HashSet<string> BuildedPool = new HashSet<string>(); 
+        public static HashSet<string> BuildedPool = new HashSet<string>();
 
         private static HashSet<string> TempFiles = new HashSet<string>();
         private static HashSet<string> TempDirs = new HashSet<string>();
@@ -293,6 +293,22 @@ namespace KEngine.ResourceDep.Builder
         }
 
         /// <summary>
+        /// 绝对路径转相对路径, 来避免路径过长无法写入的问题
+        /// </summary>
+        /// <param name="absPath"></param>
+        /// <returns></returns>
+        private static string AbsPath2RelativePath(string absPath)
+        {
+            var cleanAbsPath = absPath.Replace("\\", "/");
+            var workdirPath = Environment.CurrentDirectory.Replace("\\", "/"); // 当前工作目录
+            if (cleanAbsPath.StartsWith(workdirPath))
+            {
+                return cleanAbsPath.Substring(workdirPath.Length + 1, cleanAbsPath.Length - workdirPath.Length - 1); // +1是因为多了个/
+            }
+            return cleanAbsPath;
+        }
+
+        /// <summary>
         /// ResourceDep系统专用的打包AssetBundle函数
         /// </summary>
         /// <param name="asset"></param>
@@ -309,8 +325,11 @@ namespace KEngine.ResourceDep.Builder
 
             uint crc;
             var time = DateTime.Now;
-            var fullPath = KBuildTools.MakeSureExportPath(path, buildTarget, quality) +
+            // 最终完整路径
+            var buildToFullPath = KBuildTools.MakeSureExportPath(path, buildTarget, quality) +
                            AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt);
+            var buildToRelativePath = AbsPath2RelativePath(buildToFullPath);//buildToFullPath.Replace(workdirPath, "").Substring(1); // 转换成相对路径，避免路径过程无法打包的问题
+
             var assetPath = AssetDatabase.GetAssetPath(asset);
 
             // 版本标记
@@ -330,7 +349,7 @@ namespace KEngine.ResourceDep.Builder
             bool result = false;
             if (isScene)
             {
-                var resultStr = BuildPipeline.BuildStreamedSceneAssetBundle(new string[] { assetPath }, fullPath,
+                var resultStr = BuildPipeline.BuildStreamedSceneAssetBundle(new string[] { assetPath }, buildToRelativePath,
                     buildTarget, out crc);
                 result = string.IsNullOrEmpty(resultStr);
                 if (!string.IsNullOrEmpty(resultStr))
@@ -340,7 +359,7 @@ namespace KEngine.ResourceDep.Builder
             }
             else
             {
-                result = BuildPipeline.BuildAssetBundle(asset, null, fullPath,
+                result = BuildPipeline.BuildAssetBundle(asset, null, buildToRelativePath,
                     out crc,
                     BuildAssetBundleOptions.CollectDependencies | BuildAssetBundleOptions.DeterministicAssetBundle |
                     BuildAssetBundleOptions.CompleteAssets,
@@ -351,29 +370,45 @@ namespace KEngine.ResourceDep.Builder
             string fullManifestPath = null;
             if (depFileRelativeBuildPath != null && depFileRelativeBuildPath.Any())
             {
-                var manifestFileContent = string.Join("\n", depFileRelativeBuildPath.KToArray());
+                //var manifestFileContent = string.Join("\n", depFileRelativeBuildPath.KToArray());
                 var manifestPath = path + ".manifest";
                 fullManifestPath = KBuildTools.MakeSureExportPath(manifestPath, buildTarget, quality) +
                                    AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt);
+                var relativeManifestPath = AbsPath2RelativePath(fullManifestPath); // 转成相对路径
                 var utf8NoBom = new UTF8Encoding(false);
-                File.WriteAllText(fullManifestPath, manifestFileContent, utf8NoBom);
+                //try
+                //{
+                File.WriteAllLines(relativeManifestPath, depFileRelativeBuildPath.KToArray(), utf8NoBom);
+                //}
+                //catch (Exception e)
+                //{
+                //    // 会出现DirectoryNotFound，但是目录明明就存在！ 先Catch
+                //    Logger.LogError("Exception: {0}", e.Message);
+                //    var dirPath = Path.GetDirectoryName(fullManifestPath);
+                //    if (Directory.Exists(dirPath))
+                //        Logger.LogError("Directory Exists: {0}", dirPath);
+                //    else
+                //    {
+                //        Logger.LogError("Directory not exists: {0}", dirPath);
+                //    }
+                //}
             }
 
             if (result)
             {
-                var abInfo = new FileInfo(fullPath);
-                Logger.Log("Build AssetBundle： {0} / CRC: {1} / Time: {2:F4}s / Size: {3:F3}KB / FullPath: {4}", path, crc, (DateTime.Now - time).TotalSeconds,
-                    abInfo.Length / 1024d, fullPath);
+                var abInfo = new FileInfo(buildToFullPath);
+                Logger.Log("Build AssetBundle： {0} / CRC: {1} / Time: {2:F4}s / Size: {3:F3}KB / FullPath: {4} / RelPath: {5}", path, crc, (DateTime.Now - time).TotalSeconds,
+                    abInfo.Length / 1024d, buildToFullPath, buildToRelativePath);
             }
             else
             {
                 Logger.LogError("生成文件失败： {0}, crc: {1} 耗时: {2:F5}, 完整路径: {3}", path, crc,
-                    (DateTime.Now - time).TotalSeconds, fullPath);
+                    (DateTime.Now - time).TotalSeconds, buildToFullPath);
             }
             return new BuildBundleResult
             {
                 Crc = crc,
-                FullPath = fullPath,
+                FullPath = buildToFullPath,
                 RelativePath = path,
                 IsSuccess = result,
                 ManifestFullPath = fullManifestPath,
@@ -408,8 +443,12 @@ namespace KEngine.ResourceDep.Builder
             var depObjectsMap = new Dictionary<string, CollectedDepAssetInfo>();
             foreach (var depObj in depObjects)
             {
+                if (depObj == null)
+                {
+                    Logger.LogError("Found NULL obj when collect dep from '{0}'", buildObj);
+                    continue;
+                }
                 // 过滤
-
                 var depExtType = GetAssetExtType(depObj);
 
                 // 某些类型进行忽略
@@ -504,6 +543,8 @@ namespace KEngine.ResourceDep.Builder
         /// <param name="limitMainObjCount">限制构建的主对象（不计算依赖对象）</param>
         public static void BuildDirectory(string dirPath, int limitMainObjCount = -1)
         {
+            UnityEditor.EditorUtility.DisplayProgressBar("Build Directory", "Getting files list...", .2f);
+
             var fileList = new List<string>();
             foreach (var file in Directory.GetFiles(dirPath, "*", SearchOption.AllDirectories))
             {
@@ -520,7 +561,7 @@ namespace KEngine.ResourceDep.Builder
                 var bExt = GetAssetExtType(b);
                 return aExt.CompareTo(bExt);
             });
-
+            EditorUtility.ClearProgressBar();
             var buildMainObjList = new List<UnityEngine.Object>();
             foreach (var file in fileList)
             {

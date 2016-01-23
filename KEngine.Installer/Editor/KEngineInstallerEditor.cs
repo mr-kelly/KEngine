@@ -46,7 +46,7 @@ namespace KEngine.Installer
     }
 
     /// <summary>
-    /// KEngine Installer
+    /// KEngine Installer --- Tool install from KEngine.git
     /// </summary>
     public class KEngineInstallerEditor : EditorWindow
     {

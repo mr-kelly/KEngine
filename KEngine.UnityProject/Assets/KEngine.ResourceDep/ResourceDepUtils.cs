@@ -50,7 +50,7 @@ namespace KEngine.ResourceDep
     public class ResourceDepUtils
     {
         /// <summary>
-        /// 将返回具体的资源路径，会根据目录进行匹配
+        /// 将返回具体的资源路径，会把其余目录名的首字母合并在一起
         /// </summary>
         /// <param name="relativeAssetPath"></param>
         /// <returns></returns>
@@ -60,7 +60,13 @@ namespace KEngine.ResourceDep
             var fileExt = Path.GetExtension(relativeAssetPath);
             var dirPath = Path.GetDirectoryName(relativeAssetPath);
             var dirArr = dirPath.Split('/');
-            var newBuildAssetPath = string.Format("{0}/{1}_{2}{3}", dirPath, string.Join("_", dirArr), fileName, fileExt);
+            // 寻找所有目录的首字母
+            var dirFirstCharArr = new string[dirArr.Length];
+            for (var i = 0; i < dirArr.Length; i++)
+            {
+                dirFirstCharArr[i] = dirArr[i][0].ToString().ToUpper();
+            }
+            var newBuildAssetPath = string.Format("{0}/{1}_{2}{3}", dirPath, string.Join("", dirFirstCharArr), fileName, fileExt);
             return newBuildAssetPath;
         }
 
@@ -78,7 +84,7 @@ namespace KEngine.ResourceDep
             manifestLoader.Release(); // 释放掉文本字节
             var utf8NoBom = new UTF8Encoding(false);
             var manifestList = utf8NoBom.GetString(manifestBytes)
-                .Split(new char[] {'\n'}, StringSplitOptions.RemoveEmptyEntries);
+                .Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
             for (var i = 0; i < manifestList.Length; i++)
             {
                 var depPath = manifestList[i] + AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt);
@@ -101,7 +107,7 @@ namespace KEngine.ResourceDep
 
         public static ResourceDepRequest LoadAssetBundleAsync(string relativePath)
         {
-            var request = new ResourceDepRequest {Path = relativePath};
+            var request = new ResourceDepRequest { Path = relativePath };
             AppEngine.EngineInstance.StartCoroutine(CoLoadAssetBundleAsync(relativePath, request));
             return request;
         }
@@ -119,7 +125,7 @@ namespace KEngine.ResourceDep
             manifestLoader.Release(); // 释放掉文本字节
             var utf8NoBom = new UTF8Encoding(false);
             var manifestList = utf8NoBom.GetString(manifestBytes)
-                .Split(new char[] {'\n'}, StringSplitOptions.RemoveEmptyEntries);
+                .Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
             for (var i = 0; i < manifestList.Length; i++)
             {
                 var depPath = manifestList[i] + AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt);

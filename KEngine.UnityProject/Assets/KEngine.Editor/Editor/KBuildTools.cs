@@ -53,12 +53,12 @@ public partial class KBuildTools
     {
         path = KBuildTools.GetExportPath(buildTarget, quality) + path;
 
+        path = path.Replace("\\", "/");
+
         string exportDirectory = path.Substring(0, path.LastIndexOf('/'));
 
         if (!System.IO.Directory.Exists(exportDirectory))
             System.IO.Directory.CreateDirectory(exportDirectory);
-
-        path = path.Replace("\\", "/");
 
         return path;
     }

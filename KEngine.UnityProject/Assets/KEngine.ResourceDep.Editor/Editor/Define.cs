@@ -65,7 +65,7 @@ namespace KEngine.ResourceDep.Builder
 
         Mat,
         Prefab,
-        Scene,
+        Unity, // Scene/Level
 
         Cs,
         Default,
