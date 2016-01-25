@@ -54,6 +54,7 @@ namespace KEngine.ResourceDep.Builder
     /// </summary>
     public enum AssetExtType
     {
+        Jpg,
         Png,
         Tga,
         Bmp,
