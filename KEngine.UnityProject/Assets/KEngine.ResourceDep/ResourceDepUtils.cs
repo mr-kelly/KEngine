@@ -70,7 +70,24 @@ namespace KEngine.ResourceDep
             return newBuildAssetPath;
         }
 
+        /// <summary>
+        /// 自动将字节码转换字符串，在分割CRLF字符，获取依赖文本列表
+        /// </summary>
+        /// <param name="manifestBytes"></param>
+        /// <returns></returns>
+        private static string[] GetManifestList(byte[] manifestBytes)
+        {
+            var utf8NoBom = new UTF8Encoding(false);
+            var manifestList = utf8NoBom.GetString(manifestBytes)
+                .Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+            return manifestList;
+        }
 
+        /// <summary>
+        /// 同步加载AssetBundle
+        /// </summary>
+        /// <param name="relativePath"></param>
+        /// <returns></returns>
         public static UnityEngine.Object LoadAssetBundleSync(string relativePath)
         {
             // manifest
@@ -82,9 +99,7 @@ namespace KEngine.ResourceDep
             //    yield return null;
             var manifestBytes = manifestLoader.Bytes;
             manifestLoader.Release(); // 释放掉文本字节
-            var utf8NoBom = new UTF8Encoding(false);
-            var manifestList = utf8NoBom.GetString(manifestBytes)
-                .Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            var manifestList = GetManifestList(manifestBytes);
             for (var i = 0; i < manifestList.Length; i++)
             {
                 var depPath = manifestList[i] + AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt);
@@ -105,6 +120,11 @@ namespace KEngine.ResourceDep
             return assetLoader.Asset;
         }
 
+        /// <summary>
+        /// 异步加载Asset Bundle，自动处理依赖
+        /// </summary>
+        /// <param name="relativePath"></param>
+        /// <returns></returns>
         public static ResourceDepRequest LoadAssetBundleAsync(string relativePath)
         {
             var request = new ResourceDepRequest { Path = relativePath };
@@ -123,9 +143,7 @@ namespace KEngine.ResourceDep
                 yield return null;
             var manifestBytes = manifestLoader.Bytes;
             manifestLoader.Release(); // 释放掉文本字节
-            var utf8NoBom = new UTF8Encoding(false);
-            var manifestList = utf8NoBom.GetString(manifestBytes)
-                .Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            var manifestList = GetManifestList(manifestBytes);
             for (var i = 0; i < manifestList.Length; i++)
             {
                 var depPath = manifestList[i] + AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt);
