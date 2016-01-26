@@ -37,11 +37,11 @@ namespace KEngine.ResourceDep
     /// </summary>
     public class ResourceDepRequest
     {
+        public Object Asset { get; internal set; }
         public string Path { get; internal set; }
         public System.Type Type { get; internal set; }
 
         public bool IsDone { get; internal set; }
-        public Object Asset { get; internal set; }
     }
 
     /// <summary>
@@ -157,12 +157,45 @@ namespace KEngine.ResourceDep
                 GetBuildPath(string.Format("{0}{1}", relativePath,
                     KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt)));
 
-            var assetLoader = KAssetFileLoader.Load(path);
-            while (!assetLoader.IsCompleted)
-                yield return null;
+            // 获取后缀名
+            var ext = Path.GetExtension(relativePath);
+            if (ext == ".unity")
+            {
+                // Scene 
+                var sceneLoader = KAssetBundleLoader.Load(path);
+                while (!sceneLoader.IsCompleted)
+                    yield return null;
+            }
+            else
+            {
+                var assetLoader = KAssetFileLoader.Load(path);
+                while (!assetLoader.IsCompleted)
+                    yield return null;
+                request.Asset = assetLoader.Asset;
+            }
 
             request.IsDone = true;
-            request.Asset = assetLoader.Asset;
+        }
+
+        public static ResourceDepRequest LoadLevelAdditiveAsync(string path)
+        {
+            var req = new ResourceDepRequest();
+            KResourceModule.Instance.StartCoroutine(CoLoadLevelAdditiveAsync(path, req));
+            return req;
+        }
+
+        static IEnumerator CoLoadLevelAdditiveAsync(string path, ResourceDepRequest req)
+        {
+            var abReq = LoadAssetBundleAsync(path);
+            while (!abReq.IsDone)
+                yield return null;
+
+            var levelName = Path.GetFileNameWithoutExtension(path);
+            var op = Application.LoadLevelAdditiveAsync(levelName);
+            while (!op.isDone)
+                yield return null;
+
+            Logger.Log("[LoadLevelAdditiveAsync]Load Level `{0}` Complete!", path);
         }
     }
 }

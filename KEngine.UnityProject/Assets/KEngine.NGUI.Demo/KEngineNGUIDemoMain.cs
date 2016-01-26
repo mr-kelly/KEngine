@@ -27,6 +27,7 @@
 using System.Collections;
 using KEngine;
 using KEngine.CoreModules;
+using KEngine.ResourceDep;
 using KEngine.UI;
 using UnityEngine;
 
@@ -49,6 +50,9 @@ public class KEngineNGUIDemoMain : MonoBehaviour
             null);
         while (!app.IsInited)
             yield return null;
+
+        //TestLoadLevelAdditiveAsync();
+
         KUIModule.Instance.OpenWindow<KUITestWindow>();
 
         KUIModule.Instance.CallUI<KUITestWindow>(ui =>
@@ -57,8 +61,15 @@ public class KEngineNGUIDemoMain : MonoBehaviour
         });
 
         yield return new WaitForSeconds(2f);
-
+        Logger.Log("Opening KUITestSubWindow");
         KUIModule.Instance.OpenWindow<KUITestSubWindow>();
+
+    }
+
+    void TestLoadLevelAdditiveAsync()
+    {
+        Logger.Log("Load Scene");
+        ResourceDepUtils.LoadLevelAdditiveAsync("BundleResources/NGUI/TestNGUI.unity");
     }
 
     // Update is called once per frame
