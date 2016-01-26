@@ -66,7 +66,8 @@ namespace KEngine.ResourceDep.Builder
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public delegate UnityEngine.Object BuildFilter(UnityEngine.Object obj);
+        public delegate UnityEngine.Object BuildFilterDelegate(UnityEngine.Object obj);
+        public static BuildFilterDelegate BuildObjectFilter;
 
         /// <summary>
         /// 用于GetBuildAssetPath过滤
@@ -508,6 +509,9 @@ namespace KEngine.ResourceDep.Builder
         /// <param name="unityObject"></param>
         private static List<CollectedDepAssetInfo> BuildObject(UnityEngine.Object unityObject)
         {
+            if (BuildObjectFilter != null)
+                unityObject = BuildObjectFilter(unityObject);
+
             var assetPath = AssetDatabase.GetAssetPath(unityObject);
 
             if (string.IsNullOrEmpty(assetPath))

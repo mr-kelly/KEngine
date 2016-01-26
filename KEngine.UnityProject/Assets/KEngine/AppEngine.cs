@@ -257,6 +257,16 @@ namespace KEngine
         }
 
         /// <summary>
+        /// Check whetehr exist a config key
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public static bool HasConfig(string key)
+        {
+            return _configsTable.HasPrimaryKey(key);
+        }
+
+        /// <summary>
         /// Get Config from the CEngineConfig file through key
         /// </summary>
         public static string GetConfig(string key, bool showLog = true)

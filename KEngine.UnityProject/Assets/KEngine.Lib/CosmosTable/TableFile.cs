@@ -362,6 +362,11 @@ namespace CosmosTable
             Dispose();
         }
 
+        public bool HasPrimaryKey(object primaryKey)
+        {
+            return PrimaryKey2Row.ContainsKey(primaryKey);
+        }
+
         public T FindByPrimaryKey(object primaryKey)
         {
             object ret;
