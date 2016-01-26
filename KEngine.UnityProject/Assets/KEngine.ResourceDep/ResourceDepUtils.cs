@@ -141,16 +141,21 @@ namespace KEngine.ResourceDep
                 KAssetBundleLoaderMode.ResourcesLoad);
             while (!manifestLoader.IsCompleted)
                 yield return null;
-            var manifestBytes = manifestLoader.Bytes;
-            manifestLoader.Release(); // 释放掉文本字节
-            var manifestList = GetManifestList(manifestBytes);
-            for (var i = 0; i < manifestList.Length; i++)
+
+            // manifest读取失败，可能根本没有manifest，是允许的
+            if (manifestLoader.IsSuccess)
             {
-                var depPath = manifestList[i] + AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt);
-                var depLoader = KAssetFileLoader.Load(depPath);
-                while (!depLoader.IsCompleted)
+                var manifestBytes = manifestLoader.Bytes;
+                manifestLoader.Release(); // 释放掉文本字节
+                string[] manifestList = GetManifestList(manifestBytes);
+                for (var i = 0; i < manifestList.Length; i++)
                 {
-                    yield return null;
+                    var depPath = manifestList[i] + AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt);
+                    var depLoader = KAssetFileLoader.Load(depPath);
+                    while (!depLoader.IsCompleted)
+                    {
+                        yield return null;
+                    }
                 }
             }
             string path =

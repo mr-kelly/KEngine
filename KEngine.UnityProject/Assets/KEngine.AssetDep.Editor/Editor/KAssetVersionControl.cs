@@ -316,6 +316,7 @@ namespace KEngine.Editor
         public void MarkRecord(string strKey)
         {
             StoreBuildVersion[strKey] = InstanceBuildVersion[strKey] = new BuildRecord(); // ensure in dict
+            Current.BuildedList.Add(strKey);
         }
 
         /// <summary>

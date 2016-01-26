@@ -41,11 +41,12 @@ namespace KEngine.ResourceDep.Builder
     public class Define
     {
         /// <summary>
-        /// 列表中的不进行push打包
+        /// 列表中的不进行push依赖打包
         /// </summary>
-        public static HashSet<AssetExtType> IgnoreBuildType = new HashSet<AssetExtType>
+        public static HashSet<AssetExtType> IgnoreDepType = new HashSet<AssetExtType>
         {
-            AssetExtType.Cs,
+            AssetExtType.Cs, // 脚本不打包
+            //AssetExtType.Prefab, // Prefab不需要依赖
         };
     }
 

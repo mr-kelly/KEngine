@@ -70,6 +70,16 @@ namespace KEngine.ResourceDep.Builder
         public static BuildFilterDelegate BuildObjectFilter;
 
         /// <summary>
+        /// 收集依赖资源时的过滤器
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="unityAssetPath"></param>
+        /// <param name="buildAssetPath"></param>
+        /// <returns></returns>
+        public delegate bool CollectDepPathFilterDelegate(UnityEngine.Object obj, string unityAssetPath, string buildAssetPath);
+        public static CollectDepPathFilterDelegate CollectDepPathFilter;
+
+        /// <summary>
         /// 用于GetBuildAssetPath过滤
         /// </summary>
         /// <param name="unityAssetPath"></param>
@@ -281,7 +291,7 @@ namespace KEngine.ResourceDep.Builder
 
             // 检查是否需要打包的后缀类型
             var extType = GetAssetExtType(assetPath);
-            if (Define.IgnoreBuildType.Contains(extType))
+            if (Define.IgnoreDepType.Contains(extType))
             {
                 if (!UnityEditorInternal.InternalEditorUtility.inBatchMode)
                 {
@@ -324,7 +334,7 @@ namespace KEngine.ResourceDep.Builder
             //是否是Level / Scene
             var isScene = asset.ToString().Contains("SceneAsset");
 
-            uint crc;
+            uint crc = 0;
             var time = DateTime.Now;
             // 最终完整路径
             var buildToFullPath = KBuildTools.MakeSureExportPath(path, buildTarget, quality) +
@@ -453,15 +463,21 @@ namespace KEngine.ResourceDep.Builder
                 var depExtType = GetAssetExtType(depObj);
 
                 // 某些类型进行忽略
-                if (Define.IgnoreBuildType.Contains(depExtType))
+                if (Define.IgnoreDepType.Contains(depExtType))
                     continue;
+
+                var buildAssetPath = GetBuildAssetPath(depObj);
 
                 // 很多跟自己路径一样的
                 var depAssetPath = AssetDatabase.GetAssetPath(depObj);
                 if (depAssetPath == assetPath)
                     continue;
 
-                var buildAssetPath = GetBuildAssetPath(depObj);
+                // 可自定义过滤
+                if (CollectDepPathFilter != null)
+                    if (!CollectDepPathFilter(depObj, depAssetPath, buildAssetPath))
+                        continue;
+
                 var unityAssetType = GetUnityAssetType(depAssetPath);
 
                 depObjectsMap[buildAssetPath] = new CollectedDepAssetInfo()
@@ -531,8 +547,6 @@ namespace KEngine.ResourceDep.Builder
                 BuildPipeline.PushAssetDependencies();
                 BuildAssetBundle(unityObject, buildPath, GetBuildAssetPaths(depObjectsMap));
                 BuildPipeline.PopAssetDependencies();
-
-                Debug.Log(unityObject.name);
 
                 Debug.Log(string.Join("\n", GetBuildAssetPaths(depObjectsMap).ToArray()));
             }
@@ -724,6 +738,24 @@ namespace KEngine.ResourceDep.Builder
             AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
 
             Logger.Log("Builded AssetBundle Count: {0}, They are: \n {1}", BuildedPool.Count, string.Join("\n", BuildedPool.KToArray()));
+        }
+
+        [MenuItem("Assets/Build Asset Bundles Without KEngine.ResourceDep", false, 1010)]
+        public static void MenuBuildObjectNoDeps()
+        {
+            var objs = Selection.objects;
+            if (objs == null)
+            {
+                Debug.LogError("No selection object");
+                return;
+            }
+            foreach (var obj in objs)
+            {
+                var buildPath = GetBuildAssetPath(obj);
+                BuildAssetBundle(obj, buildPath, null);
+            }
+
+            Clear();
         }
 
         [MenuItem("Assets/Build Asset Bundles with KEngine.ResourceDep", false, 1000)]
