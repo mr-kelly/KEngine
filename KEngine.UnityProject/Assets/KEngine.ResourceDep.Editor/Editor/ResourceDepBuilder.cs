@@ -36,6 +36,7 @@ using Object = UnityEngine.Object;
 
 namespace KEngine.ResourceDep.Builder
 {
+
     /// <summary>
     /// New instead of KAssetDep
     /// 定义:
@@ -86,7 +87,7 @@ namespace KEngine.ResourceDep.Builder
         /// <returns></returns>
         public delegate string BuildAssetPathFilterDelegate(string unityAssetPath);
 
-        public static BuildAssetPathFilterDelegate BuildAssetPathFilter;
+        public static BuildAssetPathFilterDelegate BuildAssetPathFilter; // 带有Assets/
 
         /// <summary>
         /// Build in Asset's build asset pth
@@ -123,7 +124,9 @@ namespace KEngine.ResourceDep.Builder
                 }
                 else
                 {
-                    Logger.LogError("Un handle Libray builtin resource, Type:{0}, Name: {1}", depObjType, @object.name);
+                    // 无视Mono Scrpt BuiltIn类型
+                    if (depObjType != typeof(UnityEditor.MonoScript))
+                        Logger.LogError("Un handle Libray builtin resource, Type:{0}, Name: {1}", depObjType, @object.name);
                 }
             }
 
@@ -145,18 +148,19 @@ namespace KEngine.ResourceDep.Builder
             // 去掉空格
             cleanAssetPath = cleanAssetPath.Replace(" ", "_");
 
-            // 过滤器
-            if (BuildAssetPathFilter != null)
-                cleanAssetPath = BuildAssetPathFilter(cleanAssetPath);
-
             // 无前缀直接返回
             if (!cleanAssetPath.StartsWith(assetPrefix))
                 return cleanAssetPath;
 
             // 去掉前缀
-            var relativeAssetPath = cleanAssetPath.Substring(assetPrefix.Length,
+             cleanAssetPath = cleanAssetPath.Substring(assetPrefix.Length,
                 cleanAssetPath.Length - assetPrefix.Length);
-            return ResourceDepUtils.GetBuildPath(relativeAssetPath);
+
+            // 过滤器
+            if (BuildAssetPathFilter != null)
+                cleanAssetPath = BuildAssetPathFilter(cleanAssetPath);
+
+            return ResourceDepUtils.GetBuildPath(cleanAssetPath);
         }
 
         public static IList<string> GetBuildAssetPaths(IList<CollectedDepAssetInfo> depAssetInfos)
@@ -340,6 +344,7 @@ namespace KEngine.ResourceDep.Builder
             var buildToFullPath = KBuildTools.MakeSureExportPath(path, buildTarget, quality) +
                            AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt);
             var buildToRelativePath = AbsPath2RelativePath(buildToFullPath);//buildToFullPath.Replace(workdirPath, "").Substring(1); // 转换成相对路径，避免路径过程无法打包的问题
+            buildToRelativePath = buildToRelativePath.ToLower();
 
             var assetPath = AssetDatabase.GetAssetPath(asset);
 
@@ -386,6 +391,8 @@ namespace KEngine.ResourceDep.Builder
                 fullManifestPath = KBuildTools.MakeSureExportPath(manifestPath, buildTarget, quality) +
                                    AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt);
                 var relativeManifestPath = AbsPath2RelativePath(fullManifestPath); // 转成相对路径
+                relativeManifestPath = relativeManifestPath.ToLower();
+
                 var utf8NoBom = new UTF8Encoding(false);
                 //try
                 //{

@@ -99,25 +99,48 @@ namespace KEngine.ResourceDep
             //    yield return null;
             var manifestBytes = manifestLoader.Bytes;
             manifestLoader.Release(); // 释放掉文本字节
-            var manifestList = GetManifestList(manifestBytes);
-            for (var i = 0; i < manifestList.Length; i++)
+            if (manifestBytes != null)
             {
-                var depPath = manifestList[i] + AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt);
-                var depLoader = KAssetFileLoader.Load(depPath);
-                //while (!depLoader.IsCompleted)
-                //{
-                //    yield return null;
-                //}
+                var manifestList = GetManifestList(manifestBytes);
+                for (var i = 0; i < manifestList.Length; i++)
+                {
+                    var depPath = manifestList[i] + AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt);
+                    var depLoader = KAssetFileLoader.Load(depPath);
+                    //while (!depLoader.IsCompleted)
+                    //{
+                    //    yield return null;
+                    //}
+                }
             }
+            else
+            {
+                Logger.LogWarning("Cannot find Manifest: {0}", relativePath);
+            }
+
             string path =
                 GetBuildPath(string.Format("{0}{1}", relativePath,
                     KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt)));
 
-            var assetLoader = KAssetFileLoader.Load(path);
             //while (!assetLoader.IsCompleted)
             //    yield return null;
+            // 获取后缀名
+            var ext = Path.GetExtension(relativePath);
+            if (ext == ".unity")
+            {
+                // Scene 
+                var sceneLoader = KAssetBundleLoader.Load(path);
+                //while (!sceneLoader.IsCompleted)
+                //    yield return null;
+                return null;
+            }
+            else
+            {
+                var assetLoader = KAssetFileLoader.Load(path);
+                //while (!assetLoader.IsCompleted)
+                //    yield return null;
+                return assetLoader.Asset;
+            }
 
-            return assetLoader.Asset;
         }
 
         /// <summary>
