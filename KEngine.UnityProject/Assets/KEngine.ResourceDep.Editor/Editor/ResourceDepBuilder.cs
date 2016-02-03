@@ -45,6 +45,12 @@ namespace KEngine.ResourceDep.Builder
     /// </summary>
     public partial class ResourceDepBuilder
     {
+
+        /// <summary>
+        /// 一个存放所有shader的对象
+        /// </summary>
+        public const string ShadersPrefabUnityAssetPath = "Assets/ResourceDepShaders.prefab";
+
         /// <summary>
         /// 存放Push进去的对象, 这些对象对下一次打包AssetBundle自动进行依赖, 存放BuildAssetPath而不是UnityAssetPath
         /// </summary>
@@ -86,7 +92,6 @@ namespace KEngine.ResourceDep.Builder
         /// <param name="unityAssetPath"></param>
         /// <returns></returns>
         public delegate string BuildAssetPathFilterDelegate(string unityAssetPath);
-
         public static BuildAssetPathFilterDelegate BuildAssetPathFilter; // 带有Assets/
 
         /// <summary>
@@ -95,12 +100,12 @@ namespace KEngine.ResourceDep.Builder
         private static Dictionary<Type, Func<UnityEngine.Object, string>> _buildInAssetType2BuildAssetPath = new Dictionary
             <Type, Func<UnityEngine.Object, string>>()
         {
-            {typeof (Shader), (@object) => "Shader/" + @object.name.Replace(" ", "_") + ".shader"},
-            {typeof(Texture2D), (o) =>"Texture/" + o.name.Replace(" ", "_") + ".png" },
+            {typeof (Shader), (@object) => "Shader/Internal_" + @object.name.Replace(" ", "_") + ".shader"},
+            {typeof(Texture2D), (o) =>"Texture/Internal_" + o.name.Replace(" ", "_") + ".png" },
 
-            {typeof(Material), (o) =>"Material/" + o.name.Replace(" ", "_") + ".mat" },
+            {typeof(Material), (o) =>"Material/Internal_" + o.name.Replace(" ", "_") + ".mat" },
 
-            {typeof(Mesh), (o) =>"Mesh/" + o.name.Replace(" ", "_") + ".fbx" },
+            {typeof(Mesh), (o) =>"Mesh/Internal_" + o.name.Replace(" ", "_") + ".fbx" },
         };
 
         /// <summary>
@@ -120,7 +125,10 @@ namespace KEngine.ResourceDep.Builder
                 Func<UnityEngine.Object, string> getNameFunc;
                 if (_buildInAssetType2BuildAssetPath.TryGetValue(depObjType, out getNameFunc))
                 {
-                    return getNameFunc(@object);
+                    var inPath = getNameFunc(@object);
+                    if (BuildAssetPathFilter != null)
+                        inPath = BuildAssetPathFilter(inPath);
+                    return inPath;
                 }
                 else
                 {
@@ -148,13 +156,20 @@ namespace KEngine.ResourceDep.Builder
             // 去掉空格
             cleanAssetPath = cleanAssetPath.Replace(" ", "_");
 
-            // 无前缀直接返回
+            // 无前缀直接返回, 但要修改文件名加上Internal，防止AssetBundle重名冲突
             if (!cleanAssetPath.StartsWith(assetPrefix))
-                return cleanAssetPath;
+            {
+                var dirPath = Path.GetDirectoryName(cleanAssetPath);
+                var fileName = "Library_" + Path.GetFileName(cleanAssetPath);
+                var retPath = string.Format("{0}/{1}", dirPath, fileName);
+                if (BuildAssetPathFilter != null)
+                    retPath = BuildAssetPathFilter(retPath);
+                return retPath;
+            }
 
             // 去掉前缀
-             cleanAssetPath = cleanAssetPath.Substring(assetPrefix.Length,
-                cleanAssetPath.Length - assetPrefix.Length);
+            cleanAssetPath = cleanAssetPath.Substring(assetPrefix.Length,
+               cleanAssetPath.Length - assetPrefix.Length);
 
             // 过滤器
             if (BuildAssetPathFilter != null)
@@ -210,7 +225,6 @@ namespace KEngine.ResourceDep.Builder
                 needBuild = forceBuild || CheckNeedBuildAsset(info.UnityAssetType, assetPath);
                 // 其实基本Library资源是肯定要打包的，这一句其实可以忽略
             }
-            var depObjectsMap = CollectAndPushBuildDependencies(info.Asset, needBuild);
 
             if (!needBuild)
                 return;
@@ -218,7 +232,9 @@ namespace KEngine.ResourceDep.Builder
             BuildPipeline.PushAssetDependencies();
 
             var buildAssetPath = info.BuildAssetPath;
+            var depObjectsMap = CollectAndPushBuildDependencies(info.Asset, needBuild);
             BuildAssetBundle(info.Asset, buildAssetPath, GetBuildAssetPaths(depObjectsMap));
+
             DependencyPool.Add(buildAssetPath);
         }
 
@@ -446,6 +462,44 @@ namespace KEngine.ResourceDep.Builder
             return UnityAssetType.Object;
         }
 
+        private static bool OnCollectDepPathFilter(Object obj, string unityassetpath, string buildassetpath)
+        {
+            // Shader特别处理, 创建临时Prefab
+            //if (obj is Shader)
+            //{
+            //    var shader = obj as Shader;
+            //    var tmpShaderObj = new GameObject(Path.GetFileNameWithoutExtension(buildassetpath));
+            //    var shaderCom = tmpShaderObj.AddComponent<ResourceDepShaders>();
+            //    shaderCom.Shader = shader;
+
+            //    var saveDir = "Assets/TmpShader_" + UnityEngine.Random.Range(0, 10000);
+            //    if (!Directory.Exists(saveDir))
+            //    {
+            //        Directory.CreateDirectory(saveDir);
+            //    }
+            //    var savePath = string.Format("{0}/{1}.prefab", saveDir, Path.GetFileNameWithoutExtension(buildassetpath));
+            //    var shaderPrefab = PrefabUtility.CreatePrefab(savePath, tmpShaderObj, ReplacePrefabOptions.Default);
+
+            //    GameObject.DestroyImmediate(tmpShaderObj);
+            //    return new CollectDepPathFilterResult()
+            //    {
+            //        UnityAssetPath = savePath,
+            //        BuildAssetPath =
+            //            string.Format("Shader/Shader_{0}.prefab", Path.GetFileNameWithoutExtension(buildassetpath)),
+            //        Object = shaderPrefab,
+            //        HasDepObject = false,  // 接下来无依赖
+            //    };
+            //}
+
+            if (CollectDepPathFilter != null)
+            {
+                var filterResult = CollectDepPathFilter(obj, unityassetpath, buildassetpath);
+                return filterResult;
+            }
+
+            return true;
+        }
+
         /// <summary>
         /// 智能收集依赖，剔除非用于AssetBundle打包的部分，返回路径list(路径去掉了'Assets/')
         /// </summary>
@@ -464,6 +518,8 @@ namespace KEngine.ResourceDep.Builder
                     Logger.LogError("Found NULL obj when collect dep from '{0}'", buildObj);
                     continue;
                 }
+                var buildAssetPath = GetBuildAssetPath(depObj);
+
                 // 过滤
                 var depExtType = GetAssetExtType(depObj);
 
@@ -471,17 +527,15 @@ namespace KEngine.ResourceDep.Builder
                 if (Define.IgnoreDepType.Contains(depExtType))
                     continue;
 
-                var buildAssetPath = GetBuildAssetPath(depObj);
-
                 // 很多跟自己路径一样的
                 var depAssetPath = AssetDatabase.GetAssetPath(depObj);
                 if (depAssetPath == assetPath)
                     continue;
 
-                // 可自定义过滤
-                if (CollectDepPathFilter != null)
-                    if (!CollectDepPathFilter(depObj, depAssetPath, buildAssetPath))
-                        continue;
+                // 可自定义过滤,改变路径
+                var filterResult = OnCollectDepPathFilter(depObj, depAssetPath, buildAssetPath);
+                if (!filterResult)
+                    continue;
 
                 var unityAssetType = GetUnityAssetType(depAssetPath);
 
@@ -509,16 +563,16 @@ namespace KEngine.ResourceDep.Builder
         private static List<CollectedDepAssetInfo> CollectAndPushBuildDependencies(Object unityObject, bool needBuild)
         {
             var depObjectsMap = CollectDependenciesPaths(unityObject);
-            foreach (var depPath in depObjectsMap)
+            foreach (var depInfo in depObjectsMap)
             {
-                if (depPath.Asset == null)
+                if (depInfo.Asset == null)
                 {
-                    Logger.LogError("Null Object on Path: {0}", depPath.BuildAssetPath);
+                    Logger.LogError("Null Object on Path: {0}", depInfo.BuildAssetPath);
                     continue;
                 }
-                if (!HasPushDep(depPath.Asset))
+                if (!HasPushDep(depInfo.Asset))
                 {
-                    AddPushDep(depPath, needBuild);
+                    AddPushDep(depInfo, needBuild);
                 }
             }
             return depObjectsMap;
@@ -544,6 +598,13 @@ namespace KEngine.ResourceDep.Builder
             var needBuild = CheckNeedBuildAsset(assetPath);
             // 检查本对象是否需要build，当true时，传入CollectAndPushBuild函数则所有依赖的都要重新打包一次了
             var depObjectsMap = CollectAndPushBuildDependencies(unityObject, needBuild);
+
+            // Shader打包
+            var shadersPrefab = AssetDatabase.LoadAssetAtPath(ShadersPrefabUnityAssetPath, typeof(GameObject));
+            if (!HasPushDep(shadersPrefab))
+            {
+                AddPushDep(shadersPrefab, false);
+            }
 
             if (needBuild && !HasPushDep(unityObject)) // 该对象可能被依赖过，依赖过，就不打了 
             {
@@ -794,6 +855,23 @@ namespace KEngine.ResourceDep.Builder
             {
                 MenuBuildUnityObject();
             }
+        }
+
+        [MenuItem("Assets/Collect All Shaders to Shaders.prefab")]
+        public static void CollectShaderPrefab()
+        {
+            var shaderList = new List<Shader>();
+            foreach (var path in AssetDatabase.GetAllAssetPaths())
+            {
+                if (Path.GetExtension(path) == ".shader")
+                {
+                    shaderList.Add(AssetDatabase.LoadAssetAtPath(path, typeof(Shader)) as Shader);
+                }
+            }
+            var newPrefabs = new GameObject("Prefabs").AddComponent<ResourceDepShaders>();
+            newPrefabs.Shaders = shaderList.ToArray();
+            PrefabUtility.CreatePrefab(ShadersPrefabUnityAssetPath, newPrefabs.gameObject);
+            GameObject.DestroyImmediate(newPrefabs.gameObject);
         }
     }
 }

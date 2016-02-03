@@ -47,6 +47,7 @@ namespace KEngine.ResourceDep.Builder
         {
             AssetExtType.Cs, // 脚本不打包
             //AssetExtType.Prefab, // Prefab不需要依赖
+            AssetExtType.Shader,
         };
     }
 

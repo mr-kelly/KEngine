@@ -59,12 +59,13 @@ namespace KEngine.ResourceDep
             var fileName = Path.GetFileNameWithoutExtension(relativeAssetPath);
             var fileExt = Path.GetExtension(relativeAssetPath);
             var dirPath = Path.GetDirectoryName(relativeAssetPath);
-            var dirArr = dirPath.Split('/');
+            var dirArr = dirPath.Split(new char[] {'/'}, StringSplitOptions.RemoveEmptyEntries);
+
             // 寻找所有目录的首字母
             var dirFirstCharArr = new string[dirArr.Length];
             for (var i = 0; i < dirArr.Length; i++)
             {
-                dirFirstCharArr[i] = dirArr[i][0].ToString().ToUpper();
+                dirFirstCharArr[i] = dirArr[i][0].ToString().ToLower();
             }
             var newBuildAssetPath = string.Format("{0}/{1}_{2}{3}", dirPath, string.Join("", dirFirstCharArr), fileName, fileExt);
             return newBuildAssetPath;
@@ -105,11 +106,6 @@ namespace KEngine.ResourceDep
                 for (var i = 0; i < manifestList.Length; i++)
                 {
                     var depPath = manifestList[i] + AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt);
-                    if (depPath.Contains(".shader"))
-                    {
-                        int qw;
-                        qw = 0;
-                    }
                     var depLoader = KAssetFileLoader.Load(depPath);
                     //while (!depLoader.IsCompleted)
                     //{

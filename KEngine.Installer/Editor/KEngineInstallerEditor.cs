@@ -149,9 +149,18 @@ namespace KEngine.Installer
 
         public static void UnInstall()
         {
+            if (Directory.Exists(KEngineInstallDirPath))
+            {
+                Directory.Delete(KEngineInstallDirPath, true);
+            }
+
             AssetDatabase.DeleteAsset(KEngineEditorInstallDirPath);
             Debug.Log("UnInstall dir: " + KEngineEditorInstallDirPath);
-            AssetDatabase.DeleteAsset(KEngineInstallDirPath);
+
+            if (Directory.Exists(KEngineInstallDirPath))
+            {
+                AssetDatabase.DeleteAsset(KEngineInstallDirPath);
+            }
             Debug.Log("UnInstall dir: " + KEngineInstallDirPath);
         }
 
@@ -238,7 +247,7 @@ namespace KEngine.Installer
             if (_addonResourceDep)
             {
                 var srcResourceDepDirPath = Path.Combine(gitPath, @"KEngine.UnityProject\Assets\KEngine.ResourceDep");
-                var srcResourceDepEditorDirPath = Path.Combine(gitPath, @"KEngine.UnityProject\Assets\KEngine.ResourceDep.Editor\Editor"); 
+                var srcResourceDepEditorDirPath = Path.Combine(gitPath, @"KEngine.UnityProject\Assets\KEngine.ResourceDep.Editor\Editor");
 
                 CopyFolder(srcResourceDepDirPath, KEngineInstallDirPath + "/KEngine.ResourceDep");
                 CopyFolder(srcResourceDepEditorDirPath, KEngineEditorInstallDirPath + "/KEngine.ResourceDep");
