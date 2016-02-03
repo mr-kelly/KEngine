@@ -344,7 +344,6 @@ namespace KEngine.ResourceDep.Builder
             var buildToFullPath = KBuildTools.MakeSureExportPath(path, buildTarget, quality) +
                            AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt);
             var buildToRelativePath = AbsPath2RelativePath(buildToFullPath);//buildToFullPath.Replace(workdirPath, "").Substring(1); // 转换成相对路径，避免路径过程无法打包的问题
-            buildToRelativePath = buildToRelativePath.ToLower();
 
             var assetPath = AssetDatabase.GetAssetPath(asset);
 
@@ -391,7 +390,6 @@ namespace KEngine.ResourceDep.Builder
                 fullManifestPath = KBuildTools.MakeSureExportPath(manifestPath, buildTarget, quality) +
                                    AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt);
                 var relativeManifestPath = AbsPath2RelativePath(fullManifestPath); // 转成相对路径
-                relativeManifestPath = relativeManifestPath.ToLower();
 
                 var utf8NoBom = new UTF8Encoding(false);
                 //try

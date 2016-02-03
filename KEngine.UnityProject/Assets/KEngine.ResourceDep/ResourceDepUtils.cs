@@ -105,6 +105,11 @@ namespace KEngine.ResourceDep
                 for (var i = 0; i < manifestList.Length; i++)
                 {
                     var depPath = manifestList[i] + AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt);
+                    if (depPath.Contains(".shader"))
+                    {
+                        int qw;
+                        qw = 0;
+                    }
                     var depLoader = KAssetFileLoader.Load(depPath);
                     //while (!depLoader.IsCompleted)
                     //{
