@@ -34,6 +34,7 @@ namespace KEngine
 {
     /// <summary>
     /// 多线程+断点续传 http下载器, 注意用完后要Dispose
+    /// 
     /// TODO: 线程的回调Callback有点难看，以后弄个KHttpDownloader2（本类稳定就不改本类）
     /// </summary>
     public class KHttpDownloader : MonoBehaviour, IDisposable
@@ -46,7 +47,7 @@ namespace KEngine
         }
 
         public string Url { get; private set; }
-//        private string ToPath;
+        private string ToPath;
 
         //CWWWLoader WWWLoader;
 
@@ -73,6 +74,7 @@ namespace KEngine
         //public WWW Www { get { return WWWLoader.Www; } }
         public float Progress = 0; // 進度
         //public float Speed { get { return WWWLoader.LoadSpeed; } } // 速度
+        public int TotalSize = int.MaxValue; // 下载的整个大小，在获取到Response后，会设置这个值
 
         private KHttpDownloader()
         {
@@ -80,6 +82,7 @@ namespace KEngine
 
 
         /// <summary>
+        /// 
         /// </summary>
         /// <param name="fullUrl"></param>
         /// <param name="saveFullPath">完整的保存路径！</param>
@@ -92,7 +95,7 @@ namespace KEngine
         {
             var downloader = new GameObject("HttpDownloader+" + fullUrl).AddComponent<KHttpDownloader>();
             downloader.Init(fullUrl, saveFullPath, useContinue, useCache, expireDays, timeout);
-            DontDestroyOnLoad(downloader.gameObject);
+
             return downloader;
         }
 
@@ -105,7 +108,7 @@ namespace KEngine
             int expireDays = 1, int timeout = 10)
         {
             Url = fullUrl;
-//            ToPath = saveFullPath;
+            ToPath = saveFullPath;
             _saveFullPath = saveFullPath;
             UseCache = useCache;
             _useContinue = useContinue;
@@ -121,7 +124,7 @@ namespace KEngine
 
         private IEnumerator StartDownload(string fullUrl)
         {
-//            float startTime = Time.time;
+            float startTime = Time.time;
             if (UseCache && File.Exists(_saveFullPath))
             {
                 var lastWriteTime = File.GetLastWriteTimeUtc(_saveFullPath);
@@ -257,6 +260,7 @@ namespace KEngine
                 //向服务器请求，获得服务器回应数据流 
                 using (var response = request.GetResponse()) // TODO: Async Timeout
                 {
+                    TotalSize = (int) response.ContentLength;
                     //CDebug.LogConsole_MultiThread("Getted Response : {0}", url);
                     Console.WriteLine("Getted Response : {0}", url);
                     if (IsFinished)
@@ -265,11 +269,8 @@ namespace KEngine
                     }
                     else
                     {
-                        var totalSize = (int) response.ContentLength;
-                        if (totalSize <= 0)
-                        {
-                            totalSize = int.MaxValue;
-                        }
+                        var totalSize = (int) TotalSize;
+
                         using (var ns = response.GetResponseStream())
                         {
                             //CDebug.LogConsole_MultiThread("Start Stream: {0}", url);
