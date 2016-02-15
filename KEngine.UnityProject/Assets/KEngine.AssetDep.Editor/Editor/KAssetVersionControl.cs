@@ -43,6 +43,21 @@ namespace KEngine.Editor
         private bool _isRebuild = false;
 
         /// <summary>
+        /// 持久化，硬盘的
+        /// </summary>
+        private Dictionary<string, BuildRecord> StoreBuildVersion = new Dictionary<string, BuildRecord>();
+
+        private Dictionary<string, BuildRecord> InstanceBuildVersion = new Dictionary<string, BuildRecord>();
+
+        /// <summary>
+        /// Getter获取所有记录的字典, 对这个字典的修改，将会影响写入文件的结果
+        /// </summary>
+        public Dictionary<string, BuildRecord> BuildRecords
+        {
+            get { return StoreBuildVersion; }
+        } 
+
+        /// <summary>
         /// 资源打包周期版本管理
         /// </summary>
         /// <param name="rebuild">如果是rebuild，将无视之前的差异打包信息</param>
@@ -91,7 +106,7 @@ namespace KEngine.Editor
 
         #region 资源版本管理相关
 
-        private class BuildRecord
+        public class BuildRecord
         {
             public string MD5;
             public int ChangeCount;
@@ -118,13 +133,6 @@ namespace KEngine.Editor
                 ChangeCount++;
             }
         }
-
-        /// <summary>
-        /// 持久化，硬盘的
-        /// </summary>
-        private Dictionary<string, BuildRecord> StoreBuildVersion = new Dictionary<string, BuildRecord>();
-
-        private Dictionary<string, BuildRecord> InstanceBuildVersion = new Dictionary<string, BuildRecord>();
 
         public void WriteVersion()
         {

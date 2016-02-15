@@ -49,6 +49,8 @@ namespace KEngine.ResourceDep
     /// </summary>
     public class ResourceDepUtils
     {
+        //public static string ShadersPrefabName = "ResourceDepShaders.prefab";
+
         /// <summary>
         /// 将返回具体的资源路径，会把其余目录名的首字母合并在一起
         /// </summary>
@@ -59,15 +61,25 @@ namespace KEngine.ResourceDep
             var fileName = Path.GetFileNameWithoutExtension(relativeAssetPath);
             var fileExt = Path.GetExtension(relativeAssetPath);
             var dirPath = Path.GetDirectoryName(relativeAssetPath);
-            var dirArr = dirPath.Split(new char[] {'/'}, StringSplitOptions.RemoveEmptyEntries);
+            //var dirArr = dirPath.Split(new char[] {'/'}, StringSplitOptions.RemoveEmptyEntries);
 
             // 寻找所有目录的首字母
-            var dirFirstCharArr = new string[dirArr.Length];
-            for (var i = 0; i < dirArr.Length; i++)
+            //var dirFirstCharArr = new string[dirArr.Length];
+            //for (var i = 0; i < dirArr.Length; i++)
+            //{
+            //    dirFirstCharArr[i] = dirArr[i][0].ToString().ToLower();
+            //}
+            string newBuildAssetPath;
+            if (!string.IsNullOrEmpty(dirPath))
+                newBuildAssetPath = String.Format("{0}/{1}{2}", dirPath, fileName, fileExt);
+            else
             {
-                dirFirstCharArr[i] = dirArr[i][0].ToString().ToLower();
+                // 处理根目录的情况
+                newBuildAssetPath = string.Format("_{0}{1}", fileName, fileExt);
             }
-            var newBuildAssetPath = string.Format("{0}/{1}_{2}{3}", dirPath, string.Join("", dirFirstCharArr), fileName, fileExt);
+
+            // 去掉路径，所有文件根目录
+            newBuildAssetPath = newBuildAssetPath.Replace("/", "_").Replace("(", "_").Replace(")", "_"); // 去掉一些特殊字符
             return newBuildAssetPath;
         }
 
@@ -85,14 +97,53 @@ namespace KEngine.ResourceDep
         }
 
         /// <summary>
+        /// 是否完成shaders加载？
+        /// </summary>
+        private static bool IsShadersPrefabLoaded = false;
+
+        /// <summary>
+        /// 检查如果Shader对象还没有加载，旧加载
+        /// </summary>
+        //private static void CheckLoadShadersPrefab()
+        //{
+        //    if (!IsShadersPrefabLoaded)
+        //    {
+        //        var buildPath = GetBuildPath(ShadersPrefabName  + AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt));
+        //        //KAssetBundleLoader.Load(buildPath);
+        //        KAssetFileLoader.Load(buildPath);
+        //        IsShadersPrefabLoaded = true;
+        //    }
+        //}
+
+        /// <summary>
+        /// 编辑器模式下，对全部GameObject刷新一下Material
+        /// </summary>
+        public static void RefreshAllMaterialsShaders()
+        {
+            foreach (var renderer in GameObject.FindObjectsOfType<Renderer>())
+            {
+                if (renderer.sharedMaterials != null)
+                {
+                    foreach (var mat in renderer.sharedMaterials)
+                    {
+                        if (mat != null && mat.shader != null)
+                        {
+                            mat.shader = Shader.Find(mat.shader.name);
+                        }
+                    }
+                }
+            }
+        }
+        /// <summary>
         /// 同步加载AssetBundle
         /// </summary>
         /// <param name="relativePath"></param>
         /// <returns></returns>
-        public static UnityEngine.Object LoadAssetBundleSync(string relativePath)
+        public static Object LoadAssetBundleSync(string relativePath)
         {
+            //CheckLoadShadersPrefab();
             // manifest
-            string manifestPath = ResourceDepUtils.GetBuildPath(string.Format("{0}.manifest{1}", relativePath,
+            string manifestPath = ResourceDepUtils.GetBuildPath(String.Format("{0}.manifest{1}", relativePath,
                 AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt)));
             var manifestLoader = KBytesLoader.Load(manifestPath, KResourceInAppPathType.ResourcesAssetsPath,
                 KAssetBundleLoaderMode.ResourcesLoad);
@@ -111,6 +162,11 @@ namespace KEngine.ResourceDep
                     //{
                     //    yield return null;
                     //}
+
+                    if (Application.isEditor)
+                    {
+                        Logger.Log("Load dep sync:{0}, from: {1}", depPath, relativePath);
+                    }
                 }
             }
             else
@@ -119,14 +175,14 @@ namespace KEngine.ResourceDep
             }
 
             string path =
-                GetBuildPath(string.Format("{0}{1}", relativePath,
-                    KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt)));
+                GetBuildPath(String.Format("{0}{1}", relativePath,
+                    AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt)));
 
             //while (!assetLoader.IsCompleted)
             //    yield return null;
             // 获取后缀名
             var ext = Path.GetExtension(relativePath);
-            if (ext == ".unity")
+            if (ext == ".unity" || ext == ".shader")
             {
                 // Scene 
                 var sceneLoader = KAssetBundleLoader.Load(path);
@@ -141,7 +197,6 @@ namespace KEngine.ResourceDep
                 //    yield return null;
                 return assetLoader.Asset;
             }
-
         }
 
         /// <summary>
@@ -151,6 +206,7 @@ namespace KEngine.ResourceDep
         /// <returns></returns>
         public static ResourceDepRequest LoadAssetBundleAsync(string relativePath)
         {
+            //CheckLoadShadersPrefab();
             var request = new ResourceDepRequest { Path = relativePath };
             AppEngine.EngineInstance.StartCoroutine(CoLoadAssetBundleAsync(relativePath, request));
             return request;
@@ -159,7 +215,7 @@ namespace KEngine.ResourceDep
         private static IEnumerator CoLoadAssetBundleAsync(string relativePath, ResourceDepRequest request)
         {
             // manifest
-            string manifestPath = ResourceDepUtils.GetBuildPath(string.Format("{0}.manifest{1}", relativePath,
+            string manifestPath = ResourceDepUtils.GetBuildPath(String.Format("{0}.manifest{1}", relativePath,
                 AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt)));
             var manifestLoader = KBytesLoader.Load(manifestPath, KResourceInAppPathType.ResourcesAssetsPath,
                 KAssetBundleLoaderMode.ResourcesLoad);
@@ -183,12 +239,12 @@ namespace KEngine.ResourceDep
                 }
             }
             string path =
-                GetBuildPath(string.Format("{0}{1}", relativePath,
-                    KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt)));
+                GetBuildPath(String.Format("{0}{1}", relativePath,
+                    AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt)));
 
             // 获取后缀名
             var ext = Path.GetExtension(relativePath);
-            if (ext == ".unity")
+            if (ext == ".unity" || ext == ".shader")
             {
                 // Scene 
                 var sceneLoader = KAssetBundleLoader.Load(path);
@@ -206,6 +262,11 @@ namespace KEngine.ResourceDep
             request.IsDone = true;
         }
 
+        /// <summary>
+        /// 暂时不用
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public static ResourceDepRequest LoadLevelAdditiveAsync(string path)
         {
             var req = new ResourceDepRequest();
@@ -213,6 +274,12 @@ namespace KEngine.ResourceDep
             return req;
         }
 
+        /// <summary>
+        /// 暂时不用，交给KResources
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="req"></param>
+        /// <returns></returns>
         static IEnumerator CoLoadLevelAdditiveAsync(string path, ResourceDepRequest req)
         {
             var abReq = LoadAssetBundleAsync(path);
@@ -224,6 +291,8 @@ namespace KEngine.ResourceDep
             while (!op.isDone)
                 yield return null;
 
+            RefreshAllMaterialsShaders();
+            req.IsDone = true;
             Logger.Log("[LoadLevelAdditiveAsync]Load Level `{0}` Complete!", path);
         }
     }
