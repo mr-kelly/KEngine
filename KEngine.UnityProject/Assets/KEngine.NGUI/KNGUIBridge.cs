@@ -106,7 +106,7 @@ public class KNGUIBridge : IKUIBridge
         var manifestBytes = manifestLoader.Bytes;
         manifestLoader.Release(); // 释放掉文本字节
         var utf8NoBom = new UTF8Encoding(false);
-        var manifestList = utf8NoBom.GetString(manifestBytes).Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        var manifestList = utf8NoBom.GetString(manifestBytes).Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
         for (var i = 0; i < manifestList.Length; i++)
         {
             var depPath = manifestList[i] + AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt);

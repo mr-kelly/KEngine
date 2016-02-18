@@ -43,7 +43,7 @@ public class KEngineNGUIDemoMain : MonoBehaviour
             new IModule[]
             {
                 KUIModule.Instance,
-                KGameSettings.Instance,
+                //KGameSettings.Instance,
                 
             },
             null,
