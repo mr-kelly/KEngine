@@ -26,6 +26,7 @@
 using System;
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Object = UnityEngine.Object;
@@ -42,6 +43,8 @@ namespace KEngine.ResourceDep
         public System.Type Type { get; internal set; }
 
         public bool IsDone { get; internal set; }
+
+        public List<KAbstractResourceLoader> Loaders = null;
     }
 
     /// <summary>
@@ -163,10 +166,10 @@ namespace KEngine.ResourceDep
                     //    yield return null;
                     //}
 
-                    if (Application.isEditor)
+                    /*if (Application.isEditor)
                     {
                         Logger.Log("Load dep sync:{0}, from: {1}", depPath, relativePath);
-                    }
+                    }*/
                 }
             }
             else
@@ -232,6 +235,9 @@ namespace KEngine.ResourceDep
                 {
                     var depPath = manifestList[i] + AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt);
                     var depLoader = KAssetFileLoader.Load(depPath);
+                    if (request.Loaders == null)
+                        request.Loaders = new List<KAbstractResourceLoader>();
+                    request.Loaders.Add(depLoader);
                     while (!depLoader.IsCompleted)
                     {
                         yield return null;
@@ -248,6 +254,10 @@ namespace KEngine.ResourceDep
             {
                 // Scene 
                 var sceneLoader = KAssetBundleLoader.Load(path);
+
+                if (request.Loaders == null)
+                    request.Loaders = new List<KAbstractResourceLoader>();
+                request.Loaders.Add(sceneLoader);
                 while (!sceneLoader.IsCompleted)
                     yield return null;
             }

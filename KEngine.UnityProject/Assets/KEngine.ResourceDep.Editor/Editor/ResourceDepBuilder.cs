@@ -233,10 +233,10 @@ namespace KEngine.ResourceDep.Builder
             if (!needBuild)
                 return;
 
-            BuildPipeline.PushAssetDependencies();
 
             var buildAssetPath = info.BuildAssetPath;
             var depObjectsMap = CollectAndPushBuildDependencies(info.Asset, needBuild);
+            BuildPipeline.PushAssetDependencies();
             BuildAssetBundle(info.Asset, buildAssetPath, GetBuildAssetPaths(depObjectsMap));
 
             DependencyPool.Add(buildAssetPath);
@@ -251,9 +251,9 @@ namespace KEngine.ResourceDep.Builder
             if (!needBuild)
                 return;
 
-            BuildPipeline.PushAssetDependencies();
 
             var buildAssetPath = GetBuildAssetPath(obj);
+            BuildPipeline.PushAssetDependencies();
             BuildAssetBundle(obj, buildAssetPath, GetBuildAssetPaths(depObjectsMap));
             DependencyPool.Add(buildAssetPath);
         }
@@ -403,9 +403,12 @@ namespace KEngine.ResourceDep.Builder
 
             // 创建依赖记录文件
             string fullManifestPath = null;
-            if (depFileRelativeBuildPath != null && depFileRelativeBuildPath.Any())
+            //if (depFileRelativeBuildPath != null && depFileRelativeBuildPath.Any())
             {
                 //var manifestFileContent = string.Join("\n", depFileRelativeBuildPath.KToArray());
+                if (depFileRelativeBuildPath == null)
+                    depFileRelativeBuildPath = new List<string>();
+
                 var manifestPath = path + ".manifest";
                 fullManifestPath = KBuildTools.MakeSureExportPath(manifestPath, buildTarget, quality) +
                                    AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt);

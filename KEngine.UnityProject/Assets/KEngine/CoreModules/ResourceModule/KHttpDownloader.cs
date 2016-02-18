@@ -47,7 +47,7 @@ namespace KEngine
         }
 
         public string Url { get; private set; }
-        private string ToPath;
+//        private string ToPath;
 
         //CWWWLoader WWWLoader;
 
@@ -95,7 +95,7 @@ namespace KEngine
         {
             var downloader = new GameObject("HttpDownloader+" + fullUrl).AddComponent<KHttpDownloader>();
             downloader.Init(fullUrl, saveFullPath, useContinue, useCache, expireDays, timeout);
-
+            DontDestroyOnLoad(downloader.gameObject);
             return downloader;
         }
 
@@ -108,7 +108,7 @@ namespace KEngine
             int expireDays = 1, int timeout = 10)
         {
             Url = fullUrl;
-            ToPath = saveFullPath;
+//            ToPath = saveFullPath;
             _saveFullPath = saveFullPath;
             UseCache = useCache;
             _useContinue = useContinue;
@@ -124,7 +124,7 @@ namespace KEngine
 
         private IEnumerator StartDownload(string fullUrl)
         {
-            float startTime = Time.time;
+//            float startTime = Time.time;
             if (UseCache && File.Exists(_saveFullPath))
             {
                 var lastWriteTime = File.GetLastWriteTimeUtc(_saveFullPath);
@@ -269,7 +269,7 @@ namespace KEngine
                     }
                     else
                     {
-                        var totalSize = (int) TotalSize;
+                        var totalSize = TotalSize;
 
                         using (var ns = response.GetResponseStream())
                         {
