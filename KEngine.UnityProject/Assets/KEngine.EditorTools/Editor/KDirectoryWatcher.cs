@@ -62,7 +62,7 @@ namespace KUnityEditorTools
             var watcher = new FileSystemWatcher();
             watcher.IncludeSubdirectories = false;//includeSubdirectories;
             watcher.Path = dirPath;
-            watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size;
+            watcher.NotifyFilter = NotifyFilters.LastWrite;
             watcher.Filter = "*";
             watcher.Changed += handler;
             watcher.EnableRaisingEvents = true;

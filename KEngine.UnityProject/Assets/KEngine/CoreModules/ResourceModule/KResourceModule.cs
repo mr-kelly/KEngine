@@ -46,6 +46,7 @@ public enum KResourceQuality
 public enum KResourceInAppPathType
 {
     Invalid,
+    PersistentAssetsPath, // 使用PersitentDataPath目录，可以使用File.Read
     StreamingAssetsPath,
 
     ResourcesAssetsPath,
@@ -88,7 +89,7 @@ public class KResourceModule : MonoBehaviour, KEngine.IModule
 
     public static KResourceQuality Quality = KResourceQuality.Sd;
 
-    public static KResourceInAppPathType DefaultInAppPathType = KResourceInAppPathType.ResourcesAssetsPath;
+    public static KResourceInAppPathType DefaultInAppPathType = KResourceInAppPathType.PersistentAssetsPath;
 
     public static float TextureScale
     {
@@ -168,7 +169,7 @@ public class KResourceModule : MonoBehaviour, KEngine.IModule
     public static string DocumentResourcesPath;
 
     public static KResourcePathPriorityType ResourcePathPriorityType =
-        KResourcePathPriorityType.PersistentDataPathPriority; // 是否優先找下載的資源?還是app本身資源優先
+        KResourcePathPriorityType.InAppPathPriority; // 是否優先找下載的資源?還是app本身資源優先
 
     public static System.Func<string, string> CustomGetResourcesPath; // 自定义资源路径。。。
 
@@ -237,6 +238,10 @@ public class KResourceModule : MonoBehaviour, KEngine.IModule
         else if (inAppPathType == KResourceInAppPathType.ResourcesAssetsPath)
         {
             hasInAppUrl = TryGetInAppResourcesFolderUrl(url, out inAppUrl); // 使用Resources某
+        }
+        else if (inAppPathType == KResourceInAppPathType.PersistentAssetsPath)
+        {
+            hasInAppUrl = TryGetPersitentResourceUrl(url, out inAppUrl);
         }
         else
         {
@@ -350,6 +355,24 @@ public class KResourceModule : MonoBehaviour, KEngine.IModule
         return false;
     }
 
+    /// <summary>
+    /// 可被File.ReadXXX读取到的PersistentDataPath路径
+    /// </summary>
+    /// <param name="url"></param>
+    /// <param name="newUrl"></param>
+    /// <returns></returns>
+    public static bool TryGetPersitentResourceUrl(string url, out string newUrl)
+    {
+        newUrl = DocumentResourcesPathWithoutFileProtocol + url;
+        return File.Exists(newUrl);
+    }
+
+    /// <summary>
+    /// 可被WWW读取的Resource路径
+    /// </summary>
+    /// <param name="url"></param>
+    /// <param name="newUrl"></param>
+    /// <returns></returns>
     public static bool TryGetDocumentResourceUrl(string url, out string newUrl)
     {
         newUrl = DocumentResourcesPath + url;
@@ -434,7 +457,7 @@ public class KResourceModule : MonoBehaviour, KEngine.IModule
     /// Here, get Platform name that represent the AssetBundles Folder.
     /// </summary>
     /// <returns>Platform folder Name</returns>
-    private static string GetBuildPlatformName()
+    public static string GetBuildPlatformName()
     {
         string buildPlatformName = "Win32"; // default
 

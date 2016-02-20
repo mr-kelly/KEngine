@@ -237,6 +237,9 @@ namespace KEngine.Editor
                     return "Assets/Resources/" +
                            KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.StreamingBundlesFolderName);
                         // hold asset bundles"
+                if (KResourceModule.DefaultInAppPathType == KResourceInAppPathType.PersistentAssetsPath)
+                    return Application.persistentDataPath + "/" +
+                           KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.StreamingBundlesFolderName); 
 
                 Logger.LogError("[AssetBundlesLinkPath]Invalid {0}", KResourceModule.DefaultInAppPathType);
                 return null;

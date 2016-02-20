@@ -61,7 +61,12 @@ public class KBytesLoader : KAbstractResourceLoader
                 Logger.LogError("[KBytesLoader]Error Path: {0}", url);
             OnFinish(null);
         }
-        if (_inAppPathType == KResourceInAppPathType.StreamingAssetsPath)
+        if (_inAppPathType == KResourceInAppPathType.PersistentAssetsPath)
+        {
+            Progress = .5f;
+            Bytes = File.ReadAllBytes(FullUrl);
+        }
+        else if (_inAppPathType == KResourceInAppPathType.StreamingAssetsPath)
         {
             _wwwLoader = KWWWLoader.Load(FullUrl);
             while (!_wwwLoader.IsCompleted)

@@ -167,25 +167,25 @@ PlayerSettings:
   flashStrippingLevel: 2
   spritePackerPolicy: 
   scriptingDefineSymbols:
-    0: NGUI
-    1: NGUI
-    2: NGUI
-    4: NGUI
-    5: NGUI
-    6: NGUI
-    7: NGUI
-    9: NGUI
-    11: NGUI
-    12: NGUI
-    14: NGUI
-    15: NGUI
-    16: NGUI
-    17: NGUI
-    18: NGUI
-    19: NGUI
-    20: NGUI
-    21: NGUI
-    22: NGUI
+    0: 
+    1: 
+    2: 
+    4: 
+    5: 
+    6: 
+    7: 
+    9: 
+    11: 
+    12: 
+    14: 
+    15: 
+    16: 
+    17: 
+    18: 
+    19: 
+    20: 
+    21: 
+    22: 
   metroPackageName: CosmosEngineBootstrap
   metroPackageLogo: 
   metroPackageLogo140: 
