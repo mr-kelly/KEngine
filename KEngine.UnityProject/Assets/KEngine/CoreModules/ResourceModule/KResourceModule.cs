@@ -200,7 +200,7 @@ public class KResourceModule : MonoBehaviour, KEngine.IModule
     /// <param name="isLog"></param>
     /// <returns></returns>
     public static string GetResourceFullPath(string url,
-        KResourceInAppPathType inAppPathType = KResourceInAppPathType.StreamingAssetsPath, bool isLog = true)
+        KResourceInAppPathType inAppPathType = KResourceInAppPathType.Default, bool isLog = true)
     {
         string fullPath;
         if (GetResourceFullPath(url, out fullPath, inAppPathType, isLog))
