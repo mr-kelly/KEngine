@@ -78,7 +78,7 @@ namespace KUnityEditorTools
         /// 将要停止游戏 (不包括暂停哦)
         /// </summary>
         private static System.Action _OnWillStopEvent;
-        private static System.Action OnWillStopEvent
+        public static System.Action OnWillStopEvent
         {
             get { return _OnWillStopEvent; }
             set
