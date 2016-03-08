@@ -69,6 +69,6 @@ public class KUIDemoHome : KUIController
         HomeLabel.text = "Change UI Label...... 3";
 
         yield return new WaitForSeconds(1f);
-        HomeLabel.text = "CosmosEngine Demo!";
+        HomeLabel.text = "KEngine Demo!";
     }
 }

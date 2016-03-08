@@ -786,10 +786,12 @@ namespace KEngine.ResourceDep.Builder
 
         public static void PopAll()
         {
-            foreach (var depObj in DependencyPool)
+            var popCount = DependencyPool.Count;
+            for (var i = 0; i < popCount; i++)
             {
                 BuildPipeline.PopAssetDependencies();
             }
+
             Logger.Log("Clear pushed ResourceDep pool count: {0}", DependencyPool.Count);
             DependencyPool.Clear();
         }

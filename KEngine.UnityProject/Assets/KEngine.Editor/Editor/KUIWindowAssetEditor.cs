@@ -27,7 +27,6 @@
 using UnityEditor;
 using UnityEngine;
 
-#if NGUI
 [InitializeOnLoad]
 internal class KUIPanelAssetEditorInitializer
 {
@@ -44,7 +43,7 @@ internal class KUIPanelAssetEditorInitializer
             if (obj.GetComponent<KUIWindowAsset>() != null)
             {
                 Rect r = new Rect(selectionrect);
-                r.x = 0; //r.width - 30;
+                r.x = r.width - 30;
                 r.width = 30;
                 var style = new GUIStyle();
                 style.normal.textColor = Color.yellow;
@@ -64,4 +63,3 @@ public class KUIWindowAssetEditor : Editor
         base.OnInspectorGUI();
     }
 }
-#endif

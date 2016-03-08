@@ -34,11 +34,17 @@ namespace KEngine.UI
     /// <summary>
     /// Abstract class of all UI Script
     /// </summary>
-    public abstract class KUIController : KBehaviour
+    public class KUIController : KBehaviour
     {
+        /// <summary>
+        /// Set from KUIModule, Resource Name
+        /// </summary>
         public string UITemplateName = "";
+
+        /// <summary>
+        /// Set from KUIModule, InstanceName
+        /// </summary>
         public string UIName = "";
-        public bool HasBackBtn = true; // 是否有返回按钮
 
         public virtual void OnInit()
         {

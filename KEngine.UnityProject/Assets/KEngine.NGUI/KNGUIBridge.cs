@@ -100,7 +100,7 @@ public class KNGUIBridge : IKUIBridge
         // manifest
         string manifestPath = ResourceDepUtils.GetBuildPath(string.Format("BundleResources/NGUI/{0}.prefab.manifest{1}", name,
             AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt)));
-        var manifestLoader = KBytesLoader.Load(manifestPath, KResourceInAppPathType.ResourcesAssetsPath, KAssetBundleLoaderMode.ResourcesLoad);
+        var manifestLoader = KBytesLoader.Load(manifestPath, KResourceInAppPathType.PersistentAssetsPath, KAssetBundleLoaderMode.PersitentDataPathSync);
         while (!manifestLoader.IsCompleted)
             yield return null;
         var manifestBytes = manifestLoader.Bytes;

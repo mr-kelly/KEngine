@@ -55,9 +55,10 @@ public class KUGUIDemoMain : MonoBehaviour
         while (!engine.IsInited)
             yield return null;
 
-        KUIModule.Instance.OpenWindow<KUIDemoHome>();
+        var uiName = "DemoHome";
+        KUIModule.Instance.OpenWindow(uiName);
 
-        KUIModule.Instance.CallUI<KUIDemoHome>(ui =>
+        KUIModule.Instance.CallUI(uiName, (ui, args) =>
         {
             // Do some UI stuff
         });
