@@ -194,7 +194,7 @@ namespace KEngine.Editor
             return PerformBuild(path, BuildTarget.Android, opt);
         }
 
-        [MenuItem("KEngine/Clear PC PersitentDataPath")]
+        [MenuItem("KEngine/Clear PC PersistentDataPath")]
         public static void ClearPersistentDataPath()
         {
             foreach (string dir in Directory.GetDirectories(KResourceModule.GetAppDataPath()))
@@ -207,7 +207,7 @@ namespace KEngine.Editor
             }
         }
 
-        [MenuItem("KEngine/Open PC PersitentDataPath Folder")]
+        [MenuItem("KEngine/Open PC PersistentDataPath Folder")]
         public static void OpenPersistentDataPath()
         {
             System.Diagnostics.Process.Start(KResourceModule.GetAppDataPath());
@@ -237,6 +237,9 @@ namespace KEngine.Editor
                     return "Assets/Resources/" +
                            KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.StreamingBundlesFolderName);
                         // hold asset bundles"
+                if (KResourceModule.DefaultInAppPathType == KResourceInAppPathType.PersistentAssetsPath)
+                    return Application.persistentDataPath + "/" +
+                           KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.StreamingBundlesFolderName); 
 
                 Logger.LogError("[AssetBundlesLinkPath]Invalid {0}", KResourceModule.DefaultInAppPathType);
                 return null;

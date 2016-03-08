@@ -121,24 +121,26 @@ namespace KEngine.UI
             yield break;
         }
 
+        [Obsolete("Use string ui name instead for more flexible!")]
         public CUILoadState OpenWindow(Type type, params object[] args)
         {
             string uiName = type.Name.Remove(0, 3); // 去掉"CUI"
             return OpenWindow(uiName, args);
         }
 
+        [Obsolete("Use string ui name instead for more flexible!")]
         public CUILoadState OpenWindow<T>(params object[] args) where T : KUIController
         {
             return OpenWindow(typeof(T), args);
         }
 
         // 打开窗口（非复制）
-        public CUILoadState OpenWindow(string name, params object[] args)
+        public CUILoadState OpenWindow(string uiTemplateName, params object[] args)
         {
             CUILoadState uiState;
-            if (!UIWindows.TryGetValue(name, out uiState))
+            if (!UIWindows.TryGetValue(uiTemplateName, out uiState))
             {
-                uiState = LoadWindow(name, true, args);
+                uiState = LoadWindow(uiTemplateName, true, args);
                 return uiState;
             }
 
@@ -392,7 +394,8 @@ namespace KEngine.UI
             uiObj.SetActive(false);
             uiObj.name = openState.TemplateName;
 
-            KUIController uiBase = (KUIController)uiObj.AddComponent(openState.UIType);
+            KUIController uiBase = uiObj.AddComponent(openState.UIType) as KUIController;
+            Logger.Assert(uiBase);
 
             openState.UIWindow = uiBase;
 
@@ -465,17 +468,19 @@ namespace KEngine.UI
             openState.DoCallback(callback, args);
         }
 
+        [Obsolete("Use string ui name instead for more flexible!")]
         public void CallUI<T>(Action<T> callback) where T : KUIController
         {
             CallUI<T>((_ui, _args) => callback(_ui));
         }
 
         // 使用泛型方式
+        [Obsolete("Use string ui name instead for more flexible!")]
         public void CallUI<T>(Action<T, object[]> callback, params object[] args) where T : KUIController
         {
             string uiName = typeof(T).Name.Remove(0, 3); // 去掉 "XUI"
 
-            CallUI(uiName, (KUIController _uibase, object[] _args) => { callback((T)_uibase, _args); }, args);
+            CallUI(uiName, (KUIController _uibase, object[] _args) => { callback(_uibase as T, _args); }, args);
         }
 
         private void OnOpen(CUILoadState uiState, params object[] args)
@@ -546,7 +551,7 @@ namespace KEngine.UI
         public string TemplateName;
         public string InstanceName;
         public KUIController UIWindow;
-        public string UIType;
+        public Type UIType;
         public bool IsLoading;
         public bool IsStaticUI; // 非复制出来的, 静态UI
 
@@ -557,12 +562,14 @@ namespace KEngine.UI
         internal Queue<object[]> CallbacksArgsWhenFinish;
         public KAbstractResourceLoader UIResourceLoader; // 加载器，用于手动释放资源
 
-        public CUILoadState(string uiTypeTemplateName, string uiInstanceName)
+        public CUILoadState(string uiTemplateName, string uiInstanceName, Type uiControllerType = default(Type))
         {
-            TemplateName = uiTypeTemplateName;
+            if (uiControllerType == default(Type)) uiControllerType = typeof (KUIController);
+
+            TemplateName = uiTemplateName;
             InstanceName = uiInstanceName;
             UIWindow = null;
-            UIType = "KUI" + uiTypeTemplateName;
+            UIType = uiControllerType;
 
             IsLoading = true;
             OpenWhenFinish = false;

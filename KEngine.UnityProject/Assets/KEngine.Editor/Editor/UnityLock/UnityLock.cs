@@ -243,7 +243,8 @@ public class UnityLock : EditorWindow
         {
             get
             {
-                return "Assets" + Directory.GetFiles(Application.dataPath, "UnityLockHierarchyIcon.png", SearchOption.AllDirectories)[0].Substring(Application.dataPath.Length).Replace('\\', '/');
+                return ""; // TODO: 图标
+                //return "Assets" + Directory.GetFiles(Application.dataPath, "UnityLockHierarchyIcon.png", SearchOption.AllDirectories)[0].Substring(Application.dataPath.Length).Replace('\\', '/');
             }
         }
 

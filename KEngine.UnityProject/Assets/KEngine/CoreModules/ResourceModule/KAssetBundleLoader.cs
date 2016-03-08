@@ -33,6 +33,7 @@ using UnityEngine;
 public enum KAssetBundleLoaderMode
 {
     Default,
+    PersitentDataPathSync, // Use PersistentDataPath!
     StreamingAssetsWww, // default, use WWW class -> StreamingAssets Path
     ResourcesLoadAsync, // -> Resources path
     ResourcesLoad, // -> Resources Path
@@ -99,6 +100,9 @@ public class KAssetBundleLoader : KAbstractResourceLoader
                 case KResourceInAppPathType.ResourcesAssetsPath:
                     _loaderMode = KAssetBundleLoaderMode.ResourcesLoad;
                     break;
+                case KResourceInAppPathType.PersistentAssetsPath:
+                    _loaderMode = KAssetBundleLoaderMode.PersitentDataPathSync;
+                    break;
                 default:
                     Logger.LogError("Error DefaultInAppPathType: {0}", _inAppPathType);
                     break;
@@ -113,6 +117,9 @@ public class KAssetBundleLoader : KAbstractResourceLoader
                 break;
             case KAssetBundleLoaderMode.StreamingAssetsWww:
                 _inAppPathType = KResourceInAppPathType.StreamingAssetsPath;
+                break;
+            case KAssetBundleLoaderMode.PersitentDataPathSync:
+                _inAppPathType = KResourceInAppPathType.PersistentAssetsPath;
                 break;
             default:
                 Logger.LogError("[KAssetBundleLoader:Init]Unknow loader mode: {0}", _loaderMode);
