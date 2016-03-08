@@ -171,6 +171,7 @@ namespace CosmosTable
 
                     T newT = new T();  // the New Object may not be used this time, so cache it!
                     newT.RowNumber = rowIndex;
+                    newT.HeaderInfos = Headers; // pass header info into
 
                     if (!newT.IsAutoParse)
                         newT.Parse(splitString1);
@@ -201,6 +202,9 @@ namespace CosmosTable
             return true;
         }
 
+        /// <summary>
+        /// Auto get fields from class definition, use reflection (poor performance warning!)
+        /// </summary>
         internal FieldInfo[] AutoTabFields
         {
             get
@@ -225,6 +229,11 @@ namespace CosmosTable
         //    }
         //}
 
+        /// <summary>
+        /// Auto parser with class's definition fields (poor performance warning)
+        /// </summary>
+        /// <param name="tableRowInfo"></param>
+        /// <param name="cellStrs"></param>
         protected void AutoParse(TableRowInfo tableRowInfo, string[] cellStrs)
         {
             var type = tableRowInfo.GetType();

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace CosmosTable
 {
-    public partial class TableRowInfo
+    public abstract class TableRowInfo
     {
         /// <summary>
         /// When true, will use reflection to map the Tab File
@@ -13,6 +13,8 @@ namespace CosmosTable
             get { return true; }
         }
         public int RowNumber { get; set; }
+        public Dictionary<string, HeaderInfo> HeaderInfos { get; internal set; }
+
         protected TableRowInfo()
         {
         }
@@ -114,6 +116,7 @@ namespace CosmosTable
         {
             Values = cellStrs;
         }
+
     }
 
 }
