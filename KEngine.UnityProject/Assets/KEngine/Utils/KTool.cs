@@ -428,7 +428,7 @@ public class KTool
                     break;
                 default:
                     Logger.LogError("Unsupport Type {0} in StrBytesToArray(), You can custom this.", typeCode);
-                    Logger.Assert(false);
+                    Debuger.Assert(false);
                     break;
             }
 
@@ -932,7 +932,7 @@ public class KTool
 
     public static void MoveAllCollidersToGameObject(GameObject srcGameObject, GameObject targetGameObject)
     {
-        Logger.Assert(srcGameObject != targetGameObject);
+        Debuger.Assert(srcGameObject != targetGameObject);
         foreach (Collider collider2d in srcGameObject.GetComponentsInChildren<Collider>())
         {
             CopyColliderToGameObject(collider2d, targetGameObject);
@@ -1390,7 +1390,7 @@ public class XMemoryParser<T>
     {
         get
         {
-            Logger.Assert(index < MaxCount);
+            Debuger.Assert(index < MaxCount);
             IntPtr p = (IntPtr) (SourceBytesPtr.ToInt32() + Marshal.SizeOf(typeof (T))*index);
             return (T) Marshal.PtrToStructure(p, typeof (T));
         }

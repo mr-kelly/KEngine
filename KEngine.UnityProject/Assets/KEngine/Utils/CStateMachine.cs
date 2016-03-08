@@ -62,9 +62,9 @@ public class CStateMachine<OBJ, STATE>
         CurState = initState;
 
         Array statesArray = Enum.GetValues(typeof (STATE));
-        Logger.Assert(statesArray.Length == stateMap.Length);
+        Debuger.Assert(statesArray.Length == stateMap.Length);
 
-        Logger.Assert(Object_);
+        Debuger.Assert(Object_);
 
         foreach (CState<STATE> state in stateMap)
         {

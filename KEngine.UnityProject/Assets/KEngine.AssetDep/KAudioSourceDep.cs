@@ -42,7 +42,7 @@ public class KAudioSourceDep : KAssetDep
             {
                 AudioSource src = DependencyComponent as AudioSource;
 
-                Logger.Assert(src);
+                Debuger.Assert(src);
                 src.clip = clip;
                 //src.Play(); // 特效进行Play, 不主动播放
                 src.Stop();

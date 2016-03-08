@@ -67,7 +67,7 @@ namespace KEngine
             }
 
             var shader = loader.Bundle.mainAsset as Shader;
-            Logger.Assert(shader);
+            Debuger.Assert(shader);
 
             Desc = shader.name;
 

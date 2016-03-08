@@ -35,7 +35,7 @@ namespace KEngine.Editor
 {
     public class KEngineUtils : EditorWindow
     {
-        public static readonly Version KEngineVersion = new Version("2.0.2.0");
+        public static readonly Version KEngineVersion = new Version("2.1.0.0");
 
         static KEngineUtils()
         {

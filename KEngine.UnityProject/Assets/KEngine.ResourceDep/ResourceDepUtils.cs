@@ -102,7 +102,7 @@ namespace KEngine.ResourceDep
         /// <summary>
         /// 是否完成shaders加载？
         /// </summary>
-        private static bool IsShadersPrefabLoaded = false;
+        //private static bool IsShadersPrefabLoaded = false;
 
         /// <summary>
         /// 检查如果Shader对象还没有加载，旧加载
@@ -160,7 +160,8 @@ namespace KEngine.ResourceDep
                 for (var i = 0; i < manifestList.Length; i++)
                 {
                     var depPath = manifestList[i] + AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt);
-                    var depLoader = KAssetFileLoader.Load(depPath);
+                    //var depLoader = 
+                    KAssetFileLoader.Load(depPath);
                     //while (!depLoader.IsCompleted)
                     //{
                     //    yield return null;
@@ -188,7 +189,8 @@ namespace KEngine.ResourceDep
             if (ext == ".unity" || ext == ".shader")
             {
                 // Scene 
-                var sceneLoader = KAssetBundleLoader.Load(path);
+                //var sceneLoader = 
+                KAssetBundleLoader.Load(path);
                 //while (!sceneLoader.IsCompleted)
                 //    yield return null;
                 return null;

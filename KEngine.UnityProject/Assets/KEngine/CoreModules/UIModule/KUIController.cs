@@ -182,6 +182,7 @@ namespace KEngine.UI
             return openArgs.Get<T>(offset, isLog);
         }
 
+        [Obsolete("Use CallUI(stringName) insted!")]
         public static void CallUI<T>(Action<T> callback) where T : KUIController
         {
             KUIModule.Instance.CallUI<T>(callback);

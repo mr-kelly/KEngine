@@ -120,9 +120,9 @@ public class KTabFile : IDisposable, IKTabReadble, IEnumerable<KTabFile.RowInter
     {
         // 首行
         var headLine = oReader.ReadLine();
-        Logger.Assert(headLine != null);
+        Debuger.Assert(headLine != null);
         var defLine = oReader.ReadLine(); // 声明行
-        Logger.Assert(defLine != null);
+        Debuger.Assert(defLine != null);
         var defLineArr = defLine.Split(KTabFileDef.Separators, StringSplitOptions.None);
 
         string[] firstLineSplitString = headLine.Split(KTabFileDef.Separators, StringSplitOptions.None);
@@ -385,7 +385,7 @@ public class KTabFile : IDisposable, IKTabReadble, IEnumerable<KTabFile.RowInter
 
     public int NewColumn(string colName, string defineStr = "")
     {
-        Logger.Assert(!string.IsNullOrEmpty(colName));
+        Debuger.Assert(!string.IsNullOrEmpty(colName));
 
         var newHeader = new HeaderInfo
         {

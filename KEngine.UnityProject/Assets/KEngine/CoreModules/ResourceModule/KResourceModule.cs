@@ -387,7 +387,7 @@ public class KResourceModule : MonoBehaviour, KEngine.IModule
     private void Awake()
     {
         if (_Instance != null)
-            Logger.Assert(_Instance == this);
+            Debuger.Assert(_Instance == this);
 
         //InvokeRepeating("CheckGcCollect", 0f, 3f);
     }
@@ -478,7 +478,7 @@ public class KResourceModule : MonoBehaviour, KEngine.IModule
                     buildPlatformName = "IOS";
                     break;
                 default:
-                    Logger.Assert(false);
+                    Debuger.Assert(false);
                     break;
             }
         }
@@ -497,7 +497,7 @@ public class KResourceModule : MonoBehaviour, KEngine.IModule
                     buildPlatformName = "Win32";
                     break;
                 default:
-                    Logger.Assert(false);
+                    Debuger.Assert(false);
                     break;
             }
         }
@@ -605,7 +605,7 @@ public class KResourceModule : MonoBehaviour, KEngine.IModule
                 break;
             default:
             {
-                Logger.Assert(false);
+                Debuger.Assert(false);
             }
                 break;
         }

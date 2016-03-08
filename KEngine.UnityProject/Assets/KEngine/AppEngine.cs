@@ -108,7 +108,7 @@ namespace KEngine
         public static AppEngine New(GameObject gameObjectToAttach, IModule[] modules, CoroutineDelegate before,
             CoroutineDelegate after)
         {
-            Logger.Assert(gameObjectToAttach != null && modules != null);
+            Debuger.Assert(gameObjectToAttach != null && modules != null);
             AppEngine appEngine = gameObjectToAttach.AddComponent<AppEngine>();
             appEngine.GameModules = modules;
             appEngine.BeforeInitModules = before;
@@ -229,7 +229,7 @@ namespace KEngine
                 else
                 {
                     var textAsset = Resources.Load<TextAsset>("KEngineConfig");
-                    Logger.Assert(textAsset);
+                    Debuger.Assert(textAsset);
                     configContent = textAsset.text;
                 }
 

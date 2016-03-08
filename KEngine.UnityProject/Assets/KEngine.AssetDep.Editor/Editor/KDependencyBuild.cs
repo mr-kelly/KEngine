@@ -351,7 +351,7 @@ public class KDependencyBuild
     //static HashSet<string> _depTextureScaleList = new HashSet<string>();  // 进行过Scale的图片
     public static string BuildDepTexture(Texture tex, float scale = 1f)
     {
-        Logger.Assert(tex);
+        Debuger.Assert(tex);
         CDepCollectInfo result = KDepCollectInfoCaching.GetCache(tex);
         if (result != null)
         {

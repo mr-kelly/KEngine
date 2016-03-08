@@ -67,13 +67,13 @@ public class KMaterialLoader : KAbstractResourceLoader
         }
 
         var sMat = matLoadBridge.ResultObject as KSerializeMaterial;
-        Logger.Assert(sMat);
+        Debuger.Assert(sMat);
 
         Desc = sMat.ShaderName;
 
-        Logger.Assert(Mat == null);
+        Debuger.Assert(Mat == null);
         yield return KResourceModule.Instance.StartCoroutine(CoGenerateMaterial(Url, sMat));
-        Logger.Assert(Mat);
+        Debuger.Assert(Mat);
 
         matLoadBridge.Release(); //不需要它了
 
@@ -110,7 +110,7 @@ public class KMaterialLoader : KAbstractResourceLoader
     {
         var textureStr = materialTextureStr; // 纹理+tiling+offset
         var textureArr = textureStr.Split('|');
-        Logger.Assert(textureArr.Length > 0);
+        Debuger.Assert(textureArr.Length > 0);
         string texturePath = textureArr[0];
         tiling = Vector2.one;
         offset = Vector2.zero;
@@ -146,7 +146,7 @@ public class KMaterialLoader : KAbstractResourceLoader
                     shader = KTool.FindShader("Diffuse");
                 }
             }
-            Logger.Assert(shader);
+            Debuger.Assert(shader);
 
             Mat = new Material(shader);
             Mat.name = sMat.MaterialName;

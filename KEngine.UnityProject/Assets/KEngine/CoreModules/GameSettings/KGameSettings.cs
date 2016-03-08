@@ -74,14 +74,14 @@ namespace KEngine.CoreModules
 
         public void LazyLoadTab(Type type, params Func<string>[] getTabContentFuncs)
         {
-            Logger.Assert(typeof (CBaseInfo).IsAssignableFrom(type));
+            Debuger.Assert(typeof(CBaseInfo).IsAssignableFrom(type));
 
             LazyLoad[type] = getTabContentFuncs;
         }
 
         public void LoadTab(Type type, params string[] contents)
         {
-            Logger.Assert(typeof (CBaseInfo).IsAssignableFrom(type));
+            Debuger.Assert(typeof(CBaseInfo).IsAssignableFrom(type));
             DoLoadTab(type, contents);
         }
 
@@ -96,7 +96,7 @@ namespace KEngine.CoreModules
         /// <param name="type"></param>
         private void EnsureLoad(Type type)
         {
-            Logger.Assert(typeof (CBaseInfo).IsAssignableFrom(type));
+            Debuger.Assert(typeof(CBaseInfo).IsAssignableFrom(type));
 
             Func<string>[] getContentFuncs;
             if (LazyLoad.TryGetValue(type, out getContentFuncs))
@@ -131,7 +131,7 @@ namespace KEngine.CoreModules
         /// <param name="contents"></param>
         private void DoLoadTab(Type type, IEnumerable<string> contents)
         {
-            Logger.Assert(typeof (CBaseInfo).IsAssignableFrom(type));
+            Debuger.Assert(typeof(CBaseInfo).IsAssignableFrom(type));
             foreach (string content in contents)
             {
                 using (KTabFile tabFile = KTabFile.LoadFromString(content))
@@ -292,7 +292,7 @@ namespace KEngine.CoreModules
         public void ReadFromTab(Type type, ref CBaseInfo newT, IKTabReadble tabFile, int row)
         {
             if (Debug.isDebugBuild)
-                Logger.Assert(typeof (CBaseInfo).IsAssignableFrom(type));
+                Debuger.Assert(typeof(CBaseInfo).IsAssignableFrom(type));
 
             // 缓存字段Field, 每个Type只反射一次！
             LinkedList<FieldInfo> okFields;

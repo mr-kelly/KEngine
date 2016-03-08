@@ -53,16 +53,16 @@ public class KEngineNGUIDemoMain : MonoBehaviour
 
         //TestLoadLevelAdditiveAsync();
 
-        KUIModule.Instance.OpenWindow<KUITestWindow>();
+        KUIModule.Instance.OpenWindow("Test");
 
-        KUIModule.Instance.CallUI<KUITestWindow>(ui =>
+        KUIModule.Instance.CallUI("Test", (ui, _) =>
         {
             // Do some UI stuff
         });
 
         yield return new WaitForSeconds(2f);
-        Logger.Log("Opening KUITestSubWindow");
-        KUIModule.Instance.OpenWindow<KUITestSubWindow>();
+        Logger.Log("Opening KUITestSubWindow"); 
+        KUIModule.Instance.OpenWindow("TestSub");
 
     }
 

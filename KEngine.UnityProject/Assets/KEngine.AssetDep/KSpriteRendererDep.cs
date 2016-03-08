@@ -37,7 +37,7 @@ public class KSpriteRendererDep : KAssetDep
             if (!IsDestroy)
             {
                 var spriteRenderer = DependencyComponent as SpriteRenderer;
-                Logger.Assert(spriteRenderer);
+                Debuger.Assert(spriteRenderer);
                 spriteRenderer.sprite = sprite;
             }
             OnFinishLoadDependencies(gameObject); // 返回GameObject而已哦

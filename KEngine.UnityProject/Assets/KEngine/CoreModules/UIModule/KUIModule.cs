@@ -365,7 +365,7 @@ namespace KEngine.UI
             {
                 Logger.LogError("[LoadWindow]多次重复LoadWindow: {0}", windowTemplateName);
             }
-            Logger.Assert(!UIWindows.ContainsKey(windowTemplateName));
+            Debuger.Assert(!UIWindows.ContainsKey(windowTemplateName));
 
             CUILoadState openState = new CUILoadState(windowTemplateName, windowTemplateName);
             openState.IsStaticUI = true;
@@ -395,7 +395,7 @@ namespace KEngine.UI
             uiObj.name = openState.TemplateName;
 
             KUIController uiBase = uiObj.AddComponent(openState.UIType) as KUIController;
-            Logger.Assert(uiBase);
+            Debuger.Assert(uiBase);
 
             openState.UIWindow = uiBase;
 
@@ -436,7 +436,7 @@ namespace KEngine.UI
         /// <param name="args"></param>
         public void CallUI(string uiTemplateName, Action<KUIController, object[]> callback, params object[] args)
         {
-            Logger.Assert(callback);
+            Debuger.Assert(callback);
 
             CUILoadState uiState;
             if (!UIWindows.TryGetValue(uiTemplateName, out uiState))
@@ -455,7 +455,7 @@ namespace KEngine.UI
         /// <param name="args"></param>
         public void CallDynamicUI(string uiName, Action<KUIController, object[]> callback, params object[] args)
         {
-            Logger.Assert(callback);
+            Debuger.Assert(callback);
 
             CUILoadState uiState;
             if (!UIWindows.TryGetValue(uiName, out uiState))

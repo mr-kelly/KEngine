@@ -56,7 +56,6 @@ public class KAssetBundleLoader : KAbstractResourceLoader
     }
 
     private string RelativeResourceUrl;
-    private string FullUrl;
 
     /// <summary>
     /// AssetBundle加载方式
@@ -131,7 +130,7 @@ public class KAssetBundleLoader : KAbstractResourceLoader
             NewAssetBundleLoaderEvent(url);
 
         RelativeResourceUrl = url;
-        KResourceModule.LogRequest("AssetBundle", FullUrl);
+        KResourceModule.LogRequest("AssetBundle", RelativeResourceUrl);
         KResourceModule.Instance.StartCoroutine(LoadAssetBundle(url));
     }
     private IEnumerator LoadAssetBundle(string relativeUrl)
@@ -171,7 +170,7 @@ public class KAssetBundleLoader : KAbstractResourceLoader
         Progress = 1f;
         var assetBundle = BundleParser.Bundle;
         if (assetBundle == null)
-            Logger.LogError("WWW.assetBundle is NULL: {0}", FullUrl);
+            Logger.LogError("WWW.assetBundle is NULL: {0}", RelativeResourceUrl);
 
         OnFinish(assetBundle);
 

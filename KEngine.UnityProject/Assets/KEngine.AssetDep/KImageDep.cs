@@ -36,7 +36,7 @@ public class KImageDep : KAssetDep
             if (!IsDestroy)
             {
                 var image = DependencyComponent as Image;
-                Logger.Assert(image);
+                Debuger.Assert(image);
                 image.sprite = sprite;
             }
             OnFinishLoadDependencies(gameObject); // 返回GameObject而已哦

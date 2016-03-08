@@ -130,7 +130,7 @@ public class KAssetFileLoader : KAbstractResourceLoader
                 //}
                 try
                 {
-                    Logger.Assert(getAsset = assetBundle.mainAsset);
+                    Debuger.Assert(getAsset = assetBundle.mainAsset);
                 }
                 catch
                 {

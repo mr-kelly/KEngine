@@ -43,7 +43,7 @@ public class KUIDemoHome : KUIController
         base.OnInit();
 
         Button1 = GetControl<Button>("Button1"); // child
-        Logger.Assert(Button1);
+        Debuger.Assert(Button1);
 
         HomeLabel = GetControl<Text>("HomeText");
 

@@ -62,7 +62,7 @@ public class KExcelFile
         }
         if (IsLoadSuccess)
         {
-            Logger.Assert(Workbook);
+            Debuger.Assert(Workbook);
 
             //var dt = new DataTable();
 
