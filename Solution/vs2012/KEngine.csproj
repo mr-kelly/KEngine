@@ -47,11 +47,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\AssemblyInfo.cs">
+      <Link>AssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\AppEngine.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\AppEngine.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\AssemblyInfo.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\AssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\GameSettings\CGameSettingFiles.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\GameSettings\CGameSettingFiles.cs</Link>
@@ -139,6 +139,12 @@
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\UIModule\KUIModule.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\UIModule\KUIModule.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\UIModule\KUIWindowAsset.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\UIModule\KUIWindowAsset.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Debuger.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\Debuger.cs</Link>
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\IAsyncObject.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\IAsyncObject.cs</Link>

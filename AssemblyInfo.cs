@@ -1,4 +1,6 @@
-﻿#region Using directives
+﻿// Information for every DLL
+
+#region Using directives
 
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -8,11 +10,11 @@ using System.Runtime.CompilerServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("KEngine")]
+[assembly: AssemblyTitle("KEngine (http://github.com/mr-kelly/KEngine)")]
 [assembly: AssemblyDescription("KEngine - Asset Bundle Framework for Unity3D")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Kelly")]
-[assembly: AssemblyProduct("KEngine AssetBundle Framework")]
+[assembly: AssemblyProduct("KEngine Unity3D AssetBundle Framework")]
 [assembly: AssemblyCopyright("Copyright @ Kelly<23110388@qq.com> 2015-2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

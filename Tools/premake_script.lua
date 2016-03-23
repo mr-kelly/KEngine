@@ -69,6 +69,7 @@ framework "3.5"
 files
 {
     "../KEngine.UnityProject/Assets/KEngine.Lib/**.cs",
+    "../AssemblyInfo.cs",
 }
 
 defines
@@ -89,6 +90,7 @@ framework "3.5"
 files
 {
     "../KEngine.UnityProject/Assets/KEngine/**.cs",
+    "../AssemblyInfo.cs",
 }
 
 defines
@@ -113,6 +115,7 @@ files
 {
     "../KEngine.UnityProject/Assets/KEngine.Editor/Editor/**.cs",
     "../KEngine.UnityProject/Assets/KEngine.EditorTools/Editor/**.cs",
+    "../AssemblyInfo.cs",
 }
 
 defines
@@ -144,6 +147,7 @@ framework "3.5"
 files
 {
     "../KEngine.UnityProject/Assets/KEngine.AssetDep/**.cs",
+    "../AssemblyInfo.cs",
 }
 
 defines
@@ -167,6 +171,7 @@ framework "3.5"
 files
 {
     "../KEngine.UnityProject/Assets/KEngine.AssetDep.Editor/Editor/**.cs",
+    "../AssemblyInfo.cs",
 }
 
 defines
@@ -195,6 +200,7 @@ framework "3.5"
 files
 {
     "../KEngine.UnityProject/Assets/KEngine.Tests/**.cs",
+    "../AssemblyInfo.cs",
 }
 
 defines

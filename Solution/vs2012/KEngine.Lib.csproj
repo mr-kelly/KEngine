@@ -44,6 +44,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\AssemblyInfo.cs">
+      <Link>AssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Lib\7zip\Common\CRC.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Lib\7zip\Common\CRC.cs</Link>
     </Compile>

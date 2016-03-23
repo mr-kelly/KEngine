@@ -14,8 +14,8 @@ CosmosEngine的官方改名、改进版
 # 特点 / Features
 
 * 精简的代码
-* AssetBundle的加载、打包、调试
-* 新的依赖处理系统AssetDep
+* AssetBundle的加载、打包
+* 编辑器模式下AssetBundle的性能调试器
 * 具备完整的策划->美术->程序工作流
 * 适用于PC/Android/IOS平台开发
 * 高性能，无反射

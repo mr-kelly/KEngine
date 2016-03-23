@@ -68,6 +68,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\AssemblyInfo.cs">
+      <Link>AssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\AlignEditor\AlignEditor.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\AlignEditor\AlignEditor.cs</Link>
     </Compile>
@@ -103,6 +106,9 @@
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\KSettingModuleEditor.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\KSettingModuleEditor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\KUIWindowAssetEditor.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\KUIWindowAssetEditor.cs</Link>
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\ResourcesBuild\KBuild_UGUI.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\ResourcesBuild\KBuild_UGUI.cs</Link>
