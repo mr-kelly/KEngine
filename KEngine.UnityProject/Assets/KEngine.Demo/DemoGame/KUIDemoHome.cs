@@ -33,7 +33,7 @@ using UnityEngine.UI;
 /// <summary>
 /// A script class that auto AddComponent to the UI AssetBundle(or Prefab)
 /// </summary>
-public class KUIDemoHome : KUIController
+public class KUIDemoHome : UIController
 {
     private Button Button1;
     private Text HomeLabel;

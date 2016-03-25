@@ -26,6 +26,6 @@
 
 using KEngine.UI;
 
-public class KUITestSubWindow : KUIController
+public class KUITestSubWindow : UIController
 {
 }

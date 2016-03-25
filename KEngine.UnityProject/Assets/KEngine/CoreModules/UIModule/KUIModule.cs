@@ -73,15 +73,15 @@ namespace KEngine.UI
         /// <summary>
         /// A bridge for different UI System, for instance, you can use NGUI or EZGUI or etc.. UI Plugin through UIBridge
         /// </summary>
-        public IKUIBridge UiBridge;
+        public IUIBridge UiBridge;
 
         public Dictionary<string, CUILoadState> UIWindows = new Dictionary<string, CUILoadState>();
         public bool UIRootLoaded = false;
 
-        public static event Action<KUIController> OnInitEvent;
+        public static event Action<UIController> OnInitEvent;
 
-        public static event Action<KUIController> OnOpenEvent;
-        public static event Action<KUIController> OnCloseEvent;
+        public static event Action<UIController> OnOpenEvent;
+        public static event Action<UIController> OnCloseEvent;
 
         private KUIModule()
         {
@@ -93,11 +93,11 @@ namespace KEngine.UI
 
             if (!string.IsNullOrEmpty(configUiBridge))
             {
-                var uiBridgeTypeName = string.Format("K{0}Bridge", configUiBridge);
+                var uiBridgeTypeName = string.Format("{0}", configUiBridge);
                 var uiBridgeType = Type.GetType(uiBridgeTypeName);
                 if (uiBridgeType != null)
                 {
-                    UiBridge = Activator.CreateInstance(uiBridgeType) as IKUIBridge;
+                    UiBridge = Activator.CreateInstance(uiBridgeType) as IUIBridge;
                     Logger.Debug("Use UI Bridge: {0}", uiBridgeType);
                 }
                 else
@@ -108,7 +108,7 @@ namespace KEngine.UI
 
             if (UiBridge == null)
             {
-                UiBridge = new KUGUIBridge();
+                UiBridge = new UGUIBridge();
             }
 
             UiBridge.InitBridge();
@@ -129,7 +129,7 @@ namespace KEngine.UI
         }
 
         [Obsolete("Use string ui name instead for more flexible!")]
-        public CUILoadState OpenWindow<T>(params object[] args) where T : KUIController
+        public CUILoadState OpenWindow<T>(params object[] args) where T : UIController
         {
             return OpenWindow(typeof(T), args);
         }
@@ -209,7 +209,7 @@ namespace KEngine.UI
             return uiInstanceState;
         }
 
-        private void OnDynamicWindowCallback(KUIController _ui, object[] _args)
+        private void OnDynamicWindowCallback(UIController _ui, object[] _args)
         {
             string template = (string)_args[0];
             string name = (string)_args[1];
@@ -223,7 +223,7 @@ namespace KEngine.UI
             CUILoadState instanceUIState = UIWindows[name];
             instanceUIState.IsLoading = false;
 
-            KUIController uiBase = uiObj.GetComponent<KUIController>();
+            UIController uiBase = uiObj.GetComponent<UIController>();
             uiBase.UITemplateName = template;
             uiBase.UIName = name;
 
@@ -330,7 +330,7 @@ namespace KEngine.UI
             return null;
         }
 
-        private KUIController GetUIBase(string name)
+        private UIController GetUIBase(string name)
         {
             CUILoadState uiState;
             UIWindows.TryGetValue(name, out uiState);
@@ -340,7 +340,7 @@ namespace KEngine.UI
             return null;
         }
 
-        public bool IsOpen<T>() where T : KUIController
+        public bool IsOpen<T>() where T : UIController
         {
             string uiName = typeof(T).Name.Remove(0, 3); // 去掉"CUI"
             return IsOpen(uiName);
@@ -348,7 +348,7 @@ namespace KEngine.UI
 
         public bool IsOpen(string name)
         {
-            KUIController uiBase = GetUIBase(name);
+            UIController uiBase = GetUIBase(name);
             return uiBase == null ? false : uiBase.gameObject.activeSelf;
         }
 
@@ -394,8 +394,7 @@ namespace KEngine.UI
             uiObj.SetActive(false);
             uiObj.name = openState.TemplateName;
 
-            KUIController uiBase = uiObj.AddComponent(openState.UIType) as KUIController;
-            Debuger.Assert(uiBase);
+            var uiBase = UiBridge.CreateUIController(uiObj, openState.TemplateName);
 
             openState.UIWindow = uiBase;
 
@@ -434,7 +433,7 @@ namespace KEngine.UI
         /// <param name="uiTemplateName"></param>
         /// <param name="callback"></param>
         /// <param name="args"></param>
-        public void CallUI(string uiTemplateName, Action<KUIController, object[]> callback, params object[] args)
+        public void CallUI(string uiTemplateName, Action<UIController, object[]> callback, params object[] args)
         {
             Debuger.Assert(callback);
 
@@ -453,7 +452,7 @@ namespace KEngine.UI
         /// <param name="uiName"></param>
         /// <param name="callback"></param>
         /// <param name="args"></param>
-        public void CallDynamicUI(string uiName, Action<KUIController, object[]> callback, params object[] args)
+        public void CallDynamicUI(string uiName, Action<UIController, object[]> callback, params object[] args)
         {
             Debuger.Assert(callback);
 
@@ -469,18 +468,18 @@ namespace KEngine.UI
         }
 
         [Obsolete("Use string ui name instead for more flexible!")]
-        public void CallUI<T>(Action<T> callback) where T : KUIController
+        public void CallUI<T>(Action<T> callback) where T : UIController
         {
             CallUI<T>((_ui, _args) => callback(_ui));
         }
 
         // 使用泛型方式
         [Obsolete("Use string ui name instead for more flexible!")]
-        public void CallUI<T>(Action<T, object[]> callback, params object[] args) where T : KUIController
+        public void CallUI<T>(Action<T, object[]> callback, params object[] args) where T : UIController
         {
             string uiName = typeof(T).Name.Remove(0, 3); // 去掉 "XUI"
 
-            CallUI(uiName, (KUIController _uibase, object[] _args) => { callback(_uibase as T, _args); }, args);
+            CallUI(uiName, (UIController _uibase, object[] _args) => { callback(_uibase as T, _args); }, args);
         }
 
         private void OnOpen(CUILoadState uiState, params object[] args)
@@ -492,7 +491,7 @@ namespace KEngine.UI
                 return;
             }
 
-            KUIController uiBase = uiState.UIWindow;
+            UIController uiBase = uiState.UIWindow;
 
             Action doOpenAction = () =>
             {
@@ -516,7 +515,7 @@ namespace KEngine.UI
         }
 
 
-        private void InitWindow(CUILoadState uiState, KUIController uiBase, bool open, params object[] args)
+        private void InitWindow(CUILoadState uiState, UIController uiBase, bool open, params object[] args)
         {
             uiBase.OnInit();
             if (OnInitEvent != null)
@@ -550,7 +549,7 @@ namespace KEngine.UI
     {
         public string TemplateName;
         public string InstanceName;
-        public KUIController UIWindow;
+        public UIController UIWindow;
         public Type UIType;
         public bool IsLoading;
         public bool IsStaticUI; // 非复制出来的, 静态UI
@@ -558,13 +557,13 @@ namespace KEngine.UI
         public bool OpenWhenFinish;
         public object[] OpenArgs;
 
-        internal Queue<Action<KUIController, object[]>> CallbacksWhenFinish;
+        internal Queue<Action<UIController, object[]>> CallbacksWhenFinish;
         internal Queue<object[]> CallbacksArgsWhenFinish;
         public KAbstractResourceLoader UIResourceLoader; // 加载器，用于手动释放资源
 
         public CUILoadState(string uiTemplateName, string uiInstanceName, Type uiControllerType = default(Type))
         {
-            if (uiControllerType == default(Type)) uiControllerType = typeof (KUIController);
+            if (uiControllerType == default(Type)) uiControllerType = typeof (UIController);
 
             TemplateName = uiTemplateName;
             InstanceName = uiInstanceName;
@@ -575,7 +574,7 @@ namespace KEngine.UI
             OpenWhenFinish = false;
             OpenArgs = null;
 
-            CallbacksWhenFinish = new Queue<Action<KUIController, object[]>>();
+            CallbacksWhenFinish = new Queue<Action<UIController, object[]>>();
             CallbacksArgsWhenFinish = new Queue<object[]>();
         }
 
@@ -585,7 +584,7 @@ namespace KEngine.UI
         /// </summary>
         /// <param name="callback"></param>
         /// <param name="args"></param>
-        public void DoCallback(Action<KUIController, object[]> callback, object[] args = null)
+        public void DoCallback(Action<UIController, object[]> callback, object[] args = null)
         {
             if (args == null)
                 args = new object[0];
@@ -601,13 +600,13 @@ namespace KEngine.UI
             callback(UIWindow, args);
         }
 
-        internal void OnUIWindowLoadedCallbacks(CUILoadState uiState, KUIController uiObject)
+        internal void OnUIWindowLoadedCallbacks(CUILoadState uiState, UIController uiObject)
         {
             //if (openState.OpenWhenFinish)  // 加载完打开 模式下，打开时执行回调
             {
                 while (uiState.CallbacksWhenFinish.Count > 0)
                 {
-                    Action<KUIController, object[]> callback = uiState.CallbacksWhenFinish.Dequeue();
+                    Action<UIController, object[]> callback = uiState.CallbacksWhenFinish.Dequeue();
                     object[] _args = uiState.CallbacksArgsWhenFinish.Dequeue();
                     //callback(uiBase, _args);
 

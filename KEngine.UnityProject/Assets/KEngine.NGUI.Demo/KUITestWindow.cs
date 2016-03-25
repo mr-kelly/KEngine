@@ -29,6 +29,6 @@ using KEngine.UI;
 /// <summary>
 /// NGUI
 /// </summary>
-public class KUITestWindow : KUIController
+public class KUITestWindow : UIController
 {
 }

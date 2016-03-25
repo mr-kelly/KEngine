@@ -42,7 +42,7 @@ internal class GameDef
     public const int DefaultPixelPerMeters = 100;
 }
 
-public class KNGUIBridge : IKUIBridge
+public class KNGUIBridge : IUIBridge
 {
     public UICamera UiCamera;
     public UIRoot UiRoot;
@@ -78,7 +78,13 @@ public class KNGUIBridge : IKUIBridge
 #endif
     }
 
-    public void UIObjectFilter(KUIController ui, GameObject uiObj)
+    public UIController CreateUIController(GameObject uiObj, string uiTemplateName)
+    {
+        UIController uiBase = uiObj.AddComponent("KUI" + uiTemplateName) as UIController;
+        KEngine.Debuger.Assert(uiBase);
+        return uiBase;
+    }
+    public void UIObjectFilter(UIController ui, GameObject uiObj)
     {
         //if (ui is IUGUIWindow)
         //{

@@ -5,6 +5,6 @@ AssetBundleBuildRelPath	../Product/Bundles
 StreamingBundlesFolderName	Bundles			
 AssetBundleExt	.bytes	base		
 IsLoadAssetBundle	1			
-UIModuleBridge	UGUI			
+UIModuleBridge	KEngine.UI.UGUIBridge			
 SettingSourcePath	../Product/SettingSource			
 SettingPath	Resources/Setting			

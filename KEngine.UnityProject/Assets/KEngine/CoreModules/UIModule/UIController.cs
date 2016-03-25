@@ -3,7 +3,7 @@
 // KEngine - Toolset and framework for Unity3D
 // ===================================
 // 
-// Filename: KUIController.cs
+// Filename: UIController.cs
 // Date:     2015/12/03
 // Author:  Kelly
 // Email: 23110388@qq.com
@@ -34,7 +34,7 @@ namespace KEngine.UI
     /// <summary>
     /// Abstract class of all UI Script
     /// </summary>
-    public class KUIController : KBehaviour
+    public class UIController : KBehaviour
     {
         /// <summary>
         /// Set from KUIModule, Resource Name
@@ -183,7 +183,7 @@ namespace KEngine.UI
         }
 
         [Obsolete("Use CallUI(stringName) insted!")]
-        public static void CallUI<T>(Action<T> callback) where T : KUIController
+        public static void CallUI<T>(Action<T> callback) where T : UIController
         {
             KUIModule.Instance.CallUI<T>(callback);
         }
