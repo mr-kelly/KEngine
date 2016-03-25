@@ -139,7 +139,7 @@ public static class KEngineExtensions
 
     public static byte ToByte(this string val)
     {
-        return string.IsNullOrEmpty(val) ? (byte) 0 : Convert.ToByte(val);
+        return string.IsNullOrEmpty(val) ? (byte)0 : Convert.ToByte(val);
     }
 
     public static int ToInt32(this string val)
@@ -177,7 +177,7 @@ public static class KEngineExtensions
             {
                 try
                 {
-                    ret = (T) Convert.ChangeType(arrElement, typeof (T));
+                    ret = (T)Convert.ChangeType(arrElement, typeof(T));
                 }
                 catch (Exception)
                 {
@@ -185,7 +185,7 @@ public static class KEngineExtensions
                         ret = default(T);
                     else
                     {
-                        Logger.LogError("[Error get from object[],  '{0}' change to type {1}", arrElement, typeof (T));
+                        Logger.LogError("[Error get from object[],  '{0}' change to type {1}", arrElement, typeof(T));
                         ret = default(T);
                     }
                 }

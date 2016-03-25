@@ -3,7 +3,7 @@
 // KEngine - Toolset and framework for Unity3D
 // ===================================
 // 
-// Filename: KUIWindowAsset.cs
+// Filename: IUIBridge.cs
 // Date:     2015/12/03
 // Author:  Kelly
 // Email: 23110388@qq.com
@@ -23,15 +23,28 @@
 // License along with this library.
 
 #endregion
+
+using System.Collections;
+using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 
-namespace KEngine.UI 
+namespace KEngine.UI
 {
-    /// <summary>
-    /// Mark for build UI window
-    /// </summary>
-    public class KUIWindowAsset : MonoBehaviour
+
+    public interface IUIBridge
     {
-        public string StringArgument;
+        // Init the UI Bridge, necessary
+        void InitBridge();
+
+        /// <summary>
+        /// CreateUIController
+        /// </summary>
+        /// <returns></returns>
+        UIController CreateUIController(GameObject uiObj, string uiTemplateName);
+
+        void UIObjectFilter(UIController controller, GameObject uiObject);
+
+        IEnumerator LoadUIAsset(CUILoadState loadState, UILoadRequest request);
+
     }
 }

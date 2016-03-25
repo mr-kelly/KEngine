@@ -166,7 +166,7 @@ namespace KEngine.UI
         /// <param name="uiName"></param>
         protected void CloseWindow(string uiName = null)
         {
-            KUIModule.Instance.CloseWindow(uiName == null ? UIName : uiName);
+            KUIModule.Instance.CloseWindow(uiName ?? UIName);
         }
 
 

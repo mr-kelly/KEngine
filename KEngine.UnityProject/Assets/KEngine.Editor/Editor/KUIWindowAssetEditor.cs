@@ -24,6 +24,7 @@
 
 #endregion
 
+using KEngine.UI;
 using UnityEditor;
 using UnityEngine;
 
@@ -48,7 +49,7 @@ internal class KUIPanelAssetEditorInitializer
                 var style = new GUIStyle();
                 style.normal.textColor = Color.yellow;
                 style.hover.textColor = Color.cyan;
-                GUI.Label(r, "[UI]", style);
+                GUI.Label(r, string.Format("[UI]", obj.name), style);
             }
         }
     }
