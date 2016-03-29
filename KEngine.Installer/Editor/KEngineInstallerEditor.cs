@@ -86,6 +86,8 @@ namespace KEngine.Installer
         private static KEngineInstallType InstallType = KEngineInstallType.Dll;
         private static KEngineCopyType CopyType = KEngineCopyType.Hardlink;
 
+        private bool _addonTools = false;
+        private bool _addonUI= false;
         private bool _addonAssetDep = false;
         private bool _addonNGUI = true;
         private bool _addonResourceDep = true;
@@ -118,6 +120,8 @@ namespace KEngine.Installer
             InstallType = (KEngineInstallType)EditorGUILayout.EnumPopup("Install Type", InstallType);
             CopyType = (KEngineCopyType)EditorGUILayout.EnumPopup("Copy File Type", CopyType);
 
+            _addonTools = EditorGUILayout.Toggle("[Addon]Tools", _addonTools);
+            _addonUI = EditorGUILayout.Toggle("[Addon]UI Module", _addonUI);
             _addonAssetDep = EditorGUILayout.Toggle("[Addon]Asset Dep", _addonAssetDep);
             if (_addonAssetDep)
                 _addonNGUI = EditorGUILayout.Toggle("[Addon]NGUI AssetDep", _addonNGUI);
@@ -242,6 +246,16 @@ namespace KEngine.Installer
             }
 
             Debug.Log("Install KEngine Successed!");
+            if (_addonTools)
+            {
+                var srcToolDllPath = Path.Combine(gitPath, "Build/Release/KEngine.Tools.dll");
+                CopyDll(srcToolDllPath, KEngineInstallDirPath);
+            }
+            if (_addonUI)
+            {
+                var srcUIDLLPath = Path.Combine(gitPath, "Build/Release/KEngine.UI.dll");
+                CopyDll(srcUIDLLPath, KEngineInstallDirPath);
+            }
 
             // Resource Dep
             if (_addonResourceDep)
