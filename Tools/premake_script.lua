@@ -78,7 +78,6 @@ defines
 links
 {
     "System",
-    SharpZipLib_DLL
 }
 
 ------------------KEngine Main--------------------
@@ -101,9 +100,59 @@ links
     "KEngine.Lib",
     "System",
     UNITY_ENGINE_DLL,
+    -- UNITY_UI_DLL,
+}
+
+------------------KEngine UIModule--------------------
+project "KEngine.UI"
+language "C#"
+kind "SharedLib"
+framework "3.5"
+
+files
+{
+    "../KEngine.UnityProject/Assets/KEngine.UI/**.cs",
+    "../AssemblyInfo.cs",
+}
+
+defines
+{
+}
+links
+{
+    "KEngine", 
+    "KEngine.Lib",
+    "System",
+    UNITY_ENGINE_DLL,
     UNITY_UI_DLL,
 }
 
+------------------KEngine UIModule Editor--------------------
+project "KEngine.UI.Editor"
+language "C#"
+kind "SharedLib"
+framework "3.5"
+
+files
+{
+    "../KEngine.UnityProject/Assets/KEngine.UI.Editor/**.cs",
+    "../AssemblyInfo.cs",
+}
+
+defines
+{
+}
+links
+{
+    "KEngine", 
+    "KEngine.Lib",
+    "System",
+    UNITY_ENGINE_DLL,
+    UNITY_UI_DLL,
+    "KEngine.UI",
+    UNITY_EDITOR_DLL,
+    "KEngine.Editor",
+}
 
 ----------------------- KEngine Editor
 project "KEngine.Editor"
@@ -128,14 +177,36 @@ links
     "KEngine",
     "System",
     UNITY_ENGINE_DLL,
-    UNITY_UI_DLL,
-    SharpZipLib_DLL,
+    -- UNITY_UI_DLL,
     UNITY_EDITOR_DLL,
     "../KEngine.UnityProject/Assets/KEngine.Editor/Editor/CosmosTable.Compiler/DotLiquid.dll",
     "../KEngine.UnityProject/Assets/KEngine.Editor/Editor/NPOI/NPOI.dll",
     "../KEngine.UnityProject/Assets/KEngine.Editor/Editor/NPOI/NPOI.OOXML.dll",
     "../KEngine.UnityProject/Assets/KEngine.Editor/Editor/NPOI/NPOI.OpenXml4Net.dll",
     "../KEngine.UnityProject/Assets/KEngine.Editor/Editor/NPOI/NPOI.OpenXmlFormats.dll",
+}
+
+
+----------------------- KEngine Tools ----------------
+project "KEngine.Tools"
+language "C#"
+kind "SharedLib"
+framework "3.5"
+
+files
+{
+    "../KEngine.UnityProject/Assets/KEngine.Tools/**.cs",
+    "../AssemblyInfo.cs",
+}
+
+defines
+{
+}
+
+links
+{
+    "System",
+    SharpZipLib_DLL,
 }
 
 ----------------------- KEngine AssetDep
@@ -184,12 +255,12 @@ links
     "KEngine",
     "KEngine.AssetDep",
     "KEngine.Editor",
+    "KEngine.Tools",
     "System",
     UNITY_ENGINE_DLL,
     UNITY_UI_DLL,
     UNITY_EDITOR_DLL,
 }
-
 
 ----------------------- KEngine Test ----------------
 project "KEngine.Tests"

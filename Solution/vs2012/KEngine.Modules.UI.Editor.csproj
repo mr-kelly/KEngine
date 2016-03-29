@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{828B060C-EEC2-4EA3-F7CC-B2C66383759C}</ProjectGuid>
+    <ProjectGuid>{0E25E2EE-7AE7-1579-C397-A4052F99EE56}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>KEngine.AssetDep.Editor</RootNamespace>
-    <AssemblyName>KEngine.AssetDep.Editor</AssemblyName>
+    <RootNamespace>KEngine.Modules.UI.Editor</RootNamespace>
+    <AssemblyName>KEngine.Modules.UI.Editor</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -18,24 +18,24 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\Build\Debug\</OutputPath>
-    <BaseIntermediateOutputPath>obj\Debug\KEngine.AssetDep.Editor\</BaseIntermediateOutputPath>
+    <BaseIntermediateOutputPath>obj\Debug\KEngine.Modules.UI.Editor\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
     <DefineConstants>_DEBUG;DEBUG;TRACE;MS_DOTNET</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>../../Build/Debug/KEngine.AssetDep.Editor.xml</DocumentationFile>
+    <DocumentationFile>../../Build/Debug/KEngine.Modules.UI.Editor.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\..\Build\Release\</OutputPath>
-    <BaseIntermediateOutputPath>obj\Release\KEngine.AssetDep.Editor\</BaseIntermediateOutputPath>
+    <BaseIntermediateOutputPath>obj\Release\KEngine.Modules.UI.Editor\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
     <DefineConstants>MS_DOTNET</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>../../Build/Release/KEngine.AssetDep.Editor.xml</DocumentationFile>
+    <DocumentationFile>../../Build/Release/KEngine.Modules.UI.Editor.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -53,51 +53,29 @@
     <Compile Include="..\..\AssemblyInfo.cs">
       <Link>AssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.AssetDep.Editor\Editor\KAssetDepInspector.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine.AssetDep.Editor\Editor\KAssetDepInspector.cs</Link>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Modules.UI.Editor\KBuild_UGUI.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Modules.UI.Editor\KBuild_UGUI.cs</Link>
     </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.AssetDep.Editor\Editor\KBuildTools_AsssetDepExtend.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine.AssetDep.Editor\Editor\KBuildTools_AsssetDepExtend.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.AssetDep.Editor\Editor\KDepBuild_AudioSourceAndClip.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine.AssetDep.Editor\Editor\KDepBuild_AudioSourceAndClip.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.AssetDep.Editor\Editor\KDepBuild_Material.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine.AssetDep.Editor\Editor\KDepBuild_Material.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.AssetDep.Editor\Editor\KDepBuild_Mesh.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine.AssetDep.Editor\Editor\KDepBuild_Mesh.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.AssetDep.Editor\Editor\KDepBuild_ParticleSystem.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine.AssetDep.Editor\Editor\KDepBuild_ParticleSystem.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.AssetDep.Editor\Editor\KDepBuild_UGUI.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine.AssetDep.Editor\Editor\KDepBuild_UGUI.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.AssetDep.Editor\Editor\KDependencyBuild.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine.AssetDep.Editor\Editor\KDependencyBuild.cs</Link>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Modules.UI.Editor\KUIWindowAssetEditor.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Modules.UI.Editor\KUIWindowAssetEditor.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="KEngine.Lib.csproj">
-      <Project>{ABCAD9CA-1780-52C0-A074-4C970C2949C4}</Project>
-      <Name>KEngine.Lib</Name>
-    </ProjectReference>
     <ProjectReference Include="KEngine.csproj">
       <Project>{062D043A-720C-83D5-7B24-0EACE782E936}</Project>
       <Name>KEngine</Name>
     </ProjectReference>
-    <ProjectReference Include="KEngine.AssetDep.csproj">
-      <Project>{AD8F6845-9988-8797-C2BA-6C1CAE1267A3}</Project>
-      <Name>KEngine.AssetDep</Name>
+    <ProjectReference Include="KEngine.Lib.csproj">
+      <Project>{ABCAD9CA-1780-52C0-A074-4C970C2949C4}</Project>
+      <Name>KEngine.Lib</Name>
+    </ProjectReference>
+    <ProjectReference Include="KEngine.Modules.UI.csproj">
+      <Project>{B90ED387-A5F2-93DD-0E53-8E30FA557E5F}</Project>
+      <Name>KEngine.Modules.UI</Name>
     </ProjectReference>
     <ProjectReference Include="KEngine.Editor.csproj">
       <Project>{BB8AB2E6-A758-A6EC-90EC-16137C598251}</Project>
       <Name>KEngine.Editor</Name>
-    </ProjectReference>
-    <ProjectReference Include="KEngine.Tools.csproj">
-      <Project>{65750BE9-D135-871F-9A70-D09C06F0CBFB}</Project>
-      <Name>KEngine.Tools</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -86,7 +86,7 @@ namespace KEngine.Installer
         private static KEngineInstallType InstallType = KEngineInstallType.Dll;
         private static KEngineCopyType CopyType = KEngineCopyType.Hardlink;
 
-        private bool _addonAssetDep = true;
+        private bool _addonAssetDep = false;
         private bool _addonNGUI = true;
         private bool _addonResourceDep = true;
         private bool _deleteKEngineConfigTxt = false;

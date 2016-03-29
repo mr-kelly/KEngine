@@ -42,9 +42,6 @@
     <Reference Include="UnityEngine">
       <HintPath>..\..\Tools\UnityEngine.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>..\..\Tools\UnityEngine.UI.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\AssemblyInfo.cs">
@@ -127,21 +124,6 @@
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\SettingModule\SettingModule.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\SettingModule\SettingModule.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\UIModule\IKUIBridge.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\UIModule\IKUIBridge.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\UIModule\KUGUIBridge.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\UIModule\KUGUIBridge.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\UIModule\KUIController.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\UIModule\KUIController.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\UIModule\KUIModule.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\UIModule\KUIModule.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\UIModule\KUIWindowAsset.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\UIModule\KUIWindowAsset.cs</Link>
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Debuger.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\Debuger.cs</Link>

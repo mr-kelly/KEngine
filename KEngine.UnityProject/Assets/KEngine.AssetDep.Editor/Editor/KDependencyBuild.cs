@@ -120,6 +120,9 @@ public class KDependencyBuild
     /// save the cache. which file builded
     /// </summary>
     //[MenuItem("Game/TestSaveBuildAction")]
+    /// <summary>
+    /// 完成所有后，请SaveBuildAction，并Clear！
+    /// </summary>
     public static void SaveBuildAction()
     {
         if (BuildRecord.Count > 0)

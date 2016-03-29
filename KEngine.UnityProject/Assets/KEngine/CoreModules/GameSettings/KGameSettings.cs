@@ -29,7 +29,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using SimpleJson;
 using UnityEngine;
 
 namespace KEngine.CoreModules
@@ -421,11 +420,11 @@ namespace KEngine.CoreModules
                     else
                         value = new List<List<int>>();
                 }
-                else if (fieldType == typeof (JsonObject))
-                {
-                    string sz = tabFile.GetString(row, fieldName);
-                    value = string.IsNullOrEmpty(sz) ? new JsonObject() : KTool.SplitToJson(sz);
-                }
+                //else if (fieldType == typeof (JsonObject))
+                //{
+                //    string sz = tabFile.GetString(row, fieldName);
+                //    value = string.IsNullOrEmpty(sz) ? new JsonObject() : KTool.SplitToJson(sz);
+                //}
                 else
                 {
                     Logger.LogWarning("未知类型: {0}", fieldName);

@@ -42,12 +42,6 @@
     <Reference Include="UnityEngine">
       <HintPath>..\..\Tools\UnityEngine.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>..\..\Tools\UnityEngine.UI.dll</HintPath>
-    </Reference>
-    <Reference Include="ICSharpCode.SharpZipLib">
-      <HintPath>..\..\KEngine.UnityProject\Assets\KEngine.Lib\SharpZipLib\ICSharpCode.SharpZipLib.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEditor">
       <HintPath>..\..\Tools\UnityEditor.dll</HintPath>
     </Reference>
@@ -86,6 +80,9 @@
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\CosmosTable.Compiler\SimpleExcelFile.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\CosmosTable.Compiler\SimpleExcelFile.cs</Link>
     </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\KAssetVersionControl.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\KAssetVersionControl.cs</Link>
+    </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\KAutoBuilder.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\KAutoBuilder.cs</Link>
     </Compile>
@@ -106,12 +103,6 @@
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\KSettingModuleEditor.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\KSettingModuleEditor.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\KUIWindowAssetEditor.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\KUIWindowAssetEditor.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\ResourcesBuild\KBuild_UGUI.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\ResourcesBuild\KBuild_UGUI.cs</Link>
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\ResourcesBuild\KResourceBuilder.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\ResourcesBuild\KResourceBuilder.cs</Link>

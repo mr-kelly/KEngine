@@ -76,7 +76,7 @@ namespace KEngine.Editor
 
             SetupHistory();
 
-            KDependencyBuild.Clear();
+            //KDependencyBuild.Clear();
 
             KBuildTools.AfterBuildAssetBundleEvent += OnAfterBuildAssetBundleEvent;
         }
@@ -92,11 +92,11 @@ namespace KEngine.Editor
             else
                 Logger.Log("没有任何需要打包的资源！");
 
-            KDependencyBuild.SaveBuildAction();
+            //KDependencyBuild.SaveBuildAction();
 
             Current = null;
             KBuildTools.AfterBuildAssetBundleEvent -= OnAfterBuildAssetBundleEvent;
-            KDependencyBuild.Clear();
+            //KDependencyBuild.Clear();
         }
 
         private void OnAfterBuildAssetBundleEvent(Object arg1, string arg2, string arg3)

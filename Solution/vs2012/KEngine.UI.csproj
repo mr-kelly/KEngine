@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{ABCAD9CA-1780-52C0-A074-4C970C2949C4}</ProjectGuid>
+    <ProjectGuid>{32263544-1EDE-7691-87E5-4FED73BC1182}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>KEngine.Lib</RootNamespace>
-    <AssemblyName>KEngine.Lib</AssemblyName>
+    <RootNamespace>KEngine.UI</RootNamespace>
+    <AssemblyName>KEngine.UI</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -18,43 +18,63 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\Build\Debug\</OutputPath>
-    <BaseIntermediateOutputPath>obj\Debug\KEngine.Lib\</BaseIntermediateOutputPath>
+    <BaseIntermediateOutputPath>obj\Debug\KEngine.UI\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
     <DefineConstants>_DEBUG;DEBUG;TRACE;MS_DOTNET</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>../../Build/Debug/KEngine.Lib.xml</DocumentationFile>
+    <DocumentationFile>../../Build/Debug/KEngine.UI.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\..\Build\Release\</OutputPath>
-    <BaseIntermediateOutputPath>obj\Release\KEngine.Lib\</BaseIntermediateOutputPath>
+    <BaseIntermediateOutputPath>obj\Release\KEngine.UI\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
     <DefineConstants>MS_DOTNET</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>../../Build/Release/KEngine.Lib.xml</DocumentationFile>
+    <DocumentationFile>../../Build/Release/KEngine.UI.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\Tools\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>..\..\Tools\UnityEngine.UI.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\AssemblyInfo.cs">
       <Link>AssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Lib\CosmosTable\TabFileWriter.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine.Lib\CosmosTable\TabFileWriter.cs</Link>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.UI\IUIBridge.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.UI\IUIBridge.cs</Link>
     </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Lib\CosmosTable\TableFile.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine.Lib\CosmosTable\TableFile.cs</Link>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.UI\KUIModule.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.UI\KUIModule.cs</Link>
     </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Lib\CosmosTable\TableRowInfo.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine.Lib\CosmosTable\TableRowInfo.cs</Link>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.UI\KUIWindowAsset.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.UI\KUIWindowAsset.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.UI\UGUIBridge.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.UI\UGUIBridge.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.UI\UIController.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.UI\UIController.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="KEngine.csproj">
+      <Project>{062D043A-720C-83D5-7B24-0EACE782E936}</Project>
+      <Name>KEngine</Name>
+    </ProjectReference>
+    <ProjectReference Include="KEngine.Lib.csproj">
+      <Project>{ABCAD9CA-1780-52C0-A074-4C970C2949C4}</Project>
+      <Name>KEngine.Lib</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

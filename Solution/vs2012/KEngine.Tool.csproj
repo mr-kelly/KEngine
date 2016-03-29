@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{B29E1726-9E01-A7CA-4787-DF8033C9724D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>KEngine.Tool</RootNamespace>
+    <AssemblyName>KEngine.Tool</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\Build\Debug\</OutputPath>
+    <BaseIntermediateOutputPath>obj\Debug\KEngine.Tool\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants>_DEBUG;DEBUG;TRACE;MS_DOTNET</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>../../Build/Debug/KEngine.Tool.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\Build\Release\</OutputPath>
+    <BaseIntermediateOutputPath>obj\Release\KEngine.Tool\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants>MS_DOTNET</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>../../Build/Release/KEngine.Tool.xml</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\AssemblyInfo.cs">
+      <Link>AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\7zip\Common\CRC.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\7zip\Common\CRC.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\7zip\Common\CommandLineParser.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\7zip\Common\CommandLineParser.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\7zip\Common\InBuffer.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\7zip\Common\InBuffer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\7zip\Common\OutBuffer.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\7zip\Common\OutBuffer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\7zip\Compress\LZ\IMatchFinder.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\7zip\Compress\LZ\IMatchFinder.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\7zip\Compress\LZ\LzBinTree.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\7zip\Compress\LZ\LzBinTree.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\7zip\Compress\LZ\LzInWindow.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\7zip\Compress\LZ\LzInWindow.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\7zip\Compress\LZ\LzOutWindow.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\7zip\Compress\LZ\LzOutWindow.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\7zip\Compress\LZMA\LzmaBase.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\7zip\Compress\LZMA\LzmaBase.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\7zip\Compress\LZMA\LzmaDecoder.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\7zip\Compress\LZMA\LzmaDecoder.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\7zip\Compress\LZMA\LzmaEncoder.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\7zip\Compress\LZMA\LzmaEncoder.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\7zip\Compress\LzmaAlone\LzmaAlone.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\7zip\Compress\LzmaAlone\LzmaAlone.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\7zip\Compress\LzmaAlone\LzmaBench.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\7zip\Compress\LzmaAlone\LzmaBench.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\7zip\Compress\LzmaAlone\Properties\Resources.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\7zip\Compress\LzmaAlone\Properties\Resources.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\7zip\Compress\RangeCoder\RangeCoder.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\7zip\Compress\RangeCoder\RangeCoder.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\7zip\Compress\RangeCoder\RangeCoderBit.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\7zip\Compress\RangeCoder\RangeCoderBit.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\7zip\Compress\RangeCoder\RangeCoderBitTree.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\7zip\Compress\RangeCoder\RangeCoderBitTree.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\7zip\ICoder.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\7zip\ICoder.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\KLzmaUtil.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\KLzmaUtil.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\KZipTool.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\KZipTool.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\SimpleJson.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\SimpleJson.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -33,7 +33,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using KEngine;
-using SimpleJson;
 using UnityEngine;
 
 /// <summary>
@@ -188,17 +187,6 @@ public class KTool
             }
         }
         return dict;
-    }
-
-    public static JsonObject SplitToJson(string str, char delimeter1 = '|', char delimeter2 = ':')
-    {
-        var json = new JsonObject();
-        var dic = SplitToDict<string, object>(str, delimeter1, delimeter2);
-        foreach (KeyValuePair<string, object> pair in dic)
-        {
-            json[pair.Key] = pair.Value;
-        }
-        return json;
     }
 
     /// <summary>
