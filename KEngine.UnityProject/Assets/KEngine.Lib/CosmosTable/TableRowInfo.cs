@@ -29,6 +29,16 @@ namespace CosmosTable
     public abstract class TableRowInfo
     {
         /// <summary>
+        /// TableRowInfo's row number of table
+        /// </summary>
+        public int RowNumber { get; internal set; }
+
+        public TableRowInfo()
+        {
+            RowNumber = 0;
+        }
+
+        /// <summary>
         /// When true, will use reflection to map the Tab File
         /// </summary>
         public virtual bool IsAutoParse
@@ -37,18 +47,9 @@ namespace CosmosTable
         }
 
         /// <summary>
-        /// TableRowInfo's row number of table
-        /// </summary>
-        public int RowNumber { get; internal set; }
-
-        /// <summary>
         /// Table Header, name and type definition
         /// </summary>
         public Dictionary<string, HeaderInfo> HeaderInfos { get; internal set; }
-
-        protected TableRowInfo()
-        {
-        }
 
         public virtual void Parse(string[] cellStrs)
         {

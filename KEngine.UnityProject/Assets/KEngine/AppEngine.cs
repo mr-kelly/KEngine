@@ -329,11 +329,6 @@ namespace KEngine
         {
             get { return Key; }
         }
-
-        public CCosmosEngineInfo()
-        {
-        }
-
         public override bool IsAutoParse
         {
             get { return true; }
