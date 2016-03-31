@@ -50,12 +50,6 @@
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\AppEngine.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\AppEngine.cs</Link>
     </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\GameSettings\CGameSettingFiles.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\GameSettings\CGameSettingFiles.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\GameSettings\KGameSettings.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\GameSettings\KGameSettings.cs</Link>
-    </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KAbstractResourceLoader.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KAbstractResourceLoader.cs</Link>
     </Compile>
@@ -94,9 +88,6 @@
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KSerializeMaterialProperty.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KSerializeMaterialProperty.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KSettingManager.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KSettingManager.cs</Link>
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KShaderLoader.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KShaderLoader.cs</Link>
@@ -152,44 +143,11 @@
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\UnityLayerDef.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\UnityLayerDef.cs</Link>
     </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\CFiber.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Utils\CFiber.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\CObjectPool.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Utils\CObjectPool.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\CStateMachine.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Utils\CStateMachine.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\CUnityObjectPool.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Utils\CUnityObjectPool.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\CWaitCo.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Utils\CWaitCo.cs</Link>
-    </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\IKTabReadble.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\Utils\IKTabReadble.cs</Link>
     </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KActionRecord.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Utils\KActionRecord.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KCrypt.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Utils\KCrypt.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KDelegateList.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Utils\KDelegateList.cs</Link>
-    </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KEngineExtensions.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\Utils\KEngineExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KFileCacheList.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Utils\KFileCacheList.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KHook.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Utils\KHook.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KPrefs.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Utils\KPrefs.cs</Link>
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KProfiler.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\Utils\KProfiler.cs</Link>
@@ -197,17 +155,8 @@
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KTabFile.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\Utils\KTabFile.cs</Link>
     </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KTabReader.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Utils\KTabReader.cs</Link>
-    </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\KTool.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\Utils\KTool.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\Singleton.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Utils\Singleton.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Utils\TextureScaler.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Utils\TextureScaler.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>

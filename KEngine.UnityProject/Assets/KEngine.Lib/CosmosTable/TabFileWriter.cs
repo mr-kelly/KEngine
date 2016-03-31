@@ -94,7 +94,8 @@ namespace CosmosTable
         public T NewRow()
         {
             int rowId = TabFile.Rows.Count + 1;
-            var newRow = new T { RowNumber = rowId };
+            var newRow = new T();
+            newRow.RowNumber = rowId;
 
             TabFile.Rows.Add(rowId, newRow);
 
@@ -105,6 +106,7 @@ namespace CosmosTable
         {
             return TabFile.Rows.Remove(row);
         }
+
         public T GetRow(int row)
         {
             object rowT;

@@ -35,11 +35,10 @@ namespace KEngine.Editor
 {
     public class KEngineUtils : EditorWindow
     {
-        public static readonly Version KEngineVersion = new Version("2.1.0.0");
+        public static readonly Version KEngineVersion = new Version("2.2.0.0");
 
         static KEngineUtils()
         {
-            EnsureConfigFile();
         }
 
         private static string ConfFilePath = "Assets/Resources/KEngineConfig.txt";
@@ -60,13 +59,11 @@ namespace KEngine.Editor
 
         private static KEngineUtils Instance;
 
-        private static KTabFile ConfFile;
 
         [MenuItem("KEngine/Options")]
         private static void Init()
         {
-            // Get existing open window or if none, make a new one:		
-            EnsureConfigFile();
+            // Get existing open window or if none, make a new one:
 
             if (Instance == null)
             {
@@ -83,45 +80,9 @@ namespace KEngine.Editor
             _headerStyle.normal.textColor = Color.white;
         }
 
-        private static void EnsureConfigFile()
-        {
-            if (!File.Exists(ConfFilePath))
-            {
-                KTabFile confFile = new KTabFile();
-                confFile.NewColumn("Key");
-                confFile.NewColumn("Value");
-                confFile.NewColumn("Comment");
-
-
-                foreach (string[] strArr in DefaultConfigs)
-                {
-                    int row = confFile.NewRow();
-                    confFile.SetValue<string>(row, "Key", strArr[0]);
-                    confFile.SetValue<string>(row, "Value", strArr[1]);
-                    confFile.SetValue<string>(row, "Comment", strArr[2]);
-                }
-                confFile.Save(ConfFilePath);
-
-                Logger.Log("新建CosmosEngine配置文件: {0}", ConfFilePath);
-                AssetDatabase.Refresh();
-            }
-
-            ConfFile = KTabFile.LoadFromFile(ConfFilePath);
-        }
-
         private string GetConfValue(string key)
         {
-            foreach (KTabFile.RowInterator row in ConfFile)
-            {
-                string key2 = row.GetString("Key");
-                if (key == key2)
-                {
-                    string value = row.GetString("Value");
-                    return value;
-                }
-            }
-
-            return null;
+            return AppEngine.GetConfig(key);
         }
 
         /// <summary>
@@ -144,19 +105,7 @@ namespace KEngine.Editor
         /// <param name="value"></param>
         public static void SetConfValue(string key, string value)
         {
-            foreach (KTabFile.RowInterator row in ConfFile)
-            {
-                string key2 = row.GetString("Key");
-                if (key == key2)
-                {
-                    ConfFile.SetValue<string>(row.Row, "Value", value);
-                }
-            }
-            ConfFile.Save(ConfFilePath);
-
-            AppEngine.EnsureConfigTab(true); // reload current appengine instance
-
-            AssetDatabase.Refresh();
+            AppEngine.SetConfig(key, value);
         }
 
         private void OnGUI()
@@ -183,30 +132,22 @@ namespace KEngine.Editor
 
             EditorGUILayout.LabelField("== KEngineConfig.txt ==");
             bool tabDirty = false;
-            foreach (KTabFile.RowInterator row in ConfFile)
+            foreach (var item in AppEngine.ConfigsTable.GetAll())
             {
-                string value = row.GetString("Value");
-                string newValue = EditorGUILayout.TextField(row.GetString("Key"), value);
+                string value = item.Value;
+                string newValue = EditorGUILayout.TextField(item.Key, value);
                 if (value != newValue)
                 {
-                    ConfFile.SetValue<string>(row.Row, "Value", newValue);
+                    AppEngine.SetConfig(item.Key, newValue);
                     tabDirty = true;
                 }
             }
 
             if (tabDirty)
             {
-                SaveConfigFile();
+                AssetDatabase.Refresh();
             }
-        }
 
-        /// <summary>
-        /// Save to EngineConfig
-        /// </summary>
-        private void SaveConfigFile()
-        {
-            ConfFile.Save(ConfFilePath);
-            AssetDatabase.Refresh();
         }
     }
 }

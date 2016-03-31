@@ -206,7 +206,9 @@ defines
 links
 {
     "System",
+    "KEngine",
     SharpZipLib_DLL,
+    UNITY_ENGINE_DLL
 }
 
 ----------------------- KEngine AssetDep
@@ -286,6 +288,7 @@ links
     "KEngine.Editor",
     "KEngine.AssetDep.Editor",
     "System",
+    "KEngine.Tools",
     UNITY_ENGINE_DLL,
     UNITY_UI_DLL,
     UNITY_EDITOR_DLL,

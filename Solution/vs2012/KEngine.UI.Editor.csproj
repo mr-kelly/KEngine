@@ -53,11 +53,11 @@
     <Compile Include="..\..\AssemblyInfo.cs">
       <Link>AssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.UI.Editor\KBuild_UGUI.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine.UI.Editor\KBuild_UGUI.cs</Link>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.UI.Editor\Editor\KBuild_UGUI.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.UI.Editor\Editor\KBuild_UGUI.cs</Link>
     </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.UI.Editor\KUIWindowAssetEditor.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine.UI.Editor\KUIWindowAssetEditor.cs</Link>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.UI.Editor\Editor\KUIWindowAssetEditor.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.UI.Editor\Editor\KUIWindowAssetEditor.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>

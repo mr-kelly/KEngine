@@ -42,6 +42,9 @@
     <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>..\..\KEngine.UnityProject\Assets\KEngine.Lib\SharpZipLib\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\Tools\UnityEngine.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\AssemblyInfo.cs">
@@ -101,8 +104,71 @@
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\7zip\ICoder.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Tools\7zip\ICoder.cs</Link>
     </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\CFiber.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\CFiber.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\CObjectPool.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\CObjectPool.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\CStateMachine.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\CStateMachine.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\CUnityObjectPool.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\CUnityObjectPool.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\CWaitCo.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\CWaitCo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\GameSettings\CGameSettingFiles.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\GameSettings\CGameSettingFiles.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\GameSettings\KGameSettings.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\GameSettings\KGameSettings.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\KActionRecord.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\KActionRecord.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\KCrypt.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\KCrypt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\KDelegateList.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\KDelegateList.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\KEngine.Tk2dSpine.AssetDep\CSpineAnimationDep.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\KEngine.Tk2dSpine.AssetDep\CSpineAnimationDep.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\KEngine.Tk2dSpine.AssetDep\CTk2dSpriteCollectionDep.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\KEngine.Tk2dSpine.AssetDep\CTk2dSpriteCollectionDep.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\KEngine.Tk2dSpine.AssetDep\CTk2dSpriteDep.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\KEngine.Tk2dSpine.AssetDep\CTk2dSpriteDep.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\KEngine.Tk2dSpine.AssetDep\Ctk2dTileMapDep.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\KEngine.Tk2dSpine.AssetDep\Ctk2dTileMapDep.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\KEngine.Tk2dSpine.AssetDep\Editor\CDepBuild_Spine.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\KEngine.Tk2dSpine.AssetDep\Editor\CDepBuild_Spine.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\KEngine.Tk2dSpine.AssetDep\Editor\CDepBuild_tk2dToolkit.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\KEngine.Tk2dSpine.AssetDep\Editor\CDepBuild_tk2dToolkit.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\KFileCacheList.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\KFileCacheList.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\KHook.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\KHook.cs</Link>
+    </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\KLzmaUtil.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Tools\KLzmaUtil.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\KPrefs.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\KPrefs.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\KSettingManager.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\KSettingManager.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\KTabReader.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\KTabReader.cs</Link>
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\KZipTool.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Tools\KZipTool.cs</Link>
@@ -110,8 +176,18 @@
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\SimpleJson.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Tools\SimpleJson.cs</Link>
     </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\Singleton.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\Singleton.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Tools\TextureScaler.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Tools\TextureScaler.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="KEngine.csproj">
+      <Project>{062D043A-720C-83D5-7B24-0EACE782E936}</Project>
+      <Name>KEngine</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

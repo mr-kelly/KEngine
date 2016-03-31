@@ -77,6 +77,10 @@
       <Project>{828B060C-EEC2-4EA3-F7CC-B2C66383759C}</Project>
       <Name>KEngine.AssetDep.Editor</Name>
     </ProjectReference>
+    <ProjectReference Include="KEngine.Tools.csproj">
+      <Project>{65750BE9-D135-871F-9A70-D09C06F0CBFB}</Project>
+      <Name>KEngine.Tools</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

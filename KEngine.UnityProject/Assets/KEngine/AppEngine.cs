@@ -55,6 +55,15 @@ namespace KEngine
 
         private static TableFile<CCosmosEngineInfo> _configsTable;
 
+        public static TableFile<CCosmosEngineInfo> ConfigsTable
+        {
+            get
+            {
+                EnsureConfigTab();
+                return _configsTable;
+            }
+        }
+
         //private static AppVersion _appVersion = null;
 
         /// <summary>
@@ -211,7 +220,7 @@ namespace KEngine
                 GUILayout.EndVertical();
             }
         }
-
+        static string ConfigFilePath = "Assets/Resources/KEngineConfig.txt";
         /// <summary>
         /// Ensure the CEngineConfig file loaded.
         /// </summary>
@@ -223,7 +232,7 @@ namespace KEngine
                 if (Application.isEditor && !Application.isPlaying)
                 {
                     // prevent Resources.Load fail on Batch Mode
-                    configContent = System.IO.File.ReadAllText("Assets/Resources/KEngineConfig.txt");
+                    configContent = System.IO.File.ReadAllText(ConfigFilePath);
                 }
                 else
                 {
@@ -262,7 +271,7 @@ namespace KEngine
         /// <returns></returns>
         public static bool HasConfig(string key)
         {
-            return _configsTable.HasPrimaryKey(key);
+            return ConfigsTable.HasPrimaryKey(key);
         }
 
         /// <summary>
@@ -272,7 +281,7 @@ namespace KEngine
         {
             EnsureConfigTab();
 
-            var conf = _configsTable.FindByPrimaryKey(key);
+            var conf = ConfigsTable.FindByPrimaryKey(key);
             if (conf == null)
             {
                 if (showLog)
@@ -285,6 +294,23 @@ namespace KEngine
         public static string GetConfig(KEngineDefaultConfigs cfg)
         {
             return GetConfig(cfg.ToString());
+        }
+
+        public static void SetConfig(string key, string value)
+        {
+            EnsureConfigTab();
+            if (!Application.isEditor)
+            {
+                Logger.LogError("Set Config is Editor only");
+                return;
+            }
+
+            var item = ConfigsTable.FindByPrimaryKey(key);
+            var writer = new TabFileWriter<CCosmosEngineInfo>(ConfigsTable);
+            var row = writer.GetRow(item.RowNumber);
+            row.Value = value;
+
+            writer.Save(ConfigFilePath);
         }
     }
 

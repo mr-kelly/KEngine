@@ -1,10 +1,10 @@
 ﻿Key	Value	Comment		
 [string]	[string]	[string]		
-ProductRelPath	../Product			
-AssetBundleBuildRelPath	../Product/Bundles			
-StreamingBundlesFolderName	Bundles			
-AssetBundleExt	.bytes	base		
-IsLoadAssetBundle	1			
-UIModuleBridge	KEngine.UI.UGUIBridge			
-SettingSourcePath	../Product/SettingSource			
-SettingPath	Resources/Setting			
+ProductRelPath	../Product	
+AssetBundleBuildRelPath	../Product/Bundles	
+StreamingBundlesFolderName	Bundles	
+AssetBundleExt	.bytes	
+IsLoadAssetBundle	1	
+UIModuleBridge	KEngine.UI.UGUIBridge	
+SettingSourcePath	../Product/SettingSource	
+SettingPath	Resources/Setting	
