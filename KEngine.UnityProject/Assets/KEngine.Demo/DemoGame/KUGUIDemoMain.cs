@@ -64,10 +64,11 @@ public class KUGUIDemoMain : MonoBehaviour
         });
 
         Debug.Log("[SettingModule]Table: " + ExampleInfo.TabFilePath);
-        var exampleInfoTable = SettingModule.Get<ExampleInfo>(ExampleInfo.TabFilePath);
+        var exampleInfoTable = SettingModule.Get(ExampleInfo.TabFilePath);
         foreach (var info in exampleInfoTable.GetAll())
         {
-            Debug.Log(string.Format("Name: {0}", info.Name));
+            var exampleInfo = ExampleInfo.Wrap(info);
+            Debug.Log(string.Format("Name: {0}", exampleInfo.Name));
         }
     }
     private void OnGameSettingsInit()

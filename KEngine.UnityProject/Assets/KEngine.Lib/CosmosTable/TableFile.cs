@@ -40,20 +40,7 @@ namespace CosmosTable
         public TableFileExceptionDelegate OnExceptionEvent;
     }
 
-    public class TableFile : TableFile<DefaultTableRowInfo>
-    {
-        public TableFile(string content)
-            : base(content)
-        {
-        }
-
-        public TableFile(TableFileConfig config)
-            : base(config)
-        {
-        }
-    }
-
-    public partial class TableFile<T> : IDisposable where T : TableRowInfo, new()
+    public partial class TableFile : IDisposable
     {
         private readonly TableFileConfig _config;
 
@@ -86,12 +73,12 @@ namespace CosmosTable
         /// <summary>
         /// Row Id to Rows , start from 1
         /// </summary>
-        protected internal Dictionary<int, object> Rows = new Dictionary<int, object>();  // iOS不支持 Dict<int, T>
+        protected internal Dictionary<int, TableRow> Rows = new Dictionary<int, TableRow>();  // iOS不支持 Dict<int, T>
 
         /// <summary>
         /// Store the Primary Key to Rows
         /// </summary>
-        protected Dictionary<object, object> PrimaryKey2Row = new Dictionary<object, object>();
+        protected Dictionary<object, TableRow> PrimaryKey2Row = new Dictionary<object, TableRow>();
 
         public Dictionary<string, HeaderInfo>.KeyCollection HeaderNames
         {
@@ -99,22 +86,22 @@ namespace CosmosTable
         }
 
         // 直接从字符串分析
-        public static TableFile<T> LoadFromString(string content)
+        public static TableFile LoadFromString(string content)
         {
-            TableFile<T> tabFile = new TableFile<T>(content);
+            TableFile tabFile = new TableFile(content);
 
             return tabFile;
         }
 
         // 直接从文件, 传入完整目录，跟通过资源管理器自动生成完整目录不一样，给art库用的
-        public static TableFile<T> LoadFromFile(string fileFullPath)
+        public static TableFile LoadFromFile(string fileFullPath)
         {
             using (FileStream fileStream = new FileStream(fileFullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             // 不会锁死, 允许其它程序打开
             {
 
                 StreamReader oReader = new StreamReader(fileStream, System.Text.Encoding.UTF8);
-                return new TableFile<T>(oReader.ReadToEnd());
+                return new TableFile(oReader.ReadToEnd());
             }
         }
 
@@ -141,15 +128,15 @@ namespace CosmosTable
             string[] firstLineDef = new string[firstLineSplitString.Length];
             Array.Copy(defLineArr, 0, firstLineDef, 0, defLineArr.Length);  // 拷贝，确保不会超出表头的
 
-            for (int i = 1; i <= firstLineSplitString.Length; i++)
+            for (int i = 0; i < firstLineSplitString.Length; i++)
             {
-                var headerString = firstLineSplitString[i - 1];
+                var headerString = firstLineSplitString[i];
 
                 var headerInfo = new HeaderInfo
                 {
                     ColumnIndex = i,
                     HeaderName = headerString,
-                    HeaderDef = firstLineDef[i - 1],
+                    HeaderDef = firstLineDef[i],
                 };
 
                 Headers[headerInfo.HeaderName] = headerInfo;
@@ -169,25 +156,25 @@ namespace CosmosTable
 
                     TabInfo[rowIndex] = splitString1;
 
-                    T newT = new T();  // the New Object may not be used this time, so cache it!
+                    TableRow newT = new TableRow();  // the New Object may not be used this time, so cache it!
                     newT.RowNumber = rowIndex;
                     newT.HeaderInfos = Headers; // pass header info into
 
-                    if (!newT.IsAutoParse)
-                        newT.Parse(splitString1);
-                    else
-                        AutoParse(newT, splitString1);
+                    //if (!newT.IsAutoParse)
+                    newT.Parse(splitString1);
+                    //else
+                    //    AutoParse(newT, splitString1);
 
                     if (newT.PrimaryKey != null)
                     {
-                        object oldT;
+                        TableRow oldT;
                         if (!PrimaryKey2Row.TryGetValue(newT.PrimaryKey, out oldT))  // 原本不存在，使用new的，释放cacheNew，下次直接new
                         {
                             PrimaryKey2Row[newT.PrimaryKey] = newT;
                         }
                         else  // 原本存在，使用old的， cachedNewObj(newT)因此残留, 留待下回合使用
                         {
-                            T toT = (T)oldT;
+                            TableRow toT = oldT;
                             // Check Duplicated Primary Key, 使用原来的，不使用新new出来的, 下回合直接用_cachedNewObj
                             OnExeption(TableFileExceptionType.DuplicatedKey, toT.PrimaryKey.ToString());
                             newT = toT;
@@ -205,11 +192,12 @@ namespace CosmosTable
         /// <summary>
         /// Auto get fields from class definition, use reflection (poor performance warning!)
         /// </summary>
+        [Obsolete("We don't use reflection and generic for better performance")]
         internal FieldInfo[] AutoTabFields
         {
             get
             {
-                return typeof(T).GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                return typeof(TableRow).GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             }
         }
 
@@ -232,11 +220,12 @@ namespace CosmosTable
         /// <summary>
         /// Auto parser with class's definition fields (poor performance warning)
         /// </summary>
-        /// <param name="tableRowInfo"></param>
+        /// <param name="tableRow"></param>
         /// <param name="cellStrs"></param>
-        protected void AutoParse(TableRowInfo tableRowInfo, string[] cellStrs)
+        [Obsolete("We don't use reflection and generic for better performance")]
+        protected void AutoParse(TableRow tableRow, string[] cellStrs)
         {
-            var type = tableRowInfo.GetType();
+            var type = tableRow.GetType();
             var okFields = new List<FieldInfo>();
 
             foreach (FieldInfo field in AutoTabFields)
@@ -270,9 +259,9 @@ namespace CosmosTable
                         if (defs.Length >= 2) defaultValue = defs[1];
                     }
 
-                    field.SetValue(tableRowInfo, method.Invoke(tableRowInfo, new object[]
+                    field.SetValue(tableRow, method.Invoke(tableRow, new object[]
                     {
-                       cellStrs[index-1] , defaultValue
+                       cellStrs[index] , defaultValue
                     }));
                 }
                 else
@@ -337,23 +326,23 @@ namespace CosmosTable
             return _colCount;
         }
 
-        public T GetRow(int row)
+        public TableRow GetRow(int row)
         {
-            object rowT;
+            TableRow rowT;
             if (!Rows.TryGetValue(row, out rowT))
             {
-                rowT = Rows[row] = new T();
+                rowT = Rows[row] = new TableRow();
             }
 
-            return (T)rowT;
+            return rowT;
         }
 
-        public List<T> GetAll()
+        public List<TableRow> GetAll()
         {
-            List<T> l = new List<T>();
+            List<TableRow> l = new List<TableRow>();
             foreach (var item in Rows.Values)
             {
-                l.Add((T)item);
+                l.Add(item);
             }
             return l;
         }
@@ -376,16 +365,16 @@ namespace CosmosTable
             return PrimaryKey2Row.ContainsKey(primaryKey);
         }
 
-        public T FindByPrimaryKey(object primaryKey)
+        public TableRow FindByPrimaryKey(object primaryKey)
         {
-            object ret;
+            TableRow ret;
 
             if (PrimaryKey2Row.TryGetValue(primaryKey, out ret))
-                return (T) ret;
+                return ret;
             else
             {
                 OnExeption(TableFileExceptionType.NotFoundPrimaryKey, primaryKey.ToString());
-                return default(T);
+                return null;
             }
         }
     }

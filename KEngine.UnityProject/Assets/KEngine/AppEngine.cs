@@ -53,9 +53,9 @@ namespace KEngine
 
         public static AppEngine EngineInstance { get; private set; }
 
-        private static TableFile<CCosmosEngineInfo> _configsTable;
+        private static TableFile _configsTable;
 
-        public static TableFile<CCosmosEngineInfo> ConfigsTable
+        public static TableFile ConfigsTable
         {
             get
             {
@@ -224,7 +224,7 @@ namespace KEngine
         /// <summary>
         /// Ensure the CEngineConfig file loaded.
         /// </summary>
-        public static TableFile<CCosmosEngineInfo> EnsureConfigTab(bool reload = false)
+        public static TableFile EnsureConfigTab(bool reload = false)
         {
             if (_configsTable == null || reload)
             {
@@ -241,7 +241,7 @@ namespace KEngine
                     configContent = textAsset.text;
                 }
 
-                _configsTable = new TableFile<CCosmosEngineInfo>(new TableFileConfig
+                _configsTable = new TableFile(new TableFileConfig
                 {
                     Content = configContent, 
                     OnExceptionEvent = (ex, args) =>
@@ -288,7 +288,7 @@ namespace KEngine
                     Logger.LogError("Cannot get CosmosConfig: {0}", key);
                 return null;
             }
-            return conf.Value;
+            return conf["Value"] as string;
         }
 
         public static string GetConfig(KEngineDefaultConfigs cfg)
@@ -306,9 +306,10 @@ namespace KEngine
             }
 
             var item = ConfigsTable.FindByPrimaryKey(key);
-            var writer = new TabFileWriter<CCosmosEngineInfo>(ConfigsTable);
+            var writer = new TabFileWriter(ConfigsTable);
             var row = writer.GetRow(item.RowNumber);
-            row.Value = value;
+            var rowInfo = KEngineInfo.Wrap(row);
+            rowInfo.Value = value;
 
             writer.Save(ConfigFilePath);
         }
@@ -344,20 +345,38 @@ namespace KEngine
 
 
     /// <summary>
-    /// Engine Config
+    /// Engine Config, Wrapper of the TableRow
     /// </summary>
-    public class CCosmosEngineInfo : TableRowInfo
+    public class KEngineInfo
     {
-        public string Key;
-        public string Value;
+        private static KEngineInfo _instance;
 
-        public override object PrimaryKey
+        public static KEngineInfo Wrap(TableRow row)
         {
-            get { return Key; }
+            if (_instance == null)
+                _instance = new KEngineInfo();
+
+            _instance._row = row;
+            return _instance;
         }
-        public override bool IsAutoParse
+
+        private TableRow _row;
+
+        private KEngineInfo()
         {
-            get { return true; }
         }
+
+        public string Key
+        {
+            get { return _row["Key"]; }
+        }
+
+        public string Value
+        {
+            get { return _row["Value"]; }
+            set { _row["Value"] = value; }
+        }
+
+
     }
 }

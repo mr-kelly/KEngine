@@ -45,11 +45,10 @@ namespace KEngine.CoreModules
         /// <summary>
         /// 通过SettingModule拥有缓存与惰式加载
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <param name="path"></param>
         /// <param name="useCache">是否缓存起来？还是单独创建新的</param>
         /// <returns></returns>
-        public static TableFile<T> Get<T>(string path, bool useCache = true) where T : TableRowInfo, new()
+        public static TableFile Get(string path, bool useCache = true) 
         {
             object tableFile;
             if (!useCache || !_tableFilesCache.TryGetValue(path, out tableFile))
@@ -57,12 +56,12 @@ namespace KEngine.CoreModules
                 var fileContentAsset = Resources.Load("Setting/" + Path.GetFileNameWithoutExtension(path)) as TextAsset;
                 var fileContent = Encoding.UTF8.GetString(fileContentAsset.bytes);
 
-                var tab = TableFile<T>.LoadFromString(fileContent);
+                var tab = TableFile.LoadFromString(fileContent);
                 _tableFilesCache[path] = tableFile = tab;
                 return tab;
             }
 
-            return tableFile as TableFile<T>;
+            return tableFile as TableFile;
         }
     }
 }

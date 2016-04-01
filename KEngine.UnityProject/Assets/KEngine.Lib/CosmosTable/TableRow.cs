@@ -26,57 +26,25 @@ using System.Collections.Generic;
 
 namespace CosmosTable
 {
-    public abstract class TableRowInfo
+    public class TableRowParser
     {
-        /// <summary>
-        /// TableRowInfo's row number of table
-        /// </summary>
-        public int RowNumber { get; internal set; }
-
-        public TableRowInfo()
-        {
-            RowNumber = 0;
-        }
-
-        /// <summary>
-        /// When true, will use reflection to map the Tab File
-        /// </summary>
-        public virtual bool IsAutoParse
-        {
-            get { return true; }
-        }
-
-        /// <summary>
-        /// Table Header, name and type definition
-        /// </summary>
-        public Dictionary<string, HeaderInfo> HeaderInfos { get; internal set; }
-
-        public virtual void Parse(string[] cellStrs)
-        {
-        }
-
-        public virtual object PrimaryKey
-        {
-            get { return null; }
-        }
-
-        protected string Get_String(string value, string defaultValue)
+        public string Get_String(string value, string defaultValue)
         {
             return Get_string(value, defaultValue);
         }
 
-        protected string Get_string(string value, string defaultValue)
+        public string Get_string(string value, string defaultValue)
         {
             if (string.IsNullOrEmpty(value))
                 return defaultValue;
             return value;
         }
 
-        protected int Get_Int32(string value, string defaultValue)
+        public int Get_Int32(string value, string defaultValue)
         {
             return Get_int(value, defaultValue);
         }
-        protected bool Get_Boolean(string value, string defaultValue)
+        public bool Get_Boolean(string value, string defaultValue)
         {
             var str = Get_string(value, defaultValue);
             bool result;
@@ -86,25 +54,25 @@ namespace CosmosTable
             }
             return Get_int(value, defaultValue) != 0;
         }
-        protected int Get_int(string value, string defaultValue)
+        public int Get_int(string value, string defaultValue)
         {
             var str = Get_string(value, defaultValue);
             return string.IsNullOrEmpty(str) ? default(int) : int.Parse(str);
         }
 
-        protected uint Get_uint(string value, string defaultValue)
+        public uint Get_uint(string value, string defaultValue)
         {
             var str = Get_string(value, defaultValue);
             return string.IsNullOrEmpty(str) ? default(int) : uint.Parse(str);
         }
 
-        protected string[] Get_string_array(string value, string defaultValue)
+        public string[] Get_string_array(string value, string defaultValue)
         {
             var str = Get_string(value, defaultValue);
             return str.Split(',');
         }
 
-        protected Dictionary<string, int> Get_Dictionary_string_int(string value, string defaultValue)
+        public Dictionary<string, int> Get_Dictionary_string_int(string value, string defaultValue)
         {
             return GetDictionary<string, int>(value, defaultValue);
         }
@@ -127,35 +95,46 @@ namespace CosmosTable
 
         protected T ConvertString<T>(string value)
         {
-            return (T)Convert.ChangeType(value, typeof (T));
+            return (T)Convert.ChangeType(value, typeof(T));
         }
 
     }
 
-    /// <summary>
-    /// Default Tab Row
-    /// Store All column Values
-    /// </summary>
-    public class DefaultTableRowInfo : TableRowInfo
+    public class TableRow : TableRowParser
     {
         /// <summary>
-        /// No need to auto parse, use string as key!
+        /// TableRow's row number of table
         /// </summary>
-        public override bool IsAutoParse
+        public int RowNumber { get; internal set; }
+
+        public TableRow()
         {
-            get { return false; }
+            RowNumber = 0;
         }
+
+        /// <summary>
+        /// When true, will use reflection to map the Tab File
+        /// </summary>
+        //public virtual bool IsAutoParse
+        //{
+        //    get { return false; }
+        //}
+
+        /// <summary>
+        /// Table Header, name and type definition
+        /// </summary>
+        public Dictionary<string, HeaderInfo> HeaderInfos { get; internal set; }
 
         /// <summary>
         /// Store values of this row
         /// </summary>
-        public string[] Values;
+        public string[] Values { get; private set; }
 
         /// <summary>
         /// Cache save the row values
         /// </summary>
         /// <param name="cellStrs"></param>
-        public override void Parse(string[] cellStrs)
+        public virtual void Parse(string[] cellStrs)
         {
             Values = cellStrs;
         }
@@ -163,17 +142,17 @@ namespace CosmosTable
         /// <summary>
         /// Use first object of array as primary key!
         /// </summary>
-        public override object PrimaryKey
+        public virtual object PrimaryKey
         {
             get { return this[0]; }
         }
 
-        public object Get(int index)
+        public string Get(int index)
         {
             return this[index];
         }
 
-        public object Get(string headerName)
+        public string Get(string headerName)
         {
             return this[headerName];
         }
@@ -183,7 +162,7 @@ namespace CosmosTable
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public object this[int index]
+        public string this[int index]
         {
             get
             {
@@ -194,6 +173,7 @@ namespace CosmosTable
 
                 return Values[index];
             }
+            set { Values[index] = value; }
         }
 
         /// <summary>
@@ -201,7 +181,7 @@ namespace CosmosTable
         /// </summary>
         /// <param name="headerName"></param>
         /// <returns></returns>
-        public object this[string headerName]
+        public string this[string headerName]
         {
             get
             {
@@ -213,7 +193,25 @@ namespace CosmosTable
 
                 return this[headerInfo.ColumnIndex];
             }
+            set
+            {
+                HeaderInfo headerInfo;
+                if (!HeaderInfos.TryGetValue(headerName, out headerInfo))
+                {
+                    throw new Exception("not found header: " + headerName);
+                }
+
+                this[headerInfo.ColumnIndex] = value;
+            }
         }
+    }
+
+    /// <summary>
+    /// Default Tab Row
+    /// Store All column Values
+    /// </summary>
+    public class DefaultTableRow : TableRow
+    {
     }
 
 }

@@ -58,33 +58,44 @@ namespace {{ NameSpace }}
 	/// <summary>
 	/// Auto Generate for Tab File: {{ file.TabFilePath }}
 	/// </summary>
-	public partial class {{file.ClassName}}Info : TableRowInfo
+	public partial class {{file.ClassName}}Info : TableRowParser
 	{
 		public static readonly string TabFilePath = ""{{ file.TabFilePath }}"";
-		
-		public override bool IsAutoParse { get { return false; } }
+
+		private static {{file.ClassName}}Info _instance;
+
+        public static {{file.ClassName}}Info Wrap(TableRow row)
+        {
+            if (_instance == null)
+                _instance = new {{file.ClassName}}Info();
+
+            _instance._row = row;
+            return _instance;
+        }
+
+        private TableRow _row;
+
+        private {{file.ClassName}}Info()
+        {
+        }
 
 		{% for field in file.Fields %}
-		public {{ field.FormatType }} {{ field.Name}} { get; internal set; }  // {{ field.Comment }}
-		{% endfor %}
+        /// {{ field.Comment }}
+		public {{ field.FormatType }} {{ field.Name}}
+        {
+            get
+            {
+                return _row.Get_{{ field.TypeMethod }}(_row.Values[{{ field.Index }}], ""{{ field.DefaultValue }}"");
+            }
+            set
+            {
+                _row[{{ field.Index}}] = value.ToString();
+            }
 
-		public override void Parse(string[] values)
-		{
-		{% for field in file.Fields %}
-			// {{ field.Comment }}
-			{{ field.Name}} = Get_{{ field.TypeMethod }}(values[{{ field.Index }}], ""{{ field.DefaultValue }}"");
+        }
 		{% endfor %}
-		}
-
-		public override object PrimaryKey
-		{
-			get
-			{
-				return {{ file.PrimaryKey }};
-			}
-		}
 	}
-{% endfor %}
+{% endfor %} 
 }
 ";
         /// <summary>
@@ -105,14 +116,14 @@ namespace {{ NameSpace }}
                     KEditorUtils.CallMainThread(() =>
                     {
                         EditorUtility.DisplayDialog("Excel Setting Changed!", "Ready to Recompile All!", "OK");
-                        CompileTabConfigs();
+                        CompileSettings();
                         _isPopUpConfirm = false;
                     });
                 });
                 Debug.Log("[KSettingModuleEditor]Watching directory: " + SettingSourcePath);
             }
         }
-        public static void CompileTabConfigs(string sourcePath, string compilePath, string genCodeFilePath, string changeExtension = ".bytes")
+        public static void CompileTabConfigs(string sourcePath, string compilePath, string genCodeFilePath, string changeExtension = ".bytes", bool force = false)
         {
             // excel compiler
             var compiler = new Compiler(new CompilerConfig()
@@ -156,7 +167,7 @@ namespace {{ NameSpace }}
                         {
                             var toFileInfo = new FileInfo(compileToPath);
 
-                            if (srcFileInfo.LastWriteTime == toFileInfo.LastWriteTime)
+                            if (!force && srcFileInfo.LastWriteTime == toFileInfo.LastWriteTime)
                             {
                                 Logger.Log("Pass!SameTime! From {0} to {1}", excelPath, compileToPath);
                                 continue;
@@ -185,10 +196,10 @@ namespace {{ NameSpace }}
         }
 
         [MenuItem("KEngine/Settings/Force Compile Settings")]
-        public static void CompileTabConfigs()
+        public static void CompileSettings()
         {
             var sourcePath = SettingSourcePath;//AppEngine.GetConfig("SettingSourcePath");
-            if (string.IsNullOrEmpty(sourcePath))
+            if (string.IsNullOrEmpty(sourcePath)) 
             {
                 Logger.LogError("Need to KEngineConfig: SettingSourcePath");
                 return;
@@ -199,7 +210,7 @@ namespace {{ NameSpace }}
                 Logger.LogError("Need to KEngineConfig: SettingPath");
                 return;
             }
-            CompileTabConfigs(sourcePath, compilePath, SettingCodePath, SettingExtension);
+            CompileTabConfigs(sourcePath, compilePath, SettingCodePath, SettingExtension, true);
         }
     }
 }

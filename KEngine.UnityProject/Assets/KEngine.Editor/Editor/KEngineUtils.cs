@@ -41,21 +41,21 @@ namespace KEngine.Editor
         {
         }
 
-        private static string ConfFilePath = "Assets/Resources/KEngineConfig.txt";
+        //private static string ConfFilePath = "Assets/Resources/KEngineConfig.txt";
 
         // 默認的配置文件內容
-        private static string[][] DefaultConfigs = new string[][]
-        {
-            new string[] {"ProductRelPath", "../Product", ""},
-            new string[] {"AssetBundleBuildRelPath", "../Product/Bundles", "The Relative path to build assetbundles"},
-            new [] {"StreamingBundlesFolderName", "Bundles"},
-            new [] {"UIModuleBridge","UGUI"},
-            new string[] {"AssetBundleExt", ".bytes", "Asset bundle file extension"},
-            new string[] {"IsLoadAssetBundle", "1", "Asset bundle or in resources?"},
-            new [] {"SettingSourcePath", "../Product/SettingSource"},
-            new [] {"SettingPath", "Resources/Setting"},
+        //private static string[][] DefaultConfigs = new string[][]
+        //{
+        //    new string[] {"ProductRelPath", "../Product", ""},
+        //    new string[] {"AssetBundleBuildRelPath", "../Product/Bundles", "The Relative path to build assetbundles"},
+        //    new [] {"StreamingBundlesFolderName", "Bundles"},
+        //    new [] {"UIModuleBridge","UGUI"},
+        //    new string[] {"AssetBundleExt", ".bytes", "Asset bundle file extension"},
+        //    new string[] {"IsLoadAssetBundle", "1", "Asset bundle or in resources?"},
+        //    new [] {"SettingSourcePath", "../Product/SettingSource"},
+        //    new [] {"SettingPath", "Resources/Setting"},
 
-        };
+        //};
 
         private static KEngineUtils Instance;
 
@@ -134,11 +134,11 @@ namespace KEngine.Editor
             bool tabDirty = false;
             foreach (var item in AppEngine.ConfigsTable.GetAll())
             {
-                string value = item.Value;
-                string newValue = EditorGUILayout.TextField(item.Key, value);
+                string value = item["Value"];
+                string newValue = EditorGUILayout.TextField(item["Key"], value);
                 if (value != newValue)
                 {
-                    AppEngine.SetConfig(item.Key, newValue);
+                    AppEngine.SetConfig(item["Key"], newValue);
                     tabDirty = true;
                 }
             }

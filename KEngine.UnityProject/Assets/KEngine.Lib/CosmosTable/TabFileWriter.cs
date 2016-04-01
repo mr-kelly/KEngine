@@ -8,38 +8,24 @@ namespace CosmosTable
     /// Write the TabFile!
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class TabFileWriter<T> : IDisposable where T : TableRowInfo, new()
+    public class TabFileWriter : IDisposable
     {
-        public readonly TableFile<T> TabFile;
+        public readonly TableFile TabFile;
 
         public TabFileWriter()
         {
-            TabFile = new TableFile<T>();
-            CheckHeaders();
+            TabFile = new TableFile();
         }
 
-        void CheckHeaders()
-        {
-            foreach (var field in TabFile.AutoTabFields)
-            {
-                HeaderInfo headerInfo;
-                if (!TabFile.Headers.TryGetValue(field.Name, out headerInfo))
-                {
-                    NewColumn(field.Name);
-                }
-            }
-            
-        }
-        public TabFileWriter(TableFile<T> tabFile)
+        public TabFileWriter(TableFile tabFile)
         {
             TabFile = tabFile;
-            CheckHeaders();
         }
 
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-
+             
             foreach (var header in TabFile.Headers.Values)
                 sb.Append(string.Format("{0}\t", header.HeaderName));
             sb.Append("\r\n");
@@ -52,11 +38,12 @@ namespace CosmosTable
             foreach (var kv in TabFile.Rows)
             {
                 var rowT = kv.Value;
-                foreach (var field in TabFile.AutoTabFields)
+                var rowItemCount = rowT.Values.Length;
+                for (var i = 0; i < rowItemCount; i++)
                 {
-                    var retVal = field.GetValue(rowT);
-                    sb.Append(retVal);
-                    sb.Append('\t');
+                    sb.Append(rowT.Values[i]);
+                    if (i != (rowItemCount - 1))
+                        sb.Append('\t'); 
                 }
                 sb.Append("\r\n");
             }
@@ -91,10 +78,10 @@ namespace CosmosTable
             }
         }
 
-        public T NewRow()
+        public TableRow NewRow()
         {
             int rowId = TabFile.Rows.Count + 1;
-            var newRow = new T();
+            var newRow = new TableRow();
             newRow.RowNumber = rowId;
 
             TabFile.Rows.Add(rowId, newRow);
@@ -107,12 +94,12 @@ namespace CosmosTable
             return TabFile.Rows.Remove(row);
         }
 
-        public T GetRow(int row)
+        public TableRow GetRow(int row)
         {
-            object rowT;
+            TableRow rowT;
             if (TabFile.Rows.TryGetValue(row, out rowT))
             {
-                return (T)rowT;
+                return rowT;
             }
 
             return null;
@@ -129,7 +116,7 @@ namespace CosmosTable
 
             var newHeader = new HeaderInfo
             {
-                ColumnIndex = TabFile.Headers.Count + 1,
+                ColumnIndex = TabFile.Headers.Count,
                 HeaderName = colName,
                 HeaderDef = defineStr,
             };

@@ -50,8 +50,8 @@
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Lib\CosmosTable\TableFile.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Lib\CosmosTable\TableFile.cs</Link>
     </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Lib\CosmosTable\TableRowInfo.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine.Lib\CosmosTable\TableRowInfo.cs</Link>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Lib\CosmosTable\TableRow.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Lib\CosmosTable\TableRow.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>
