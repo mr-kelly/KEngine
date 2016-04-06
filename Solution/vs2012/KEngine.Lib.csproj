@@ -53,6 +53,9 @@
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Lib\CosmosTable\TableRow.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Lib\CosmosTable\TableRow.cs</Link>
     </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Lib\SettingModule\SettingModuleBase.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Lib\SettingModule\SettingModuleBase.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>

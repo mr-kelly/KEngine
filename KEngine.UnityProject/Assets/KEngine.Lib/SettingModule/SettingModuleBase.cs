@@ -24,23 +24,29 @@
 
 #endregion
 
+using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using CosmosTable;
-using UnityEngine;
 
-namespace KEngine.CoreModules
+namespace KEngine.Modules
 {
     /// <summary>
-    /// 使用CosmosTable的数据表加载器
+    /// 带有惰式加载的数据表加载器基类，
+    /// 不带具体的加载文件的方法，需要自定义。
+    /// 主要为了解耦，移除对UnityEngine命名空间的依赖使之可以进行其它.net平台的兼容
+    /// 使用时进行继承，并注册LoadSettingMethod自定义的
     /// </summary>
-    public class SettingModule
+    public abstract class SettingModuleBase
     {
         /// <summary>
         /// table缓存
         /// </summary>
-        private static readonly Dictionary<string, object> _tableFilesCache = new Dictionary<string, object>();
+        private readonly Dictionary<string, object> _tableFilesCache = new Dictionary<string, object>();
+
+        /// <summary>
+        /// You can custom method to load file.
+        /// </summary>
+        protected abstract string LoadSetting(string path);
 
         /// <summary>
         /// 通过SettingModule拥有缓存与惰式加载
@@ -48,14 +54,12 @@ namespace KEngine.CoreModules
         /// <param name="path"></param>
         /// <param name="useCache">是否缓存起来？还是单独创建新的</param>
         /// <returns></returns>
-        public static TableFile Get(string path, bool useCache = true) 
+        public TableFile GetTableFile(string path, bool useCache = true) 
         {
             object tableFile;
             if (!useCache || !_tableFilesCache.TryGetValue(path, out tableFile))
             {
-                var fileContentAsset = Resources.Load("Setting/" + Path.GetFileNameWithoutExtension(path)) as TextAsset;
-                var fileContent = Encoding.UTF8.GetString(fileContentAsset.bytes);
-
+                var fileContent = LoadSetting(path);
                 var tab = TableFile.LoadFromString(fileContent);
                 _tableFilesCache[path] = tableFile = tab;
                 return tab;

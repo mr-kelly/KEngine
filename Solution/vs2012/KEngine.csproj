@@ -113,8 +113,8 @@
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\LoaderDebugers\KResourceLoaderDebuggers.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\LoaderDebugers\KResourceLoaderDebuggers.cs</Link>
     </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\SettingModule\SettingModule.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\SettingModule\SettingModule.cs</Link>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\SettingModule.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\SettingModule.cs</Link>
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Debuger.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\Debuger.cs</Link>
