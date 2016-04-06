@@ -44,7 +44,7 @@ namespace KEngine
 
         public static KAudioLoader Load(string url, System.Action<bool, AudioClip> callback = null)
         {
-            CLoaderDelgate newCallback = null;
+            LoaderDelgate newCallback = null;
             if (callback != null)
             {
                 newCallback = (isOk, obj) => callback(isOk, obj as AudioClip);

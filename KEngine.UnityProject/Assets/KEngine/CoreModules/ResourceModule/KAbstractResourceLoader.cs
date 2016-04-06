@@ -37,16 +37,12 @@ namespace KEngine
     /// </summary>
     public abstract class KAbstractResourceLoader : IAsyncObject
     {
-        static KAbstractResourceLoader()
-        {
-        }
-
-        public delegate void CLoaderDelgate(bool isOk, object resultObject);
+        public delegate void LoaderDelgate(bool isOk, object resultObject);
 
         private static readonly Dictionary<Type, Dictionary<string, KAbstractResourceLoader>> _loadersPool =
             new Dictionary<Type, Dictionary<string, KAbstractResourceLoader>>();
 
-        private readonly List<CLoaderDelgate> _afterFinishedCallbacks = new List<CLoaderDelgate>();
+        private readonly List<LoaderDelgate> _afterFinishedCallbacks = new List<LoaderDelgate>();
 
         #region 垃圾回收 Garbage Collect
 
@@ -229,7 +225,7 @@ namespace KEngine
         /// <param name="callback"></param>
         /// <param name="forceCreateNew"></param>
         /// <returns></returns>
-        protected static T AutoNew<T>(string url, CLoaderDelgate callback = null, bool forceCreateNew = false,
+        protected static T AutoNew<T>(string url, LoaderDelgate callback = null, bool forceCreateNew = false,
             params object[] initArgs) where T : KAbstractResourceLoader, new()
         {
             Dictionary<string, KAbstractResourceLoader> typesDict = GetTypeDict(typeof(T));
@@ -382,7 +378,7 @@ namespace KEngine
         /// 在IsFinisehd后悔执行的回调
         /// </summary>
         /// <param name="callback"></param>
-        protected void AddCallback(CLoaderDelgate callback)
+        protected void AddCallback(LoaderDelgate callback)
         {
             if (callback != null)
             {

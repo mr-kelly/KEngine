@@ -29,133 +29,137 @@ using System.Collections;
 using KEngine;
 using UnityEngine;
 
-/// <summary>
-/// AssetBundle字节解析器
-/// </summary>
-public class KAssetBundleParser
+namespace KEngine
 {
-    public enum CAssetBundleParserMode
-    {
-        Async,
-        Sync,
-    }
-
     /// <summary>
-    /// 是异步解析，还是同步解析
+    /// AssetBundle字节解析器
     /// </summary>
-    public static CAssetBundleParserMode Mode = CAssetBundleParserMode.Sync;
-
-    private bool IsDisposed = false;
-    private bool UnloadAllAssets; // Dispose时赋值
-
-    private readonly Action<AssetBundle> Callback;
-    public bool IsFinished;
-    public AssetBundle Bundle;
-
-    public static Func<string, byte[], byte[]> BundleBytesFilter = null; // 可以放置資源加密函數
-
-    private static int _autoPriority = 1;
-
-    private readonly AssetBundleCreateRequest CreateRequest;
-
-    public float Progress
+    public class KAssetBundleParser
     {
-        get { return CreateRequest.progress; }
-    }
-
-    public string RelativePath;
-
-    private readonly float _startTime = 0;
-
-    public KAssetBundleParser(string relativePath, byte[] bytes, Action<AssetBundle> callback = null)
-    {
-        if (Debug.isDebugBuild)
+        public enum CAssetBundleParserMode
         {
-            _startTime = Time.realtimeSinceStartup;
+            Async,
+            Sync,
         }
 
-        Callback = callback;
-        RelativePath = relativePath;
+        /// <summary>
+        /// 是异步解析，还是同步解析
+        /// </summary>
+        public static CAssetBundleParserMode Mode = CAssetBundleParserMode.Sync;
 
-        var func = BundleBytesFilter ?? DefaultParseAb;
-        var abBytes = func(relativePath, bytes);
-        switch (Mode)
+        private bool IsDisposed = false;
+        private bool UnloadAllAssets; // Dispose时赋值
+
+        private readonly Action<AssetBundle> Callback;
+        public bool IsFinished;
+        public AssetBundle Bundle;
+
+        public static Func<string, byte[], byte[]> BundleBytesFilter = null; // 可以放置資源加密函數
+
+        private static int _autoPriority = 1;
+
+        private readonly AssetBundleCreateRequest CreateRequest;
+
+        public float Progress
         {
-            case CAssetBundleParserMode.Async:
-                CreateRequest = AssetBundle.CreateFromMemory(abBytes);
-                CreateRequest.priority = _autoPriority++; // 后进先出, 一个一个来
-                KResourceModule.Instance.StartCoroutine(WaitCreateAssetBundle(CreateRequest));
-                break;
-            case CAssetBundleParserMode.Sync:
-                OnFinish(AssetBundle.CreateFromMemoryImmediate(abBytes));
-                break;
-            default:
-                throw new Exception("Error CAssetBundleParserMode: " + Mode);
-        }
-    }
-
-    private void OnFinish(AssetBundle bundle)
-    {
-        IsFinished = true;
-        Bundle = bundle;
-
-        if (IsDisposed)
-            DisposeBundle();
-        else
-        {
-            if (Callback != null)
-                Callback(Bundle);
+            get { return CreateRequest.progress; }
         }
 
-        if (Application.isEditor && Debug.isDebugBuild)
+        public string RelativePath;
+
+        private readonly float _startTime = 0;
+
+        public KAssetBundleParser(string relativePath, byte[] bytes, Action<AssetBundle> callback = null)
         {
-            var useTime = Time.realtimeSinceStartup - _startTime;
-            var timeLimit = Mode == CAssetBundleParserMode.Async ? 1f : .3f;
-            if (useTime > timeLimit) // 超过一帧时间肯定了
+            if (Debug.isDebugBuild)
             {
-                Logger.LogWarning("[KAssetBundleParser] Parse Too long time: {0},  used time: {1}", RelativePath,
-                    useTime);
+                _startTime = Time.realtimeSinceStartup;
+            }
+
+            Callback = callback;
+            RelativePath = relativePath;
+
+            var func = BundleBytesFilter ?? DefaultParseAb;
+            var abBytes = func(relativePath, bytes);
+            switch (Mode)
+            {
+                case CAssetBundleParserMode.Async:
+                    CreateRequest = AssetBundle.CreateFromMemory(abBytes);
+                    CreateRequest.priority = _autoPriority++; // 后进先出, 一个一个来
+                    KResourceModule.Instance.StartCoroutine(WaitCreateAssetBundle(CreateRequest));
+                    break;
+                case CAssetBundleParserMode.Sync:
+                    OnFinish(AssetBundle.CreateFromMemoryImmediate(abBytes));
+                    break;
+                default:
+                    throw new Exception("Error CAssetBundleParserMode: " + Mode);
             }
         }
-    }
 
-    private IEnumerator WaitCreateAssetBundle(AssetBundleCreateRequest req)
-    {
-        float startTime = Time.time;
-
-        while (!req.isDone)
+        private void OnFinish(AssetBundle bundle)
         {
-            yield return null;
-        }
+            IsFinished = true;
+            Bundle = bundle;
 
-        if (Application.isEditor)
-        {
-            const float timeout = 5f;
-            if (Time.time - startTime > timeout)
+            if (IsDisposed)
+                DisposeBundle();
+            else
             {
-                Logger.LogWarning("[CAssetBundlerParser]{0} 解压/读取Asset太久了! 花了{1}秒, 超过 {2}秒", RelativePath,
-                    Time.time - startTime, timeout);
+                if (Callback != null)
+                    Callback(Bundle);
+            }
+
+            if (Application.isEditor && Debug.isDebugBuild)
+            {
+                var useTime = Time.realtimeSinceStartup - _startTime;
+                var timeLimit = Mode == CAssetBundleParserMode.Async ? 1f : .3f;
+                if (useTime > timeLimit) // 超过一帧时间肯定了
+                {
+                    Logger.LogWarning("[KAssetBundleParser] Parse Too long time: {0},  used time: {1}", RelativePath,
+                        useTime);
+                }
             }
         }
-        OnFinish(req.assetBundle);
-    }
+
+        private IEnumerator WaitCreateAssetBundle(AssetBundleCreateRequest req)
+        {
+            float startTime = Time.time;
+
+            while (!req.isDone)
+            {
+                yield return null;
+            }
+
+            if (Application.isEditor)
+            {
+                const float timeout = 5f;
+                if (Time.time - startTime > timeout)
+                {
+                    Logger.LogWarning("[CAssetBundlerParser]{0} 解压/读取Asset太久了! 花了{1}秒, 超过 {2}秒", RelativePath,
+                        Time.time - startTime, timeout);
+                }
+            }
+            OnFinish(req.assetBundle);
+        }
 
 
-    private static byte[] DefaultParseAb(string relativePath, byte[] bytes)
-    {
-        return bytes;
+        private static byte[] DefaultParseAb(string relativePath, byte[] bytes)
+        {
+            return bytes;
+        }
+
+        private void DisposeBundle()
+        {
+            Bundle.Unload(UnloadAllAssets);
+        }
+
+        public void Dispose(bool unloadAllAssets)
+        {
+            UnloadAllAssets = unloadAllAssets;
+            if (Bundle != null)
+                DisposeBundle();
+            IsDisposed = true;
+        }
     }
 
-    private void DisposeBundle()
-    {
-        Bundle.Unload(UnloadAllAssets);
-    }
-
-    public void Dispose(bool unloadAllAssets)
-    {
-        UnloadAllAssets = unloadAllAssets;
-        if (Bundle != null)
-            DisposeBundle();
-        IsDisposed = true;
-    }
 }

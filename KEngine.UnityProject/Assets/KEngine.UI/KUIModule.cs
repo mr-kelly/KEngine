@@ -41,7 +41,6 @@ namespace KEngine.UI
     /// <summary>
     /// UI Module
     /// </summary>
-    [CDependencyClass(typeof(KResourceModule))]
     public class KUIModule : KEngine.IModule
     {
         private class _InstanceClass

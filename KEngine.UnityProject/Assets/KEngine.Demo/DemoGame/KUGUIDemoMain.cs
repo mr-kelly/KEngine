@@ -40,7 +40,7 @@ public class KUGUIDemoMain : MonoBehaviour
 
     IEnumerator Start()
     {
-        KGameSettings.Instance.InitAction += OnGameSettingsInit;
+        //KGameSettings.Instance.InitAction += OnGameSettingsInit;
 
         var engine = KEngine.AppEngine.New(
             gameObject,
@@ -72,22 +72,22 @@ public class KUGUIDemoMain : MonoBehaviour
         var info = ExampleInfos.GetByPrimaryKey("A_1024");
         Debuger.Assert(info.Name == "Test1");
     }
-    private void OnGameSettingsInit()
-    {
-        KGameSettings _ = KGameSettings.Instance;
+    //private void OnGameSettingsInit()
+    //{
+    //    KGameSettings _ = KGameSettings.Instance;
 
-        Logger.Log("Begin Load tab file...");
+    //    Logger.Log("Begin Load tab file...");
 
-        var tabContent =
-            File.ReadAllText(Application.dataPath + "/" + KEngine.AppEngine.GetConfig("ProductRelPath") +
-                             "/Setting/test_tab.bytes");
-        _.LoadTab<CTestTabInfo>(tabContent);
-        Logger.Log("Output the tab file...");
-        foreach (CTestTabInfo info in _.GetInfos<CTestTabInfo>())
-        {
-            Logger.Log("Id:{0}, Name: {1}", info.Id, info.Name);
-        }
-    }
+    //    var tabContent =
+    //        File.ReadAllText(Application.dataPath + "/" + KEngine.AppEngine.GetConfig("ProductRelPath") +
+    //                         "/Setting/test_tab.bytes");
+    //    _.LoadTab<CTestTabInfo>(tabContent);
+    //    Logger.Log("Output the tab file...");
+    //    foreach (CTestTabInfo info in _.GetInfos<CTestTabInfo>())
+    //    {
+    //        Logger.Log("Id:{0}, Name: {1}", info.Id, info.Name);
+    //    }
+    //}
 }
 
 public class CTestTabInfo : CBaseInfo

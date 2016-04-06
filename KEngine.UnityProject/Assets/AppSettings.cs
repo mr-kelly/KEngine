@@ -63,6 +63,7 @@ namespace AppSettings
             return ExampleInfo.Wrap(row);
         }
     }
+
 	/// <summary>
 	/// Auto Generate for Tab File: Example.bytes
     /// Singleton class for less memory use

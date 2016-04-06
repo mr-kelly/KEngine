@@ -33,8 +33,7 @@ using UnityEngine;
 
 namespace KEngine.CoreModules
 {
-    [CDependencyClass(typeof (KResourceModule))]
-    [CDependencyClass(typeof (KSettingManager))]
+    [Obsolete("Use SettingModule instead!")]
     public class KGameSettings : IModule
     {
         private class _InstanceClass

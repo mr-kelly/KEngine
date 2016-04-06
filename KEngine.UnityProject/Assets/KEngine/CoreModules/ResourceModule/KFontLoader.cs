@@ -40,7 +40,7 @@ namespace KEngine
 
         public static KFontLoader Load(string path, Action<bool, Font> callback = null)
         {
-            CLoaderDelgate realcallback = null;
+            LoaderDelgate realcallback = null;
             if (callback != null)
             {
                 realcallback = (isOk, obj) => callback(isOk, obj as Font);

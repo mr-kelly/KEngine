@@ -33,7 +33,6 @@ using UnityEngine;
 /// Load from Local hard disk or
 /// Load from a AssetBundles..
 /// </summary>
-[CDependencyClass(typeof (KResourceModule))]
 public class KSettingManager : KEngine.IModule
 {
     private static KSettingManager _Instance;

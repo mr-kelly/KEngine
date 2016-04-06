@@ -38,10 +38,3 @@ namespace KEngine
     }
 
 }
-[AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
-public class CDependencyClass : Attribute
-{
-    public CDependencyClass(Type dependencyType)
-    {
-    }
-}

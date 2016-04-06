@@ -28,8 +28,6 @@ using UnityEngine;
 
 namespace KEngine
 {
-
-    [CDependencyClass(typeof(KAssetFileLoader))]
     public class KSpriteLoader : KAbstractResourceLoader
     {
         public Sprite Asset
@@ -50,7 +48,7 @@ namespace KEngine
 
         public static KSpriteLoader Load(string path, CSpriteLoaderDelegate callback = null)
         {
-            CLoaderDelgate newCallback = null;
+            LoaderDelgate newCallback = null;
             if (callback != null)
             {
                 newCallback = (isOk, obj) => callback(isOk, obj as Sprite);

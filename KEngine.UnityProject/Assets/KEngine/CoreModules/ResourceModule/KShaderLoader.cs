@@ -43,7 +43,7 @@ namespace KEngine
 
         public static KShaderLoader Load(string path, ShaderLoaderDelegate callback = null)
         {
-            CLoaderDelgate newCallback = null;
+            LoaderDelgate newCallback = null;
             if (callback != null)
             {
                 newCallback = (isOk, obj) => callback(isOk, obj as Shader);
