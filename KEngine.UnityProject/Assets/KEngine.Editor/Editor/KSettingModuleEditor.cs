@@ -66,22 +66,21 @@ namespace {{ NameSpace }}
 
         public static {{file.ClassName}}Info Wrap(TableRow row)
         {
-            if (_instance == null)
-                _instance = new {{file.ClassName}}Info();
-
-            _instance._row = row;
-            return _instance;
+            return _instance ?? (_instance = new {{file.ClassName}}Info(row));
         }
 
-        private TableRow _row;
+        private readonly TableRow _row;
 
-        private {{file.ClassName}}Info()
+        private {{file.ClassName}}Info(TableRow row)
         {
+            _row = row;
         }
 
 		{% for field in file.Fields %}
+        /// <summary>
         /// {{ field.Comment }}
-		public {{ field.FormatType }} {{ field.Name}}
+        /// </summary>
+        public {{ field.FormatType }} {{ field.Name}}
         {
             get
             {
@@ -146,7 +145,8 @@ namespace {{ NameSpace }}
                 {
                     nowFileIndex++;
                     var ext = Path.GetExtension(excelPath);
-                    if (excelExt.Contains(ext))
+                    var fileName = Path.GetFileNameWithoutExtension(excelPath);
+                    if (excelExt.Contains(ext) && !fileName.StartsWith("~")) // ~开头为excel临时文件，不要读
                     {
                         // it's an excel file
                         var relativePath = excelPath.Replace(findDir, "").Replace("\\", "/");

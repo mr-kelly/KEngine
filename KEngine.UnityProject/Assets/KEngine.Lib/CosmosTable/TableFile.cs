@@ -10,7 +10,7 @@ namespace CosmosTable
         DuplicatedKey,
 
         HeadLineNull,
-        StamentLineNull, // 第二行
+        MetaLineNull, // 第二行
         NotFoundHeader,
         NotFoundGetMethod,
         NotFoundPrimaryKey,
@@ -23,7 +23,7 @@ namespace CosmosTable
     {
         public int ColumnIndex;
         public string HeaderName;
-        public string HeaderDef;
+        public string HeaderMeta;
     }
 
     public delegate void TableFileExceptionDelegate(TableFileExceptionType exceptionType, string[] args);
@@ -111,22 +111,22 @@ namespace CosmosTable
             var headLine = oReader.ReadLine();
             if (headLine == null)
             {
-                OnExeption(TableFileExceptionType.HeadLineNull);
+                OnException(TableFileExceptionType.HeadLineNull);
                 return false;
             }
 
-            var defLine = oReader.ReadLine(); // 声明行
-            if (defLine == null)
+            var metaLine = oReader.ReadLine(); // 声明行
+            if (metaLine == null)
             {
-                OnExeption(TableFileExceptionType.StamentLineNull);
+                OnException(TableFileExceptionType.MetaLineNull);
                 return false;
             }
 
-            var defLineArr = defLine.Split(_config.Separators, StringSplitOptions.None);
+            var metaLineArr = metaLine.Split(_config.Separators, StringSplitOptions.None);
 
             string[] firstLineSplitString = headLine.Split(_config.Separators, StringSplitOptions.None);  // don't remove RemoveEmptyEntries!
             string[] firstLineDef = new string[firstLineSplitString.Length];
-            Array.Copy(defLineArr, 0, firstLineDef, 0, defLineArr.Length);  // 拷贝，确保不会超出表头的
+            Array.Copy(metaLineArr, 0, firstLineDef, 0, metaLineArr.Length);  // 拷贝，确保不会超出表头的
 
             for (int i = 0; i < firstLineSplitString.Length; i++)
             {
@@ -136,7 +136,7 @@ namespace CosmosTable
                 {
                     ColumnIndex = i,
                     HeaderName = headerString,
-                    HeaderDef = firstLineDef[i],
+                    HeaderMeta = firstLineDef[i],
                 };
 
                 Headers[headerInfo.HeaderName] = headerInfo;
@@ -176,7 +176,7 @@ namespace CosmosTable
                         {
                             TableRow toT = oldT;
                             // Check Duplicated Primary Key, 使用原来的，不使用新new出来的, 下回合直接用_cachedNewObj
-                            OnExeption(TableFileExceptionType.DuplicatedKey, toT.PrimaryKey.ToString());
+                            OnException(TableFileExceptionType.DuplicatedKey, toT.PrimaryKey.ToString());
                             newT = toT;
                         }
                     }
@@ -232,7 +232,7 @@ namespace CosmosTable
             {
                 if (!HasColumn(field.Name))
                 {
-                    OnExeption(TableFileExceptionType.NotFoundHeader, type.Name, field.Name);
+                    OnException(TableFileExceptionType.NotFoundHeader, type.Name, field.Name);
                     continue;
                 }
                 okFields.Add(field);
@@ -251,7 +251,7 @@ namespace CosmosTable
                     // default value
                     //string szType = "string";
                     string defaultValue = "";
-                    var headerDef = Headers[fieldName].HeaderDef;
+                    var headerDef = Headers[fieldName].HeaderMeta;
                     if (!string.IsNullOrEmpty(headerDef))
                     {
                         var defs = headerDef.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
@@ -266,7 +266,7 @@ namespace CosmosTable
                 }
                 else
                 {
-                    OnExeption(TableFileExceptionType.NotFoundGetMethod, methodName);
+                    OnException(TableFileExceptionType.NotFoundGetMethod, methodName);
                 }
             }
 
@@ -286,7 +286,7 @@ namespace CosmosTable
             return Headers.ContainsKey(colName);
         }
 
-        protected internal void OnExeption(TableFileExceptionType message, params string[] args)
+        protected internal void OnException(TableFileExceptionType message, params string[] args)
         {
             if (TableFileStaticConfig.GlobalExceptionEvent != null)
             {
@@ -373,7 +373,7 @@ namespace CosmosTable
                 return ret;
             else
             {
-                OnExeption(TableFileExceptionType.NotFoundPrimaryKey, primaryKey.ToString());
+                OnException(TableFileExceptionType.NotFoundPrimaryKey, primaryKey.ToString());
                 return null;
             }
         }

@@ -15,22 +15,21 @@ namespace AppSettings
 
         public static ExampleInfo Wrap(TableRow row)
         {
-            if (_instance == null)
-                _instance = new ExampleInfo();
-
-            _instance._row = row;
-            return _instance;
+            return _instance ?? (_instance = new ExampleInfo(row));
         }
 
-        private TableRow _row;
+        private readonly TableRow _row;
 
-        private ExampleInfo()
+        private ExampleInfo(TableRow row)
         {
+            _row = row;
         }
 
 		
+        /// <summary>
         /// ID Column/编号
-		public int Id
+        /// </summary>
+        public int Id
         {
             get
             {
@@ -43,8 +42,10 @@ namespace AppSettings
 
         }
 		
+        /// <summary>
         /// Name/名字
-		public string Name
+        /// </summary>
+        public string Name
         {
             get
             {
@@ -57,8 +58,10 @@ namespace AppSettings
 
         }
 		
+        /// <summary>
         /// ArrayTest/测试数组
-		public string[] StrArray
+        /// </summary>
+        public string[] StrArray
         {
             get
             {
@@ -71,8 +74,10 @@ namespace AppSettings
 
         }
 		
+        /// <summary>
         /// 字典测试
-		public Dictionary<string,int> StrIntMap
+        /// </summary>
+        public Dictionary<string,int> StrIntMap
         {
             get
             {

@@ -65,9 +65,9 @@ public class KTabFile : IDisposable, IKTabReadble, IEnumerable<KTabFile.RowInter
         //public string ToColumnString()
         //{
         //    var retStr = HeaderName;
-        //    if (HeaderDef != null)
+        //    if (HeaderMeta != null)
         //    {
-        //        retStr += "|" + string.Join("|", HeaderDef);    
+        //        retStr += "|" + string.Join("|", HeaderMeta);    
         //    }
         //    return retStr;
         //}

@@ -31,7 +31,7 @@ namespace CosmosTable
             sb.Append("\r\n");
 
             foreach (var header in TabFile.Headers.Values)
-                sb.Append(string.Format("{0}\t", header.HeaderDef));
+                sb.Append(string.Format("{0}\t", header.HeaderMeta));
             sb.Append("\r\n");
 
             // 获取所有值
@@ -118,7 +118,7 @@ namespace CosmosTable
             {
                 ColumnIndex = TabFile.Headers.Count,
                 HeaderName = colName,
-                HeaderDef = defineStr,
+                HeaderMeta = defineStr,
             };
 
             TabFile.Headers.Add(colName, newHeader);

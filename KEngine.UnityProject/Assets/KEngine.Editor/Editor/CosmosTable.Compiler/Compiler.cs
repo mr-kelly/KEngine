@@ -278,30 +278,39 @@ namespace CosmosTable
                 var columnCount = excelFile.GetColumnCount();
                 for (var loopColumn = 0; loopColumn < columnCount; loopColumn++)
                 {
-                    if (ignoreColumns.Contains(loopColumn)) // comment column, ignore
-                        continue;
-                    if (loopColumn > 0)
-                        strBuilder.Append("\t");
-                    var columnName = excelFile.Index2ColName[loopColumn];
-                    
-                    var cellStr = excelFile.GetString(columnName, startRow);
+                    if (!ignoreColumns.Contains(loopColumn)) // comment column, ignore 注释列忽略
+                    {
+                        var columnName = excelFile.Index2ColName[loopColumn];
+                        var cellStr = excelFile.GetString(columnName, startRow);
 
-                    if (loopColumn == 0 && CheckCommentString(cellStr)) // 如果行首为#注释字符，忽略这一行
-                        continue;
+                        if (loopColumn == 0)
+                        {
+                            if (CheckCommentString(cellStr)) // 如果行首为#注释字符，忽略这一行)
+                            {
+                                break;
+                            }
+                            if (startRow != 0) // 不是第一行，往添加换行，首列
+                                strBuilder.Append("\n");
+                        }
 
-                    //        // 如果单元格是字符串，换行符改成\\n
-                    //        if (item is string)
-                    //        {
-                    //            var sItme = item as string;
-                    //            cloneItem = sItme.Replace("\n", "\\n");
-                    //        }
-                    //        strBuilder.Append(cloneItem);
-                    //        colIndex++;
+                        if (loopColumn > 0 && loopColumn != (columnCount - 1)) // 最后一列不需加tab
+                            strBuilder.Append("\t");
+                        //        // 如果单元格是字符串，换行符改成\\n
+                        //        if (item is string)
+                        //        {
+                        //            var sItme = item as string;
+                        //            cloneItem = sItme.Replace("\n", "\\n");
+                        //        }
+                        //        strBuilder.Append(cloneItem);
+                        //        colIndex++;
 
-                    cellStr = cellStr.Replace("\n", "\\n");
-                    strBuilder.Append(cellStr);
+                        // 如果单元格是字符串，换行符改成\\n
+                        cellStr = cellStr.Replace("\n", "\\n");
+                        strBuilder.Append(cellStr);
+
+                    }
+
                 }
-                strBuilder.Append("\n");
             }
             //if (hasStatementRow)
             //{
