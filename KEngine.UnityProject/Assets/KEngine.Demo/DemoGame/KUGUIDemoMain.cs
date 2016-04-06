@@ -69,6 +69,8 @@ public class KUGUIDemoMain : MonoBehaviour
         {
             var exampleInfo = ExampleInfo.Wrap(info);
             Debug.Log(string.Format("Name: {0}", exampleInfo.Name));
+            Debug.Log(string.Format("Number: {0}", exampleInfo.Number));
+
         }
     }
     private void OnGameSettingsInit()

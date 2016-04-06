@@ -90,7 +90,6 @@ namespace {{ NameSpace }}
             {
                 _row[{{ field.Index}}] = value.ToString();
             }
-
         }
 		{% endfor %}
 	}

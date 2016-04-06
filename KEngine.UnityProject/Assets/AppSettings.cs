@@ -15,14 +15,15 @@ namespace AppSettings
 
         public static ExampleInfo Wrap(TableRow row)
         {
-            return _instance ?? (_instance = new ExampleInfo(row));
+            var inst = _instance ?? (_instance = new ExampleInfo());
+            inst._row = row;
+            return inst;
         }
 
-        private readonly TableRow _row;
+        private TableRow _row;
 
-        private ExampleInfo(TableRow row)
+        private ExampleInfo()
         {
-            _row = row;
         }
 
 		
@@ -39,7 +40,6 @@ namespace AppSettings
             {
                 _row[0] = value.ToString();
             }
-
         }
 		
         /// <summary>
@@ -55,7 +55,21 @@ namespace AppSettings
             {
                 _row[1] = value.ToString();
             }
-
+        }
+		
+        /// <summary>
+        /// 数据测试
+        /// </summary>
+        public int Number
+        {
+            get
+            {
+                return _row.Get_int(_row.Values[2], "");
+            }
+            set
+            {
+                _row[2] = value.ToString();
+            }
         }
 		
         /// <summary>
@@ -65,13 +79,12 @@ namespace AppSettings
         {
             get
             {
-                return _row.Get_string_array(_row.Values[2], "");
+                return _row.Get_string_array(_row.Values[3], "");
             }
             set
             {
-                _row[2] = value.ToString();
+                _row[3] = value.ToString();
             }
-
         }
 		
         /// <summary>
@@ -81,13 +94,12 @@ namespace AppSettings
         {
             get
             {
-                return _row.Get_Dictionary_string_int(_row.Values[3], "");
+                return _row.Get_Dictionary_string_int(_row.Values[4], "");
             }
             set
             {
-                _row[3] = value.ToString();
+                _row[4] = value.ToString();
             }
-
         }
 		
 	}
