@@ -1,15 +1,47 @@
 
+using System.Collections;
 using System.Collections.Generic;
 using CosmosTable;
+using KEngine.CoreModules;
 namespace AppSettings
 {
 
+
 	/// <summary>
 	/// Auto Generate for Tab File: Example.bytes
+	/// </summary>>
+    public partial class ExampleInfos
+    {
+		public static readonly string TabFilePath = "Example.bytes";
+
+        public static TableFile GetTableFile()
+        {
+            return SettingModule.Get(TabFilePath);
+        }
+
+        public static IEnumerable GetAll()
+        {
+            var tableFile = SettingModule.Get(TabFilePath);
+            foreach (var row in tableFile)
+            {
+                yield return ExampleInfo.Wrap(row);
+            }
+        }
+
+        public static ExampleInfo GetByPrimaryKey(object primaryKey)
+        {
+            var tableFile = SettingModule.Get(TabFilePath);
+            var row = tableFile.GetByPrimaryKey(primaryKey);
+            if (row == null) return null;
+            return ExampleInfo.Wrap(row);
+        }
+    }
+	/// <summary>
+	/// Auto Generate for Tab File: Example.bytes
+    /// Singleton class for less memory use
 	/// </summary>
 	public partial class ExampleInfo : TableRowParser
 	{
-		public static readonly string TabFilePath = "Example.bytes";
 
 		private static ExampleInfo _instance;
 
@@ -28,13 +60,13 @@ namespace AppSettings
 
 		
         /// <summary>
-        /// ID Column/编号
+        /// ID Column/编号/主键
         /// </summary>
-        public int Id
+        public string Id
         {
             get
             {
-                return _row.Get_int(_row.Values[0], "0");
+                return _row.Get_string(_row.Values[0], "");
             }
             set
             {
@@ -58,17 +90,32 @@ namespace AppSettings
         }
 		
         /// <summary>
+        /// 用于组合成Id主键
+        /// </summary>
+        public string KeyString
+        {
+            get
+            {
+                return _row.Get_string(_row.Values[2], "");
+            }
+            set
+            {
+                _row[2] = value.ToString();
+            }
+        }
+		
+        /// <summary>
         /// 数据测试
         /// </summary>
         public int Number
         {
             get
             {
-                return _row.Get_int(_row.Values[2], "");
+                return _row.Get_int(_row.Values[3], "");
             }
             set
             {
-                _row[2] = value.ToString();
+                _row[3] = value.ToString();
             }
         }
 		
@@ -79,11 +126,11 @@ namespace AppSettings
         {
             get
             {
-                return _row.Get_string_array(_row.Values[3], "");
+                return _row.Get_string_array(_row.Values[4], "");
             }
             set
             {
-                _row[3] = value.ToString();
+                _row[4] = value.ToString();
             }
         }
 		
@@ -94,11 +141,11 @@ namespace AppSettings
         {
             get
             {
-                return _row.Get_Dictionary_string_int(_row.Values[4], "");
+                return _row.Get_Dictionary_string_int(_row.Values[5], "");
             }
             set
             {
-                _row[4] = value.ToString();
+                _row[5] = value.ToString();
             }
         }
 		

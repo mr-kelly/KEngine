@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -40,7 +41,7 @@ namespace CosmosTable
         public TableFileExceptionDelegate OnExceptionEvent;
     }
 
-    public partial class TableFile : IDisposable
+    public partial class TableFile : IDisposable, IEnumerable<TableRow>
     {
         private readonly TableFileConfig _config;
 
@@ -311,11 +312,25 @@ namespace CosmosTable
             }
         }
 
+        [Obsolete("Use GetRowCount() instead")]
         public int GetHeight()
         {
             return Rows.Count;
         }
 
+        /// <summary>
+        /// Get rows count
+        /// </summary>
+        /// <returns></returns>
+        public int GetRowCount()
+        {
+            return Rows.Count;
+        }
+
+        /// <summary>
+        /// Get table columns count
+        /// </summary>
+        /// <returns></returns>
         public int GetColumnCount()
         {
             return _colCount;
@@ -337,16 +352,6 @@ namespace CosmosTable
             return rowT;
         }
 
-        public List<TableRow> GetAll()
-        {
-            List<TableRow> l = new List<TableRow>();
-            foreach (var item in Rows.Values)
-            {
-                l.Add(item);
-            }
-            return l;
-        }
-
         public void Dispose()
         {
             Headers.Clear();
@@ -365,6 +370,11 @@ namespace CosmosTable
             return PrimaryKey2Row.ContainsKey(primaryKey);
         }
 
+        /// <summary>
+        /// Get object of the primary key (pk in meta header)
+        /// </summary>
+        /// <param name="primaryKey"></param>
+        /// <returns></returns>
         public TableRow FindByPrimaryKey(object primaryKey)
         {
             TableRow ret;
@@ -376,6 +386,35 @@ namespace CosmosTable
                 OnException(TableFileExceptionType.NotFoundPrimaryKey, primaryKey.ToString());
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Get object of the primary key (pk in meta header)
+        /// </summary>
+        /// <param name="primaryKey"></param>
+        /// <returns></returns>
+        public TableRow GetByPrimaryKey(object primaryKey)
+        {
+            return FindByPrimaryKey(primaryKey);
+        }
+
+        /// <summary>
+        /// Return a IEnumerable class, for each this
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<TableRow> GetAll()
+        {
+            return Rows.Values;
+        }
+
+        public IEnumerator<TableRow> GetEnumerator()
+        {
+            return Rows.Values.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return Rows.Values.GetEnumerator();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using NPOI.SS.UserModel;
 
@@ -147,6 +148,14 @@ namespace CosmosTable
             var cell = theRow.GetCell(colIndex);
             if (cell == null)
                 cell = theRow.CreateCell(colIndex);
+            if (cell.CellType == CellType.Formula)
+                return cell.StringCellValue;
+            if (cell.CellType == CellType.String)
+                return cell.StringCellValue;
+            if (cell.CellType == CellType.Boolean)
+                return cell.BooleanCellValue ? "1" : "0";
+            if (cell.CellType == CellType.Numeric)
+                return cell.NumericCellValue.ToString(CultureInfo.InvariantCulture);
             return cell.ToString();
         }
 

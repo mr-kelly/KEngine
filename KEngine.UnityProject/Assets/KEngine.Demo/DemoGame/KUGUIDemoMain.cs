@@ -63,15 +63,14 @@ public class KUGUIDemoMain : MonoBehaviour
             // Do some UI stuff
         });
 
-        Debug.Log("[SettingModule]Table: " + ExampleInfo.TabFilePath);
-        var exampleInfoTable = SettingModule.Get(ExampleInfo.TabFilePath);
-        foreach (var info in exampleInfoTable.GetAll())
+        Debug.Log("[SettingModule]Table: " + ExampleInfos.TabFilePath);
+        foreach (ExampleInfo exampleInfo in ExampleInfos.GetAll())
         {
-            var exampleInfo = ExampleInfo.Wrap(info);
             Debug.Log(string.Format("Name: {0}", exampleInfo.Name));
             Debug.Log(string.Format("Number: {0}", exampleInfo.Number));
-
         }
+        var info = ExampleInfos.GetByPrimaryKey("A_1024");
+        Debuger.Assert(info.Name == "Test1");
     }
     private void OnGameSettingsInit()
     {

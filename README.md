@@ -90,6 +90,7 @@ KEngine.Installer安装器为现有项目嵌入KEngine提供方便的支持，�
 
 PS: 如果在Unity未打开情况下进行Excel表的修改保存，将无法自动监测到改动。这时候，需要在打开Unity后通过菜单"KEngine->Settings->Force compile settings"进行手工编译。
 
+示例Excel文件: KEngine.UnityProject/Product/SettingSource/Example.xlsx
 
 # 美术人员使用指南
 

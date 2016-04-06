@@ -50,30 +50,63 @@ namespace KEngine.Editor
         public static string SettingCodePath = "Assets/AppSettings.cs";
 
         public static string GenCodeTemplate = @"
+using System.Collections;
 using System.Collections.Generic;
 using CosmosTable;
+using KEngine.CoreModules;
 namespace {{ NameSpace }}
 {
 {% for file in Files %}
+
 	/// <summary>
 	/// Auto Generate for Tab File: {{ file.TabFilePath }}
+	/// </summary>>
+    public partial class {{file.ClassName}}Infos
+    {
+		public static readonly string TabFilePath = ""{{ file.TabFilePath }}"";
+
+        public static TableFile GetTableFile()
+        {
+            return SettingModule.Get(TabFilePath);
+        }
+
+        public static IEnumerable GetAll()
+        {
+            var tableFile = SettingModule.Get(TabFilePath);
+            foreach (var row in tableFile)
+            {
+                yield return {{file.ClassName}}Info.Wrap(row);
+            }
+        }
+
+        public static {{file.ClassName}}Info GetByPrimaryKey(object primaryKey)
+        {
+            var tableFile = SettingModule.Get(TabFilePath);
+            var row = tableFile.GetByPrimaryKey(primaryKey);
+            if (row == null) return null;
+            return {{file.ClassName}}Info.Wrap(row);
+        }
+    }
+	/// <summary>
+	/// Auto Generate for Tab File: {{ file.TabFilePath }}
+    /// Singleton class for less memory use
 	/// </summary>
 	public partial class {{file.ClassName}}Info : TableRowParser
 	{
-		public static readonly string TabFilePath = ""{{ file.TabFilePath }}"";
 
 		private static {{file.ClassName}}Info _instance;
 
         public static {{file.ClassName}}Info Wrap(TableRow row)
         {
-            return _instance ?? (_instance = new {{file.ClassName}}Info(row));
+            var inst = _instance ?? (_instance = new {{file.ClassName}}Info());
+            inst._row = row;
+            return inst;
         }
 
-        private readonly TableRow _row;
+        private TableRow _row;
 
-        private {{file.ClassName}}Info(TableRow row)
+        private {{file.ClassName}}Info()
         {
-            _row = row;
         }
 
 		{% for field in file.Fields %}
