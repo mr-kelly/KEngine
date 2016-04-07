@@ -30,13 +30,15 @@ KEngine安装器，用于对现有的Unity项目进行安装KEngine的快捷操�
 
 ### 运行时库Runtime DLL
 
+
 * KEngine.dll
-	* KEngine.AssetDep.dll
+	* ~~KEngine.AssetDep.dll~~
+    * KEngine.Tools.dll
 
 ### 编辑器库Editor DLL
 
 * KEngine.Editor.dll
-	* KEngine.AssetDep.Editor.dll
+	* ~~KEngine.AssetDep.Editor.dll~~
 
 ### 不支持DLL的源码
 

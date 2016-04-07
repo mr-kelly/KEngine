@@ -13,16 +13,15 @@ CosmosEngine的官方改名、改进版
 
 # 特点 / Features
 
-* 精简的代码
-* AssetBundle的加载、打包
+* 代码精简, 运行时没有使用反射机制，高性能
+* 包含AssetBundle的加载、打包
 * 编辑器模式下AssetBundle的性能调试器
-* 具备完整的策划->美术->程序工作流
 * 适用于PC/Android/IOS平台开发
-* 高性能，无反射
-* 良好扩展性，支持高清版、低清版
+* 良好扩展性，支持资源的高清版、低清版
 * 两种异步风格的AssetBundle加载
+* 具备完整的策划->美术->程序工作流
 * 基于约定的、无配置式的UI模块
-* 基于编译的Excel配置表，配置表可添加图标、注释、批注
+* 基于编译的Excel配置表，配置表可添加图表、注释、批注
 
 
 # 整体结构：模块插拔与三大基础模块
@@ -65,10 +64,12 @@ KEngine.Installer安装器为现有项目嵌入KEngine提供方便的支持，�
 * [资源模块/ResourceModule](Docs/Doc_ResourceModule.md)
 	* [简单资源版本控制/AssetVersionControl](Docs/Doc_AssetVersionControl.md)
 	* 资源运行时调试工具/ResourceModuleDebuggers
-	* [依赖处理系统/AssetDep](Docs/Doc_AssetDep.md)
+	* ~~[依赖处理系统/AssetDep](Docs/Doc_AssetDep.md)~~
 * [UI模块/UIModule](Docs/Doc_UIModule.md)
 * [配置表模块/SettingModule](Docs/Doc_SettingModule.md)
+	* 惰式初始化
 	* 扩展表头类型
+
 
 # 策划人员使用指南
 
@@ -100,7 +101,7 @@ _ResourcesBuild_中依次建好产品化所需的目录，如UI、Effect、Audio
 
 # 基础配置/Config
 
-Assets/Resources/KEngineConfig.txt为CSV格式配置文件，可拖入Excel打开编辑, 也可通过菜单KEngine->Options进行配置
+KEngine.UnityProject/Assets/Resources/KEngineConfig.txt为CSV格式配置文件，可拖入Excel打开编辑, 也可通过菜单KEngine->Options进行配置
 
 # Demo
 

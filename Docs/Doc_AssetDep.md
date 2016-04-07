@@ -1,3 +1,10 @@
+
+AssetDep系统已经弃用！！！ Unity 4.x使用ResourcesDep模块！Unity 5.x直接使用官方更完善的AssetBundle机制即可！！！
+=======================
+
+
+
+
 依赖处理系统 AssetDep
 ==========================
 
