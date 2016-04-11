@@ -386,7 +386,7 @@ namespace CosmosTable
 
             renderVars.ClassName = string.Join("",
                 (from name in classNameOrigin.Replace("/", "_").Replace("\\", "_").Replace(" ", "").Split(new char[]{'_'}, StringSplitOptions.RemoveEmptyEntries)
-                 select System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(name)).ToArray());
+                 select name).ToArray());
             renderVars.TabFilePath = tabFilePath;
 
             return Hash.FromAnonymousObject(renderVars);
