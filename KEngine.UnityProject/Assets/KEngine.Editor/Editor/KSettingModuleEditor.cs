@@ -27,6 +27,7 @@
 using System.Collections.Generic;
 using System.IO;
 using CosmosTable;
+using DotLiquid;
 using KUnityEditorTools;
 using UnityEditor;
 using UnityEngine;
@@ -183,15 +184,15 @@ namespace {{ NameSpace }}
         }
         public static void CompileTabConfigs(string sourcePath, string compilePath, string genCodeFilePath, string changeExtension = ".bytes", bool force = false)
         {
-            // excel compiler
-            var compiler = new Compiler(new CompilerConfig()
+            var codeTemplates = new Dictionary<string, string>()
             {
-                CodeTemplates = string.IsNullOrEmpty(genCodeFilePath) ? null : new Dictionary<string, string>()
-                {
-                    {GenCodeTemplate, "Assets/AppSettings.cs"}
-                },
-                NameSpace = "AppSettings",
-            });
+                {GenCodeTemplate, "Assets/AppSettings.cs"},
+            };
+
+            var nameSpace = "AppSettings";
+
+            // excel compiler
+            var compiler = new Compiler(new CompilerConfig());
 
             var excelExt = new HashSet<string>() { ".xls", ".xlsx" };
             var findDir = sourcePath;
@@ -200,6 +201,7 @@ namespace {{ NameSpace }}
                 var allFiles = Directory.GetFiles(findDir, "*.*", SearchOption.AllDirectories);
                 var allFilesCount = allFiles.Length;
                 var nowFileIndex = -1; // 开头+1， 起始为0
+                var files = new List<Hash>();
                 foreach (var excelPath in allFiles)
                 {
                     nowFileIndex++;
@@ -212,14 +214,14 @@ namespace {{ NameSpace }}
                         if (relativePath.StartsWith("/"))
                             relativePath = relativePath.Substring(1);
 
-                        var compileBaseDir =  compilePath;
+                        var compileBaseDir = compilePath;
 
                         var compileToPath = string.Format("{0}/{1}", compileBaseDir,
                             Path.ChangeExtension(relativePath, changeExtension));
                         var srcFileInfo = new FileInfo(excelPath);
 
                         EditorUtility.DisplayProgressBar("Compiling Excel to Tab...",
-                            string.Format("{0} -> {1}", excelPath, compilePath), nowFileIndex / (float)allFilesCount);
+                            string.Format("{0} -> {1}", excelPath, compileToPath), nowFileIndex / (float)allFilesCount);
 
                         // 如果已经存在，判断修改时间是否一致，用此来判断是否无需compile，节省时间
                         if (File.Exists(compileToPath))
@@ -233,11 +235,31 @@ namespace {{ NameSpace }}
                             }
                         }
                         KLogger.LogWarning("[SettingModule]Compile from {0} to {1}", excelPath, compileToPath);
-                        compiler.Compile(excelPath, compileToPath, compileBaseDir);
+                        var templateHash = compiler.Compile(excelPath, compileToPath, compileBaseDir);
+                        files.Add(templateHash);
                         var compiledFileInfo = new FileInfo(compileToPath);
                         compiledFileInfo.LastWriteTime = srcFileInfo.LastWriteTime;
                     }
                 }
+
+
+                // 根据模板生成所有代码
+                foreach (var kv in codeTemplates)
+                {
+                    var templateStr = kv.Key;
+                    var exportPath = kv.Value;
+
+                    // 生成代码
+                    var template = Template.Parse(templateStr);
+                    var topHash = new Hash();
+                    topHash["NameSpace"] = nameSpace;
+                    topHash["Files"] = files;
+
+                    if (!string.IsNullOrEmpty(exportPath))
+                        File.WriteAllText(exportPath, template.Render(topHash));
+                }
+
+
             }
             finally
             {
@@ -258,7 +280,7 @@ namespace {{ NameSpace }}
         public static void CompileSettings()
         {
             var sourcePath = SettingSourcePath;//AppEngine.GetConfig("SettingSourcePath");
-            if (string.IsNullOrEmpty(sourcePath)) 
+            if (string.IsNullOrEmpty(sourcePath))
             {
                 KLogger.LogError("Need to KEngineConfig: SettingSourcePath");
                 return;

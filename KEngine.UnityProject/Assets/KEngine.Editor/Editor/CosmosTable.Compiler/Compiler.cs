@@ -74,13 +74,13 @@ namespace CosmosTable
 
     public class CompilerConfig
     {
-        public Dictionary<string, string> CodeTemplates;
+        /// <summary>
+        /// 编译后的扩展名
+        /// </summary>
         public string ExportTabExt = ".bytes";
-
         // 被认为是注释的表头
         public string[] CommentColumnStartsWith = { "Comment", "#" };
 
-        public string NameSpace = "AppConfigs";
 
         public CompilerConfig()
         {
@@ -364,7 +364,7 @@ namespace CosmosTable
             else
             {
                 // use default
-                exportPath = string.Format("{0}{1}", fileName, _config.ExportTabExt);
+                exportPath = fileName + _config.ExportTabExt;
             }
 
             var exportDirPath = Path.GetDirectoryName(exportPath);
@@ -374,7 +374,7 @@ namespace CosmosTable
 
 
             // 基于base dir路径
-            var tabFilePath = exportPath;
+            var tabFilePath = exportPath; // without extension
             if (!string.IsNullOrEmpty(compileBaseDir))
             {
                 tabFilePath = tabFilePath.Replace(compileBaseDir, ""); // 保留后戳
@@ -382,8 +382,10 @@ namespace CosmosTable
             if (tabFilePath.StartsWith("/"))
                 tabFilePath = tabFilePath.Substring(1);
 
+            var classNameOrigin = Path.GetDirectoryName(tabFilePath) + "/" + Path.GetFileNameWithoutExtension(tabFilePath);// 未处理路径的类名, 去掉后缀扩展名
+
             renderVars.ClassName = string.Join("",
-                (from name in fileName.Split('_')
+                (from name in classNameOrigin.Replace("/", "_").Replace("\\", "_").Replace(" ", "").Split(new char[]{'_'}, StringSplitOptions.RemoveEmptyEntries)
                  select System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(name)).ToArray());
             renderVars.TabFilePath = tabFilePath;
 
@@ -408,7 +410,14 @@ namespace CosmosTable
             return false;
         }
 
-        public bool Compile(string path, string compileToFilePath = null, string compileBaseDir = null)
+        /// <summary>
+        /// Compile a setting file, return a hash for template
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="compileToFilePath"></param>
+        /// <param name="compileBaseDir"></param>
+        /// <returns></returns>
+        public Hash Compile(string path, string compileToFilePath = null, string compileBaseDir = null)
         {
             // 确保目录存在
             var compileToFileDirPath = Path.GetDirectoryName(compileToFilePath);
@@ -417,30 +426,9 @@ namespace CosmosTable
                 Directory.CreateDirectory(compileToFileDirPath);
 
             var excelFile = new SimpleExcelFile(path);
-            var files = new List<Hash>();
             var hash = DoCompiler(path, excelFile, compileToFilePath, compileBaseDir);
-            files.Add(hash);
+            return hash;
 
-            if (_config.CodeTemplates != null)
-            {
-                foreach (var kv in _config.CodeTemplates)
-                {
-                    var templateStr = kv.Key;
-                    var exportPath = kv.Value;
-
-                    // 生成代码
-                    var template = Template.Parse(templateStr);
-                    var topHash = new Hash();
-                    topHash["NameSpace"] = _config.NameSpace;
-                    topHash["Files"] = files;
-
-                    if (!string.IsNullOrEmpty(exportPath))
-                        File.WriteAllText(exportPath, template.Render(topHash));
-                }
-            }
-
-
-            return true;
         }
     }
 }

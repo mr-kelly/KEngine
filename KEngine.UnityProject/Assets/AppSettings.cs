@@ -177,5 +177,175 @@ namespace AppSettings
         }
 		
 	}
+
+	/// <summary>
+	/// Auto Generate for Tab File: Subdir/Example2.bytes
+    /// No use of generic and reflection, for better performance,  less IL code generating
+	/// </summary>>
+    public partial class SubdirExample2Infos
+    {
+		public static readonly string TabFilePath = "Subdir/Example2.bytes";
+
+        public static TableFile GetTableFile()
+        {
+            return SettingModule.Get(TabFilePath);
+        }
+
+        public static IEnumerable GetAll()
+        {
+            var tableFile = SettingModule.Get(TabFilePath);
+            foreach (var row in tableFile)
+            {
+                yield return SubdirExample2Info.Wrap(row);
+            }
+        }
+
+        public static SubdirExample2Info GetByPrimaryKey(object primaryKey)
+        {
+            var tableFile = SettingModule.Get(TabFilePath);
+            var row = tableFile.GetByPrimaryKey(primaryKey);
+            if (row == null) return null;
+            return SubdirExample2Info.Wrap(row);
+        }
+    }
+	/// <summary>
+	/// Auto Generate for Tab File: Subdir/Example2.bytes
+    /// Singleton class for less memory use
+	/// </summary>
+	public partial class SubdirExample2Info : TableRowParser
+	{
+
+		private static SubdirExample2Info _instance;
+
+        public static SubdirExample2Info Wrap(TableRow row)
+        {
+            var inst = _instance ?? (_instance = new SubdirExample2Info());
+            inst._row = row;
+            return inst;
+        }
+
+        private TableRow _row;
+
+        private SubdirExample2Info()
+        {
+        }
+
+		
+        /// <summary>
+        /// ID Column/编号/主键
+        /// </summary>
+        public string Id
+        {
+            get
+            {
+                return _row.Get_string(_row.Values[0], "");
+            }
+            set
+            {
+                _row[0] = value.ToString();
+            }
+        }
+		
+        /// <summary>
+        /// Name/名字
+        /// </summary>
+        public string Name
+        {
+            get
+            {
+                return _row.Get_string(_row.Values[1], "");
+            }
+            set
+            {
+                _row[1] = value.ToString();
+            }
+        }
+		
+	}
+
+	/// <summary>
+	/// Auto Generate for Tab File: Subdir/__.bytes
+    /// No use of generic and reflection, for better performance,  less IL code generating
+	/// </summary>>
+    public partial class SubdirInfos
+    {
+		public static readonly string TabFilePath = "Subdir/__.bytes";
+
+        public static TableFile GetTableFile()
+        {
+            return SettingModule.Get(TabFilePath);
+        }
+
+        public static IEnumerable GetAll()
+        {
+            var tableFile = SettingModule.Get(TabFilePath);
+            foreach (var row in tableFile)
+            {
+                yield return SubdirInfo.Wrap(row);
+            }
+        }
+
+        public static SubdirInfo GetByPrimaryKey(object primaryKey)
+        {
+            var tableFile = SettingModule.Get(TabFilePath);
+            var row = tableFile.GetByPrimaryKey(primaryKey);
+            if (row == null) return null;
+            return SubdirInfo.Wrap(row);
+        }
+    }
+	/// <summary>
+	/// Auto Generate for Tab File: Subdir/__.bytes
+    /// Singleton class for less memory use
+	/// </summary>
+	public partial class SubdirInfo : TableRowParser
+	{
+
+		private static SubdirInfo _instance;
+
+        public static SubdirInfo Wrap(TableRow row)
+        {
+            var inst = _instance ?? (_instance = new SubdirInfo());
+            inst._row = row;
+            return inst;
+        }
+
+        private TableRow _row;
+
+        private SubdirInfo()
+        {
+        }
+
+		
+        /// <summary>
+        /// ID Column/编号/主键
+        /// </summary>
+        public string Id
+        {
+            get
+            {
+                return _row.Get_string(_row.Values[0], "");
+            }
+            set
+            {
+                _row[0] = value.ToString();
+            }
+        }
+		
+        /// <summary>
+        /// Name/名字
+        /// </summary>
+        public string Name
+        {
+            get
+            {
+                return _row.Get_string(_row.Values[1], "");
+            }
+            set
+            {
+                _row[1] = value.ToString();
+            }
+        }
+		
+	}
  
 }
