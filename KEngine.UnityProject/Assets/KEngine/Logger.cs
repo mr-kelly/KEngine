@@ -42,9 +42,12 @@ namespace KEngine
         Error,
     }
 
+    [Obsolete("The name 'Logger' conflict with Unity 5 'Logger', use 'KLogger' instead, at 2016/04/08")]
+    public class Logger : KLogger
+    {}
     /// Frequent Used,
     /// A File logger + Debug Tools
-    public class Logger
+    public class KLogger
     {
         public static KLogLevel LogLevel = KLogLevel.Info;
 
@@ -81,7 +84,7 @@ namespace KEngine
 
         public static event Action<string> LogErrorEvent;
 
-        static Logger()
+        static KLogger()
         {
             // isDebugBuild先预存起来，因为它是一个get_属性, 在非Unity主线程里不能用，导致多线程网络打印log时报错
 
@@ -97,24 +100,27 @@ namespace KEngine
             }
         }
 
-        //private static bool _isLogFile = false; // 是否輸出到日誌，跨线程
-        //public static bool IsLogFile
-        //{
-        //    get { return _isLogFile; }
-        //    set
-        //    {
-        //        _isLogFile = value;
-        //        if (_isLogFile)
-        //        {
-        //            AddLogCallback(DefaultCallbackLogFile);
-        //        }
-        //        else
-        //        {
-        //            RemoveLogCallback(DefaultCallbackLogFile);
-        //        }
+        /// <summary>
+        /// 是否输出到日志文件,默认false，需要初始化手工设置
+        /// </summary>
+        private static bool _isLogFile = false;
+        public static bool IsLogFile
+        {
+            get { return _isLogFile; }
+            set
+            {
+                _isLogFile = value;
+                if (_isLogFile)
+                {
+                    AddLogCallback(LogFileCallbackHandler);
+                }
+                else
+                {
+                    RemoveLogCallback(LogFileCallbackHandler);
+                }
 
-        //    }
-        //}
+            }
+        }
 
         public static void LogFileCallbackHandler(string condition, string stacktrace, UnityEngine.LogType type)
         {

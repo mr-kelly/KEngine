@@ -163,7 +163,7 @@ namespace {{ NameSpace }}
 
         static KSettingModuleEditor()
         {
-            var path = Path.Combine(Application.dataPath, SettingSourcePath);
+            var path = SettingSourcePath;
             if (Directory.Exists(path))
             {
                 new KDirectoryWatcher(path, (o, args) =>
@@ -194,7 +194,7 @@ namespace {{ NameSpace }}
             });
 
             var excelExt = new HashSet<string>() { ".xls", ".xlsx" };
-            var findDir = Path.Combine(Application.dataPath, sourcePath);
+            var findDir = sourcePath;
             try
             {
                 var allFiles = Directory.GetFiles(findDir, "*.*", SearchOption.AllDirectories);
@@ -212,7 +212,7 @@ namespace {{ NameSpace }}
                         if (relativePath.StartsWith("/"))
                             relativePath = relativePath.Substring(1);
 
-                        var compileBaseDir = "Assets/Resources/" + compilePath;
+                        var compileBaseDir =  compilePath;
 
                         var compileToPath = string.Format("{0}/{1}", compileBaseDir,
                             Path.ChangeExtension(relativePath, changeExtension));

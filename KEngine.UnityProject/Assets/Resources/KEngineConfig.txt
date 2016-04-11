@@ -6,5 +6,5 @@ StreamingBundlesFolderName	Bundles
 AssetBundleExt	.bytes	
 IsLoadAssetBundle	1	
 UIModuleBridge	KEngine.UI.UGUIBridge	
-SettingSourcePath	../Product/SettingSource	
-SettingPath	Setting	Folder in Resources	
+SettingSourcePath	Product/SettingSource	
+SettingPath	Assets/Resources/Setting	Folder in Resources	

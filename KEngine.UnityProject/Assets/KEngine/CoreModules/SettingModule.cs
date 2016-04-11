@@ -17,7 +17,7 @@ namespace KEngine.Modules
         {
             get
             {
-                return AppEngine.GetConfig("SettingPath");
+                return Path.GetFileName(AppEngine.GetConfig("SettingPath"));
             }
         }
 

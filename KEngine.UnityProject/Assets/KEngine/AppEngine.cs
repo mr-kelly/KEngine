@@ -202,7 +202,7 @@ namespace KEngine
                 if (Debug.isDebugBuild)
                 {
                     var nowMem = GC.GetTotalMemory(false);
-                    Logger.Log("Init Module: #{0}# Time:{1}, UseMem:{2}, NowMem:{3}", initModule.GetType().FullName,
+                    Logger.Log("Init Module: #{0}# Time:{1}, DiffMem:{2}, NowMem:{3}", initModule.GetType().FullName,
                         Time.time - startInitTime, nowMem - startMem, nowMem);
                 }
             }
