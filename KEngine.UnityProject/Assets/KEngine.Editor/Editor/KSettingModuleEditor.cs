@@ -235,8 +235,11 @@ namespace {{ NameSpace }}
                             }
                         }
                         KLogger.LogWarning("[SettingModule]Compile from {0} to {1}", excelPath, compileToPath);
-                        var templateHash = compiler.Compile(excelPath, compileToPath, compileBaseDir);
-                        files.Add(templateHash);
+                        var templateVar = compiler.Compile(excelPath, compileToPath, compileBaseDir);
+
+                        var renderTemplateHash = Hash.FromAnonymousObject(templateVar);
+                        files.Add(renderTemplateHash);
+
                         var compiledFileInfo = new FileInfo(compileToPath);
                         compiledFileInfo.LastWriteTime = srcFileInfo.LastWriteTime;
                     }

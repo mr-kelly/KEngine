@@ -111,7 +111,7 @@ namespace CosmosTable
             _config = cfg;
         }
 
-        private Hash DoCompiler(string path, SimpleExcelFile excelFile, string compileToFilePath = null, string compileBaseDir = null)
+        private RenderTemplateVars DoCompiler(string path, SimpleExcelFile excelFile, string compileToFilePath = null, string compileBaseDir = null)
         {
             //var fileExt = Path.GetExtension(path);
             //IExcelDataReader excelReader = null;
@@ -152,7 +152,7 @@ namespace CosmosTable
         }
 
 
-        private Hash DoCompilerExcelReader(string path, SimpleExcelFile excelFile, string compileToFilePath = null, string compileBaseDir = null)
+        private RenderTemplateVars DoCompilerExcelReader(string path, SimpleExcelFile excelFile, string compileToFilePath = null, string compileBaseDir = null)
         {
             //3. DataSet - The result of each spreadsheet will be created in the result.Tables
             //DataSet result = excelReader.AsDataSet();
@@ -173,36 +173,7 @@ namespace CosmosTable
             //var sheet1 = result.Tables[0];
 
             var strBuilder = new StringBuilder();
-
             var ignoreColumns = new HashSet<int>();
-            //var ignoreRows = new HashSet<int>();
-
-            //// 寻找注释行，1,或2行
-            //var hasStatementRow = false;
-            //var statementRow = sheet1.Rows[0].ItemArray;
-            //var regExCheckStatement = new Regex(@"\[(.*)\]"); // 不要[ xx ]符号了
-            //foreach (var cellVal in statementRow)
-            //{
-            //    if ((cellVal is string))
-            //    {
-            //        var matches = regExCheckStatement.Matches(cellVal.ToString());
-            //        if (matches.Count > 0)
-            //        {
-            //            hasStatementRow = true;
-            //        }
-            //    }
-
-            //    break;
-            //}
-
-            //// 获取注释行
-            //var commentRow = hasStatementRow ? sheet1.Rows[1].ItemArray : sheet1.Rows[0].ItemArray;
-            //var commentsOfColumns = new List<string>();
-            //foreach (var cellVal in commentRow)
-            //{
-            //    commentsOfColumns.Add(cellVal.ToString());
-            //}
-
             // Header Column
             foreach (var colNameStr in excelFile.ColName2Index.Keys)
             {
@@ -389,7 +360,7 @@ namespace CosmosTable
                  select name).ToArray());
             renderVars.TabFilePath = tabFilePath;
 
-            return Hash.FromAnonymousObject(renderVars);
+            return renderVars;
         }
 
         /// <summary>
@@ -417,7 +388,7 @@ namespace CosmosTable
         /// <param name="compileToFilePath"></param>
         /// <param name="compileBaseDir"></param>
         /// <returns></returns>
-        public Hash Compile(string path, string compileToFilePath = null, string compileBaseDir = null)
+        public RenderTemplateVars Compile(string path, string compileToFilePath = null, string compileBaseDir = null)
         {
             // 确保目录存在
             var compileToFileDirPath = Path.GetDirectoryName(compileToFilePath);
