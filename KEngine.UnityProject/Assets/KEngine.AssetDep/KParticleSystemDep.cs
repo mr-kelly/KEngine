@@ -49,7 +49,7 @@ public class KParticleSystemDep : KAssetDep
         {
             if (IsDestroy)
             {
-                Logger.LogError("[ProcessParticleSystem]Material loaded, but Destroyed Dep: {0}, Material: {1}", path,
+                KLogger.LogError("[ProcessParticleSystem]Material loaded, but Destroyed Dep: {0}, Material: {1}", path,
                     mat);
             }
 

@@ -38,7 +38,7 @@ public class CSpineAnimationDep : KAssetDep
         var loader = CStaticAssetLoader.Load(path, (_isOk, _obj) =>
         {
             SkeletonDataAsset dataAsset = _obj as SkeletonDataAsset;
-            Logger.Assert(dataAsset);
+            KLogger.Assert(dataAsset);
             dataAsset.name = path;
             callback(dataAsset);
 
@@ -63,7 +63,7 @@ public class CSpineAnimationDep : KAssetDep
                     var loader2 = CTk2dSpriteCollectionDep.LoadSpriteCollection(spineData.SpriteCollectionPath, (_obj) =>
                     {
                         tk2dSpriteCollectionData colData = _obj as tk2dSpriteCollectionData;
-                        Logger.Assert(colData);
+                        KLogger.Assert(colData);
 
                         dataAsset.spriteCollection = colData;
 
@@ -74,7 +74,7 @@ public class CSpineAnimationDep : KAssetDep
             }
             else
             {
-                Logger.LogWarning("[CSpineAnimationDep:LoadCSpineData] Not Ok {0}", path);
+                KLogger.LogWarning("[CSpineAnimationDep:LoadCSpineData] Not Ok {0}", path);
                 dataCallback(null);
             }
         });
@@ -99,7 +99,7 @@ public class CSpineAnimationDep : KAssetDep
                 }
                 catch (Exception e)
                 {
-                    Logger.LogError(e.Message);
+                    KLogger.LogError(e.Message);
                     Debug.LogError(string.Format("[ProcessSpineAnimation] {0}", resourcePath), this);
                 }
 

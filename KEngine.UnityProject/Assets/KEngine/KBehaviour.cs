@@ -101,7 +101,7 @@ public abstract class KBehaviour : MonoBehaviour
     private void OnApplicationQuit()
     {
         if (!_isApplicationQuited)
-            Logger.Log("OnApplicationQuit!");
+            KLogger.Log("OnApplicationQuit!");
 
         _isApplicationQuited = true;
 

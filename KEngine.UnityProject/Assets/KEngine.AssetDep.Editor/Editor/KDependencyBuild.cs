@@ -137,7 +137,7 @@ public class KDependencyBuild
                 buildActionCount = actionCountStr.ToInt32();
             }
             buildActionCount++;
-            Logger.Log(" DepBuild Now Action Version: {0}", buildActionCount);
+            KLogger.Log(" DepBuild Now Action Version: {0}", buildActionCount);
             KZipTool.SetZipFile(zipPath, "BuildActionCount.txt", buildActionCount.ToString());
 
             // 真实打包的资源记录
@@ -303,7 +303,7 @@ public class KDependencyBuild
 
         if (so == null)
         {
-            Logger.LogError("Error Null ScriptableObject: {0}", fullAssetPath);
+            KLogger.LogError("Error Null ScriptableObject: {0}", fullAssetPath);
         }
         else
         {
@@ -388,7 +388,7 @@ public class KDependencyBuild
                 newTex = AssetDatabase.LoadAssetAtPath(cacheFilePath, typeof(Texture2D)) as Texture2D;
                 if (newTex == null)
                 {
-                    Logger.LogError("TexturePacker scale failed... {0}", assetPath);
+                    KLogger.LogError("TexturePacker scale failed... {0}", assetPath);
                     newTex = tex2d;
                 }
 
@@ -426,14 +426,14 @@ public class KDependencyBuild
         {
             newTex = tex;
             if (!scale.Equals(1f))
-                Logger.LogWarning("[BuildDepTexture]非Texture2D: {0}, 无法进行Scale缩放....", tex);
+                KLogger.LogWarning("[BuildDepTexture]非Texture2D: {0}, 无法进行Scale缩放....", tex);
         }
         //if (!IsJustCollect)
         //    CTextureCompressor.CompressTextureAsset(assetPath, newTex as Texture2D);
 
         string path = __GetPrefabBuildPath(assetPath);
         if (string.IsNullOrEmpty(path))
-            Logger.LogWarning("[BuildTexture]不是文件的Texture, 估计是Material的原始Texture?");
+            KLogger.LogWarning("[BuildTexture]不是文件的Texture, 估计是Material的原始Texture?");
         result = DoBuildAssetBundle("Texture/Texture_" + path, newTex, needBuild);
 
         KDepCollectInfoCaching.SetCache(tex, result);
@@ -452,7 +452,7 @@ public class KDependencyBuild
 
         if (string.IsNullOrEmpty(fontAssetPath) || fontAssetPath == "Library/unity default resources")
         {
-            Logger.LogError("[BuildFont]无法打包字体...{0}", font);
+            KLogger.LogError("[BuildFont]无法打包字体...{0}", font);
             return null;
         }
         //fontAssetPath = __GetPrefabBuildPath(fontAssetPath).Replace("Atlas_", "");
@@ -499,7 +499,7 @@ public class KDependencyBuild
             texture = AssetDatabase.LoadAssetAtPath(cacheFilePath, typeof(Texture2D)) as Texture2D;
             if (texture == null)
             {
-                Logger.LogError("[BuildIOTexture]TexturePacker scale failed... {0}", cleanPath);
+                KLogger.LogError("[BuildIOTexture]TexturePacker scale failed... {0}", cleanPath);
                 return null;
             }
 
@@ -509,7 +509,7 @@ public class KDependencyBuild
 
             //if (!texture.LoadImage(File.ReadAllBytes(cleanPath)))
             //{
-            //    Logger.LogError("无法LoadImage的Texture: {0}", cleanPath);
+            //    KLogger.LogError("无法LoadImage的Texture: {0}", cleanPath);
             //    return null;
             //}
             //texture.name = fileName;
@@ -537,7 +537,7 @@ public class KDependencyBuild
         var newImporter = (TextureImporter)TextureImporter.GetAtPath(newTexPath);
         if (srcImporter == null || newImporter == null)
         {
-            Logger.LogError("[SyncTextureImportSetting]Null Importer");
+            KLogger.LogError("[SyncTextureImportSetting]Null Importer");
             return;
         }
 

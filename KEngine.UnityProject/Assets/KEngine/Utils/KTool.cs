@@ -341,7 +341,7 @@ public class KTool
             shader = Shader.Find(shaderName);
             CacheShaders[shaderName] = shader;
             if (shader == null)
-                Logger.LogError("缺少Shader：{0}  ， 检查Graphics Settings的预置shader", shaderName);
+                KLogger.LogError("缺少Shader：{0}  ， 检查Graphics Settings的预置shader", shaderName);
         }
 
         return shader;
@@ -415,7 +415,7 @@ public class KTool
                     convertedObj = BitConverter.ToUInt64(bytes, offset);
                     break;
                 default:
-                    Logger.LogError("Unsupport Type {0} in StrBytesToArray(), You can custom this.", typeCode);
+                    KLogger.LogError("Unsupport Type {0} in StrBytesToArray(), You can custom this.", typeCode);
                     Debuger.Assert(false);
                     break;
             }
@@ -581,9 +581,9 @@ public class KTool
         var nCron = NCrontab.CrontabSchedule.Parse(cron);
         var now = DateTime.Now; // 这里涉及到手机本地时间, 不能使用UtcNow
         var next = nCron.GetNextOccurrence(now, DateTime.Now.AddDays(1));
-        Logger.Log("Cron:{0}, now: {1}, next: {2}", cron, now, next);
+        KLogger.Log("Cron:{0}, now: {1}, next: {2}", cron, now, next);
         var span = next - now;
-        Logger.Log(span.TotalMinutes.ToString());
+        KLogger.Log(span.TotalMinutes.ToString());
         return span.TotalMinutes < 1;
     }
     */
@@ -692,7 +692,7 @@ public class KTool
             }
             catch (Exception)
             {
-                Logger.LogError("not find argument index: \"{0}\" in array: {1}", paramKey, args);
+                KLogger.LogError("not find argument index: \"{0}\" in array: {1}", paramKey, args);
             }
         }
 
@@ -729,7 +729,7 @@ public class KTool
         if (trans == null)
         {
             if (isLog)
-                Logger.LogError("Get Child Error: " + uri);
+                KLogger.LogError("Get Child Error: " + uri);
             return default(T);
         }
 
@@ -744,7 +744,7 @@ public class KTool
         if (trans == null)
         {
             if (isLog)
-                Logger.LogError("Get Child Error: " + uri);
+                KLogger.LogError("Get Child Error: " + uri);
             return default(T);
         }
 
@@ -772,7 +772,7 @@ public class KTool
         GameObject obj = DFSFindObject(findTrans, name);
         if (obj == null)
         {
-            Logger.LogError("Find GemeObject Error: " + name);
+            KLogger.LogError("Find GemeObject Error: " + name);
             return null;
         }
 
@@ -965,7 +965,7 @@ public class KTool
             newBox.center = oldBox.center + (Vector2) realLocalPos;
             return newBox;
         }
-        Logger.LogError("Error Collider: {0}", collider2d);
+        KLogger.LogError("Error Collider: {0}", collider2d);
         return null;
     }
 
@@ -1264,7 +1264,7 @@ public class KTool
     {
         if (string.IsNullOrEmpty(str))
         {
-            Logger.LogWarning("传入的值为空！请检查");
+            KLogger.LogWarning("传入的值为空！请检查");
             return false;
         }
         var pattern = @"^\d*$";

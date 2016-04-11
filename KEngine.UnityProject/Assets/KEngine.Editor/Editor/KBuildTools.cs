@@ -195,7 +195,7 @@ public partial class KBuildTools
 
                 var tmpTexPath = string.Format("Assets/Tex_{0}_{1}.png", memoryTexture.name, Path.GetRandomFileName());
 
-                Logger.LogWarning("【BuildAssetBundle】Build一个非Asset 的Texture: {0}", memoryTexture.name);
+                KLogger.LogWarning("【BuildAssetBundle】Build一个非Asset 的Texture: {0}", memoryTexture.name);
 
                 File.WriteAllBytes(tmpTexPath, memoryTexture.EncodeToPNG());
                 AssetDatabase.ImportAsset(tmpTexPath,
@@ -211,7 +211,7 @@ public partial class KBuildTools
                 }
                 catch (Exception e)
                 {
-                    Logger.LogException(e);
+                    KLogger.LogException(e);
                 }
 
                 File.Delete(tmpTexPath);
@@ -240,7 +240,7 @@ public partial class KBuildTools
         }
         else
         {
-            //Logger.LogError("[Wrong asse Type] {0}", asset.GetType());
+            //KLogger.LogError("[Wrong asse Type] {0}", asset.GetType());
             _DoBuild(out crc, asset, null, path, relativePath, buildTarget);
         }
         return crc;
@@ -273,7 +273,7 @@ public partial class KBuildTools
                     var depAssetPath = AssetDatabase.GetAssetPath(depAsset);
                     depSb.AppendLine(string.Format("{0} --> {1} <{2}>", depAssetPath, depAsset.name, depAsset.GetType()));
                 }
-                Logger.Log("[BuildAssetBundle]Asset: {0} has dependencies: \n{1}", assetPath, depSb.ToString());
+                KLogger.Log("[BuildAssetBundle]Asset: {0} has dependencies: \n{1}", assetPath, depSb.ToString());
             }
         }
     }
@@ -321,7 +321,7 @@ public partial class KBuildTools
             BuildAssetBundleOptions.DeterministicAssetBundle,
             buildTarget);
 
-        Logger.Log("生成文件： {0}, 耗时: {1:F5}", path, (DateTime.Now - time).TotalSeconds);
+        KLogger.Log("生成文件： {0}, 耗时: {1:F5}", path, (DateTime.Now - time).TotalSeconds);
 
         if (AfterBuildAssetBundleEvent != null)
             AfterBuildAssetBundleEvent(asset, path, relativePath);
@@ -458,7 +458,7 @@ public partial class KBuildTools
 
         if (string.IsNullOrEmpty(pythonExe))
         {
-            Logger.LogError("无法找到py.exe, 或python指令");
+            KLogger.LogError("无法找到py.exe, 或python指令");
             return "Error: Not found python";
         }
 
@@ -475,7 +475,7 @@ public partial class KBuildTools
             process.StartInfo.RedirectStandardOutput = true;
 
             var tips = string.Format("ExecutePython: {0} {1}", process.StartInfo.FileName, process.StartInfo.Arguments);
-            Logger.Log(tips);
+            KLogger.Log(tips);
             EditorUtility.DisplayProgressBar("Python...", tips, .5f);
 
             process.Start();
@@ -484,7 +484,7 @@ public partial class KBuildTools
 
             process.WaitForExit();
 
-            Logger.Log("PyExecuteResult: {0}", allOutput);
+            KLogger.Log("PyExecuteResult: {0}", allOutput);
 
             EditorUtility.ClearProgressBar();
 
@@ -506,7 +506,7 @@ public partial class KBuildTools
             }
             else
             {
-                Logger.LogError("[SymbolLinkFolder]Error on OS: {0}", os.ToString());
+                KLogger.LogError("[SymbolLinkFolder]Error on OS: {0}", os.ToString());
             }
         }
 
@@ -529,7 +529,7 @@ public partial class KBuildTools
             }
             else
             {
-                Logger.LogError("[SymbolLinkFolder]Error on OS: {0}", os.ToString());
+                KLogger.LogError("[SymbolLinkFolder]Error on OS: {0}", os.ToString());
             }
         }
         */

@@ -73,7 +73,7 @@ namespace KEngine
                 if (!isOk)
                 {
                     OnFinish(null);
-                    Logger.LogError("[InstanceAssetLoader]Error on assetfilebridge loaded... {0}", url);
+                    KLogger.LogError("[InstanceAssetLoader]Error on assetfilebridge loaded... {0}", url);
                     return;
                 }
 
@@ -83,7 +83,7 @@ namespace KEngine
                 }
                 catch (Exception e)
                 {
-                    Logger.LogException(e);
+                    KLogger.LogException(e);
                 }
 
                 if (Application.isEditor)

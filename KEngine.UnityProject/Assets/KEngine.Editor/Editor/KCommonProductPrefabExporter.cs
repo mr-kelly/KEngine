@@ -52,7 +52,7 @@ public class KCommonProductPrefabExporter : KBuild_Base
         foreach (string file in fileArray)
         {
             string filePath = file.Replace('\\', '/');
-            Logger.Log("Build Func To: " + filePath);
+            KLogger.Log("Build Func To: " + filePath);
         }
     }
 

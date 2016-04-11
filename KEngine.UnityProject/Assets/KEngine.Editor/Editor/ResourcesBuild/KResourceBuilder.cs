@@ -83,7 +83,7 @@ namespace KEngine.Editor
 
         public static void ProductExport(KBuild_Base export)
         {
-            Logger.Log("Start Auto Build... {0}", export.GetType().Name);
+            KLogger.Log("Start Auto Build... {0}", export.GetType().Name);
 
             var time = DateTime.Now;
             try
@@ -131,12 +131,12 @@ namespace KEngine.Editor
                 export.AfterExport();
 
 
-                Logger.Log("Finish Auto Build: {0}, ItemsCount: {1}, Used Time: {2}", export.GetType().Name,
+                KLogger.Log("Finish Auto Build: {0}, ItemsCount: {1}, Used Time: {2}", export.GetType().Name,
                     okItemCount, DateTime.Now - time);
             }
             catch (Exception e)
             {
-                Logger.LogError("[Fail] Auto Build... {0}, Exception: {1}, Used Time: {2}, CurrentScene: {3}, Stack: {4}",
+                KLogger.LogError("[Fail] Auto Build... {0}, Exception: {1}, Used Time: {2}, CurrentScene: {3}, Stack: {4}",
                     export.GetType().Name,
                     e.Message + "," + (e.InnerException != null ? e.InnerException.Message : ""), DateTime.Now - time,
                     EditorApplication.currentScene,

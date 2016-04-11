@@ -43,7 +43,7 @@ public class KDepBuild_AudioSource : IDepBuildProcessor
         }
         else
         {
-            Logger.LogWarning("找不到AudioClip在AudioSource... {0}", audioSource.name);
+            KLogger.LogWarning("找不到AudioClip在AudioSource... {0}", audioSource.name);
         }
     }
 

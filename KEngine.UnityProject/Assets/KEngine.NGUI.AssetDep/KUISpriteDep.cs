@@ -40,12 +40,12 @@ public class KUISpriteDep : KAssetDep
             if (!IsDestroy)
             {
                 //UIAtlas atlas = _obj as UIAtlas;
-                Logger.Assert(atlas);
+                KLogger.Assert(atlas);
 
-                Logger.Assert(DependencyComponent);
+                KLogger.Assert(DependencyComponent);
                 var sprite = DependencyComponent as UISprite;
 
-                Logger.Assert(sprite);
+                KLogger.Assert(sprite);
                 sprite.atlas = atlas;
 
                 //对UISpriteAnimation处理

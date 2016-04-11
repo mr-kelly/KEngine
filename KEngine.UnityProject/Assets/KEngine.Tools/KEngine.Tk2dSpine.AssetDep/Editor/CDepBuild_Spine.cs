@@ -48,11 +48,11 @@ public partial class KDependencyBuild
         //string originPath = path;
         //string tmpPath = "Assets/~TempSkeletonDataAsset.asset";
         //bool copyResult = AssetDatabase.CopyAsset(path, tmpPath);
-        //Logger.Assert(copyResult);
+        //KLogger.Assert(copyResult);
         //SkeletonDataAsset copyData = AssetDatabase.LoadAssetAtPath(tmpPath, typeof(SkeletonDataAsset)) as SkeletonDataAsset;
         if (data.spriteCollection == null || data.skeletonJSON == null)
         {
-            Logger.LogError("Err Spine Data: {0}, Lack of SpriteCollection or Json", data.name);
+            KLogger.LogError("Err Spine Data: {0}, Lack of SpriteCollection or Json", data.name);
             //return "";
         }
 
@@ -88,19 +88,19 @@ public partial class KDependencyBuild
     {
         if (sa.skeletonDataAsset == null)
         {
-            Logger.LogError("SkeletonAnimation {0}缺少DataAsset，无法打包", sa.gameObject.name);
+            KLogger.LogError("SkeletonAnimation {0}缺少DataAsset，无法打包", sa.gameObject.name);
             return null;
         }
         else
         {
             if (sa.skeletonDataAsset.spriteCollection == null)
             {
-                Logger.LogError("SkeletonDataAsset {0}缺少SpriteCollection，无法打包", sa.skeletonDataAsset.name);
+                KLogger.LogError("SkeletonDataAsset {0}缺少SpriteCollection，无法打包", sa.skeletonDataAsset.name);
                 return null;
             }
             if (sa.skeletonDataAsset.skeletonJSON == null)
             {
-                Logger.LogError("SkeletonDataAsset {0}缺少Json，无法打包", sa.skeletonDataAsset.name);
+                KLogger.LogError("SkeletonDataAsset {0}缺少Json，无法打包", sa.skeletonDataAsset.name);
                 return null;
             }
 

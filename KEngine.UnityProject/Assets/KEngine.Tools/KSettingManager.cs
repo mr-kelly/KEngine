@@ -61,7 +61,7 @@ public class KSettingManager : KEngine.IModule
         if (LoadFinished)
         {
             if (Debug.isDebugBuild)
-                Logger.LogWarning("[CSettingMananger]重新加载Settings");
+                KLogger.LogWarning("[CSettingMananger]重新加载Settings");
             LoadFinished = false;
         }
 
@@ -74,7 +74,7 @@ public class KSettingManager : KEngine.IModule
                 break;
         }
 
-        Logger.Log("Load setting out of package = {0}", SettingOutPackage.ToString());
+        KLogger.Log("Load setting out of package = {0}", SettingOutPackage.ToString());
 
         yield return KResourceModule.Instance.StartCoroutine(InitSetting());
     }
@@ -97,7 +97,7 @@ public class KSettingManager : KEngine.IModule
             GameSettings[gameSetting.SettingFiles[i]] = gameSetting.SettingContents[i];
         }
 
-        Logger.Log("{0} setting files loaded.", GameSettings.Count);
+        KLogger.Log("{0} setting files loaded.", GameSettings.Count);
 
         Object.Destroy(gameSetting);
         assetLoader.Release();
@@ -118,7 +118,7 @@ public class KSettingManager : KEngine.IModule
         bool result = GameSettings.TryGetValue(path, out content);
         if (!result)
         {
-            Logger.LogError("Setting not fount, {0}", path);
+            KLogger.LogError("Setting not fount, {0}", path);
             return null;
         }
 

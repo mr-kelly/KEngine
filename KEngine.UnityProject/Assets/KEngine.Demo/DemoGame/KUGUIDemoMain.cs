@@ -76,16 +76,16 @@ public class KUGUIDemoMain : MonoBehaviour
     //{
     //    KGameSettings _ = KGameSettings.Instance;
 
-    //    Logger.Log("Begin Load tab file...");
+    //    KLogger.Log("Begin Load tab file...");
 
     //    var tabContent =
     //        File.ReadAllText(Application.dataPath + "/" + KEngine.AppEngine.GetConfig("ProductRelPath") +
     //                         "/Setting/test_tab.bytes");
     //    _.LoadTab<CTestTabInfo>(tabContent);
-    //    Logger.Log("Output the tab file...");
+    //    KLogger.Log("Output the tab file...");
     //    foreach (CTestTabInfo info in _.GetInfos<CTestTabInfo>())
     //    {
-    //        Logger.Log("Id:{0}, Name: {1}", info.Id, info.Name);
+    //        KLogger.Log("Id:{0}, Name: {1}", info.Id, info.Name);
     //    }
     //}
 }

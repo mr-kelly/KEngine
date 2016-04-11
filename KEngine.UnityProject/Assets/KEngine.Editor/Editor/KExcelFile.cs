@@ -56,7 +56,7 @@ public class KExcelFile
             }
             catch (Exception e)
             {
-                Logger.LogError("无法打开Excel: {0}, 可能原因：正在打开？或是Office2007格式（尝试另存为）？ {1}", excelPath, e.Message);
+                KLogger.LogError("无法打开Excel: {0}, 可能原因：正在打开？或是Office2007格式（尝试另存为）？ {1}", excelPath, e.Message);
                 IsLoadSuccess = false;
             }
         }
@@ -76,7 +76,7 @@ public class KExcelFile
                 var cell = headerRow.GetCell(columnIndex);
                 if (cell == null)
                 {
-                    //Logger.LogError("Null Cel on Column: {0}, File: {1}", columnIndex, excelPath);
+                    //KLogger.LogError("Null Cel on Column: {0}, File: {1}", columnIndex, excelPath);
                     // 可能是空字符串的格子，忽略！
                     continue;
                 }
@@ -148,7 +148,7 @@ public class KExcelFile
     {
         if (!ColName2Index.ContainsKey(columnName))
         {
-            Logger.LogError("No Column: {0} of File: {1}", columnName, Path);
+            KLogger.LogError("No Column: {0} of File: {1}", columnName, Path);
             return;
         }
         var theRow = Worksheet.GetRow(row);
@@ -197,8 +197,8 @@ public class KExcelFile
         }
         //catch (Exception e)
         //{
-        //    Logger.LogError(e.Message);
-        //    Logger.LogError("是否打开了Excel表？");
+        //    KLogger.LogError(e.Message);
+        //    KLogger.LogError("是否打开了Excel表？");
         //}
     }
 }

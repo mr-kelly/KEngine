@@ -81,7 +81,7 @@ namespace KEngine.UI
             if (trans == null)
             {
                 if (isLog)
-                    Logger.LogError("Get UI<{0}> Control Error: " + uri, this);
+                    KLogger.LogError("Get UI<{0}> Control Error: " + uri, this);
                 return null;
             }
 
@@ -102,7 +102,7 @@ namespace KEngine.UI
             GameObject obj = DFSFindObject(transform, name);
             if (obj == null)
             {
-                Logger.LogError("Find UI Control Error: " + name);
+                KLogger.LogError("Find UI Control Error: " + name);
                 return null;
             }
 
@@ -114,7 +114,7 @@ namespace KEngine.UI
             GameObject obj = DFSFindObject(transform, name);
             if (obj == null)
             {
-                Logger.LogError("Find GemeObject Error: " + name);
+                KLogger.LogError("Find GemeObject Error: " + name);
                 return null;
             }
 

@@ -40,10 +40,10 @@ public class KUIFontDep : KAssetDep
         {
             if (!IsDestroy)
             {
-                Logger.Assert(atlas);
+                KLogger.Assert(atlas);
 
                 UIFont uiFont = DependencyComponent as UIFont;
-                Logger.Assert(uiFont);
+                KLogger.Assert(uiFont);
                 //foreach (UIFont uiFont in this.gameObject.GetComponents<UIFont>())
                 {
                     uiFont.atlas = atlas;

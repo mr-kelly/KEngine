@@ -105,7 +105,7 @@ namespace KEngine
                         _loaderMode = KAssetBundleLoaderMode.PersitentDataPathSync;
                         break;
                     default:
-                        Logger.LogError("Error DefaultInAppPathType: {0}", _inAppPathType);
+                        KLogger.LogError("Error DefaultInAppPathType: {0}", _inAppPathType);
                         break;
                 }
             }
@@ -123,7 +123,7 @@ namespace KEngine
                     _inAppPathType = KResourceInAppPathType.PersistentAssetsPath;
                     break;
                 default:
-                    Logger.LogError("[KAssetBundleLoader:Init]Unknow loader mode: {0}", _loaderMode);
+                    KLogger.LogError("[KAssetBundleLoader:Init]Unknow loader mode: {0}", _loaderMode);
                     break;
             }
 
@@ -148,7 +148,7 @@ namespace KEngine
                 {
                     AssetBundlerLoaderErrorEvent(this);
                 }
-                Logger.LogError("[KAssetBundleLoader]Error Load Bytes AssetBundle: {0}", relativeUrl);
+                KLogger.LogError("[KAssetBundleLoader]Error Load Bytes AssetBundle: {0}", relativeUrl);
                 OnFinish(null);
                 yield break;
             }
@@ -172,7 +172,7 @@ namespace KEngine
             Progress = 1f;
             var assetBundle = BundleParser.Bundle;
             if (assetBundle == null)
-                Logger.LogError("WWW.assetBundle is NULL: {0}", RelativeResourceUrl);
+                KLogger.LogError("WWW.assetBundle is NULL: {0}", RelativeResourceUrl);
 
             OnFinish(assetBundle);
 
@@ -206,7 +206,7 @@ namespace KEngine
             {
                 if (Url.Contains("Arial"))
                 {
-                    Logger.LogError("要释放Arial字体！！错啦！！builtinextra:{0}", Url);
+                    KLogger.LogError("要释放Arial字体！！错啦！！builtinextra:{0}", Url);
                     //UnityEditor.EditorApplication.isPaused = true;
                 }
             }

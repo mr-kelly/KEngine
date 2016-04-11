@@ -65,14 +65,14 @@ namespace KEngine.Editor
         {
             if (Current != null)
             {
-                Logger.LogError("New a KAssetVersionControl, but already has annother instance using! Be careful!");
+                KLogger.LogError("New a KAssetVersionControl, but already has annother instance using! Be careful!");
             }
 
             Current = this;
 
             _isRebuild = rebuild;
 
-            Logger.LogWarning("================== KAssetVersionControl Begin ======================");
+            KLogger.LogWarning("================== KAssetVersionControl Begin ======================");
 
             SetupHistory();
 
@@ -87,10 +87,10 @@ namespace KEngine.Editor
             if (BuildedList.Count > 0)
             {
                 //ProductMd5_CurPlatform();
-                Logger.Log("一共打包了{0}個資源:\n{1}", BuildedList.Count, string.Join("\n", BuildedList.ToArray()));
+                KLogger.Log("一共打包了{0}個資源:\n{1}", BuildedList.Count, string.Join("\n", BuildedList.ToArray()));
             }
             else
-                Logger.Log("没有任何需要打包的资源！");
+                KLogger.Log("没有任何需要打包的资源！");
 
             //KDependencyBuild.SaveBuildAction();
 
@@ -290,11 +290,11 @@ namespace KEngine.Editor
             if (!File.Exists(filePath))
             {
                 if (log)
-                    Logger.LogError("[DoCheckBuild]Not Found 无法找到文件 {0}", filePath);
+                    KLogger.LogError("[DoCheckBuild]Not Found 无法找到文件 {0}", filePath);
 
                 if (filePath.Contains("unity_builtin_extra"))
                 {
-                    Logger.LogError(
+                    KLogger.LogError(
                         "[DoCheckBuild]Find unity_builtin_extra resource to build!! Please check it! current scene: {0}",
                         EditorApplication.currentScene);
                 }

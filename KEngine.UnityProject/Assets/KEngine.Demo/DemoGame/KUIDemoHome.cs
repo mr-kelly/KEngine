@@ -47,7 +47,7 @@ public class KUIDemoHome : UIController
 
         HomeLabel = GetControl<Text>("HomeText");
 
-        Button1.onClick.AddListener(() => Logger.LogWarning("Click Home Button!"));
+        Button1.onClick.AddListener(() => KLogger.LogWarning("Click Home Button!"));
     }
 
     public override void OnOpen(params object[] args)

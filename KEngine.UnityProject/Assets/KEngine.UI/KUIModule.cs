@@ -64,7 +64,7 @@ namespace KEngine.UI
             set
             {
                 _loadingUICount = value;
-                if (_loadingUICount < 0) Logger.LogError("Error ---- LoadingUICount < 0");
+                if (_loadingUICount < 0) KLogger.LogError("Error ---- LoadingUICount < 0");
             }
         }
 
@@ -97,11 +97,11 @@ namespace KEngine.UI
                 if (uiBridgeType != null)
                 {
                     UiBridge = Activator.CreateInstance(uiBridgeType) as IUIBridge;
-                    Logger.Debug("Use UI Bridge: {0}", uiBridgeType);
+                    KLogger.Debug("Use UI Bridge: {0}", uiBridgeType);
                 }
                 else
                 {
-                    Logger.LogError("Cannot find UIBridge Type: {0}", uiBridgeTypeName);
+                    KLogger.LogError("Cannot find UIBridge Type: {0}", uiBridgeTypeName);
                 }
             }
 
@@ -250,14 +250,14 @@ namespace KEngine.UI
             if (!UIWindows.TryGetValue(name, out uiState))
             {
                 if (Debug.isDebugBuild)
-                    Logger.LogWarning("[CloseWindow]没有加载的UIWindow: {0}", name);
+                    KLogger.LogWarning("[CloseWindow]没有加载的UIWindow: {0}", name);
                 return; // 未开始Load
             }
 
             if (uiState.IsLoading) // Loading中
             {
                 if (Debug.isDebugBuild)
-                    Logger.Log("[CloseWindow]IsLoading的{0}", name);
+                    KLogger.Log("[CloseWindow]IsLoading的{0}", name);
                 uiState.OpenWhenFinish = false;
                 return;
             }
@@ -362,7 +362,7 @@ namespace KEngine.UI
         {
             if (UIWindows.ContainsKey(windowTemplateName))
             {
-                Logger.LogError("[LoadWindow]多次重复LoadWindow: {0}", windowTemplateName);
+                KLogger.LogError("[LoadWindow]多次重复LoadWindow: {0}", windowTemplateName);
             }
             Debuger.Assert(!UIWindows.ContainsKey(windowTemplateName));
 
@@ -413,7 +413,7 @@ namespace KEngine.UI
             UIWindows.TryGetValue(name, out uiState);
             if (uiState == null || uiState.UIWindow == null)
             {
-                Logger.Log("{0} has been destroyed", name);
+                KLogger.Log("{0} has been destroyed", name);
                 return;
             }
 
@@ -458,7 +458,7 @@ namespace KEngine.UI
             CUILoadState uiState;
             if (!UIWindows.TryGetValue(uiName, out uiState))
             {
-                Logger.LogError("找不到UIState: {0}", uiName);
+                KLogger.LogError("找不到UIState: {0}", uiName);
                 return;
             }
 

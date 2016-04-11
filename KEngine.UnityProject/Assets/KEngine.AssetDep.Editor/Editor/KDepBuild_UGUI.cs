@@ -44,7 +44,7 @@ public class KDepBuild_SpriteRenderer : IDepBuildProcessor
             renderer.sprite = null; // 挖空依赖的数据
         }
         else
-            Logger.LogWarning("SpriteRenderer null sprite: {0}", renderer.name);
+            KLogger.LogWarning("SpriteRenderer null sprite: {0}", renderer.name);
     }
 }
 
@@ -61,7 +61,7 @@ public class KDepBuild_Text : IDepBuildProcessor
             text.font = null; // 挖空依赖的数据
         }
         else
-            Logger.LogWarning("UISprite null Atlas: {0}", text.name); ;
+            KLogger.LogWarning("UISprite null Atlas: {0}", text.name); ;
     }
 }
 
@@ -86,7 +86,7 @@ public class KDepBuild_UGUI
     public static string BuildSprite(Sprite sprite)
     {
         if (sprite.packed)
-            Logger.LogWarning("Sprite: {0} is packing!!!", sprite.name);
+            KLogger.LogWarning("Sprite: {0} is packing!!!", sprite.name);
 
         string assetPath = AssetDatabase.GetAssetPath(sprite);
         bool needBuild = KAssetVersionControl.TryCheckNeedBuildWithMeta(assetPath);
@@ -95,7 +95,7 @@ public class KDepBuild_UGUI
 
         string path = KDependencyBuild.__GetPrefabBuildPath(assetPath);
         if (string.IsNullOrEmpty(path))
-            Logger.LogWarning("[BuildSprite]不是文件的Texture, 估计是Material的原始Texture?");
+            KLogger.LogWarning("[BuildSprite]不是文件的Texture, 估计是Material的原始Texture?");
         var result = KDependencyBuild.DoBuildAssetBundle("Common/Sprite_" + path, sprite, needBuild);
 
         return result.Path;

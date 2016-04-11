@@ -225,7 +225,7 @@ namespace KEngine
             KResourceInAppPathType inAppPathType = KResourceInAppPathType.Default, bool isLog = true)
         {
             if (string.IsNullOrEmpty(url))
-                Logger.LogError("尝试获取一个空的资源路径！");
+                KLogger.LogError("尝试获取一个空的资源路径！");
 
             if (inAppPathType == KResourceInAppPathType.Default)
                 inAppPathType = DefaultInAppPathType;
@@ -249,7 +249,7 @@ namespace KEngine
             }
             else
             {
-                Logger.LogError("[GetResourceFullPath]Invalid InAppPathType: {0}", DefaultInAppPathType);
+                KLogger.LogError("[GetResourceFullPath]Invalid InAppPathType: {0}", DefaultInAppPathType);
                 hasInAppUrl = false;
                 inAppUrl = null;
             }
@@ -259,7 +259,7 @@ namespace KEngine
                 if (hasDocUrl)
                 {
                     if (Application.isEditor)
-                        Logger.LogWarning("[Use PersistentDataPath] {0}", docUrl);
+                        KLogger.LogWarning("[Use PersistentDataPath] {0}", docUrl);
                     fullPath = docUrl;
                     return true;
                 }
@@ -269,7 +269,7 @@ namespace KEngine
             if (!hasInAppUrl) // 连本地资源都没有，直接失败吧 ？？ 沒有本地資源但又遠程資源？竟然！!?
             {
                 if (isLog)
-                    Logger.LogError("[Not Found] StreamingAssetsPath Url Resource: {0}", url);
+                    KLogger.LogError("[Not Found] StreamingAssetsPath Url Resource: {0}", url);
                 fullPath = null;
                 return false;
             }
@@ -333,7 +333,7 @@ namespace KEngine
                 var result = FileExistsWithDifferentCase(StreamingPlatformPathWithoutFileProtocol + url);
                 if (!result)
                 {
-                    Logger.LogError("[大小写敏感]发现一个资源 {0}，大小写出现问题，在Windows可以读取，手机不行，请改表修改！", url);
+                    KLogger.LogError("[大小写敏感]发现一个资源 {0}，大小写出现问题，在Windows可以读取，手机不行，请改表修改！", url);
                 }
             }
             return true;
@@ -407,10 +407,10 @@ namespace KEngine
 
             if (Debug.isDebugBuild)
             {
-                Logger.Log("ResourceManager ApplicationPath: {0}", ApplicationPath);
-                Logger.Log("ResourceManager StreamingPlatformPath: {0}", StreamingPlatformPath);
-                Logger.Log("ResourceManager DocumentResourcesPath: {0}", DocumentResourcesPath);
-                Logger.Log("================================================================================");
+                KLogger.Log("ResourceManager ApplicationPath: {0}", ApplicationPath);
+                KLogger.Log("ResourceManager StreamingPlatformPath: {0}", StreamingPlatformPath);
+                KLogger.Log("ResourceManager DocumentResourcesPath: {0}", DocumentResourcesPath);
+                KLogger.Log("================================================================================");
             }
             yield break;
         }
@@ -620,7 +620,7 @@ namespace KEngine
             if (LogLevel < (int)LoadingLogLevel.ShowDetail)
                 return;
 
-            Logger.Log("[Request] {0}, {1}", resType, resPath);
+            KLogger.Log("[Request] {0}, {1}", resType, resPath);
         }
 
         public static void LogLoadTime(string resType, string resPath, System.DateTime begin)
@@ -628,7 +628,7 @@ namespace KEngine
             if (LogLevel < (int)LoadingLogLevel.ShowTime)
                 return;
 
-            Logger.Log("[Load] {0}, {1}, {2}s", resType, resPath, (System.DateTime.Now - begin).TotalSeconds);
+            KLogger.Log("[Load] {0}, {1}, {2}s", resType, resPath, (System.DateTime.Now - begin).TotalSeconds);
         }
 
         public static void Collect()

@@ -61,7 +61,7 @@ namespace KEngine
             else
             {
                 if (Debug.isDebugBuild)
-                    Logger.LogError("[KBytesLoader]Error Path: {0}", url);
+                    KLogger.LogError("[KBytesLoader]Error Path: {0}", url);
                 OnFinish(null);
             }
             if (_inAppPathType == KResourceInAppPathType.PersistentAssetsPath)
@@ -84,7 +84,7 @@ namespace KEngine
                     //{
                     //    AssetBundlerLoaderErrorEvent(this);
                     //}
-                    Logger.LogError("[KBytesLoader]Error Load WWW: {0}", url);
+                    KLogger.LogError("[KBytesLoader]Error Load WWW: {0}", url);
                     OnFinish(null);
                     yield break;
                 }
@@ -101,7 +101,7 @@ namespace KEngine
                     var textAsset = Resources.Load<TextAsset>(pathWithoutExt);
                     if (textAsset == null)
                     {
-                        Logger.LogError("[KBytesLoader]Cannot Resources.Load from : {0}", pathWithoutExt);
+                        KLogger.LogError("[KBytesLoader]Cannot Resources.Load from : {0}", pathWithoutExt);
                         OnFinish(null);
                         yield break;
                     }
@@ -120,7 +120,7 @@ namespace KEngine
                     var loadTextAsset = loadAsset as TextAsset;
                     if (loadTextAsset == null)
                     {
-                        Logger.LogError("[KBytesLoader]Error Resources.LoadAsync: {0}", url);
+                        KLogger.LogError("[KBytesLoader]Error Resources.LoadAsync: {0}", url);
                         OnFinish(null);
                         yield break;
                     }
@@ -129,14 +129,14 @@ namespace KEngine
                 }
                 else
                 {
-                    Logger.LogError("[KBytesLoader]Unvalid LoaderMode on Resources Load Mode: {0}", _loaderMode);
+                    KLogger.LogError("[KBytesLoader]Unvalid LoaderMode on Resources Load Mode: {0}", _loaderMode);
                     OnFinish(null);
                     yield break;
                 }
             }
             else
             {
-                Logger.LogError("[KBytesLoader]Error InAppPathType: {0}", KResourceModule.DefaultInAppPathType);
+                KLogger.LogError("[KBytesLoader]Error InAppPathType: {0}", KResourceModule.DefaultInAppPathType);
                 OnFinish(null);
                 yield break;
             }

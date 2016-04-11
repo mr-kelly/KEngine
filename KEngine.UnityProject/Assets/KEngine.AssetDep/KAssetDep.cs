@@ -164,7 +164,7 @@ public abstract class KAssetDep : MonoBehaviour
         {
             AppEngine.EngineInstance.StopCoroutine(ExistCustomUpdate);
             ExistCustomUpdate = null;
-            Logger.LogWarning("[ExistCustomUpdate != null");
+            KLogger.LogWarning("[ExistCustomUpdate != null");
         }
         ExistCustomUpdate = CustomUpdate();
         AppEngine.EngineInstance.StartCoroutine(ExistCustomUpdate); // 可以无视对象是否处于inactive状态，避免Update不反应的问题
@@ -422,7 +422,7 @@ public abstract class KAssetDep : MonoBehaviour
 //            AssetDeps.Remove(assetDep);
 //if UNITY_EDITOR
             //if (Application.isEditor)
-            //    Logger.Assert(count == AssetDeps.Count);
+            //    KLogger.Assert(count == AssetDeps.Count);
 //endif
             if (count <= 0)
             {

@@ -228,11 +228,11 @@ namespace {{ NameSpace }}
 
                             if (!force && srcFileInfo.LastWriteTime == toFileInfo.LastWriteTime)
                             {
-                                Logger.Log("Pass!SameTime! From {0} to {1}", excelPath, compileToPath);
+                                KLogger.Log("Pass!SameTime! From {0} to {1}", excelPath, compileToPath);
                                 continue;
                             }
                         }
-                        Logger.LogWarning("[SettingModule]Compile from {0} to {1}", excelPath, compileToPath);
+                        KLogger.LogWarning("[SettingModule]Compile from {0} to {1}", excelPath, compileToPath);
                         compiler.Compile(excelPath, compileToPath, compileBaseDir);
                         var compiledFileInfo = new FileInfo(compileToPath);
                         compiledFileInfo.LastWriteTime = srcFileInfo.LastWriteTime;
@@ -260,13 +260,13 @@ namespace {{ NameSpace }}
             var sourcePath = SettingSourcePath;//AppEngine.GetConfig("SettingSourcePath");
             if (string.IsNullOrEmpty(sourcePath)) 
             {
-                Logger.LogError("Need to KEngineConfig: SettingSourcePath");
+                KLogger.LogError("Need to KEngineConfig: SettingSourcePath");
                 return;
             }
             var compilePath = AppEngine.GetConfig("SettingPath");
             if (string.IsNullOrEmpty(compilePath))
             {
-                Logger.LogError("Need to KEngineConfig: SettingPath");
+                KLogger.LogError("Need to KEngineConfig: SettingPath");
                 return;
             }
             CompileTabConfigs(sourcePath, compilePath, SettingCodePath, SettingExtension, true);

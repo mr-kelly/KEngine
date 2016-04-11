@@ -3,7 +3,7 @@
 // KEngine - Toolset and framework for Unity3D
 // ===================================
 // 
-// Filename: Logger.cs
+// Filename: KLogger.cs
 // Date:     2015/12/03
 // Author:  Kelly
 // Email: 23110388@qq.com
@@ -42,7 +42,7 @@ namespace KEngine
         Error,
     }
 
-    [Obsolete("The name 'Logger' conflict with Unity 5 'Logger', use 'KLogger' instead, at 2016/04/08")]
+    [Obsolete("The name 'Logger' conflict with Unity 5 'KLogger', use 'KLogger' instead, at 2016/04/08")]
     public class Logger : KLogger
     {}
     /// Frequent Used,
@@ -95,8 +95,8 @@ namespace KEngine
             }
             catch (Exception e)
             {
-                Logger.LogConsole_MultiThread("Logger Static Constructor Failed!");
-                Logger.LogConsole_MultiThread(e.Message + " , " + e.StackTrace);
+                KLogger.LogConsole_MultiThread("KLogger Static Constructor Failed!");
+                KLogger.LogConsole_MultiThread(e.Message + " , " + e.StackTrace);
             }
         }
 

@@ -43,12 +43,12 @@ public class KBitmapFontDep : KAssetDep
             if (!IsDestroy)
             {
                 var uiFontPrefab = (GameObject) o;
-                Logger.Assert(uiFontPrefab);
+                KLogger.Assert(uiFontPrefab);
 
                 uiFontPrefab.transform.parent = DependenciesContainer.transform;
 
                 var uiFont = uiFontPrefab.GetComponent<UIFont>();
-                Logger.Assert(uiFont);
+                KLogger.Assert(uiFont);
                 var label = DependencyComponent as UILabel;
                 //foreach (UILabel label in gameObject.GetComponents<UILabel>())
                 {

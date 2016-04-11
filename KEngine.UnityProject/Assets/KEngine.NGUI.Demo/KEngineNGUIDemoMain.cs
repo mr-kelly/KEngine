@@ -61,14 +61,14 @@ public class KEngineNGUIDemoMain : MonoBehaviour
         });
 
         yield return new WaitForSeconds(2f);
-        Logger.Log("Opening KUITestSubWindow"); 
+        KLogger.Log("Opening KUITestSubWindow"); 
         KUIModule.Instance.OpenWindow("TestSub");
 
     }
 
     void TestLoadLevelAdditiveAsync()
     {
-        Logger.Log("Load Scene");
+        KLogger.Log("Load Scene");
         ResourceDepUtils.LoadLevelAdditiveAsync("BundleResources/NGUI/TestNGUI.unity");
     }
 

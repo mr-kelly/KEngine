@@ -92,7 +92,7 @@ namespace KEngine
                 getAsset = Resources.Load<UnityEngine.Object>(path);
                 if (getAsset == null)
                 {
-                    Logger.LogError("Asset is NULL(from Resources Folder): {0}", path);
+                    KLogger.LogError("Asset is NULL(from Resources Folder): {0}", path);
                 }
                 OnFinish(getAsset);
             }
@@ -113,7 +113,7 @@ namespace KEngine
 
                 if (!_bundleLoader.IsSuccess)
                 {
-                    Logger.LogError("[KAssetFileLoader]Load BundleLoader Failed(Error) when Finished: {0}", path);
+                    KLogger.LogError("[KAssetFileLoader]Load BundleLoader Failed(Error) when Finished: {0}", path);
                     _bundleLoader.Release();
                     OnFinish(null);
                     yield break;
@@ -136,7 +136,7 @@ namespace KEngine
                     }
                     catch
                     {
-                        Logger.LogError("[OnAssetBundleLoaded:mainAsset]{0}", path);
+                        KLogger.LogError("[OnAssetBundleLoaded:mainAsset]{0}", path);
                     }
                 }
                 else
@@ -155,7 +155,7 @@ namespace KEngine
 
                 if (getAsset == null)
                 {
-                    Logger.LogError("Asset is NULL: {0}", path);
+                    KLogger.LogError("Asset is NULL: {0}", path);
                 }
 
             }
@@ -196,7 +196,7 @@ namespace KEngine
                 //var bRemove = Caches.Remove(Url);
                 //if (!bRemove)
                 //{
-                //    Logger.LogWarning("[DisposeTheCache]Remove Fail(可能有两个未完成的，同时来到这) : {0}", Url);
+                //    KLogger.LogWarning("[DisposeTheCache]Remove Fail(可能有两个未完成的，同时来到这) : {0}", Url);
                 //}
             }
             //else

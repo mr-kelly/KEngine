@@ -185,7 +185,7 @@ public static class KEngineExtensions
                         ret = default(T);
                     else
                     {
-                        Logger.LogError("[Error get from object[],  '{0}' change to type {1}", arrElement, typeof(T));
+                        KLogger.LogError("[Error get from object[],  '{0}' change to type {1}", arrElement, typeof(T));
                         ret = default(T);
                     }
                 }
@@ -195,7 +195,7 @@ public static class KEngineExtensions
         {
             ret = default(T);
             if (isLog)
-                Logger.LogError("[GetArg] {0} args - offset: {1}", openArgs, offset);
+                KLogger.LogError("[GetArg] {0} args - offset: {1}", openArgs, offset);
         }
 
         return ret;

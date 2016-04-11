@@ -62,13 +62,13 @@ public class CTk2dSpriteCollectionDep : KAssetDep
 
         obj.name = resPath;
         tk2dSpriteCollectionData colData = colObj.GetComponent<tk2dSpriteCollectionData>();
-        Logger.Assert(colData);
+        KLogger.Assert(colData);
 
         var colDep = colObj.GetComponent<KAssetDep>();
 
         if (!(colDep && colDep.GetType() == typeof (CTk2dSpriteCollectionDep))) // 依赖材质Material, 加载后是Material
         {
-            Logger.LogError("Wrong Collection DepType - {0}", resPath);    
+            KLogger.LogError("Wrong Collection DepType - {0}", resPath);    
         }
         
         colDep.AddFinishCallback((assetDep, _obj) =>

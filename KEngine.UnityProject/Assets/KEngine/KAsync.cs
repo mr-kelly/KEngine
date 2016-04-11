@@ -178,7 +178,7 @@ namespace KEngine
                 time += Time.deltaTime;
                 if (time > timeout)
                 {
-                    Logger.LogError("[KAsync:When]A WHEN Timeout!!!");
+                    KLogger.LogError("[KAsync:When]A WHEN Timeout!!!");
                     break;
                 }
                 yield return null;

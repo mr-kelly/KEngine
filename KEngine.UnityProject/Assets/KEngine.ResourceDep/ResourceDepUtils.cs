@@ -169,13 +169,13 @@ namespace KEngine.ResourceDep
 
                     /*if (Application.isEditor)
                     {
-                        Logger.Log("Load dep sync:{0}, from: {1}", depPath, relativePath);
+                        KLogger.Log("Load dep sync:{0}, from: {1}", depPath, relativePath);
                     }*/
                 }
             }
             else
             {
-                Logger.LogWarning("Cannot find Manifest: {0}", relativePath);
+                KLogger.LogWarning("Cannot find Manifest: {0}", relativePath);
             }
 
             string path =
@@ -306,7 +306,7 @@ namespace KEngine.ResourceDep
 
             RefreshAllMaterialsShaders();
             req.IsDone = true;
-            Logger.Log("[LoadLevelAdditiveAsync]Load Level `{0}` Complete!", path);
+            KLogger.Log("[LoadLevelAdditiveAsync]Load Level `{0}` Complete!", path);
         }
     }
 }

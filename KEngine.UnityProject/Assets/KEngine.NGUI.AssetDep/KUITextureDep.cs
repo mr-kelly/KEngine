@@ -42,7 +42,7 @@ public class KUITextureDep : KAssetDep
         {
             if (!IsDestroy)
             {
-                Logger.Assert(DependencyComponent is UITexture);
+                KLogger.Assert(DependencyComponent is UITexture);
                 var uiTex = (UITexture) DependencyComponent;
                 uiTex.mainTexture = _tex;
                 // different pixelSize !   uiTex.pixelSize = GameDef.PictureScale;
@@ -58,7 +58,7 @@ public class KUITextureDep : KAssetDep
         {
             if (!isOk)
             {
-                Logger.LogError("无法加载依赖图片: {0}", texPath);
+                KLogger.LogError("无法加载依赖图片: {0}", texPath);
             }
 
             if (exCallback != null)

@@ -131,7 +131,7 @@ namespace KEngine.Editor
             if (!Directory.Exists(fullDir))
                 Directory.CreateDirectory(fullDir);
 
-            Logger.Log("Build Client {0} to: {1}", tag, fullPath);
+            KLogger.Log("Build Client {0} to: {1}", tag, fullPath);
             BuildPipeline.BuildPlayer(GetScenePaths(), fullPath, tag, opt);
 
             return fullPath;
@@ -241,7 +241,7 @@ namespace KEngine.Editor
                     return Application.persistentDataPath + "/" +
                            KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.StreamingBundlesFolderName); 
 
-                Logger.LogError("[AssetBundlesLinkPath]Invalid {0}", KResourceModule.DefaultInAppPathType);
+                KLogger.LogError("[AssetBundlesLinkPath]Invalid {0}", KResourceModule.DefaultInAppPathType);
                 return null;
             }
         }
