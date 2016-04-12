@@ -33,19 +33,44 @@ using KEngine;
 using KEngine.Modules;
 namespace AppSettings
 {
+	/// <summary>
+    /// All settings list here, so you can reload all settings manully from the list.
+	/// </summary>
+    public class SettingsDefine
+    {
+        private static IReloadableSettings[] _settingsList;
+        public static IReloadableSettings[] SettingsList
+        {
+            get
+            {
+                if (_settingsList == null)
+                {
+                    _settingsList = new IReloadableSettings[]
+                    { 
+                        ExampleSettings.GetInstance(),
+                        SubdirExample2Settings.GetInstance(),
+                        SubdirSettings.GetInstance(),
+                        SubdirSubSubDirExample3Settings.GetInstance(),
+                    };
+                }
+                return _settingsList;
+            }
+        }
+    }
+
 
 	/// <summary>
 	/// Auto Generate for Tab File: Example.bytes
     /// No use of generic and reflection, for better performance,  less IL code generating
 	/// </summary>>
-    public partial class ExampleInfos
+    public partial class ExampleSettings : IReloadableSettings
     {
 		public static readonly string TabFilePath = "Example.bytes";
-        static ExampleInfos _instance = new ExampleInfos();
-        Dictionary<string, ExampleInfo> _dict = new Dictionary<string, ExampleInfo>();
+        static readonly ExampleSettings _instance = new ExampleSettings();
+        Dictionary<string, ExampleSetting> _dict = new Dictionary<string, ExampleSetting>();
 
         /// <summary>
-        /// Trigger delegate when reload the infos
+        /// Trigger delegate when reload the Settings
         /// </summary>>
 	    public static System.Action OnReload;
 
@@ -53,7 +78,7 @@ namespace AppSettings
         /// Constructor, just reload(init)
         /// When Unity Editor mode, will watch the file modification and auto reload
         /// </summary>
-	    private ExampleInfos()
+	    private ExampleSettings()
 	    {
             ReloadAll();
 #if UNITY_EDITOR
@@ -71,20 +96,32 @@ namespace AppSettings
 #endif
         }
 
+        /// <summary>
+        /// Get the singleton
+        /// </summary>
+        /// <returns></returns>
+	    public static ExampleSettings GetInstance()
+	    {
+	        return _instance;
+	    }
+
+        /// <summary>
+        /// Do reload the setting file
+        /// </summary>
 	    public void ReloadAll()
         {
 	        using (var tableFile = SettingModule.Get(TabFilePath))
 	        {
 	            foreach (var row in tableFile)
 	            {
-                    var pk = ExampleInfo.ParsePrimaryKey(row);
-                    ExampleInfo info;
-                    if (!_dict.TryGetValue(pk, out info))
+                    var pk = ExampleSetting.ParsePrimaryKey(row);
+                    ExampleSetting setting;
+                    if (!_dict.TryGetValue(pk, out setting))
                     {
-                        info = new ExampleInfo(row);
-                        _dict[info.Id] = info;
+                        setting = new ExampleSetting(row);
+                        _dict[setting.Id] = setting;
                     }
-                    else info.Reload(row);
+                    else setting.Reload(row);
 	            }
 	            
 	        }
@@ -102,10 +139,10 @@ namespace AppSettings
             }
         }
         
-        public static ExampleInfo GetByPrimaryKey(string primaryKey)
+        public static ExampleSetting GetByPrimaryKey(string primaryKey)
         {
-            ExampleInfo info;
-            if (_instance._dict.TryGetValue(primaryKey, out info)) return info;
+            ExampleSetting setting;
+            if (_instance._dict.TryGetValue(primaryKey, out setting)) return setting;
             return null;
         }
     }
@@ -114,7 +151,7 @@ namespace AppSettings
 	/// Auto Generate for Tab File: Example.bytes
     /// Singleton class for less memory use
 	/// </summary>
-	public partial class ExampleInfo : TableRowParser
+	public partial class ExampleSetting : TableRowParser
 	{
 		
         /// <summary>
@@ -148,26 +185,19 @@ namespace AppSettings
         public Dictionary<string,int> StrIntMap { get; private set;}
         
 
-        internal ExampleInfo(TableRow row)
+        internal ExampleSetting(TableRow row)
         {
             Reload(row);
         }
 
         internal void Reload(TableRow row)
-        {
-        
-            Id = row.Get_string(row.Values[0], "");
-        
-            Name = row.Get_string(row.Values[1], "");
-        
-            KeyString = row.Get_string(row.Values[2], "");
-        
-            Number = row.Get_int(row.Values[3], "");
-        
-            StrArray = row.Get_string_array(row.Values[4], "");
-        
-            StrIntMap = row.Get_Dictionary_string_int(row.Values[5], "");
-        
+        { 
+            Id = row.Get_string(row.Values[0], ""); 
+            Name = row.Get_string(row.Values[1], ""); 
+            KeyString = row.Get_string(row.Values[2], ""); 
+            Number = row.Get_int(row.Values[3], ""); 
+            StrArray = row.Get_string_array(row.Values[4], ""); 
+            StrIntMap = row.Get_Dictionary_string_int(row.Values[5], ""); 
         }
 
         /// <summary>
@@ -186,14 +216,14 @@ namespace AppSettings
 	/// Auto Generate for Tab File: Subdir/Example2.bytes
     /// No use of generic and reflection, for better performance,  less IL code generating
 	/// </summary>>
-    public partial class SubdirExample2Infos
+    public partial class SubdirExample2Settings : IReloadableSettings
     {
 		public static readonly string TabFilePath = "Subdir/Example2.bytes";
-        static SubdirExample2Infos _instance = new SubdirExample2Infos();
-        Dictionary<int, SubdirExample2Info> _dict = new Dictionary<int, SubdirExample2Info>();
+        static readonly SubdirExample2Settings _instance = new SubdirExample2Settings();
+        Dictionary<int, SubdirExample2Setting> _dict = new Dictionary<int, SubdirExample2Setting>();
 
         /// <summary>
-        /// Trigger delegate when reload the infos
+        /// Trigger delegate when reload the Settings
         /// </summary>>
 	    public static System.Action OnReload;
 
@@ -201,7 +231,7 @@ namespace AppSettings
         /// Constructor, just reload(init)
         /// When Unity Editor mode, will watch the file modification and auto reload
         /// </summary>
-	    private SubdirExample2Infos()
+	    private SubdirExample2Settings()
 	    {
             ReloadAll();
 #if UNITY_EDITOR
@@ -219,20 +249,32 @@ namespace AppSettings
 #endif
         }
 
+        /// <summary>
+        /// Get the singleton
+        /// </summary>
+        /// <returns></returns>
+	    public static SubdirExample2Settings GetInstance()
+	    {
+	        return _instance;
+	    }
+
+        /// <summary>
+        /// Do reload the setting file
+        /// </summary>
 	    public void ReloadAll()
         {
 	        using (var tableFile = SettingModule.Get(TabFilePath))
 	        {
 	            foreach (var row in tableFile)
 	            {
-                    var pk = SubdirExample2Info.ParsePrimaryKey(row);
-                    SubdirExample2Info info;
-                    if (!_dict.TryGetValue(pk, out info))
+                    var pk = SubdirExample2Setting.ParsePrimaryKey(row);
+                    SubdirExample2Setting setting;
+                    if (!_dict.TryGetValue(pk, out setting))
                     {
-                        info = new SubdirExample2Info(row);
-                        _dict[info.Id] = info;
+                        setting = new SubdirExample2Setting(row);
+                        _dict[setting.Id] = setting;
                     }
-                    else info.Reload(row);
+                    else setting.Reload(row);
 	            }
 	            
 	        }
@@ -250,10 +292,10 @@ namespace AppSettings
             }
         }
         
-        public static SubdirExample2Info GetByPrimaryKey(int primaryKey)
+        public static SubdirExample2Setting GetByPrimaryKey(int primaryKey)
         {
-            SubdirExample2Info info;
-            if (_instance._dict.TryGetValue(primaryKey, out info)) return info;
+            SubdirExample2Setting setting;
+            if (_instance._dict.TryGetValue(primaryKey, out setting)) return setting;
             return null;
         }
     }
@@ -262,7 +304,7 @@ namespace AppSettings
 	/// Auto Generate for Tab File: Subdir/Example2.bytes
     /// Singleton class for less memory use
 	/// </summary>
-	public partial class SubdirExample2Info : TableRowParser
+	public partial class SubdirExample2Setting : TableRowParser
 	{
 		
         /// <summary>
@@ -276,18 +318,15 @@ namespace AppSettings
         public string Name { get; private set;}
         
 
-        internal SubdirExample2Info(TableRow row)
+        internal SubdirExample2Setting(TableRow row)
         {
             Reload(row);
         }
 
         internal void Reload(TableRow row)
-        {
-        
-            Id = row.Get_int(row.Values[0], "");
-        
-            Name = row.Get_string(row.Values[1], "");
-        
+        { 
+            Id = row.Get_int(row.Values[0], ""); 
+            Name = row.Get_string(row.Values[1], ""); 
         }
 
         /// <summary>
@@ -306,14 +345,14 @@ namespace AppSettings
 	/// Auto Generate for Tab File: Subdir/__.bytes
     /// No use of generic and reflection, for better performance,  less IL code generating
 	/// </summary>>
-    public partial class SubdirInfos
+    public partial class SubdirSettings : IReloadableSettings
     {
 		public static readonly string TabFilePath = "Subdir/__.bytes";
-        static SubdirInfos _instance = new SubdirInfos();
-        Dictionary<string, SubdirInfo> _dict = new Dictionary<string, SubdirInfo>();
+        static readonly SubdirSettings _instance = new SubdirSettings();
+        Dictionary<string, SubdirSetting> _dict = new Dictionary<string, SubdirSetting>();
 
         /// <summary>
-        /// Trigger delegate when reload the infos
+        /// Trigger delegate when reload the Settings
         /// </summary>>
 	    public static System.Action OnReload;
 
@@ -321,7 +360,7 @@ namespace AppSettings
         /// Constructor, just reload(init)
         /// When Unity Editor mode, will watch the file modification and auto reload
         /// </summary>
-	    private SubdirInfos()
+	    private SubdirSettings()
 	    {
             ReloadAll();
 #if UNITY_EDITOR
@@ -339,20 +378,32 @@ namespace AppSettings
 #endif
         }
 
+        /// <summary>
+        /// Get the singleton
+        /// </summary>
+        /// <returns></returns>
+	    public static SubdirSettings GetInstance()
+	    {
+	        return _instance;
+	    }
+
+        /// <summary>
+        /// Do reload the setting file
+        /// </summary>
 	    public void ReloadAll()
         {
 	        using (var tableFile = SettingModule.Get(TabFilePath))
 	        {
 	            foreach (var row in tableFile)
 	            {
-                    var pk = SubdirInfo.ParsePrimaryKey(row);
-                    SubdirInfo info;
-                    if (!_dict.TryGetValue(pk, out info))
+                    var pk = SubdirSetting.ParsePrimaryKey(row);
+                    SubdirSetting setting;
+                    if (!_dict.TryGetValue(pk, out setting))
                     {
-                        info = new SubdirInfo(row);
-                        _dict[info.Id] = info;
+                        setting = new SubdirSetting(row);
+                        _dict[setting.Id] = setting;
                     }
-                    else info.Reload(row);
+                    else setting.Reload(row);
 	            }
 	            
 	        }
@@ -370,10 +421,10 @@ namespace AppSettings
             }
         }
         
-        public static SubdirInfo GetByPrimaryKey(string primaryKey)
+        public static SubdirSetting GetByPrimaryKey(string primaryKey)
         {
-            SubdirInfo info;
-            if (_instance._dict.TryGetValue(primaryKey, out info)) return info;
+            SubdirSetting setting;
+            if (_instance._dict.TryGetValue(primaryKey, out setting)) return setting;
             return null;
         }
     }
@@ -382,7 +433,7 @@ namespace AppSettings
 	/// Auto Generate for Tab File: Subdir/__.bytes
     /// Singleton class for less memory use
 	/// </summary>
-	public partial class SubdirInfo : TableRowParser
+	public partial class SubdirSetting : TableRowParser
 	{
 		
         /// <summary>
@@ -396,18 +447,15 @@ namespace AppSettings
         public string Name { get; private set;}
         
 
-        internal SubdirInfo(TableRow row)
+        internal SubdirSetting(TableRow row)
         {
             Reload(row);
         }
 
         internal void Reload(TableRow row)
-        {
-        
-            Id = row.Get_string(row.Values[0], "");
-        
-            Name = row.Get_string(row.Values[1], "");
-        
+        { 
+            Id = row.Get_string(row.Values[0], ""); 
+            Name = row.Get_string(row.Values[1], ""); 
         }
 
         /// <summary>
@@ -426,14 +474,14 @@ namespace AppSettings
 	/// Auto Generate for Tab File: Subdir/SubSubDir/Example3.bytes
     /// No use of generic and reflection, for better performance,  less IL code generating
 	/// </summary>>
-    public partial class SubdirSubSubDirExample3Infos
+    public partial class SubdirSubSubDirExample3Settings : IReloadableSettings
     {
 		public static readonly string TabFilePath = "Subdir/SubSubDir/Example3.bytes";
-        static SubdirSubSubDirExample3Infos _instance = new SubdirSubSubDirExample3Infos();
-        Dictionary<string, SubdirSubSubDirExample3Info> _dict = new Dictionary<string, SubdirSubSubDirExample3Info>();
+        static readonly SubdirSubSubDirExample3Settings _instance = new SubdirSubSubDirExample3Settings();
+        Dictionary<string, SubdirSubSubDirExample3Setting> _dict = new Dictionary<string, SubdirSubSubDirExample3Setting>();
 
         /// <summary>
-        /// Trigger delegate when reload the infos
+        /// Trigger delegate when reload the Settings
         /// </summary>>
 	    public static System.Action OnReload;
 
@@ -441,7 +489,7 @@ namespace AppSettings
         /// Constructor, just reload(init)
         /// When Unity Editor mode, will watch the file modification and auto reload
         /// </summary>
-	    private SubdirSubSubDirExample3Infos()
+	    private SubdirSubSubDirExample3Settings()
 	    {
             ReloadAll();
 #if UNITY_EDITOR
@@ -459,20 +507,32 @@ namespace AppSettings
 #endif
         }
 
+        /// <summary>
+        /// Get the singleton
+        /// </summary>
+        /// <returns></returns>
+	    public static SubdirSubSubDirExample3Settings GetInstance()
+	    {
+	        return _instance;
+	    }
+
+        /// <summary>
+        /// Do reload the setting file
+        /// </summary>
 	    public void ReloadAll()
         {
 	        using (var tableFile = SettingModule.Get(TabFilePath))
 	        {
 	            foreach (var row in tableFile)
 	            {
-                    var pk = SubdirSubSubDirExample3Info.ParsePrimaryKey(row);
-                    SubdirSubSubDirExample3Info info;
-                    if (!_dict.TryGetValue(pk, out info))
+                    var pk = SubdirSubSubDirExample3Setting.ParsePrimaryKey(row);
+                    SubdirSubSubDirExample3Setting setting;
+                    if (!_dict.TryGetValue(pk, out setting))
                     {
-                        info = new SubdirSubSubDirExample3Info(row);
-                        _dict[info.Id] = info;
+                        setting = new SubdirSubSubDirExample3Setting(row);
+                        _dict[setting.Id] = setting;
                     }
-                    else info.Reload(row);
+                    else setting.Reload(row);
 	            }
 	            
 	        }
@@ -490,10 +550,10 @@ namespace AppSettings
             }
         }
         
-        public static SubdirSubSubDirExample3Info GetByPrimaryKey(string primaryKey)
+        public static SubdirSubSubDirExample3Setting GetByPrimaryKey(string primaryKey)
         {
-            SubdirSubSubDirExample3Info info;
-            if (_instance._dict.TryGetValue(primaryKey, out info)) return info;
+            SubdirSubSubDirExample3Setting setting;
+            if (_instance._dict.TryGetValue(primaryKey, out setting)) return setting;
             return null;
         }
     }
@@ -502,7 +562,7 @@ namespace AppSettings
 	/// Auto Generate for Tab File: Subdir/SubSubDir/Example3.bytes
     /// Singleton class for less memory use
 	/// </summary>
-	public partial class SubdirSubSubDirExample3Info : TableRowParser
+	public partial class SubdirSubSubDirExample3Setting : TableRowParser
 	{
 		
         /// <summary>
@@ -516,18 +576,15 @@ namespace AppSettings
         public string Name { get; private set;}
         
 
-        internal SubdirSubSubDirExample3Info(TableRow row)
+        internal SubdirSubSubDirExample3Setting(TableRow row)
         {
             Reload(row);
         }
 
         internal void Reload(TableRow row)
-        {
-        
-            Id = row.Get_string(row.Values[0], "");
-        
-            Name = row.Get_string(row.Values[1], "");
-        
+        { 
+            Id = row.Get_string(row.Values[0], ""); 
+            Name = row.Get_string(row.Values[1], ""); 
         }
 
         /// <summary>

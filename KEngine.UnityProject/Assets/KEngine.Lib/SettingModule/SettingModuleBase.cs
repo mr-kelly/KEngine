@@ -31,6 +31,13 @@ using CosmosTable;
 namespace KEngine.Modules
 {
     /// <summary>
+    /// For all class `XXXInfos`
+    /// </summary>
+    public interface IReloadableSettings
+    {
+        void ReloadAll();
+    }
+    /// <summary>
     /// 带有惰式加载的数据表加载器基类，
     /// 不带具体的加载文件的方法，需要自定义。
     /// 主要为了解耦，移除对UnityEngine命名空间的依赖使之可以进行其它.net平台的兼容

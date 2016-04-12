@@ -156,6 +156,7 @@ namespace KEngine
                 KLogger.Log("Application.unityVersion = {0}", Application.unityVersion);
                 KLogger.Log("SystemInfo.deviceModel = {0}", SystemInfo.deviceModel);
                 KLogger.Log("SystemInfo.deviceUniqueIdentifier = {0}", SystemInfo.deviceUniqueIdentifier);
+                KLogger.Log("SystemInfo.graphicsDeviceVersion = {0}", SystemInfo.graphicsDeviceVersion);
                 KLogger.Log("====================================================================================");
             }
             StartCoroutine(DoInit());

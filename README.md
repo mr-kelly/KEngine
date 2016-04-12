@@ -23,6 +23,7 @@ CosmosEngine的官方改名、改进版
 * [UI界面]基于约定的、无配置式的UI模块
 * [策划配置]基于Excel进行编译，配置表可添加图表、注释、批注
 * [策划配置]配置表加载支持运行时**热重载**, 无需重启立即生效
+* [策划配置]自动生成文档完善的静态代码，大大便捷开发流程
 
 
 # 整体结构：模块插拔与三大基础模块
@@ -92,6 +93,7 @@ KEngine.Installer安装器为现有项目嵌入KEngine提供方便的支持，�
 > 关闭或确定提示框后，将进行表编译工作
 
 PS: 如果在Unity未打开情况下进行Excel表的修改保存，将无法自动监测到改动。这时候，需要在打开Unity后通过菜单"KEngine->Settings->Force compile settings"进行手工编译。
+同时配置表支持热重载功能。在Unity播放状态时，修改Excel表并重新编译，运行中的配置表会自动重新加载。无需重启游戏。
 
 示例Excel文件: KEngine.UnityProject/Product/SettingSource/Example.xlsx
 

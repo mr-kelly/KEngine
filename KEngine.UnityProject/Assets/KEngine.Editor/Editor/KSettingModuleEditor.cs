@@ -85,19 +85,41 @@ using KEngine;
 using KEngine.Modules;
 namespace {{ NameSpace }}
 {
+	/// <summary>
+    /// All settings list here, so you can reload all settings manully from the list.
+	/// </summary>
+    public class SettingsDefine
+    {
+        private static IReloadableSettings[] _settingsList;
+        public static IReloadableSettings[] SettingsList
+        {
+            get
+            {
+                if (_settingsList == null)
+                {
+                    _settingsList = new IReloadableSettings[]
+                    { {% for file in Files %}
+                        {{ file.ClassName }}Settings.GetInstance(),{% endfor %}
+                    };
+                }
+                return _settingsList;
+            }
+        }
+    }
+
 {% for file in Files %}
 	/// <summary>
 	/// Auto Generate for Tab File: {{ file.TabFilePath }}
     /// No use of generic and reflection, for better performance,  less IL code generating
 	/// </summary>>
-    public partial class {{file.ClassName}}Infos
+    public partial class {{file.ClassName}}Settings : IReloadableSettings
     {
 		public static readonly string TabFilePath = ""{{ file.TabFilePath }}"";
-        static {{file.ClassName}}Infos _instance = new {{file.ClassName}}Infos();
-        Dictionary<{{ file.PrimaryKeyField.FormatType }}, {{file.ClassName}}Info> _dict = new Dictionary<{{ file.PrimaryKeyField.FormatType }}, {{file.ClassName}}Info>();
+        static readonly {{file.ClassName}}Settings _instance = new {{file.ClassName}}Settings();
+        Dictionary<{{ file.PrimaryKeyField.FormatType }}, {{file.ClassName}}Setting> _dict = new Dictionary<{{ file.PrimaryKeyField.FormatType }}, {{file.ClassName}}Setting>();
 
         /// <summary>
-        /// Trigger delegate when reload the infos
+        /// Trigger delegate when reload the Settings
         /// </summary>>
 	    public static System.Action OnReload;
 
@@ -105,7 +127,7 @@ namespace {{ NameSpace }}
         /// Constructor, just reload(init)
         /// When Unity Editor mode, will watch the file modification and auto reload
         /// </summary>
-	    private {{file.ClassName}}Infos()
+	    private {{file.ClassName}}Settings()
 	    {
             ReloadAll();
 #if UNITY_EDITOR
@@ -123,20 +145,32 @@ namespace {{ NameSpace }}
 #endif
         }
 
+        /// <summary>
+        /// Get the singleton
+        /// </summary>
+        /// <returns></returns>
+	    public static {{file.ClassName}}Settings GetInstance()
+	    {
+	        return _instance;
+	    }
+
+        /// <summary>
+        /// Do reload the setting file
+        /// </summary>
 	    public void ReloadAll()
         {
 	        using (var tableFile = SettingModule.Get(TabFilePath))
 	        {
 	            foreach (var row in tableFile)
 	            {
-                    var pk = {{ file.ClassName }}Info.ParsePrimaryKey(row);
-                    {{file.ClassName}}Info info;
-                    if (!_dict.TryGetValue(pk, out info))
+                    var pk = {{ file.ClassName }}Setting.ParsePrimaryKey(row);
+                    {{file.ClassName}}Setting setting;
+                    if (!_dict.TryGetValue(pk, out setting))
                     {
-                        info = new {{file.ClassName}}Info(row);
-                        _dict[info.{{ file.PrimaryKeyField.Name }}] = info;
+                        setting = new {{file.ClassName}}Setting(row);
+                        _dict[setting.{{ file.PrimaryKeyField.Name }}] = setting;
                     }
-                    else info.Reload(row);
+                    else setting.Reload(row);
 	            }
 	            
 	        }
@@ -154,10 +188,10 @@ namespace {{ NameSpace }}
             }
         }
         
-        public static {{file.ClassName}}Info GetByPrimaryKey({{ file.PrimaryKeyField.FormatType }} primaryKey)
+        public static {{file.ClassName}}Setting GetByPrimaryKey({{ file.PrimaryKeyField.FormatType }} primaryKey)
         {
-            {{file.ClassName}}Info info;
-            if (_instance._dict.TryGetValue(primaryKey, out info)) return info;
+            {{file.ClassName}}Setting setting;
+            if (_instance._dict.TryGetValue(primaryKey, out setting)) return setting;
             return null;
         }
     }
@@ -166,7 +200,7 @@ namespace {{ NameSpace }}
 	/// Auto Generate for Tab File: {{ file.TabFilePath }}
     /// Singleton class for less memory use
 	/// </summary>
-	public partial class {{file.ClassName}}Info : TableRowParser
+	public partial class {{file.ClassName}}Setting : TableRowParser
 	{
 		{% for field in file.Fields %}
         /// <summary>
@@ -175,16 +209,14 @@ namespace {{ NameSpace }}
         public {{ field.FormatType }} {{ field.Name}} { get; private set;}
         {% endfor %}
 
-        internal {{file.ClassName}}Info(TableRow row)
+        internal {{file.ClassName}}Setting(TableRow row)
         {
             Reload(row);
         }
 
         internal void Reload(TableRow row)
-        {
-        {% for field in file.Fields %}
-            {{ field.Name}} = row.Get_{{ field.TypeMethod }}(row.Values[{{ field.Index }}], ""{{ field.DefaultValue }}"");
-        {% endfor %}
+        { {% for field in file.Fields %}
+            {{ field.Name}} = row.Get_{{ field.TypeMethod }}(row.Values[{{ field.Index }}], ""{{ field.DefaultValue }}""); {% endfor %}
         }
 
         /// <summary>

@@ -63,20 +63,20 @@ public class KUGUIDemoMain : MonoBehaviour
             // Do some UI stuff
         });
 
-        Debug.Log("[SettingModule]Table: " + ExampleInfos.TabFilePath);
-        foreach (ExampleInfo exampleInfo in ExampleInfos.GetAll())
+        Debug.Log("[SettingModule]Table: " + ExampleSettings.TabFilePath);
+        foreach (ExampleSetting exampleInfo in ExampleSettings.GetAll())
         {
             Debug.Log(string.Format("Name: {0}", exampleInfo.Name));
             Debug.Log(string.Format("Number: {0}", exampleInfo.Number));
         }
-        var info = ExampleInfos.GetByPrimaryKey("A_1024");
+        var info = ExampleSettings.GetByPrimaryKey("A_1024");
         Debuger.Assert(info.Name == "Test1");
-        var info2 = SubdirExample2Infos.GetByPrimaryKey(2);
+        var info2 = SubdirExample2Settings.GetByPrimaryKey(2);
         Debuger.Assert(info2.Name == "Test2");
 
-        ExampleInfos.OnReload = () =>
+        ExampleSettings.OnReload = () =>
         {
-            var reloadedInfo = ExampleInfos.GetByPrimaryKey("C_9888");
+            var reloadedInfo = ExampleSettings.GetByPrimaryKey("C_9888");
             KLogger.Log("Reload ExampleInfos! Now info: {0} -> {1}", "C_9888", reloadedInfo.Name);
         };
     }
