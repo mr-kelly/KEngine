@@ -96,8 +96,15 @@ namespace {{ NameSpace }}
         static {{file.ClassName}}Infos _instance = new {{file.ClassName}}Infos();
         Dictionary<{{ file.PrimaryKeyField.FormatType }}, {{file.ClassName}}Info> _dict = new Dictionary<{{ file.PrimaryKeyField.FormatType }}, {{file.ClassName}}Info>();
 
+        /// <summary>
+        /// Trigger delegate when reload the infos
+        /// </summary>>
 	    public static System.Action OnReload;
 
+        /// <summary>
+        /// Constructor, just reload(init)
+        /// When Unity Editor mode, will watch the file modification and auto reload
+        /// </summary>
 	    private {{file.ClassName}}Infos()
 	    {
             ReloadAll();

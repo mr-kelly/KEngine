@@ -44,8 +44,15 @@ namespace AppSettings
         static ExampleInfos _instance = new ExampleInfos();
         Dictionary<string, ExampleInfo> _dict = new Dictionary<string, ExampleInfo>();
 
+        /// <summary>
+        /// Trigger delegate when reload the infos
+        /// </summary>>
 	    public static System.Action OnReload;
 
+        /// <summary>
+        /// Constructor, just reload(init)
+        /// When Unity Editor mode, will watch the file modification and auto reload
+        /// </summary>
 	    private ExampleInfos()
 	    {
             ReloadAll();
@@ -57,7 +64,7 @@ namespace AppSettings
 	                if (path.Replace("\\", "/").EndsWith(path))
 	                {
                         ReloadAll();
-	                    KLogger.LogConsole_MultiThread("Reload - " + path);
+	                    KLogger.LogConsole_MultiThread("Reload success! -> " + path);
 	                }
 	            });
 	        }
@@ -185,8 +192,15 @@ namespace AppSettings
         static SubdirExample2Infos _instance = new SubdirExample2Infos();
         Dictionary<int, SubdirExample2Info> _dict = new Dictionary<int, SubdirExample2Info>();
 
+        /// <summary>
+        /// Trigger delegate when reload the infos
+        /// </summary>>
 	    public static System.Action OnReload;
 
+        /// <summary>
+        /// Constructor, just reload(init)
+        /// When Unity Editor mode, will watch the file modification and auto reload
+        /// </summary>
 	    private SubdirExample2Infos()
 	    {
             ReloadAll();
@@ -198,7 +212,7 @@ namespace AppSettings
 	                if (path.Replace("\\", "/").EndsWith(path))
 	                {
                         ReloadAll();
-	                    KLogger.LogConsole_MultiThread("Reload - " + path);
+	                    KLogger.LogConsole_MultiThread("Reload success! -> " + path);
 	                }
 	            });
 	        }
@@ -298,8 +312,15 @@ namespace AppSettings
         static SubdirInfos _instance = new SubdirInfos();
         Dictionary<string, SubdirInfo> _dict = new Dictionary<string, SubdirInfo>();
 
+        /// <summary>
+        /// Trigger delegate when reload the infos
+        /// </summary>>
 	    public static System.Action OnReload;
 
+        /// <summary>
+        /// Constructor, just reload(init)
+        /// When Unity Editor mode, will watch the file modification and auto reload
+        /// </summary>
 	    private SubdirInfos()
 	    {
             ReloadAll();
@@ -311,7 +332,7 @@ namespace AppSettings
 	                if (path.Replace("\\", "/").EndsWith(path))
 	                {
                         ReloadAll();
-	                    KLogger.LogConsole_MultiThread("Reload - " + path);
+	                    KLogger.LogConsole_MultiThread("Reload success! -> " + path);
 	                }
 	            });
 	        }
@@ -411,8 +432,15 @@ namespace AppSettings
         static SubdirSubSubDirExample3Infos _instance = new SubdirSubSubDirExample3Infos();
         Dictionary<string, SubdirSubSubDirExample3Info> _dict = new Dictionary<string, SubdirSubSubDirExample3Info>();
 
+        /// <summary>
+        /// Trigger delegate when reload the infos
+        /// </summary>>
 	    public static System.Action OnReload;
 
+        /// <summary>
+        /// Constructor, just reload(init)
+        /// When Unity Editor mode, will watch the file modification and auto reload
+        /// </summary>
 	    private SubdirSubSubDirExample3Infos()
 	    {
             ReloadAll();
@@ -424,7 +452,7 @@ namespace AppSettings
 	                if (path.Replace("\\", "/").EndsWith(path))
 	                {
                         ReloadAll();
-	                    KLogger.LogConsole_MultiThread("Reload - " + path);
+	                    KLogger.LogConsole_MultiThread("Reload success! -> " + path);
 	                }
 	            });
 	        }

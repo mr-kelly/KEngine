@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using System.IO;
 using System.Text;
 using CosmosTable;
@@ -75,6 +76,12 @@ namespace KEngine.Modules
             var resPath = "Assets/Resources/" + SettingFolderName + "/" + path;
             return resPath;
         }
+
+        /// <summary>
+        /// Cache all the FileSystemWatcher, prevent the duplicated one
+        /// </summary>
+        private static Dictionary<string, FileSystemWatcher> _cacheWatchers;
+
         /// <summary>
         /// Watch the setting file, when changed, trigger the delegate
         /// </summary>
@@ -87,9 +94,13 @@ namespace KEngine.Modules
                 KLogger.LogError("[WatchSetting] Available in Unity Editor mode only!");
                 return;
             }
-
+            if (_cacheWatchers == null)
+                 _cacheWatchers = new Dictionary<string, FileSystemWatcher>();
+            FileSystemWatcher watcher;
             var dirPath = Path.GetDirectoryName(GetFileSystemPath(path));
-            var watcher = new FileSystemWatcher(dirPath);
+            if (!_cacheWatchers.TryGetValue(dirPath, out watcher))
+                _cacheWatchers[dirPath] = watcher = new FileSystemWatcher(dirPath);
+
             watcher.IncludeSubdirectories = false;
             watcher.Path = dirPath;
             watcher.NotifyFilter = NotifyFilters.LastWrite;
