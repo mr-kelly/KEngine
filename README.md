@@ -92,10 +92,11 @@ KEngine.Installer安装器为现有项目嵌入KEngine提供方便的支持，�
 ![SettingModule Tips](Docs/SettingModule_Log.png)
 > 关闭或确定提示框后，将进行表编译工作
 
-PS: 如果在Unity未打开情况下进行Excel表的修改保存，将无法自动监测到改动。这时候，需要在打开Unity后通过菜单"KEngine->Settings->Force compile settings"进行手工编译。
-同时配置表支持热重载功能。在Unity播放状态时，修改Excel表并重新编译，运行中的配置表会自动重新加载。无需重启游戏。
+PS: 如果在Unity未打开情况下进行Excel表的修改保存，将无法**自动监测**到改动。这时候，需要在打开Unity后通过菜单"KEngine->Settings->Force compile settings"进行手工编译。
 
-示例Excel文件: KEngine.UnityProject/Product/SettingSource/Example.xlsx
+配置表支持**热重载**功能。在Unity播放状态时，修改Excel表并重新编译，运行中的配置表会自动重新加载。无需重启游戏。
+
+示例Excel文件: KEngine.UnityProject/Product/SettingSource/Example.xlsx（将被编译到KEngine.UnityProject/Assets/Resources/Example.bytes）
 
 # 美术人员使用指南
 
