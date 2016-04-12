@@ -212,7 +212,7 @@ namespace {{ NameSpace }}
                     KEditorUtils.CallMainThread(() =>
                     {
                         EditorUtility.DisplayDialog("Excel Setting Changed!", "Ready to Recompile All!", "OK");
-                        CompileSettings();
+                        DoCompileSettings(false);
                         _isPopUpConfirm = false;
                     });
                 });
@@ -261,14 +261,15 @@ namespace {{ NameSpace }}
                             string.Format("{0} -> {1}", excelPath, compileToPath), nowFileIndex / (float)allFilesCount);
 
                         // 如果已经存在，判断修改时间是否一致，用此来判断是否无需compile，节省时间
+                        bool doCompile = true;
                         if (File.Exists(compileToPath))
                         {
                             var toFileInfo = new FileInfo(compileToPath);
 
                             if (!force && srcFileInfo.LastWriteTime == toFileInfo.LastWriteTime)
                             {
-                                KLogger.Log("Pass!SameTime! From {0} to {1}", excelPath, compileToPath);
-                                continue;
+                                //KLogger.Log("Pass!SameTime! From {0} to {1}", excelPath, compileToPath);
+                                doCompile = false;
                             }
                         }
                         KLogger.LogWarning("[SettingModule]Compile from {0} to {1}", excelPath, compileToPath);
@@ -339,6 +340,10 @@ namespace {{ NameSpace }}
         [MenuItem("KEngine/Settings/Force Compile Settings")]
         public static void CompileSettings()
         {
+            DoCompileSettings(true);
+        }
+        public static void DoCompileSettings(bool force = true)
+        {
             var sourcePath = SettingSourcePath;//AppEngine.GetConfig("SettingSourcePath");
             if (string.IsNullOrEmpty(sourcePath))
             {
@@ -351,7 +356,7 @@ namespace {{ NameSpace }}
                 KLogger.LogError("Need to KEngineConfig: SettingPath");
                 return;
             }
-            CompileTabConfigs(sourcePath, compilePath, SettingCodePath, SettingExtension, true);
+            CompileTabConfigs(sourcePath, compilePath, SettingCodePath, SettingExtension, force);
         }
     }
 }

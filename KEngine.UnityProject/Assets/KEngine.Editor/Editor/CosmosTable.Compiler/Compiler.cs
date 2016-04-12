@@ -114,15 +114,8 @@ namespace CosmosTable
             _config = cfg;
         }
 
-        private RenderTemplateVars DoCompiler(string path, SimpleExcelFile excelFile, string compileToFilePath = null, string compileBaseDir = null)
+        private RenderTemplateVars DoCompilerExcelReader(string path, SimpleExcelFile excelFile, string compileToFilePath = null, string compileBaseDir = null, bool doCompile = true)
         {
-            return DoCompilerExcelReader(path, excelFile, compileToFilePath, compileBaseDir);
-        }
-
-
-        private RenderTemplateVars DoCompilerExcelReader(string path, SimpleExcelFile excelFile, string compileToFilePath = null, string compileBaseDir = null)
-        {
-
             var renderVars = new RenderTemplateVars();
             renderVars.FieldsInternal = new List<RenderFieldVars>();
 
@@ -247,7 +240,10 @@ namespace CosmosTable
             var exportDirPath = Path.GetDirectoryName(exportPath);
             if (!Directory.Exists(exportDirPath))
                 Directory.CreateDirectory(exportDirPath);
-            File.WriteAllText(exportPath, strBuilder.ToString());
+
+            // 是否写入文件
+            if (doCompile)
+                File.WriteAllText(exportPath, strBuilder.ToString());
 
 
             // 基于base dir路径
@@ -294,8 +290,9 @@ namespace CosmosTable
         /// <param name="path"></param>
         /// <param name="compileToFilePath"></param>
         /// <param name="compileBaseDir"></param>
+        /// <param name="doRealCompile">Real do, or just get the template var?</param>
         /// <returns></returns>
-        public RenderTemplateVars Compile(string path, string compileToFilePath = null, string compileBaseDir = null)
+        public RenderTemplateVars Compile(string path, string compileToFilePath = null, string compileBaseDir = null, bool doRealCompile = true)
         {
             // 确保目录存在
             var compileToFileDirPath = Path.GetDirectoryName(compileToFilePath);
@@ -304,7 +301,7 @@ namespace CosmosTable
                 Directory.CreateDirectory(compileToFileDirPath);
 
             var excelFile = new SimpleExcelFile(path);
-            var hash = DoCompiler(path, excelFile, compileToFilePath, compileBaseDir);
+            var hash = DoCompilerExcelReader(path, excelFile, compileToFilePath, compileBaseDir, doRealCompile);
             return hash;
 
         }
