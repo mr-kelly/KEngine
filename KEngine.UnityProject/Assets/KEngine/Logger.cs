@@ -80,7 +80,7 @@ namespace KEngine
 
 
         //static readonly bool IsDebugBuild = false;
-        public static readonly bool IsEditor = false;
+        public static readonly bool IsUnityEditor = false;
 
         public static event Action<string> LogErrorEvent;
 
@@ -91,7 +91,7 @@ namespace KEngine
             try
             {
                 //IsDebugBuild = UnityEngine.Debug.isDebugBuild;
-                IsEditor = Application.isEditor;
+                IsUnityEditor = Application.isEditor;
             }
             catch (Exception e)
             {
@@ -199,7 +199,7 @@ namespace KEngine
         // 这个使用系统的log，这个很特别，它可以再多线程里用，其它都不能再多线程内用！！！
         public static void LogConsole_MultiThread(string log, params object[] args)
         {
-            if (IsEditor)
+            if (IsUnityEditor)
                 Log(log, args);
             else
                 Console.WriteLine(log, args);
@@ -349,7 +349,7 @@ namespace KEngine
         {
             string logPath;
 
-            if (IsEditor)
+            if (IsUnityEditor)
                 logPath = "logs/";
             else
                 logPath = UnityEngine.Application.persistentDataPath + "/" + "logs/";

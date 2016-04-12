@@ -29,6 +29,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using CosmosTable;
+using KEngine;
 using KEngine.Modules;
 namespace AppSettings
 {
@@ -43,9 +44,24 @@ namespace AppSettings
         static ExampleInfos _instance = new ExampleInfos();
         Dictionary<string, ExampleInfo> _dict = new Dictionary<string, ExampleInfo>();
 
+	    public static System.Action OnReload;
+
 	    private ExampleInfos()
 	    {
             ReloadAll();
+#if UNITY_EDITOR
+	        if (SettingModule.IsFileSystemMode)
+	        {
+	            SettingModule.WatchSetting(TabFilePath, (path) =>
+	            {
+	                if (path.Replace("\\", "/").EndsWith(path))
+	                {
+                        ReloadAll();
+	                    KLogger.LogConsole_MultiThread("Reload - " + path);
+	                }
+	            });
+	        }
+#endif
         }
 
 	    public void ReloadAll()
@@ -64,6 +80,10 @@ namespace AppSettings
                     else info.Reload(row);
 	            }
 	            
+	        }
+	        if (OnReload != null)
+	        {
+	            OnReload();
 	        }
         }
 	    
@@ -165,9 +185,24 @@ namespace AppSettings
         static SubdirExample2Infos _instance = new SubdirExample2Infos();
         Dictionary<int, SubdirExample2Info> _dict = new Dictionary<int, SubdirExample2Info>();
 
+	    public static System.Action OnReload;
+
 	    private SubdirExample2Infos()
 	    {
             ReloadAll();
+#if UNITY_EDITOR
+	        if (SettingModule.IsFileSystemMode)
+	        {
+	            SettingModule.WatchSetting(TabFilePath, (path) =>
+	            {
+	                if (path.Replace("\\", "/").EndsWith(path))
+	                {
+                        ReloadAll();
+	                    KLogger.LogConsole_MultiThread("Reload - " + path);
+	                }
+	            });
+	        }
+#endif
         }
 
 	    public void ReloadAll()
@@ -186,6 +221,10 @@ namespace AppSettings
                     else info.Reload(row);
 	            }
 	            
+	        }
+	        if (OnReload != null)
+	        {
+	            OnReload();
 	        }
         }
 	    
@@ -259,9 +298,24 @@ namespace AppSettings
         static SubdirInfos _instance = new SubdirInfos();
         Dictionary<string, SubdirInfo> _dict = new Dictionary<string, SubdirInfo>();
 
+	    public static System.Action OnReload;
+
 	    private SubdirInfos()
 	    {
             ReloadAll();
+#if UNITY_EDITOR
+	        if (SettingModule.IsFileSystemMode)
+	        {
+	            SettingModule.WatchSetting(TabFilePath, (path) =>
+	            {
+	                if (path.Replace("\\", "/").EndsWith(path))
+	                {
+                        ReloadAll();
+	                    KLogger.LogConsole_MultiThread("Reload - " + path);
+	                }
+	            });
+	        }
+#endif
         }
 
 	    public void ReloadAll()
@@ -280,6 +334,10 @@ namespace AppSettings
                     else info.Reload(row);
 	            }
 	            
+	        }
+	        if (OnReload != null)
+	        {
+	            OnReload();
 	        }
         }
 	    
@@ -353,9 +411,24 @@ namespace AppSettings
         static SubdirSubSubDirExample3Infos _instance = new SubdirSubSubDirExample3Infos();
         Dictionary<string, SubdirSubSubDirExample3Info> _dict = new Dictionary<string, SubdirSubSubDirExample3Info>();
 
+	    public static System.Action OnReload;
+
 	    private SubdirSubSubDirExample3Infos()
 	    {
             ReloadAll();
+#if UNITY_EDITOR
+	        if (SettingModule.IsFileSystemMode)
+	        {
+	            SettingModule.WatchSetting(TabFilePath, (path) =>
+	            {
+	                if (path.Replace("\\", "/").EndsWith(path))
+	                {
+                        ReloadAll();
+	                    KLogger.LogConsole_MultiThread("Reload - " + path);
+	                }
+	            });
+	        }
+#endif
         }
 
 	    public void ReloadAll()
@@ -374,6 +447,10 @@ namespace AppSettings
                     else info.Reload(row);
 	            }
 	            
+	        }
+	        if (OnReload != null)
+	        {
+	            OnReload();
 	        }
         }
 	    

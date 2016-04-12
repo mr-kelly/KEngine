@@ -81,6 +81,7 @@ namespace KEngine.Editor
 using System.Collections;
 using System.Collections.Generic;
 using CosmosTable;
+using KEngine;
 using KEngine.Modules;
 namespace {{ NameSpace }}
 {
@@ -95,9 +96,24 @@ namespace {{ NameSpace }}
         static {{file.ClassName}}Infos _instance = new {{file.ClassName}}Infos();
         Dictionary<{{ file.PrimaryKeyField.FormatType }}, {{file.ClassName}}Info> _dict = new Dictionary<{{ file.PrimaryKeyField.FormatType }}, {{file.ClassName}}Info>();
 
+	    public static System.Action OnReload;
+
 	    private {{file.ClassName}}Infos()
 	    {
             ReloadAll();
+#if UNITY_EDITOR
+	        if (SettingModule.IsFileSystemMode)
+	        {
+	            SettingModule.WatchSetting(TabFilePath, (path) =>
+	            {
+	                if (path.Replace(""\\"", ""/"").EndsWith(path))
+	                {
+                        ReloadAll();
+	                    KLogger.LogConsole_MultiThread(""Reload - "" + path);
+	                }
+	            });
+	        }
+#endif
         }
 
 	    public void ReloadAll()
@@ -116,6 +132,10 @@ namespace {{ NameSpace }}
                     else info.Reload(row);
 	            }
 	            
+	        }
+	        if (OnReload != null)
+	        {
+	            OnReload();
 	        }
         }
 	    
@@ -276,7 +296,27 @@ namespace {{ NameSpace }}
                     topHash["Files"] = files;
 
                     if (!string.IsNullOrEmpty(exportPath))
-                        File.WriteAllText(exportPath, template.Render(topHash));
+                    {
+                        var genCode = template.Render(topHash);
+                        if (File.Exists(exportPath)) // 存在，比较是否相同
+                        {
+                            if (File.ReadAllText(exportPath) != genCode)
+                            {
+                                EditorUtility.ClearProgressBar();
+                                // 不同，会触发编译，强制停止Unity后再继续写入
+                                if (EditorApplication.isPlaying)
+                                {
+                                    KLogger.LogError("[CAUTION]AppSettings code modified! Force stop Unity playing");
+                                    EditorApplication.isPlaying = false;
+                                }
+                                File.WriteAllText(exportPath, genCode);
+                                return; // 防止Unity出现红色提示错误
+                            }
+                        }
+                        else
+                            File.WriteAllText(exportPath, genCode);
+
+                    }
                 }
 
 

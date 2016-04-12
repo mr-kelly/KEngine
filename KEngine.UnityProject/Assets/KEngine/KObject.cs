@@ -81,7 +81,7 @@ public class KObjectDebugger : KBehaviour
 
     public static void RemoveDebugObject(object obj)
     {
-        if (!KLogger.IsEditor || !Application.isPlaying || IsApplicationQuited)
+        if (!KLogger.IsUnityEditor || !Application.isPlaying || IsApplicationQuited)
             return;
 
         KAsync.AddMainThreadCall(() =>
@@ -103,7 +103,7 @@ public class KObjectDebugger : KBehaviour
 
     public static void CreateDebugObject(object obj)
     {
-        if (!KLogger.IsEditor || !Application.isPlaying || IsApplicationQuited)
+        if (!KLogger.IsUnityEditor || !Application.isPlaying || IsApplicationQuited)
             return;
 
         KAsync.AddMainThreadCall(() =>
@@ -128,7 +128,7 @@ public class KObjectDebugger : KBehaviour
 
     private void Awake()
     {
-        if (!KLogger.IsEditor)
+        if (!KLogger.IsUnityEditor)
         {
             KLogger.LogError("Error Open KObjectDebugger on not Unity Editor");
             return;

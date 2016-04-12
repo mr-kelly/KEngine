@@ -22,6 +22,7 @@ CosmosEngine的官方改名、改进版
 * 具备完整的策划->美术->程序工作流
 * 基于约定的、无配置式的UI模块
 * 基于编译的Excel配置表，配置表可添加图表、注释、批注
+* 配置表加载支持运行时**热重载**, 无需重启立即生效
 
 
 # 整体结构：模块插拔与三大基础模块
@@ -68,6 +69,7 @@ KEngine.Installer安装器为现有项目嵌入KEngine提供方便的支持，�
 * [UI模块/UIModule](Docs/Doc_UIModule.md)
 * [配置表模块/SettingModule](Docs/Doc_SettingModule.md)
 	* 惰式初始化
+	* 热重载
 	* 扩展表头类型
 
 
