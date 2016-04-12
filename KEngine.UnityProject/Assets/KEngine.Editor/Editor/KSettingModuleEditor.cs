@@ -273,7 +273,7 @@ namespace {{ NameSpace }}
                             }
                         }
                         KLogger.LogWarning("[SettingModule]Compile from {0} to {1}", excelPath, compileToPath);
-                        var templateVar = compiler.Compile(excelPath, compileToPath, compileBaseDir);
+                        var templateVar = compiler.Compile(excelPath, compileToPath, compileBaseDir, doCompile);
 
                         var renderTemplateHash = Hash.FromAnonymousObject(templateVar);
                         files.Add(renderTemplateHash);
