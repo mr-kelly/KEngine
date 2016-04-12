@@ -2,5 +2,5 @@ Id	Name	KeyString	Number	StrArray	StrIntMap
 string	string	string	int	string[]	Dictionary<string,int>
 A_1024	Test1	A	1024	1,2,3,4,5,6,7,8,9	strTest:1,strTest2:2
 B_2048	Test2	B	2048	a,b,c	A:12,B:43,C:1024
-C_9888	中文123	C	9888	d,e,f	
+C_9888	中文1	C	9888	d,e,f	
 D_3534	一个单词	D	3534	g,h,z,e,g,o,i,p	FFF:123

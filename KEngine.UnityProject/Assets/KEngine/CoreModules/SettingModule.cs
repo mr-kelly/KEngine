@@ -82,6 +82,12 @@ namespace KEngine.Modules
         /// <param name="action"></param>
         public static void WatchSetting(string path, System.Action<string> action)
         {
+            if (!IsFileSystemMode)
+            {
+                KLogger.LogError("[WatchSetting] Available in Unity Editor mode only!");
+                return;
+            }
+
             var dirPath = Path.GetDirectoryName(GetFileSystemPath(path));
             var watcher = new FileSystemWatcher(dirPath);
             watcher.IncludeSubdirectories = false;

@@ -109,7 +109,7 @@ namespace {{ NameSpace }}
 	                if (path.Replace(""\\"", ""/"").EndsWith(path))
 	                {
                         ReloadAll();
-	                    KLogger.LogConsole_MultiThread(""Reload - "" + path);
+	                    KLogger.LogConsole_MultiThread(""Reload success! -> "" + path);
 	                }
 	            });
 	        }
@@ -272,7 +272,8 @@ namespace {{ NameSpace }}
                                 doCompile = false;
                             }
                         }
-                        KLogger.LogWarning("[SettingModule]Compile from {0} to {1}", excelPath, compileToPath);
+                        if (doCompile)
+                            KLogger.LogWarning("[SettingModule]Compile from {0} to {1}", excelPath, compileToPath);
                         var templateVar = compiler.Compile(excelPath, compileToPath, compileBaseDir, doCompile);
 
                         var renderTemplateHash = Hash.FromAnonymousObject(templateVar);
