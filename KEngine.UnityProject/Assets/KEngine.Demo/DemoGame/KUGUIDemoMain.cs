@@ -71,6 +71,8 @@ public class KUGUIDemoMain : MonoBehaviour
         }
         var info = ExampleInfos.GetByPrimaryKey("A_1024");
         Debuger.Assert(info.Name == "Test1");
+        var info2 = SubdirExample2Infos.GetByPrimaryKey(2);
+        Debuger.Assert(info2.Name == "Test2");
     }
     //private void OnGameSettingsInit()
     //{

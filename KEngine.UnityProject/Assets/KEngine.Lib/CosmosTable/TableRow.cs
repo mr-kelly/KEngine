@@ -142,7 +142,7 @@ namespace CosmosTable
         /// <summary>
         /// Use first object of array as primary key!
         /// </summary>
-        public virtual object PrimaryKey
+        public virtual string PrimaryKey
         {
             get { return this[0]; }
         }

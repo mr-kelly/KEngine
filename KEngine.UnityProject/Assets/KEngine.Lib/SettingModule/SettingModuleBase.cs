@@ -54,7 +54,7 @@ namespace KEngine.Modules
         /// <param name="path"></param>
         /// <param name="useCache">是否缓存起来？还是单独创建新的</param>
         /// <returns></returns>
-        public TableFile GetTableFile(string path, bool useCache = true) 
+        public TableFile GetTableFile(string path, bool useCache = false) 
         {
             object tableFile;
             if (!useCache || !_tableFilesCache.TryGetValue(path, out tableFile))

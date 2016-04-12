@@ -32,7 +32,7 @@ namespace KEngine.Modules
         /// <param name="path"></param>
         /// <param name="useCache"></param>
         /// <returns></returns>
-        public static TableFile Get(string path, bool useCache = true)
+        public static TableFile Get(string path, bool useCache = false)
         {
             if (_instance == null)
                 _instance = new SettingModule();
@@ -46,7 +46,9 @@ namespace KEngine.Modules
         /// <returns></returns>
         protected override string LoadSetting(string path)
         {
-            var fileContentAsset = Resources.Load(SettingFolderName + "/" + Path.GetFileNameWithoutExtension(path)) as TextAsset;
+            var ext = Path.GetExtension(path);
+            var resPath = SettingFolderName + "/" + Path.ChangeExtension(path, null);
+            var fileContentAsset = Resources.Load(resPath) as TextAsset;
             var fileContent = Encoding.UTF8.GetString(fileContentAsset.bytes);
 
             return fileContent;

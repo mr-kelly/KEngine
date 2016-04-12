@@ -33,6 +33,14 @@ namespace CosmosTable
             get { return (from f in FieldsInternal select Hash.FromAnonymousObject(f)).ToList(); }
         }
 
+        /// <summary>
+        /// Get primary key, the first column field
+        /// </summary>
+        public Hash PrimaryKeyField
+        {
+            get { return Fields[0]; }
+        }
+
         public List<Hash> Columns2DefaultValus { get; set; } // column + Default Values
         public string PrimaryKey { get; set; }
 
@@ -84,11 +92,6 @@ namespace CosmosTable
 
         public CompilerConfig()
         {
-            // Default C# Code Templates
-            //CodeTemplates = new Dictionary<string, string>()
-            //{
-            //    {File.ReadAllText("./GenCode.cs.tpl"), "TabConfigs.cs"}, // code template -> CodePath
-            //};
         }
     }
 
@@ -113,59 +116,12 @@ namespace CosmosTable
 
         private RenderTemplateVars DoCompiler(string path, SimpleExcelFile excelFile, string compileToFilePath = null, string compileBaseDir = null)
         {
-            //var fileExt = Path.GetExtension(path);
-            //IExcelDataReader excelReader = null;
-            //if (fileExt == ".xlsx" || fileExt == ".xml")
-            //{
-            //    try
-            //    {
-            //        //2. Reading from a OpenXml Excel file (2007 format; *.xlsx)
-            //        excelReader = ExcelReaderFactory.CreateOpenXmlReader(stream);
-            //    }
-            //    catch (Exception e2)
-            //    {
-            //        throw new InvalidExcelException("Cannot read Excel 2007 File : " + path + e2.Message);
-            //    }
-            //}
-            //else
-            //{
-            //    try
-            //    {
-            //        //1. Reading from a binary Excel file ('97-2003 format; *.xls)
-            //        excelReader = ExcelReaderFactory.CreateBinaryReader(stream);
-            //    }
-            //    catch (Exception e2)
-            //    {
-            //        throw new InvalidExcelException("Cannot read Excel 2003 File : " + path + e2.Message);
-            //    }
-            //}
-
-
-            //if (excelReader != null)
-            //{
-            //    using (excelReader)
-            //    {
-
-            //    }
-            //}
             return DoCompilerExcelReader(path, excelFile, compileToFilePath, compileBaseDir);
         }
 
 
         private RenderTemplateVars DoCompilerExcelReader(string path, SimpleExcelFile excelFile, string compileToFilePath = null, string compileBaseDir = null)
         {
-            //3. DataSet - The result of each spreadsheet will be created in the result.Tables
-            //DataSet result = excelReader.AsDataSet();
-
-            //4. DataSet - Create column names from first row
-            //excelFile.IsFirstRowAsColumnNames = true;
-
-
-            //DataSet result = excelFile.AsDataSet();
-
-            //if (result.Tables.Count <= 0)
-            //    throw new InvalidExcelException("No Sheet!");
-
 
             var renderVars = new RenderTemplateVars();
             renderVars.FieldsInternal = new List<RenderFieldVars>();
@@ -266,14 +222,6 @@ namespace CosmosTable
 
                         if (loopColumn > 0 && loopColumn != (columnCount - 1)) // 最后一列不需加tab
                             strBuilder.Append("\t");
-                        //        // 如果单元格是字符串，换行符改成\\n
-                        //        if (item is string)
-                        //        {
-                        //            var sItme = item as string;
-                        //            cloneItem = sItme.Replace("\n", "\\n");
-                        //        }
-                        //        strBuilder.Append(cloneItem);
-                        //        colIndex++;
 
                         // 如果单元格是字符串，换行符改成\\n
                         cellStr = cellStr.Replace("\n", "\\n");
@@ -283,49 +231,7 @@ namespace CosmosTable
 
                 }
             }
-            //if (hasStatementRow)
-            //{
-            //    // 有声明行，忽略第2行
-            //    if (rowIndex == 2)
-            //    {
-            //            rowIndex++;
-            //            continue;
-
-            //        }
-            //    }
-            //    else
-            //    {
-            //        // 无声明行，忽略第1行
-            //        if (rowIndex == 1)
-            //        {
-            //            rowIndex++;
-            //            continue;
-            //        }
-            //    }
-
-            //    colIndex = 0;
-            //foreach (var item in dRow.ItemArray)
-            //    {
-            //        if (ignoreColumns.Contains(colIndex)) // comment column, ignore
-            //            continue;
-
-            //        if (colIndex > 0)
-            //            strBuilder.Append("\t");
-
-            //        var cloneItem = item;
-            //        // 如果单元格是字符串，换行符改成\\n
-            //        if (item is string)
-            //        {
-            //            var sItme = item as string;
-            //            cloneItem = sItme.Replace("\n", "\\n");
-            //        }
-            //        strBuilder.Append(cloneItem);
-            //        colIndex++;
-            //    }
-            //    strBuilder.Append("\n");
-            //    rowIndex++;
-            //}
-
+            
             var fileName = Path.GetFileNameWithoutExtension(path);
             string exportPath;
             if (!string.IsNullOrEmpty(compileToFilePath))
@@ -353,7 +259,8 @@ namespace CosmosTable
             if (tabFilePath.StartsWith("/"))
                 tabFilePath = tabFilePath.Substring(1);
 
-            var classNameOrigin = Path.GetDirectoryName(tabFilePath) + "/" + Path.GetFileNameWithoutExtension(tabFilePath);// 未处理路径的类名, 去掉后缀扩展名
+			// 未处理路径的类名, 去掉后缀扩展名
+            var classNameOrigin = Path.ChangeExtension(tabFilePath, null);
 
             renderVars.ClassName = string.Join("",
                 (from name in classNameOrigin.Replace("/", "_").Replace("\\", "_").Replace(" ", "").Split(new char[]{'_'}, StringSplitOptions.RemoveEmptyEntries)

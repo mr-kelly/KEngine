@@ -92,67 +92,84 @@ namespace {{ NameSpace }}
     public partial class {{file.ClassName}}Infos
     {
 		public static readonly string TabFilePath = ""{{ file.TabFilePath }}"";
+        static {{file.ClassName}}Infos _instance = new {{file.ClassName}}Infos();
+        Dictionary<{{ file.PrimaryKeyField.FormatType }}, {{file.ClassName}}Info> _dict = new Dictionary<{{ file.PrimaryKeyField.FormatType }}, {{file.ClassName}}Info>();
 
-        public static TableFile GetTableFile()
-        {
-            return SettingModule.Get(TabFilePath);
+	    private {{file.ClassName}}Infos()
+	    {
+            ReloadAll();
         }
 
+	    public void ReloadAll()
+        {
+	        using (var tableFile = SettingModule.Get(TabFilePath))
+	        {
+	            foreach (var row in tableFile)
+	            {
+                    var pk = {{ file.ClassName }}Info.ParsePrimaryKey(row);
+                    {{file.ClassName}}Info info;
+                    if (!_dict.TryGetValue(pk, out info))
+                    {
+                        info = new {{file.ClassName}}Info(row);
+                        _dict[info.{{ file.PrimaryKeyField.Name }}] = info;
+                    }
+                    else info.Reload(row);
+	            }
+	            
+	        }
+        }
+	    
         public static IEnumerable GetAll()
         {
-            var tableFile = SettingModule.Get(TabFilePath);
-            foreach (var row in tableFile)
+            foreach (var row in _instance._dict.Values)
             {
-                yield return {{file.ClassName}}Info.Wrap(row);
+                yield return row;
             }
         }
-
-        public static {{file.ClassName}}Info GetByPrimaryKey(object primaryKey)
+        
+        public static {{file.ClassName}}Info GetByPrimaryKey({{ file.PrimaryKeyField.FormatType }} primaryKey)
         {
-            var tableFile = SettingModule.Get(TabFilePath);
-            var row = tableFile.GetByPrimaryKey(primaryKey);
-            if (row == null) return null;
-            return {{file.ClassName}}Info.Wrap(row);
+            {{file.ClassName}}Info info;
+            if (_instance._dict.TryGetValue(primaryKey, out info)) return info;
+            return null;
         }
     }
+
 	/// <summary>
 	/// Auto Generate for Tab File: {{ file.TabFilePath }}
     /// Singleton class for less memory use
 	/// </summary>
 	public partial class {{file.ClassName}}Info : TableRowParser
 	{
-
-		private static {{file.ClassName}}Info _instance;
-
-        public static {{file.ClassName}}Info Wrap(TableRow row)
-        {
-            var inst = _instance ?? (_instance = new {{file.ClassName}}Info());
-            inst._row = row;
-            return inst;
-        }
-
-        private TableRow _row;
-
-        private {{file.ClassName}}Info()
-        {
-        }
-
 		{% for field in file.Fields %}
         /// <summary>
         /// {{ field.Comment }}
         /// </summary>
-        public {{ field.FormatType }} {{ field.Name}}
+        public {{ field.FormatType }} {{ field.Name}} { get; private set;}
+        {% endfor %}
+
+        internal {{file.ClassName}}Info(TableRow row)
         {
-            get
-            {
-                return _row.Get_{{ field.TypeMethod }}(_row.Values[{{ field.Index }}], ""{{ field.DefaultValue }}"");
-            }
-            set
-            {
-                _row[{{ field.Index}}] = value.ToString();
-            }
+            Reload(row);
         }
-		{% endfor %}
+
+        internal void Reload(TableRow row)
+        {
+        {% for field in file.Fields %}
+            {{ field.Name}} = row.Get_{{ field.TypeMethod }}(row.Values[{{ field.Index }}], ""{{ field.DefaultValue }}"");
+        {% endfor %}
+        }
+
+        /// <summary>
+        /// Get PrimaryKey from a table row
+        /// </summary>
+        /// <param name=""row""></param>
+        /// <returns></returns>
+        public static {{ file.PrimaryKeyField.FormatType }} ParsePrimaryKey(TableRow row)
+        {
+            var primaryKey = row.Get_{{ file.PrimaryKeyField.TypeMethod }}(row.Values[{{ file.PrimaryKeyField.Index }}], ""{{ file.PrimaryKeyField.DefaultValue }}"");
+            return primaryKey;
+        }
 	}
 {% endfor %} 
 }

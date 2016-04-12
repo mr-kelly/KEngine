@@ -40,142 +40,119 @@ namespace AppSettings
     public partial class ExampleInfos
     {
 		public static readonly string TabFilePath = "Example.bytes";
+        static ExampleInfos _instance = new ExampleInfos();
+        Dictionary<string, ExampleInfo> _dict = new Dictionary<string, ExampleInfo>();
 
-        public static TableFile GetTableFile()
-        {
-            return SettingModule.Get(TabFilePath);
+	    private ExampleInfos()
+	    {
+            ReloadAll();
         }
 
+	    public void ReloadAll()
+        {
+	        using (var tableFile = SettingModule.Get(TabFilePath))
+	        {
+	            foreach (var row in tableFile)
+	            {
+                    var pk = ExampleInfo.ParsePrimaryKey(row);
+                    ExampleInfo info;
+                    if (!_dict.TryGetValue(pk, out info))
+                    {
+                        info = new ExampleInfo(row);
+                        _dict[info.Id] = info;
+                    }
+                    else info.Reload(row);
+	            }
+	            
+	        }
+        }
+	    
         public static IEnumerable GetAll()
         {
-            var tableFile = SettingModule.Get(TabFilePath);
-            foreach (var row in tableFile)
+            foreach (var row in _instance._dict.Values)
             {
-                yield return ExampleInfo.Wrap(row);
+                yield return row;
             }
         }
-
-        public static ExampleInfo GetByPrimaryKey(object primaryKey)
+        
+        public static ExampleInfo GetByPrimaryKey(string primaryKey)
         {
-            var tableFile = SettingModule.Get(TabFilePath);
-            var row = tableFile.GetByPrimaryKey(primaryKey);
-            if (row == null) return null;
-            return ExampleInfo.Wrap(row);
+            ExampleInfo info;
+            if (_instance._dict.TryGetValue(primaryKey, out info)) return info;
+            return null;
         }
     }
+
 	/// <summary>
 	/// Auto Generate for Tab File: Example.bytes
     /// Singleton class for less memory use
 	/// </summary>
 	public partial class ExampleInfo : TableRowParser
 	{
-
-		private static ExampleInfo _instance;
-
-        public static ExampleInfo Wrap(TableRow row)
-        {
-            var inst = _instance ?? (_instance = new ExampleInfo());
-            inst._row = row;
-            return inst;
-        }
-
-        private TableRow _row;
-
-        private ExampleInfo()
-        {
-        }
-
 		
         /// <summary>
         /// ID Column/编号/主键
         /// </summary>
-        public string Id
-        {
-            get
-            {
-                return _row.Get_string(_row.Values[0], "");
-            }
-            set
-            {
-                _row[0] = value.ToString();
-            }
-        }
-		
+        public string Id { get; private set;}
+        
         /// <summary>
         /// Name/名字
         /// </summary>
-        public string Name
-        {
-            get
-            {
-                return _row.Get_string(_row.Values[1], "");
-            }
-            set
-            {
-                _row[1] = value.ToString();
-            }
-        }
-		
+        public string Name { get; private set;}
+        
         /// <summary>
         /// 用于组合成Id主键
         /// </summary>
-        public string KeyString
-        {
-            get
-            {
-                return _row.Get_string(_row.Values[2], "");
-            }
-            set
-            {
-                _row[2] = value.ToString();
-            }
-        }
-		
+        public string KeyString { get; private set;}
+        
         /// <summary>
         /// 数据测试
         /// </summary>
-        public int Number
-        {
-            get
-            {
-                return _row.Get_int(_row.Values[3], "");
-            }
-            set
-            {
-                _row[3] = value.ToString();
-            }
-        }
-		
+        public int Number { get; private set;}
+        
         /// <summary>
         /// ArrayTest/测试数组
         /// </summary>
-        public string[] StrArray
-        {
-            get
-            {
-                return _row.Get_string_array(_row.Values[4], "");
-            }
-            set
-            {
-                _row[4] = value.ToString();
-            }
-        }
-		
+        public string[] StrArray { get; private set;}
+        
         /// <summary>
         /// 字典测试
         /// </summary>
-        public Dictionary<string,int> StrIntMap
+        public Dictionary<string,int> StrIntMap { get; private set;}
+        
+
+        internal ExampleInfo(TableRow row)
         {
-            get
-            {
-                return _row.Get_Dictionary_string_int(_row.Values[5], "");
-            }
-            set
-            {
-                _row[5] = value.ToString();
-            }
+            Reload(row);
         }
-		
+
+        internal void Reload(TableRow row)
+        {
+        
+            Id = row.Get_string(row.Values[0], "");
+        
+            Name = row.Get_string(row.Values[1], "");
+        
+            KeyString = row.Get_string(row.Values[2], "");
+        
+            Number = row.Get_int(row.Values[3], "");
+        
+            StrArray = row.Get_string_array(row.Values[4], "");
+        
+            StrIntMap = row.Get_Dictionary_string_int(row.Values[5], "");
+        
+        }
+
+        /// <summary>
+        /// Get PrimaryKey from a table row
+        /// </summary>
+        /// <param name="row"></param>
+        /// <returns></returns>
+        public static string ParsePrimaryKey(TableRow row)
+        {
+            var primaryKey = row.Get_string(row.Values[0], "");
+            return primaryKey;
+        }
 	}
 
 	/// <summary>
@@ -185,82 +162,91 @@ namespace AppSettings
     public partial class SubdirExample2Infos
     {
 		public static readonly string TabFilePath = "Subdir/Example2.bytes";
+        static SubdirExample2Infos _instance = new SubdirExample2Infos();
+        Dictionary<int, SubdirExample2Info> _dict = new Dictionary<int, SubdirExample2Info>();
 
-        public static TableFile GetTableFile()
-        {
-            return SettingModule.Get(TabFilePath);
+	    private SubdirExample2Infos()
+	    {
+            ReloadAll();
         }
 
+	    public void ReloadAll()
+        {
+	        using (var tableFile = SettingModule.Get(TabFilePath))
+	        {
+	            foreach (var row in tableFile)
+	            {
+                    var pk = SubdirExample2Info.ParsePrimaryKey(row);
+                    SubdirExample2Info info;
+                    if (!_dict.TryGetValue(pk, out info))
+                    {
+                        info = new SubdirExample2Info(row);
+                        _dict[info.Id] = info;
+                    }
+                    else info.Reload(row);
+	            }
+	            
+	        }
+        }
+	    
         public static IEnumerable GetAll()
         {
-            var tableFile = SettingModule.Get(TabFilePath);
-            foreach (var row in tableFile)
+            foreach (var row in _instance._dict.Values)
             {
-                yield return SubdirExample2Info.Wrap(row);
+                yield return row;
             }
         }
-
-        public static SubdirExample2Info GetByPrimaryKey(object primaryKey)
+        
+        public static SubdirExample2Info GetByPrimaryKey(int primaryKey)
         {
-            var tableFile = SettingModule.Get(TabFilePath);
-            var row = tableFile.GetByPrimaryKey(primaryKey);
-            if (row == null) return null;
-            return SubdirExample2Info.Wrap(row);
+            SubdirExample2Info info;
+            if (_instance._dict.TryGetValue(primaryKey, out info)) return info;
+            return null;
         }
     }
+
 	/// <summary>
 	/// Auto Generate for Tab File: Subdir/Example2.bytes
     /// Singleton class for less memory use
 	/// </summary>
 	public partial class SubdirExample2Info : TableRowParser
 	{
-
-		private static SubdirExample2Info _instance;
-
-        public static SubdirExample2Info Wrap(TableRow row)
-        {
-            var inst = _instance ?? (_instance = new SubdirExample2Info());
-            inst._row = row;
-            return inst;
-        }
-
-        private TableRow _row;
-
-        private SubdirExample2Info()
-        {
-        }
-
 		
         /// <summary>
         /// ID Column/编号/主键
         /// </summary>
-        public string Id
-        {
-            get
-            {
-                return _row.Get_string(_row.Values[0], "");
-            }
-            set
-            {
-                _row[0] = value.ToString();
-            }
-        }
-		
+        public int Id { get; private set;}
+        
         /// <summary>
         /// Name/名字
         /// </summary>
-        public string Name
+        public string Name { get; private set;}
+        
+
+        internal SubdirExample2Info(TableRow row)
         {
-            get
-            {
-                return _row.Get_string(_row.Values[1], "");
-            }
-            set
-            {
-                _row[1] = value.ToString();
-            }
+            Reload(row);
         }
-		
+
+        internal void Reload(TableRow row)
+        {
+        
+            Id = row.Get_int(row.Values[0], "");
+        
+            Name = row.Get_string(row.Values[1], "");
+        
+        }
+
+        /// <summary>
+        /// Get PrimaryKey from a table row
+        /// </summary>
+        /// <param name="row"></param>
+        /// <returns></returns>
+        public static int ParsePrimaryKey(TableRow row)
+        {
+            var primaryKey = row.Get_int(row.Values[0], "");
+            return primaryKey;
+        }
 	}
 
 	/// <summary>
@@ -270,82 +256,91 @@ namespace AppSettings
     public partial class SubdirInfos
     {
 		public static readonly string TabFilePath = "Subdir/__.bytes";
+        static SubdirInfos _instance = new SubdirInfos();
+        Dictionary<string, SubdirInfo> _dict = new Dictionary<string, SubdirInfo>();
 
-        public static TableFile GetTableFile()
-        {
-            return SettingModule.Get(TabFilePath);
+	    private SubdirInfos()
+	    {
+            ReloadAll();
         }
 
+	    public void ReloadAll()
+        {
+	        using (var tableFile = SettingModule.Get(TabFilePath))
+	        {
+	            foreach (var row in tableFile)
+	            {
+                    var pk = SubdirInfo.ParsePrimaryKey(row);
+                    SubdirInfo info;
+                    if (!_dict.TryGetValue(pk, out info))
+                    {
+                        info = new SubdirInfo(row);
+                        _dict[info.Id] = info;
+                    }
+                    else info.Reload(row);
+	            }
+	            
+	        }
+        }
+	    
         public static IEnumerable GetAll()
         {
-            var tableFile = SettingModule.Get(TabFilePath);
-            foreach (var row in tableFile)
+            foreach (var row in _instance._dict.Values)
             {
-                yield return SubdirInfo.Wrap(row);
+                yield return row;
             }
         }
-
-        public static SubdirInfo GetByPrimaryKey(object primaryKey)
+        
+        public static SubdirInfo GetByPrimaryKey(string primaryKey)
         {
-            var tableFile = SettingModule.Get(TabFilePath);
-            var row = tableFile.GetByPrimaryKey(primaryKey);
-            if (row == null) return null;
-            return SubdirInfo.Wrap(row);
+            SubdirInfo info;
+            if (_instance._dict.TryGetValue(primaryKey, out info)) return info;
+            return null;
         }
     }
+
 	/// <summary>
 	/// Auto Generate for Tab File: Subdir/__.bytes
     /// Singleton class for less memory use
 	/// </summary>
 	public partial class SubdirInfo : TableRowParser
 	{
-
-		private static SubdirInfo _instance;
-
-        public static SubdirInfo Wrap(TableRow row)
-        {
-            var inst = _instance ?? (_instance = new SubdirInfo());
-            inst._row = row;
-            return inst;
-        }
-
-        private TableRow _row;
-
-        private SubdirInfo()
-        {
-        }
-
 		
         /// <summary>
         /// ID Column/编号/主键
         /// </summary>
-        public string Id
-        {
-            get
-            {
-                return _row.Get_string(_row.Values[0], "");
-            }
-            set
-            {
-                _row[0] = value.ToString();
-            }
-        }
-		
+        public string Id { get; private set;}
+        
         /// <summary>
         /// Name/名字
         /// </summary>
-        public string Name
+        public string Name { get; private set;}
+        
+
+        internal SubdirInfo(TableRow row)
         {
-            get
-            {
-                return _row.Get_string(_row.Values[1], "");
-            }
-            set
-            {
-                _row[1] = value.ToString();
-            }
+            Reload(row);
         }
-		
+
+        internal void Reload(TableRow row)
+        {
+        
+            Id = row.Get_string(row.Values[0], "");
+        
+            Name = row.Get_string(row.Values[1], "");
+        
+        }
+
+        /// <summary>
+        /// Get PrimaryKey from a table row
+        /// </summary>
+        /// <param name="row"></param>
+        /// <returns></returns>
+        public static string ParsePrimaryKey(TableRow row)
+        {
+            var primaryKey = row.Get_string(row.Values[0], "");
+            return primaryKey;
+        }
 	}
 
 	/// <summary>
@@ -355,82 +350,91 @@ namespace AppSettings
     public partial class SubdirSubSubDirExample3Infos
     {
 		public static readonly string TabFilePath = "Subdir/SubSubDir/Example3.bytes";
+        static SubdirSubSubDirExample3Infos _instance = new SubdirSubSubDirExample3Infos();
+        Dictionary<string, SubdirSubSubDirExample3Info> _dict = new Dictionary<string, SubdirSubSubDirExample3Info>();
 
-        public static TableFile GetTableFile()
-        {
-            return SettingModule.Get(TabFilePath);
+	    private SubdirSubSubDirExample3Infos()
+	    {
+            ReloadAll();
         }
 
+	    public void ReloadAll()
+        {
+	        using (var tableFile = SettingModule.Get(TabFilePath))
+	        {
+	            foreach (var row in tableFile)
+	            {
+                    var pk = SubdirSubSubDirExample3Info.ParsePrimaryKey(row);
+                    SubdirSubSubDirExample3Info info;
+                    if (!_dict.TryGetValue(pk, out info))
+                    {
+                        info = new SubdirSubSubDirExample3Info(row);
+                        _dict[info.Id] = info;
+                    }
+                    else info.Reload(row);
+	            }
+	            
+	        }
+        }
+	    
         public static IEnumerable GetAll()
         {
-            var tableFile = SettingModule.Get(TabFilePath);
-            foreach (var row in tableFile)
+            foreach (var row in _instance._dict.Values)
             {
-                yield return SubdirSubSubDirExample3Info.Wrap(row);
+                yield return row;
             }
         }
-
-        public static SubdirSubSubDirExample3Info GetByPrimaryKey(object primaryKey)
+        
+        public static SubdirSubSubDirExample3Info GetByPrimaryKey(string primaryKey)
         {
-            var tableFile = SettingModule.Get(TabFilePath);
-            var row = tableFile.GetByPrimaryKey(primaryKey);
-            if (row == null) return null;
-            return SubdirSubSubDirExample3Info.Wrap(row);
+            SubdirSubSubDirExample3Info info;
+            if (_instance._dict.TryGetValue(primaryKey, out info)) return info;
+            return null;
         }
     }
+
 	/// <summary>
 	/// Auto Generate for Tab File: Subdir/SubSubDir/Example3.bytes
     /// Singleton class for less memory use
 	/// </summary>
 	public partial class SubdirSubSubDirExample3Info : TableRowParser
 	{
-
-		private static SubdirSubSubDirExample3Info _instance;
-
-        public static SubdirSubSubDirExample3Info Wrap(TableRow row)
-        {
-            var inst = _instance ?? (_instance = new SubdirSubSubDirExample3Info());
-            inst._row = row;
-            return inst;
-        }
-
-        private TableRow _row;
-
-        private SubdirSubSubDirExample3Info()
-        {
-        }
-
 		
         /// <summary>
         /// ID Column/编号/主键
         /// </summary>
-        public string Id
-        {
-            get
-            {
-                return _row.Get_string(_row.Values[0], "");
-            }
-            set
-            {
-                _row[0] = value.ToString();
-            }
-        }
-		
+        public string Id { get; private set;}
+        
         /// <summary>
         /// Name/名字
         /// </summary>
-        public string Name
+        public string Name { get; private set;}
+        
+
+        internal SubdirSubSubDirExample3Info(TableRow row)
         {
-            get
-            {
-                return _row.Get_string(_row.Values[1], "");
-            }
-            set
-            {
-                _row[1] = value.ToString();
-            }
+            Reload(row);
         }
-		
+
+        internal void Reload(TableRow row)
+        {
+        
+            Id = row.Get_string(row.Values[0], "");
+        
+            Name = row.Get_string(row.Values[1], "");
+        
+        }
+
+        /// <summary>
+        /// Get PrimaryKey from a table row
+        /// </summary>
+        /// <param name="row"></param>
+        /// <returns></returns>
+        public static string ParsePrimaryKey(TableRow row)
+        {
+            var primaryKey = row.Get_string(row.Values[0], "");
+            return primaryKey;
+        }
 	}
  
 }
