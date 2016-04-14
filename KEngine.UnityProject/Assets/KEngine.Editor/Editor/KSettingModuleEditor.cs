@@ -41,6 +41,10 @@ namespace KEngine.Editor
     public class KSettingModuleEditor
     {
         /// <summary>
+        /// 是否自动在编译配置表时生成静态代码，如果不需要，外部设置false
+        /// </summary>
+        public static bool AutoGenerateCode = true;
+        /// <summary>
         /// 编译出的后缀名
         /// </summary>
         public static string SettingExtension = ".bytes";
@@ -258,15 +262,56 @@ namespace {{ NameSpace }}
                 Debug.Log("[KSettingModuleEditor]Watching directory: " + SettingSourcePath);
             }
         }
-        public static void CompileTabConfigs(string sourcePath, string compilePath, string genCodeFilePath, string changeExtension = ".bytes", bool force = false)
+
+        /// <summary>
+        /// Generate static code from settings
+        /// </summary>
+        /// <param name="templateVars"></param>
+        public static void GenerateCode(string genCodeFilePath, string nameSpace, List<Hash> files)
         {
+
             var codeTemplates = new Dictionary<string, string>()
             {
-                {GenCodeTemplate, "Assets/AppSettings.cs"},
+                {GenCodeTemplate, genCodeFilePath},
             };
 
-            var nameSpace = "AppSettings";
+            foreach (var kv in codeTemplates)
+            {
+                var templateStr = kv.Key;
+                var exportPath = kv.Value;
 
+                // 生成代码
+                var template = Template.Parse(templateStr);
+                var topHash = new Hash();
+                topHash["NameSpace"] = nameSpace;
+                topHash["Files"] = files;
+
+                if (!string.IsNullOrEmpty(exportPath))
+                {
+                    var genCode = template.Render(topHash);
+                    if (File.Exists(exportPath)) // 存在，比较是否相同
+                    {
+                        if (File.ReadAllText(exportPath) != genCode)
+                        {
+                            EditorUtility.ClearProgressBar();
+                            // 不同，会触发编译，强制停止Unity后再继续写入
+                            if (EditorApplication.isPlaying)
+                            {
+                                KLogger.LogError("[CAUTION]AppSettings code modified! Force stop Unity playing");
+                                EditorApplication.isPlaying = false;
+                            }
+                            File.WriteAllText(exportPath, genCode);
+                            return; // 防止Unity出现红色提示错误
+                        }
+                    }
+                    else
+                        File.WriteAllText(exportPath, genCode);
+
+                }
+            }
+        }
+        public static void CompileTabConfigs(string sourcePath, string compilePath, string genCodeFilePath, string changeExtension = ".bytes", bool force = false)
+        {
             // excel compiler
             var compiler = new Compiler(new CompilerConfig());
 
@@ -323,43 +368,16 @@ namespace {{ NameSpace }}
                     }
                 }
 
-
                 // 根据模板生成所有代码
-                foreach (var kv in codeTemplates)
+                if (!AutoGenerateCode)
                 {
-                    var templateStr = kv.Key;
-                    var exportPath = kv.Value;
-
-                    // 生成代码
-                    var template = Template.Parse(templateStr);
-                    var topHash = new Hash();
-                    topHash["NameSpace"] = nameSpace;
-                    topHash["Files"] = files;
-
-                    if (!string.IsNullOrEmpty(exportPath))
-                    {
-                        var genCode = template.Render(topHash);
-                        if (File.Exists(exportPath)) // 存在，比较是否相同
-                        {
-                            if (File.ReadAllText(exportPath) != genCode)
-                            {
-                                EditorUtility.ClearProgressBar();
-                                // 不同，会触发编译，强制停止Unity后再继续写入
-                                if (EditorApplication.isPlaying)
-                                {
-                                    KLogger.LogError("[CAUTION]AppSettings code modified! Force stop Unity playing");
-                                    EditorApplication.isPlaying = false;
-                                }
-                                File.WriteAllText(exportPath, genCode);
-                                return; // 防止Unity出现红色提示错误
-                            }
-                        }
-                        else
-                            File.WriteAllText(exportPath, genCode);
-
-                    }
+                    KLogger.LogWarning("Ignore Gen Settings code");
                 }
-
+                else
+                {
+                    var nameSpace = "AppSettings";
+                    GenerateCode(genCodeFilePath, nameSpace, files);
+                }
 
             }
             finally
@@ -382,6 +400,12 @@ namespace {{ NameSpace }}
         {
             DoCompileSettings(true);
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="force">Whether or not,check diff.  false will be faster!</param>
+        /// <param name="genCode">Generate static code?</param>
         public static void DoCompileSettings(bool force = true)
         {
             var sourcePath = SettingSourcePath;//AppEngine.GetConfig("SettingSourcePath");

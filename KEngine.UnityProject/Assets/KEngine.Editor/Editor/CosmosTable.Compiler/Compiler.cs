@@ -258,9 +258,13 @@ namespace CosmosTable
 			// 未处理路径的类名, 去掉后缀扩展名
             var classNameOrigin = Path.ChangeExtension(tabFilePath, null);
 
-            renderVars.ClassName = string.Join("",
-                (from name in classNameOrigin.Replace("/", "_").Replace("\\", "_").Replace(" ", "").Split(new char[]{'_'}, StringSplitOptions.RemoveEmptyEntries)
-                 select name).ToArray());
+            var className = classNameOrigin.Replace("/", "_").Replace("\\", "_");
+            className = className.Replace(" ", "");
+            className = string.Join("", (from name
+                in className.Split(new[] {'_'}, StringSplitOptions.RemoveEmptyEntries)
+                select (name[0].ToString().ToUpper() + name.Substring(1, name.Length - 1)))
+                .ToArray());
+            renderVars.ClassName = className;
             renderVars.TabFilePath = tabFilePath;
 
             return renderVars;
