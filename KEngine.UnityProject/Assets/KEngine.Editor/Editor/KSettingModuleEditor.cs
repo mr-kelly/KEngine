@@ -109,6 +109,23 @@ namespace {{ NameSpace }}
                 return _settingsList;
             }
         }
+#if UNITY_EDITOR
+        static bool HasAllReload = false;
+        [UnityEditor.MenuItem(""KEngine/Settings/Try Reload All Settings Code"")]
+	    public static void AllSettingsReload()
+	    {
+	        for (var i = 0; i < SettingsList.Length; i++)
+	        {
+	            var settings = SettingsList[i];
+                if (HasAllReload) settings.ReloadAll();
+                HasAllReload = true;
+
+	            KLogger.Log(""Reload settings: {0}, Row Count: {1}"", settings.GetType(), settings.Count);
+
+	        }
+	    }
+
+#endif
     }
 
 {% for file in Files %}
@@ -119,7 +136,7 @@ namespace {{ NameSpace }}
     public partial class {{file.ClassName}}Settings : IReloadableSettings
     {
 		public static readonly string TabFilePath = ""{{ file.TabFilePath }}"";
-        static readonly {{file.ClassName}}Settings _instance = new {{file.ClassName}}Settings();
+        static {{file.ClassName}}Settings _instance;
         Dictionary<{{ file.PrimaryKeyField.FormatType }}, {{file.ClassName}}Setting> _dict = new Dictionary<{{ file.PrimaryKeyField.FormatType }}, {{file.ClassName}}Setting>();
 
         /// <summary>
@@ -133,20 +150,6 @@ namespace {{ NameSpace }}
         /// </summary>
 	    private {{file.ClassName}}Settings()
 	    {
-            ReloadAll();
-#if UNITY_EDITOR
-	        if (SettingModule.IsFileSystemMode)
-	        {
-	            SettingModule.WatchSetting(TabFilePath, (path) =>
-	            {
-	                if (path.Replace(""\\"", ""/"").EndsWith(path))
-	                {
-                        ReloadAll();
-	                    KLogger.LogConsole_MultiThread(""Reload success! -> "" + path);
-	                }
-	            });
-	        }
-#endif
         }
 
         /// <summary>
@@ -155,8 +158,35 @@ namespace {{ NameSpace }}
         /// <returns></returns>
 	    public static {{file.ClassName}}Settings GetInstance()
 	    {
+            if (_instance == null) 
+            {
+                _instance = new {{file.ClassName}}Settings();
+
+                _instance.ReloadAll();
+    #if UNITY_EDITOR
+                if (SettingModule.IsFileSystemMode)
+                {
+                    SettingModule.WatchSetting(TabFilePath, (path) =>
+                    {
+                        if (path.Replace(""\\"", ""/"").EndsWith(path))
+                        {
+                            _instance.ReloadAll();
+                            KLogger.LogConsole_MultiThread(""Reload success! -> "" + path);
+                        }
+                    });
+                }
+    #endif
+            }
 	        return _instance;
 	    }
+        
+        public int Count
+        {
+            get
+            {
+                return _dict.Count;
+            }
+        }
 
         /// <summary>
         /// Do reload the setting file
@@ -186,7 +216,7 @@ namespace {{ NameSpace }}
 	    
         public static IEnumerable GetAll()
         {
-            foreach (var row in _instance._dict.Values)
+            foreach (var row in GetInstance()._dict.Values)
             {
                 yield return row;
             }
@@ -195,7 +225,7 @@ namespace {{ NameSpace }}
         public static {{file.ClassName}}Setting GetByPrimaryKey({{ file.PrimaryKeyField.FormatType }} primaryKey)
         {
             {{file.ClassName}}Setting setting;
-            if (_instance._dict.TryGetValue(primaryKey, out setting)) return setting;
+            if (GetInstance()._dict.TryGetValue(primaryKey, out setting)) return setting;
             return null;
         }
     }

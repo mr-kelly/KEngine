@@ -36,6 +36,7 @@ namespace KEngine.Modules
     public interface IReloadableSettings
     {
         void ReloadAll();
+        int Count { get; }
     }
     /// <summary>
     /// 带有惰式加载的数据表加载器基类，

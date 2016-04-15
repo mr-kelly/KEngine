@@ -56,6 +56,23 @@ namespace AppSettings
                 return _settingsList;
             }
         }
+#if UNITY_EDITOR
+        static bool HasAllReload = false;
+        [UnityEditor.MenuItem("KEngine/Settings/Try Reload All Settings Code")]
+	    public static void AllSettingsReload()
+	    {
+	        for (var i = 0; i < SettingsList.Length; i++)
+	        {
+	            var settings = SettingsList[i];
+                if (HasAllReload) settings.ReloadAll();
+                HasAllReload = true;
+
+	            KLogger.Log("Reload settings: {0}, Row Count: {1}", settings.GetType(), settings.Count);
+
+	        }
+	    }
+
+#endif
     }
 
 
@@ -66,7 +83,7 @@ namespace AppSettings
     public partial class ExampleSettings : IReloadableSettings
     {
 		public static readonly string TabFilePath = "Example.bytes";
-        static readonly ExampleSettings _instance = new ExampleSettings();
+        static ExampleSettings _instance;
         Dictionary<string, ExampleSetting> _dict = new Dictionary<string, ExampleSetting>();
 
         /// <summary>
@@ -80,20 +97,6 @@ namespace AppSettings
         /// </summary>
 	    private ExampleSettings()
 	    {
-            ReloadAll();
-#if UNITY_EDITOR
-	        if (SettingModule.IsFileSystemMode)
-	        {
-	            SettingModule.WatchSetting(TabFilePath, (path) =>
-	            {
-	                if (path.Replace("\\", "/").EndsWith(path))
-	                {
-                        ReloadAll();
-	                    KLogger.LogConsole_MultiThread("Reload success! -> " + path);
-	                }
-	            });
-	        }
-#endif
         }
 
         /// <summary>
@@ -102,8 +105,35 @@ namespace AppSettings
         /// <returns></returns>
 	    public static ExampleSettings GetInstance()
 	    {
+            if (_instance == null) 
+            {
+                _instance = new ExampleSettings();
+
+                _instance.ReloadAll();
+    #if UNITY_EDITOR
+                if (SettingModule.IsFileSystemMode)
+                {
+                    SettingModule.WatchSetting(TabFilePath, (path) =>
+                    {
+                        if (path.Replace("\\", "/").EndsWith(path))
+                        {
+                            _instance.ReloadAll();
+                            KLogger.LogConsole_MultiThread("Reload success! -> " + path);
+                        }
+                    });
+                }
+    #endif
+            }
 	        return _instance;
 	    }
+        
+        public int Count
+        {
+            get
+            {
+                return _dict.Count;
+            }
+        }
 
         /// <summary>
         /// Do reload the setting file
@@ -133,7 +163,7 @@ namespace AppSettings
 	    
         public static IEnumerable GetAll()
         {
-            foreach (var row in _instance._dict.Values)
+            foreach (var row in GetInstance()._dict.Values)
             {
                 yield return row;
             }
@@ -142,7 +172,7 @@ namespace AppSettings
         public static ExampleSetting GetByPrimaryKey(string primaryKey)
         {
             ExampleSetting setting;
-            if (_instance._dict.TryGetValue(primaryKey, out setting)) return setting;
+            if (GetInstance()._dict.TryGetValue(primaryKey, out setting)) return setting;
             return null;
         }
     }
@@ -219,7 +249,7 @@ namespace AppSettings
     public partial class SubdirExample2Settings : IReloadableSettings
     {
 		public static readonly string TabFilePath = "Subdir/Example2.bytes";
-        static readonly SubdirExample2Settings _instance = new SubdirExample2Settings();
+        static SubdirExample2Settings _instance;
         Dictionary<int, SubdirExample2Setting> _dict = new Dictionary<int, SubdirExample2Setting>();
 
         /// <summary>
@@ -233,20 +263,6 @@ namespace AppSettings
         /// </summary>
 	    private SubdirExample2Settings()
 	    {
-            ReloadAll();
-#if UNITY_EDITOR
-	        if (SettingModule.IsFileSystemMode)
-	        {
-	            SettingModule.WatchSetting(TabFilePath, (path) =>
-	            {
-	                if (path.Replace("\\", "/").EndsWith(path))
-	                {
-                        ReloadAll();
-	                    KLogger.LogConsole_MultiThread("Reload success! -> " + path);
-	                }
-	            });
-	        }
-#endif
         }
 
         /// <summary>
@@ -255,8 +271,35 @@ namespace AppSettings
         /// <returns></returns>
 	    public static SubdirExample2Settings GetInstance()
 	    {
+            if (_instance == null) 
+            {
+                _instance = new SubdirExample2Settings();
+
+                _instance.ReloadAll();
+    #if UNITY_EDITOR
+                if (SettingModule.IsFileSystemMode)
+                {
+                    SettingModule.WatchSetting(TabFilePath, (path) =>
+                    {
+                        if (path.Replace("\\", "/").EndsWith(path))
+                        {
+                            _instance.ReloadAll();
+                            KLogger.LogConsole_MultiThread("Reload success! -> " + path);
+                        }
+                    });
+                }
+    #endif
+            }
 	        return _instance;
 	    }
+        
+        public int Count
+        {
+            get
+            {
+                return _dict.Count;
+            }
+        }
 
         /// <summary>
         /// Do reload the setting file
@@ -286,7 +329,7 @@ namespace AppSettings
 	    
         public static IEnumerable GetAll()
         {
-            foreach (var row in _instance._dict.Values)
+            foreach (var row in GetInstance()._dict.Values)
             {
                 yield return row;
             }
@@ -295,7 +338,7 @@ namespace AppSettings
         public static SubdirExample2Setting GetByPrimaryKey(int primaryKey)
         {
             SubdirExample2Setting setting;
-            if (_instance._dict.TryGetValue(primaryKey, out setting)) return setting;
+            if (GetInstance()._dict.TryGetValue(primaryKey, out setting)) return setting;
             return null;
         }
     }
@@ -348,7 +391,7 @@ namespace AppSettings
     public partial class SubdirSettings : IReloadableSettings
     {
 		public static readonly string TabFilePath = "Subdir/__.bytes";
-        static readonly SubdirSettings _instance = new SubdirSettings();
+        static SubdirSettings _instance;
         Dictionary<string, SubdirSetting> _dict = new Dictionary<string, SubdirSetting>();
 
         /// <summary>
@@ -362,20 +405,6 @@ namespace AppSettings
         /// </summary>
 	    private SubdirSettings()
 	    {
-            ReloadAll();
-#if UNITY_EDITOR
-	        if (SettingModule.IsFileSystemMode)
-	        {
-	            SettingModule.WatchSetting(TabFilePath, (path) =>
-	            {
-	                if (path.Replace("\\", "/").EndsWith(path))
-	                {
-                        ReloadAll();
-	                    KLogger.LogConsole_MultiThread("Reload success! -> " + path);
-	                }
-	            });
-	        }
-#endif
         }
 
         /// <summary>
@@ -384,8 +413,35 @@ namespace AppSettings
         /// <returns></returns>
 	    public static SubdirSettings GetInstance()
 	    {
+            if (_instance == null) 
+            {
+                _instance = new SubdirSettings();
+
+                _instance.ReloadAll();
+    #if UNITY_EDITOR
+                if (SettingModule.IsFileSystemMode)
+                {
+                    SettingModule.WatchSetting(TabFilePath, (path) =>
+                    {
+                        if (path.Replace("\\", "/").EndsWith(path))
+                        {
+                            _instance.ReloadAll();
+                            KLogger.LogConsole_MultiThread("Reload success! -> " + path);
+                        }
+                    });
+                }
+    #endif
+            }
 	        return _instance;
 	    }
+        
+        public int Count
+        {
+            get
+            {
+                return _dict.Count;
+            }
+        }
 
         /// <summary>
         /// Do reload the setting file
@@ -415,7 +471,7 @@ namespace AppSettings
 	    
         public static IEnumerable GetAll()
         {
-            foreach (var row in _instance._dict.Values)
+            foreach (var row in GetInstance()._dict.Values)
             {
                 yield return row;
             }
@@ -424,7 +480,7 @@ namespace AppSettings
         public static SubdirSetting GetByPrimaryKey(string primaryKey)
         {
             SubdirSetting setting;
-            if (_instance._dict.TryGetValue(primaryKey, out setting)) return setting;
+            if (GetInstance()._dict.TryGetValue(primaryKey, out setting)) return setting;
             return null;
         }
     }
@@ -477,7 +533,7 @@ namespace AppSettings
     public partial class SubdirSubSubDirExample3Settings : IReloadableSettings
     {
 		public static readonly string TabFilePath = "Subdir/SubSubDir/Example3.bytes";
-        static readonly SubdirSubSubDirExample3Settings _instance = new SubdirSubSubDirExample3Settings();
+        static SubdirSubSubDirExample3Settings _instance;
         Dictionary<string, SubdirSubSubDirExample3Setting> _dict = new Dictionary<string, SubdirSubSubDirExample3Setting>();
 
         /// <summary>
@@ -491,20 +547,6 @@ namespace AppSettings
         /// </summary>
 	    private SubdirSubSubDirExample3Settings()
 	    {
-            ReloadAll();
-#if UNITY_EDITOR
-	        if (SettingModule.IsFileSystemMode)
-	        {
-	            SettingModule.WatchSetting(TabFilePath, (path) =>
-	            {
-	                if (path.Replace("\\", "/").EndsWith(path))
-	                {
-                        ReloadAll();
-	                    KLogger.LogConsole_MultiThread("Reload success! -> " + path);
-	                }
-	            });
-	        }
-#endif
         }
 
         /// <summary>
@@ -513,8 +555,35 @@ namespace AppSettings
         /// <returns></returns>
 	    public static SubdirSubSubDirExample3Settings GetInstance()
 	    {
+            if (_instance == null) 
+            {
+                _instance = new SubdirSubSubDirExample3Settings();
+
+                _instance.ReloadAll();
+    #if UNITY_EDITOR
+                if (SettingModule.IsFileSystemMode)
+                {
+                    SettingModule.WatchSetting(TabFilePath, (path) =>
+                    {
+                        if (path.Replace("\\", "/").EndsWith(path))
+                        {
+                            _instance.ReloadAll();
+                            KLogger.LogConsole_MultiThread("Reload success! -> " + path);
+                        }
+                    });
+                }
+    #endif
+            }
 	        return _instance;
 	    }
+        
+        public int Count
+        {
+            get
+            {
+                return _dict.Count;
+            }
+        }
 
         /// <summary>
         /// Do reload the setting file
@@ -544,7 +613,7 @@ namespace AppSettings
 	    
         public static IEnumerable GetAll()
         {
-            foreach (var row in _instance._dict.Values)
+            foreach (var row in GetInstance()._dict.Values)
             {
                 yield return row;
             }
@@ -553,7 +622,7 @@ namespace AppSettings
         public static SubdirSubSubDirExample3Setting GetByPrimaryKey(string primaryKey)
         {
             SubdirSubSubDirExample3Setting setting;
-            if (_instance._dict.TryGetValue(primaryKey, out setting)) return setting;
+            if (GetInstance()._dict.TryGetValue(primaryKey, out setting)) return setting;
             return null;
         }
     }
