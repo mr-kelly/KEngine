@@ -448,7 +448,6 @@ public class KTool
     {
         return ((ulong) high) << 32 | low;
     }
-
     public static uint HiInt(ulong l)
     {
         return (uint) (l >> 32);

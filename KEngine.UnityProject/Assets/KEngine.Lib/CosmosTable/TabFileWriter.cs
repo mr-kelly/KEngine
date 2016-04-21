@@ -81,8 +81,7 @@ namespace CosmosTable
         public TableRow NewRow()
         {
             int rowId = TabFile.Rows.Count + 1;
-            var newRow = new TableRow();
-            newRow.RowNumber = rowId;
+            var newRow = new TableRow(rowId, TabFile.Headers);
 
             TabFile.Rows.Add(rowId, newRow);
 

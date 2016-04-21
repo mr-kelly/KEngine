@@ -15,6 +15,7 @@ namespace CosmosTable
         NotFoundHeader,
         NotFoundGetMethod,
         NotFoundPrimaryKey,
+        NotFoundRow,
     }
 
     /// <summary>
@@ -157,9 +158,7 @@ namespace CosmosTable
 
                     TabInfo[rowIndex] = splitString1;
 
-                    TableRow newT = new TableRow();  // the New Object may not be used this time, so cache it!
-                    newT.RowNumber = rowIndex;
-                    newT.HeaderInfos = Headers; // pass header info into
+                    TableRow newT = new TableRow(rowIndex, Headers);  // the New Object may not be used this time, so cache it!
 
                     //if (!newT.IsAutoParse)
                     newT.Parse(splitString1);
@@ -346,7 +345,8 @@ namespace CosmosTable
             TableRow rowT;
             if (!Rows.TryGetValue(row, out rowT))
             {
-                rowT = Rows[row] = new TableRow();
+                OnException(TableFileExceptionType.NotFoundRow);
+                return null;
             }
 
             return rowT;

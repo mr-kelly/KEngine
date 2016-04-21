@@ -107,9 +107,11 @@ namespace CosmosTable
         /// </summary>
         public int RowNumber { get; internal set; }
 
-        public TableRow()
+        internal TableRow(int rowNumber, Dictionary<string, HeaderInfo> headerInfos)
         {
-            RowNumber = 0;
+            RowNumber = rowNumber;
+            HeaderInfos = headerInfos;
+            Values = new string[headerInfos.Count];
         }
 
         /// <summary>
@@ -205,13 +207,4 @@ namespace CosmosTable
             }
         }
     }
-
-    /// <summary>
-    /// Default Tab Row
-    /// Store All column Values
-    /// </summary>
-    public class DefaultTableRow : TableRow
-    {
-    }
-
 }
