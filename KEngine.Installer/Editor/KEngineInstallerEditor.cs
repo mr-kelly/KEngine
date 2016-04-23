@@ -153,18 +153,19 @@ namespace KEngine.Installer
 
         public static void UnInstall()
         {
-            if (Directory.Exists(KEngineInstallDirPath))
+            if (Directory.Exists(KEngineEditorInstallDirPath))
             {
-                Directory.Delete(KEngineInstallDirPath, true);
+                Directory.Delete(KEngineEditorInstallDirPath, true);
             }
-
             AssetDatabase.DeleteAsset(KEngineEditorInstallDirPath);
+
             Debug.Log("UnInstall dir: " + KEngineEditorInstallDirPath);
 
             if (Directory.Exists(KEngineInstallDirPath))
             {
-                AssetDatabase.DeleteAsset(KEngineInstallDirPath);
+                Directory.Delete(KEngineInstallDirPath, true);
             }
+            AssetDatabase.DeleteAsset(KEngineInstallDirPath);
             Debug.Log("UnInstall dir: " + KEngineInstallDirPath);
         }
 

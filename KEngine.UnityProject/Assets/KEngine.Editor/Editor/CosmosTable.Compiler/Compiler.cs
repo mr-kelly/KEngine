@@ -119,8 +119,6 @@ namespace CosmosTable
             var renderVars = new RenderTemplateVars();
             renderVars.FieldsInternal = new List<RenderFieldVars>();
 
-            //var sheet1 = result.Tables[0];
-
             var strBuilder = new StringBuilder();
             var ignoreColumns = new HashSet<int>();
             // Header Column
@@ -190,38 +188,40 @@ namespace CosmosTable
             }
             strBuilder.Append("\n");
 
-            // Data Rows
-            //var rowIndex = 1;
-            //foreach (DataRow dRow in sheet1.Rows)
-            for (var startRow = 0; startRow < excelFile.GetRowsCount(); startRow++)
+            if (doCompile)
             {
-                var columnCount = excelFile.GetColumnCount();
-                for (var loopColumn = 0; loopColumn < columnCount; loopColumn++)
+                // 如果不需要真编译，获取头部信息就够了
+                // Data Rows
+                for (var startRow = 0; startRow < excelFile.GetRowsCount(); startRow++)
                 {
-                    if (!ignoreColumns.Contains(loopColumn)) // comment column, ignore 注释列忽略
+                    var columnCount = excelFile.GetColumnCount();
+                    for (var loopColumn = 0; loopColumn < columnCount; loopColumn++)
                     {
-                        var columnName = excelFile.Index2ColName[loopColumn];
-                        var cellStr = excelFile.GetString(columnName, startRow);
-
-                        if (loopColumn == 0)
+                        if (!ignoreColumns.Contains(loopColumn)) // comment column, ignore 注释列忽略
                         {
-                            if (CheckCommentString(cellStr)) // 如果行首为#注释字符，忽略这一行)
+                            var columnName = excelFile.Index2ColName[loopColumn];
+                            var cellStr = excelFile.GetString(columnName, startRow);
+
+                            if (loopColumn == 0)
                             {
-                                break;
+                                if (CheckCommentString(cellStr)) // 如果行首为#注释字符，忽略这一行)
+                                {
+                                    break;
+                                }
+                                if (startRow != 0) // 不是第一行，往添加换行，首列
+                                    strBuilder.Append("\n");
                             }
-                            if (startRow != 0) // 不是第一行，往添加换行，首列
-                                strBuilder.Append("\n");
+
+                            if (loopColumn > 0 && loopColumn != (columnCount - 1)) // 最后一列不需加tab
+                                strBuilder.Append("\t");
+
+                            // 如果单元格是字符串，换行符改成\\n
+                            cellStr = cellStr.Replace("\n", "\\n");
+                            strBuilder.Append(cellStr);
+
                         }
 
-                        if (loopColumn > 0 && loopColumn != (columnCount - 1)) // 最后一列不需加tab
-                            strBuilder.Append("\t");
-
-                        // 如果单元格是字符串，换行符改成\\n
-                        cellStr = cellStr.Replace("\n", "\\n");
-                        strBuilder.Append(cellStr);
-
                     }
-
                 }
             }
             
