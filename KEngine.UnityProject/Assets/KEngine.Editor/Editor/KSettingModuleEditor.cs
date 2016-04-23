@@ -387,21 +387,30 @@ namespace {{ NameSpace }}
                             }
                         }
                         if (doCompile)
+                        {
                             KLogger.LogWarning("[SettingModule]Compile from {0} to {1}", excelPath, compileToPath);
-                        var templateVar = compiler.Compile(excelPath, compileToPath, compileBaseDir, doCompile);
 
-                        var renderTemplateHash = Hash.FromAnonymousObject(templateVar);
-                        files.Add(renderTemplateHash);
+                            var templateVar = compiler.Compile(excelPath, compileToPath, compileBaseDir, doCompile);
 
-                        var compiledFileInfo = new FileInfo(compileToPath);
-                        compiledFileInfo.LastWriteTime = srcFileInfo.LastWriteTime;
+                            // 添加模板值
+                            var renderTemplateHash = Hash.FromAnonymousObject(templateVar);
+                            files.Add(renderTemplateHash);
+
+                            var compiledFileInfo = new FileInfo(compileToPath);
+                            compiledFileInfo.LastWriteTime = srcFileInfo.LastWriteTime;
+                            
+                        }
                     }
                 }
 
-                // 根据模板生成所有代码
+                // 根据模板生成所有代码,  如果不是强制重建，无需进行代码编译
                 if (!AutoGenerateCode)
                 {
                     KLogger.LogWarning("Ignore Gen Settings code");
+                }
+                else if (!force)
+                {
+                    KLogger.LogWarning("Ignore Gen Settings Code, not a forcing compiling");
                 }
                 else
                 {
@@ -425,10 +434,15 @@ namespace {{ NameSpace }}
             }
         }
 
-        [MenuItem("KEngine/Settings/Force Compile Settings")]
+        [MenuItem("KEngine/Settings/Force Compile Settings + Code")]
         public static void CompileSettings()
         {
             DoCompileSettings(true);
+        }
+        [MenuItem("KEngine/Settings/Quick Compile Settings")]
+        public static void QuickCompileSettings()
+        {
+            DoCompileSettings(false);
         }
 
         /// <summary>
