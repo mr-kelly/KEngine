@@ -69,14 +69,14 @@ public class KUGUIDemoMain : MonoBehaviour
             Debug.Log(string.Format("Name: {0}", exampleInfo.Name));
             Debug.Log(string.Format("Number: {0}", exampleInfo.Number));
         }
-        var info = ExampleSettings.GetByPrimaryKey("A_1024");
+        var info = ExampleSettings.Get("A_1024");
         Debuger.Assert(info.Name == "Test1");
-        var info2 = SubdirExample2Settings.GetByPrimaryKey(2);
+        var info2 = SubdirExample2Settings.Get(2);
         Debuger.Assert(info2.Name == "Test2");
 
         ExampleSettings.OnReload = () =>
         {
-            var reloadedInfo = ExampleSettings.GetByPrimaryKey("C_9888");
+            var reloadedInfo = ExampleSettings.Get("C_9888");
             KLogger.Log("Reload ExampleInfos! Now info: {0} -> {1}", "C_9888", reloadedInfo.Name);
         };
     }

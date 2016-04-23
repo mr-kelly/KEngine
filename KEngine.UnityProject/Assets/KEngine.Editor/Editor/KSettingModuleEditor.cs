@@ -222,7 +222,7 @@ namespace {{ NameSpace }}
             }
         }
         
-        public static {{file.ClassName}}Setting GetByPrimaryKey({{ file.PrimaryKeyField.FormatType }} primaryKey)
+        public static {{file.ClassName}}Setting Get({{ file.PrimaryKeyField.FormatType }} primaryKey)
         {
             {{file.ClassName}}Setting setting;
             if (GetInstance()._dict.TryGetValue(primaryKey, out setting)) return setting;

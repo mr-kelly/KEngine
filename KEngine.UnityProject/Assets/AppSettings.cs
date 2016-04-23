@@ -169,7 +169,7 @@ namespace AppSettings
             }
         }
         
-        public static ExampleSetting GetByPrimaryKey(string primaryKey)
+        public static ExampleSetting Get(string primaryKey)
         {
             ExampleSetting setting;
             if (GetInstance()._dict.TryGetValue(primaryKey, out setting)) return setting;
@@ -335,7 +335,7 @@ namespace AppSettings
             }
         }
         
-        public static SubdirExample2Setting GetByPrimaryKey(int primaryKey)
+        public static SubdirExample2Setting Get(int primaryKey)
         {
             SubdirExample2Setting setting;
             if (GetInstance()._dict.TryGetValue(primaryKey, out setting)) return setting;
@@ -477,7 +477,7 @@ namespace AppSettings
             }
         }
         
-        public static SubdirSetting GetByPrimaryKey(string primaryKey)
+        public static SubdirSetting Get(string primaryKey)
         {
             SubdirSetting setting;
             if (GetInstance()._dict.TryGetValue(primaryKey, out setting)) return setting;
@@ -619,7 +619,7 @@ namespace AppSettings
             }
         }
         
-        public static SubdirSubSubDirExample3Setting GetByPrimaryKey(string primaryKey)
+        public static SubdirSubSubDirExample3Setting Get(string primaryKey)
         {
             SubdirSubSubDirExample3Setting setting;
             if (GetInstance()._dict.TryGetValue(primaryKey, out setting)) return setting;
