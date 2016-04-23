@@ -280,7 +280,7 @@ namespace CosmosTable
         {
             foreach (var commentStartsWith in _config.CommentColumnStartsWith)
             {
-                if (colNameStr.StartsWith(commentStartsWith))
+                if (colNameStr.ToLower().StartsWith(commentStartsWith.ToLower()))
                 {
                     return true;
                 }
