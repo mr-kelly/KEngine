@@ -38,7 +38,7 @@ namespace KEngine.Modules
         /// <param name="path"></param>
         /// <param name="useCache"></param>
         /// <returns></returns>
-        public static TableFile Get(string path, bool useCache = false)
+        public static TableFile Get(string path, bool useCache = true)
         {
             if (_instance == null)
                 _instance = new SettingModule();
