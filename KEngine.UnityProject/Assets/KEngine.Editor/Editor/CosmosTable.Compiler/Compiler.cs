@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using DotLiquid;
 
 namespace CosmosTable
 {
@@ -20,38 +19,25 @@ namespace CosmosTable
     }
 
     /// <summary>
-    /// 用来进行模板渲染
+    /// 返回编译结果
     /// </summary>
-    public class RenderTemplateVars
+    public class TableCompileResult
     {
         public string TabFilePath { get; set; }
         public string ClassName { get; set; }
-        public List<RenderFieldVars> FieldsInternal { get; set; } // column + type
+        public List<TableColumnVars> FieldsInternal { get; set; } // column + type
 
-        public List<Hash> Fields
-        {
-            get { return (from f in FieldsInternal select Hash.FromAnonymousObject(f)).ToList(); }
-        }
-
-        /// <summary>
-        /// Get primary key, the first column field
-        /// </summary>
-        public Hash PrimaryKeyField
-        {
-            get { return Fields[0]; }
-        }
-
-        public List<Hash> Columns2DefaultValus { get; set; } // column + Default Values
         public string PrimaryKey { get; set; }
+        public SimpleExcelFile ExcelFile { get; internal set; }
 
-        public RenderTemplateVars()
+        public TableCompileResult()
         {
-            FieldsInternal = new List<RenderFieldVars>();
-            Columns2DefaultValus = new List<Hash>();
+            FieldsInternal = new List<TableColumnVars>();
         }
+
     }
 
-    public class RenderFieldVars
+    public class TableColumnVars
     {
         public int Index { get; set; }
         public string Type { get; set; }
@@ -114,10 +100,11 @@ namespace CosmosTable
             _config = cfg;
         }
 
-        private RenderTemplateVars DoCompilerExcelReader(string path, SimpleExcelFile excelFile, string compileToFilePath = null, string compileBaseDir = null, bool doCompile = true)
+        private TableCompileResult DoCompilerExcelReader(string path, SimpleExcelFile excelFile, string compileToFilePath = null, string compileBaseDir = null, bool doCompile = true)
         {
-            var renderVars = new RenderTemplateVars();
-            renderVars.FieldsInternal = new List<RenderFieldVars>();
+            var renderVars = new TableCompileResult();
+            renderVars.ExcelFile = excelFile;
+            renderVars.FieldsInternal = new List<TableColumnVars>();
 
             var strBuilder = new StringBuilder();
             var ignoreColumns = new HashSet<int>();
@@ -160,7 +147,7 @@ namespace CosmosTable
                             }
                         }
 
-                        renderVars.FieldsInternal.Add(new RenderFieldVars
+                        renderVars.FieldsInternal.Add(new TableColumnVars
                         {
                             Index = colIndex,
                             Type = typeName,
@@ -296,7 +283,7 @@ namespace CosmosTable
         /// <param name="compileBaseDir"></param>
         /// <param name="doRealCompile">Real do, or just get the template var?</param>
         /// <returns></returns>
-        public RenderTemplateVars Compile(string path, string compileToFilePath = null, string compileBaseDir = null, bool doRealCompile = true)
+        public TableCompileResult Compile(string path, string compileToFilePath = null, string compileBaseDir = null, bool doRealCompile = true)
         {
             // 确保目录存在
             var compileToFileDirPath = Path.GetDirectoryName(compileToFilePath);

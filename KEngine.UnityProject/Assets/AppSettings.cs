@@ -36,7 +36,7 @@ namespace AppSettings
 	/// <summary>
     /// All settings list here, so you can reload all settings manully from the list.
 	/// </summary>
-    public class SettingsDefine
+    public partial class SettingsDefine
     {
         private static IReloadableSettings[] _settingsList;
         public static IReloadableSettings[] SettingsList
@@ -47,6 +47,7 @@ namespace AppSettings
                 {
                     _settingsList = new IReloadableSettings[]
                     { 
+                        AppConfigSettings.GetInstance(),
                         ExampleSettings.GetInstance(),
                         SubdirExample2Settings.GetInstance(),
                         SubdirSettings.GetInstance(),
@@ -75,6 +76,158 @@ namespace AppSettings
 #endif
     }
 
+
+	/// <summary>
+	/// Auto Generate for Tab File: AppConfig.bytes
+    /// No use of generic and reflection, for better performance,  less IL code generating
+	/// </summary>>
+    public partial class AppConfigSettings : IReloadableSettings
+    {
+		public static readonly string TabFilePath = "AppConfig.bytes";
+        static AppConfigSettings _instance;
+        Dictionary<string, AppConfigSetting> _dict = new Dictionary<string, AppConfigSetting>();
+
+        /// <summary>
+        /// Trigger delegate when reload the Settings
+        /// </summary>>
+	    public static System.Action OnReload;
+
+        /// <summary>
+        /// Constructor, just reload(init)
+        /// When Unity Editor mode, will watch the file modification and auto reload
+        /// </summary>
+	    private AppConfigSettings()
+	    {
+        }
+
+        /// <summary>
+        /// Get the singleton
+        /// </summary>
+        /// <returns></returns>
+	    public static AppConfigSettings GetInstance()
+	    {
+            if (_instance == null) 
+            {
+                _instance = new AppConfigSettings();
+
+                _instance.ReloadAll();
+    #if UNITY_EDITOR
+                if (SettingModule.IsFileSystemMode)
+                {
+                    SettingModule.WatchSetting(TabFilePath, (path) =>
+                    {
+                        if (path.Replace("\\", "/").EndsWith(path))
+                        {
+                            _instance.ReloadAll();
+                            KLogger.LogConsole_MultiThread("Reload success! -> " + path);
+                        }
+                    });
+                }
+    #endif
+            }
+	        return _instance;
+	    }
+        
+        public int Count
+        {
+            get
+            {
+                return _dict.Count;
+            }
+        }
+
+        /// <summary>
+        /// Do reload the setting file: AppConfig
+        /// </summary>
+	    public void ReloadAll()
+        {
+	        using (var tableFile = SettingModule.Get(TabFilePath, false))
+	        {
+	            foreach (var row in tableFile)
+	            {
+                    var pk = AppConfigSetting.ParsePrimaryKey(row);
+                    AppConfigSetting setting;
+                    if (!_dict.TryGetValue(pk, out setting))
+                    {
+                        setting = new AppConfigSetting(row);
+                        _dict[setting.Id] = setting;
+                    }
+                    else setting.Reload(row);
+	            }
+	            
+	        }
+	        if (OnReload != null)
+	        {
+	            OnReload();
+	        }
+        }
+
+	    /// <summary>
+        /// foreachable enumerable: AppConfig
+        /// </summary>
+        public static IEnumerable GetAll()
+        {
+            foreach (var row in GetInstance()._dict.Values)
+            {
+                yield return row;
+            }
+        }
+        
+	    /// <summary>
+        /// Get class by primary key: AppConfig
+        /// </summary>
+        public static AppConfigSetting Get(string primaryKey)
+        {
+            AppConfigSetting setting;
+            if (GetInstance()._dict.TryGetValue(primaryKey, out setting)) return setting;
+            return null;
+        }
+
+        // ========= CustomExtraString begin ===========
+        
+        // ========= CustomExtraString end ===========
+    }
+
+	/// <summary>
+	/// Auto Generate for Tab File: AppConfig.bytes
+    /// Singleton class for less memory use
+	/// </summary>
+	public partial class AppConfigSetting : TableRowParser
+	{
+		
+        /// <summary>
+        /// ID Column/编号/主键
+        /// </summary>
+        public string Id { get; private set;}
+        
+        /// <summary>
+        /// Name/名字
+        /// </summary>
+        public string Value { get; private set;}
+        
+
+        internal AppConfigSetting(TableRow row)
+        {
+            Reload(row);
+        }
+
+        internal void Reload(TableRow row)
+        { 
+            Id = row.Get_string(row.Values[0], ""); 
+            Value = row.Get_string(row.Values[1], ""); 
+        }
+
+        /// <summary>
+        /// Get PrimaryKey from a table row
+        /// </summary>
+        /// <param name="row"></param>
+        /// <returns></returns>
+        public static string ParsePrimaryKey(TableRow row)
+        {
+            var primaryKey = row.Get_string(row.Values[0], "");
+            return primaryKey;
+        }
+	}
 
 	/// <summary>
 	/// Auto Generate for Tab File: Example.bytes
@@ -136,11 +289,11 @@ namespace AppSettings
         }
 
         /// <summary>
-        /// Do reload the setting file
+        /// Do reload the setting file: Example
         /// </summary>
 	    public void ReloadAll()
         {
-	        using (var tableFile = SettingModule.Get(TabFilePath))
+	        using (var tableFile = SettingModule.Get(TabFilePath, false))
 	        {
 	            foreach (var row in tableFile)
 	            {
@@ -160,7 +313,10 @@ namespace AppSettings
 	            OnReload();
 	        }
         }
-	    
+
+	    /// <summary>
+        /// foreachable enumerable: Example
+        /// </summary>
         public static IEnumerable GetAll()
         {
             foreach (var row in GetInstance()._dict.Values)
@@ -169,12 +325,19 @@ namespace AppSettings
             }
         }
         
+	    /// <summary>
+        /// Get class by primary key: Example
+        /// </summary>
         public static ExampleSetting Get(string primaryKey)
         {
             ExampleSetting setting;
             if (GetInstance()._dict.TryGetValue(primaryKey, out setting)) return setting;
             return null;
         }
+
+        // ========= CustomExtraString begin ===========
+        
+        // ========= CustomExtraString end ===========
     }
 
 	/// <summary>
@@ -302,11 +465,11 @@ namespace AppSettings
         }
 
         /// <summary>
-        /// Do reload the setting file
+        /// Do reload the setting file: SubdirExample2
         /// </summary>
 	    public void ReloadAll()
         {
-	        using (var tableFile = SettingModule.Get(TabFilePath))
+	        using (var tableFile = SettingModule.Get(TabFilePath, false))
 	        {
 	            foreach (var row in tableFile)
 	            {
@@ -326,7 +489,10 @@ namespace AppSettings
 	            OnReload();
 	        }
         }
-	    
+
+	    /// <summary>
+        /// foreachable enumerable: SubdirExample2
+        /// </summary>
         public static IEnumerable GetAll()
         {
             foreach (var row in GetInstance()._dict.Values)
@@ -335,12 +501,19 @@ namespace AppSettings
             }
         }
         
+	    /// <summary>
+        /// Get class by primary key: SubdirExample2
+        /// </summary>
         public static SubdirExample2Setting Get(int primaryKey)
         {
             SubdirExample2Setting setting;
             if (GetInstance()._dict.TryGetValue(primaryKey, out setting)) return setting;
             return null;
         }
+
+        // ========= CustomExtraString begin ===========
+        
+        // ========= CustomExtraString end ===========
     }
 
 	/// <summary>
@@ -444,11 +617,11 @@ namespace AppSettings
         }
 
         /// <summary>
-        /// Do reload the setting file
+        /// Do reload the setting file: Subdir
         /// </summary>
 	    public void ReloadAll()
         {
-	        using (var tableFile = SettingModule.Get(TabFilePath))
+	        using (var tableFile = SettingModule.Get(TabFilePath, false))
 	        {
 	            foreach (var row in tableFile)
 	            {
@@ -468,7 +641,10 @@ namespace AppSettings
 	            OnReload();
 	        }
         }
-	    
+
+	    /// <summary>
+        /// foreachable enumerable: Subdir
+        /// </summary>
         public static IEnumerable GetAll()
         {
             foreach (var row in GetInstance()._dict.Values)
@@ -477,12 +653,19 @@ namespace AppSettings
             }
         }
         
+	    /// <summary>
+        /// Get class by primary key: Subdir
+        /// </summary>
         public static SubdirSetting Get(string primaryKey)
         {
             SubdirSetting setting;
             if (GetInstance()._dict.TryGetValue(primaryKey, out setting)) return setting;
             return null;
         }
+
+        // ========= CustomExtraString begin ===========
+        
+        // ========= CustomExtraString end ===========
     }
 
 	/// <summary>
@@ -586,11 +769,11 @@ namespace AppSettings
         }
 
         /// <summary>
-        /// Do reload the setting file
+        /// Do reload the setting file: SubdirSubSubDirExample3
         /// </summary>
 	    public void ReloadAll()
         {
-	        using (var tableFile = SettingModule.Get(TabFilePath))
+	        using (var tableFile = SettingModule.Get(TabFilePath, false))
 	        {
 	            foreach (var row in tableFile)
 	            {
@@ -610,7 +793,10 @@ namespace AppSettings
 	            OnReload();
 	        }
         }
-	    
+
+	    /// <summary>
+        /// foreachable enumerable: SubdirSubSubDirExample3
+        /// </summary>
         public static IEnumerable GetAll()
         {
             foreach (var row in GetInstance()._dict.Values)
@@ -619,12 +805,19 @@ namespace AppSettings
             }
         }
         
+	    /// <summary>
+        /// Get class by primary key: SubdirSubSubDirExample3
+        /// </summary>
         public static SubdirSubSubDirExample3Setting Get(string primaryKey)
         {
             SubdirSubSubDirExample3Setting setting;
             if (GetInstance()._dict.TryGetValue(primaryKey, out setting)) return setting;
             return null;
         }
+
+        // ========= CustomExtraString begin ===========
+        
+        // ========= CustomExtraString end ===========
     }
 
 	/// <summary>

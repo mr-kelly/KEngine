@@ -26,6 +26,7 @@
 
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using CosmosTable;
 using DotLiquid;
 using KUnityEditorTools;
@@ -55,6 +56,15 @@ namespace KEngine.Editor
         /// };
         /// </example>
         public static string[] GenerateCodeFilesFilter = null;
+
+        public delegate string CustomExtraStringDelegate(TableCompileResult tableCompileResult);
+
+        /// <summary>
+        /// 可以为模板提供额外生成代码块！返回string即可！
+        /// 自定义[InitializeOnLoad]的类并设置这个委托
+        /// </summary>
+        public static CustomExtraStringDelegate CustomExtraString;
+
         /// <summary>
         /// 编译出的后缀名
         /// </summary>
@@ -103,7 +113,7 @@ namespace {{ NameSpace }}
 	/// <summary>
     /// All settings list here, so you can reload all settings manully from the list.
 	/// </summary>
-    public class SettingsDefine
+    public partial class SettingsDefine
     {
         private static IReloadableSettings[] _settingsList;
         public static IReloadableSettings[] SettingsList
@@ -200,11 +210,11 @@ namespace {{ NameSpace }}
         }
 
         /// <summary>
-        /// Do reload the setting file
+        /// Do reload the setting file: {{ file.ClassName }}
         /// </summary>
 	    public void ReloadAll()
         {
-	        using (var tableFile = SettingModule.Get(TabFilePath))
+	        using (var tableFile = SettingModule.Get(TabFilePath, false))
 	        {
 	            foreach (var row in tableFile)
 	            {
@@ -224,7 +234,10 @@ namespace {{ NameSpace }}
 	            OnReload();
 	        }
         }
-	    
+
+	    /// <summary>
+        /// foreachable enumerable: {{ file.ClassName }}
+        /// </summary>
         public static IEnumerable GetAll()
         {
             foreach (var row in GetInstance()._dict.Values)
@@ -233,12 +246,19 @@ namespace {{ NameSpace }}
             }
         }
         
+	    /// <summary>
+        /// Get class by primary key: {{ file.ClassName }}
+        /// </summary>
         public static {{file.ClassName}}Setting Get({{ file.PrimaryKeyField.FormatType }} primaryKey)
         {
             {{file.ClassName}}Setting setting;
             if (GetInstance()._dict.TryGetValue(primaryKey, out setting)) return setting;
             return null;
         }
+
+        // ========= CustomExtraString begin ===========
+        {% if file.Extra %}{{ file.Extra }}{% endif %}
+        // ========= CustomExtraString end ===========
     }
 
 	/// <summary>
@@ -401,7 +421,7 @@ namespace {{ NameSpace }}
                         {
                             KLogger.LogWarning("[SettingModule]Compile from {0} to {1}", excelPath, compileToPath);
 
-                            var templateVar = compiler.Compile(excelPath, compileToPath, compileBaseDir, doCompile);
+                            var compileResult = compiler.Compile(excelPath, compileToPath, compileBaseDir, doCompile);
 
                             // 尝试类过滤
                             var ignoreThisClassName = false;
@@ -410,7 +430,7 @@ namespace {{ NameSpace }}
                                 for (var i = 0; i < GenerateCodeFilesFilter.Length; i++)
                                 {
                                     var filterClass = GenerateCodeFilesFilter[i];
-                                    if (templateVar.ClassName.Contains(filterClass))
+                                    if (compileResult.ClassName.Contains(filterClass))
                                     {
                                         ignoreThisClassName = true;
                                         break;
@@ -421,7 +441,9 @@ namespace {{ NameSpace }}
                             // 添加模板值
                             if (!ignoreThisClassName)
                             {
-                                var renderTemplateHash = Hash.FromAnonymousObject(templateVar);
+                                var customExtraStr = CustomExtraString != null ? CustomExtraString(compileResult) : null;
+
+                                var renderTemplateHash = Hash.FromAnonymousObject(new TableTemplateVars(compileResult, customExtraStr));
                                 files.Add(renderTemplateHash);
                             }
 
@@ -494,6 +516,49 @@ namespace {{ NameSpace }}
                 return;
             }
             CompileTabConfigs(sourcePath, compilePath, SettingCodePath, SettingExtension, force);
+        }
+    }
+
+    /// <summary>
+    /// 用于liquid模板
+    /// </summary>
+    public class TableTemplateVars
+    {
+        public string TabFilePath { get; set; }
+        public string ClassName { get; set; }
+        public List<TableColumnVars> FieldsInternal { get; set; } // column + type
+
+        public string PrimaryKey { get; set; }
+
+        public List<Hash> Fields
+        {
+            get { return (from f in FieldsInternal select Hash.FromAnonymousObject(f)).ToList(); }
+        }
+
+        /// <summary>
+        /// Get primary key, the first column field
+        /// </summary>
+        public Hash PrimaryKeyField
+        {
+            get { return Fields[0]; }
+        }
+
+        /// <summary>
+        /// Custom extra strings
+        /// </summary>
+        public string Extra { get; private set; }
+
+        public List<Hash> Columns2DefaultValus { get; set; } // column + Default Values
+
+        public TableTemplateVars(TableCompileResult compileResult, string extraString) : base()
+        {
+             TabFilePath = compileResult.TabFilePath;
+            ClassName = compileResult.ClassName;
+            FieldsInternal = compileResult.FieldsInternal;
+            PrimaryKey = compileResult.PrimaryKey;
+            Columns2DefaultValus = new List<Hash>();
+
+            Extra = extraString;
         }
     }
 }
