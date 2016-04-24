@@ -44,6 +44,17 @@ namespace KEngine.Editor
         /// 是否自动在编译配置表时生成静态代码，如果不需要，外部设置false
         /// </summary>
         public static bool AutoGenerateCode = true;
+
+        /// <summary>
+        /// 当生成的类名，包含数组中字符时，不生成代码
+        /// </summary>
+        /// <example>
+        /// GenerateCodeFilesFilter = new []
+        /// {
+        ///     "SubdirSubSubDirExample3",
+        /// };
+        /// </example>
+        public static string[] GenerateCodeFilesFilter = null;
         /// <summary>
         /// 编译出的后缀名
         /// </summary>
@@ -392,9 +403,27 @@ namespace {{ NameSpace }}
 
                             var templateVar = compiler.Compile(excelPath, compileToPath, compileBaseDir, doCompile);
 
+                            // 尝试类过滤
+                            var ignoreThisClassName = false;
+                            if (GenerateCodeFilesFilter != null)
+                            {
+                                for (var i = 0; i < GenerateCodeFilesFilter.Length; i++)
+                                {
+                                    var filterClass = GenerateCodeFilesFilter[i];
+                                    if (templateVar.ClassName.Contains(filterClass))
+                                    {
+                                        ignoreThisClassName = true;
+                                        break;
+                                    }
+                                    
+                                }
+                            }
                             // 添加模板值
-                            var renderTemplateHash = Hash.FromAnonymousObject(templateVar);
-                            files.Add(renderTemplateHash);
+                            if (!ignoreThisClassName)
+                            {
+                                var renderTemplateHash = Hash.FromAnonymousObject(templateVar);
+                                files.Add(renderTemplateHash);
+                            }
 
                             var compiledFileInfo = new FileInfo(compileToPath);
                             compiledFileInfo.LastWriteTime = srcFileInfo.LastWriteTime;
