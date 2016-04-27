@@ -26,6 +26,7 @@ CosmosEngine的官方改名、改进版
 * [策划配置]自动生成文档完善的静态代码，大大便捷开发流程
 
 
+
 # 整体结构：模块插拔与三大基础模块
 
 KEngine本质上只是一个模块容器(Module Container)，它只为各个模块提供初始化管理。
@@ -96,7 +97,10 @@ PS: 如果在Unity未打开情况下进行Excel表的修改保存，将无法**�
 
 配置表支持**热重载**功能。在Unity播放状态时，修改Excel表并重新编译，运行中的配置表会自动重新加载。无需重启游戏。
 
+配置表支持多表合并（分表），如AppConfig+Skill.xlsx和AppConfig+Buff.xlsx，它们可以做成一样的表头结构； 对于策划来说，可以多个表之间填写数据；而对于程序来说，在加载和使用时会合并成AppConfig一个表。
+
 示例Excel文件: KEngine.UnityProject/Product/SettingSource/Example.xlsx（将被编译到KEngine.UnityProject/Assets/Resources/Example.bytes）
+
 
 # 美术人员使用指南
 

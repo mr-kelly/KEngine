@@ -24,7 +24,6 @@ namespace CosmosTable
     public class TableCompileResult
     {
         public string TabFilePath { get; set; }
-        public string ClassName { get; set; }
         public List<TableColumnVars> FieldsInternal { get; set; } // column + type
 
         public string PrimaryKey { get; set; }
@@ -242,21 +241,6 @@ namespace CosmosTable
             if (tabFilePath.StartsWith("/"))
                 tabFilePath = tabFilePath.Substring(1);
 
-			// 未处理路径的类名, 去掉后缀扩展名
-            var classNameOrigin = Path.ChangeExtension(tabFilePath, null);
-
-            var className = classNameOrigin.Replace("/", "_").Replace("\\", "_");
-            className = className.Replace(" ", "");
-            className = string.Join("", (from name
-                in className.Split(new[] {'_'}, StringSplitOptions.RemoveEmptyEntries)
-                select (name[0].ToString().ToUpper() + name.Substring(1, name.Length - 1)))
-                .ToArray());
-
-            // 去掉+号后面的字符
-            var plusSignIndex = className.IndexOf("+");
-            className = className.Substring(0, plusSignIndex == -1 ? className.Length : plusSignIndex);
-
-            renderVars.ClassName = className;
             renderVars.TabFilePath = tabFilePath;
 
             return renderVars;

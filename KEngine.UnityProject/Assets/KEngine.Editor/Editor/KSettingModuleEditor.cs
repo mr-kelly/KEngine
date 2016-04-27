@@ -24,6 +24,7 @@
 
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -393,6 +394,7 @@ namespace {{ NameSpace }}
         }
         public static void CompileTabConfigs(string sourcePath, string compilePath, string genCodeFilePath, string changeExtension = ".bytes", bool force = false)
         {
+            var compileBaseDir = compilePath;
             // excel compiler
             var compiler = new Compiler(new CompilerConfig());
 
@@ -416,7 +418,6 @@ namespace {{ NameSpace }}
                         if (relativePath.StartsWith("/"))
                             relativePath = relativePath.Substring(1);
 
-                        var compileBaseDir = compilePath;
 
                         var compileToPath = string.Format("{0}/{1}", compileBaseDir,
                             Path.ChangeExtension(relativePath, changeExtension));
@@ -443,26 +444,8 @@ namespace {{ NameSpace }}
 
                             var compileResult = compiler.Compile(excelPath, compileToPath, compileBaseDir, doCompile);
 
-                            // 尝试类过滤
-                            var ignoreThisClassName = false;
-                            if (GenerateCodeFilesFilter != null)
-                            {
-                                for (var i = 0; i < GenerateCodeFilesFilter.Length; i++)
-                                {
-                                    var filterClass = GenerateCodeFilesFilter[i];
-                                    if (compileResult.ClassName.Contains(filterClass))
-                                    {
-                                        ignoreThisClassName = true;
-                                        break;
-                                    }
-
-                                }
-                            }
                             // 添加模板值
-                            if (!ignoreThisClassName)
-                            {
-                                results.Add(compileResult);
-                            }
+                            results.Add(compileResult);
 
                             var compiledFileInfo = new FileInfo(compileToPath);
                             compiledFileInfo.LastWriteTime = srcFileInfo.LastWriteTime;
@@ -490,12 +473,32 @@ namespace {{ NameSpace }}
                         var customExtraStr = CustomExtraString != null ? CustomExtraString(compileResult) : null;
 
                         var templateVar = new TableTemplateVars(compileResult, customExtraStr);
-                        if (!templateVars.ContainsKey(templateVar.ClassName))
-                            templateVars.Add(templateVar.ClassName, templateVar);
-                        else
+
+                        // 尝试类过滤
+                        var ignoreThisClassName = false;
+                        if (GenerateCodeFilesFilter != null)
                         {
-                            templateVars[templateVar.ClassName].Paths.Add(compileResult.TabFilePath);
+                            for (var i = 0; i < GenerateCodeFilesFilter.Length; i++)
+                            {
+                                var filterClass = GenerateCodeFilesFilter[i];
+                                if (templateVar.ClassName.Contains(filterClass))
+                                {
+                                    ignoreThisClassName = true;
+                                    break;
+                                }
+
+                            }
                         }
+                        if (!ignoreThisClassName)
+                        {
+                            if (!templateVars.ContainsKey(templateVar.ClassName))
+                                templateVars.Add(templateVar.ClassName, templateVar);
+                            else
+                            {
+                                templateVars[templateVar.ClassName].Paths.Add(compileResult.TabFilePath);
+                            }
+                        }
+
                     }
 
                     // 整合成字符串模版使用的List
@@ -609,8 +612,25 @@ namespace {{ NameSpace }}
         public TableTemplateVars(TableCompileResult compileResult, string extraString)
             : base()
         {
+            var tabFilePath = compileResult.TabFilePath;
+            // 未处理路径的类名, 去掉后缀扩展名
+            var classNameOrigin = Path.ChangeExtension(tabFilePath, null);
+
+            var className = classNameOrigin.Replace("/", "_").Replace("\\", "_");
+            className = className.Replace(" ", "");
+            className = string.Join("", (from name
+                in className.Split(new[] { '_' }, StringSplitOptions.RemoveEmptyEntries)
+                                         select (name[0].ToString().ToUpper() + name.Substring(1, name.Length - 1)))
+                .ToArray());
+
+
             Paths.Add(compileResult.TabFilePath);
-            ClassName = compileResult.ClassName;
+
+            // 去掉+号后面的字符
+            var plusSignIndex = className.IndexOf("+");
+            className = className.Substring(0, plusSignIndex == -1 ? className.Length : plusSignIndex);
+
+            ClassName = className;
             FieldsInternal = compileResult.FieldsInternal;
             PrimaryKey = compileResult.PrimaryKey;
             Columns2DefaultValus = new List<Hash>();
