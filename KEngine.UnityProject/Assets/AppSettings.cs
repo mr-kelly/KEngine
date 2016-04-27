@@ -78,12 +78,15 @@ namespace AppSettings
 
 
 	/// <summary>
-	/// Auto Generate for Tab File: AppConfig.bytes
+	/// Auto Generate for Tab File: "AppConfig+Category.bytes", "AppConfig.bytes"
     /// No use of generic and reflection, for better performance,  less IL code generating
 	/// </summary>>
     public partial class AppConfigSettings : IReloadableSettings
     {
-		public static readonly string TabFilePath = "AppConfig.bytes";
+		public static readonly string[] TabFilePaths = 
+        {
+            "AppConfig+Category.bytes", "AppConfig.bytes"
+        };
         static AppConfigSettings _instance;
         Dictionary<string, AppConfigSetting> _dict = new Dictionary<string, AppConfigSetting>();
 
@@ -114,14 +117,19 @@ namespace AppSettings
     #if UNITY_EDITOR
                 if (SettingModule.IsFileSystemMode)
                 {
-                    SettingModule.WatchSetting(TabFilePath, (path) =>
+                    for (var j = 0; j < TabFilePaths.Length; j++)
                     {
-                        if (path.Replace("\\", "/").EndsWith(path))
+                        var tabFilePath = TabFilePaths[j];
+                        SettingModule.WatchSetting(tabFilePath, (path) =>
                         {
-                            _instance.ReloadAll();
-                            KLogger.LogConsole_MultiThread("Reload success! -> " + path);
-                        }
-                    });
+                            if (path.Replace("\\", "/").EndsWith(path))
+                            {
+                                _instance.ReloadAll();
+                                KLogger.LogConsole_MultiThread("Reload success! -> " + path);
+                            }
+                        });
+                    }
+
                 }
     #endif
             }
@@ -141,21 +149,25 @@ namespace AppSettings
         /// </summary>
 	    public void ReloadAll()
         {
-	        using (var tableFile = SettingModule.Get(TabFilePath, false))
-	        {
-	            foreach (var row in tableFile)
-	            {
-                    var pk = AppConfigSetting.ParsePrimaryKey(row);
-                    AppConfigSetting setting;
-                    if (!_dict.TryGetValue(pk, out setting))
+            for (var j = 0; j < TabFilePaths.Length; j++)
+            {
+                var tabFilePath = TabFilePaths[j];
+                using (var tableFile = SettingModule.Get(tabFilePath, false))
+                {
+                    foreach (var row in tableFile)
                     {
-                        setting = new AppConfigSetting(row);
-                        _dict[setting.Id] = setting;
+                        var pk = AppConfigSetting.ParsePrimaryKey(row);
+                        AppConfigSetting setting;
+                        if (!_dict.TryGetValue(pk, out setting))
+                        {
+                            setting = new AppConfigSetting(row);
+                            _dict[setting.Id] = setting;
+                        }
+                        else setting.Reload(row);
                     }
-                    else setting.Reload(row);
-	            }
-	            
-	        }
+                }
+            }
+
 	        if (OnReload != null)
 	        {
 	            OnReload();
@@ -172,7 +184,15 @@ namespace AppSettings
                 yield return row;
             }
         }
-        
+
+        /// <summary>
+        /// GetEnumerator for `MoveNext`: AppConfig
+        /// </summary> 
+	    public static IEnumerator GetEnumerator()
+	    {
+	        return GetInstance()._dict.Values.GetEnumerator();
+	    }
+         
 	    /// <summary>
         /// Get class by primary key: AppConfig
         /// </summary>
@@ -189,7 +209,7 @@ namespace AppSettings
     }
 
 	/// <summary>
-	/// Auto Generate for Tab File: AppConfig.bytes
+	/// Auto Generate for Tab File: "AppConfig+Category.bytes", "AppConfig.bytes"
     /// Singleton class for less memory use
 	/// </summary>
 	public partial class AppConfigSetting : TableRowParser
@@ -230,12 +250,15 @@ namespace AppSettings
 	}
 
 	/// <summary>
-	/// Auto Generate for Tab File: Example.bytes
+	/// Auto Generate for Tab File: "Example.bytes"
     /// No use of generic and reflection, for better performance,  less IL code generating
 	/// </summary>>
     public partial class ExampleSettings : IReloadableSettings
     {
-		public static readonly string TabFilePath = "Example.bytes";
+		public static readonly string[] TabFilePaths = 
+        {
+            "Example.bytes"
+        };
         static ExampleSettings _instance;
         Dictionary<string, ExampleSetting> _dict = new Dictionary<string, ExampleSetting>();
 
@@ -266,14 +289,19 @@ namespace AppSettings
     #if UNITY_EDITOR
                 if (SettingModule.IsFileSystemMode)
                 {
-                    SettingModule.WatchSetting(TabFilePath, (path) =>
+                    for (var j = 0; j < TabFilePaths.Length; j++)
                     {
-                        if (path.Replace("\\", "/").EndsWith(path))
+                        var tabFilePath = TabFilePaths[j];
+                        SettingModule.WatchSetting(tabFilePath, (path) =>
                         {
-                            _instance.ReloadAll();
-                            KLogger.LogConsole_MultiThread("Reload success! -> " + path);
-                        }
-                    });
+                            if (path.Replace("\\", "/").EndsWith(path))
+                            {
+                                _instance.ReloadAll();
+                                KLogger.LogConsole_MultiThread("Reload success! -> " + path);
+                            }
+                        });
+                    }
+
                 }
     #endif
             }
@@ -293,21 +321,25 @@ namespace AppSettings
         /// </summary>
 	    public void ReloadAll()
         {
-	        using (var tableFile = SettingModule.Get(TabFilePath, false))
-	        {
-	            foreach (var row in tableFile)
-	            {
-                    var pk = ExampleSetting.ParsePrimaryKey(row);
-                    ExampleSetting setting;
-                    if (!_dict.TryGetValue(pk, out setting))
+            for (var j = 0; j < TabFilePaths.Length; j++)
+            {
+                var tabFilePath = TabFilePaths[j];
+                using (var tableFile = SettingModule.Get(tabFilePath, false))
+                {
+                    foreach (var row in tableFile)
                     {
-                        setting = new ExampleSetting(row);
-                        _dict[setting.Id] = setting;
+                        var pk = ExampleSetting.ParsePrimaryKey(row);
+                        ExampleSetting setting;
+                        if (!_dict.TryGetValue(pk, out setting))
+                        {
+                            setting = new ExampleSetting(row);
+                            _dict[setting.Id] = setting;
+                        }
+                        else setting.Reload(row);
                     }
-                    else setting.Reload(row);
-	            }
-	            
-	        }
+                }
+            }
+
 	        if (OnReload != null)
 	        {
 	            OnReload();
@@ -324,7 +356,15 @@ namespace AppSettings
                 yield return row;
             }
         }
-        
+
+        /// <summary>
+        /// GetEnumerator for `MoveNext`: Example
+        /// </summary> 
+	    public static IEnumerator GetEnumerator()
+	    {
+	        return GetInstance()._dict.Values.GetEnumerator();
+	    }
+         
 	    /// <summary>
         /// Get class by primary key: Example
         /// </summary>
@@ -341,7 +381,7 @@ namespace AppSettings
     }
 
 	/// <summary>
-	/// Auto Generate for Tab File: Example.bytes
+	/// Auto Generate for Tab File: "Example.bytes"
     /// Singleton class for less memory use
 	/// </summary>
 	public partial class ExampleSetting : TableRowParser
@@ -406,12 +446,15 @@ namespace AppSettings
 	}
 
 	/// <summary>
-	/// Auto Generate for Tab File: Subdir/Example2.bytes
+	/// Auto Generate for Tab File: "Subdir/Example2.bytes"
     /// No use of generic and reflection, for better performance,  less IL code generating
 	/// </summary>>
     public partial class SubdirExample2Settings : IReloadableSettings
     {
-		public static readonly string TabFilePath = "Subdir/Example2.bytes";
+		public static readonly string[] TabFilePaths = 
+        {
+            "Subdir/Example2.bytes"
+        };
         static SubdirExample2Settings _instance;
         Dictionary<int, SubdirExample2Setting> _dict = new Dictionary<int, SubdirExample2Setting>();
 
@@ -442,14 +485,19 @@ namespace AppSettings
     #if UNITY_EDITOR
                 if (SettingModule.IsFileSystemMode)
                 {
-                    SettingModule.WatchSetting(TabFilePath, (path) =>
+                    for (var j = 0; j < TabFilePaths.Length; j++)
                     {
-                        if (path.Replace("\\", "/").EndsWith(path))
+                        var tabFilePath = TabFilePaths[j];
+                        SettingModule.WatchSetting(tabFilePath, (path) =>
                         {
-                            _instance.ReloadAll();
-                            KLogger.LogConsole_MultiThread("Reload success! -> " + path);
-                        }
-                    });
+                            if (path.Replace("\\", "/").EndsWith(path))
+                            {
+                                _instance.ReloadAll();
+                                KLogger.LogConsole_MultiThread("Reload success! -> " + path);
+                            }
+                        });
+                    }
+
                 }
     #endif
             }
@@ -469,21 +517,25 @@ namespace AppSettings
         /// </summary>
 	    public void ReloadAll()
         {
-	        using (var tableFile = SettingModule.Get(TabFilePath, false))
-	        {
-	            foreach (var row in tableFile)
-	            {
-                    var pk = SubdirExample2Setting.ParsePrimaryKey(row);
-                    SubdirExample2Setting setting;
-                    if (!_dict.TryGetValue(pk, out setting))
+            for (var j = 0; j < TabFilePaths.Length; j++)
+            {
+                var tabFilePath = TabFilePaths[j];
+                using (var tableFile = SettingModule.Get(tabFilePath, false))
+                {
+                    foreach (var row in tableFile)
                     {
-                        setting = new SubdirExample2Setting(row);
-                        _dict[setting.Id] = setting;
+                        var pk = SubdirExample2Setting.ParsePrimaryKey(row);
+                        SubdirExample2Setting setting;
+                        if (!_dict.TryGetValue(pk, out setting))
+                        {
+                            setting = new SubdirExample2Setting(row);
+                            _dict[setting.Id] = setting;
+                        }
+                        else setting.Reload(row);
                     }
-                    else setting.Reload(row);
-	            }
-	            
-	        }
+                }
+            }
+
 	        if (OnReload != null)
 	        {
 	            OnReload();
@@ -500,7 +552,15 @@ namespace AppSettings
                 yield return row;
             }
         }
-        
+
+        /// <summary>
+        /// GetEnumerator for `MoveNext`: SubdirExample2
+        /// </summary> 
+	    public static IEnumerator GetEnumerator()
+	    {
+	        return GetInstance()._dict.Values.GetEnumerator();
+	    }
+         
 	    /// <summary>
         /// Get class by primary key: SubdirExample2
         /// </summary>
@@ -517,7 +577,7 @@ namespace AppSettings
     }
 
 	/// <summary>
-	/// Auto Generate for Tab File: Subdir/Example2.bytes
+	/// Auto Generate for Tab File: "Subdir/Example2.bytes"
     /// Singleton class for less memory use
 	/// </summary>
 	public partial class SubdirExample2Setting : TableRowParser
@@ -558,12 +618,15 @@ namespace AppSettings
 	}
 
 	/// <summary>
-	/// Auto Generate for Tab File: Subdir/__.bytes
+	/// Auto Generate for Tab File: "Subdir/__.bytes"
     /// No use of generic and reflection, for better performance,  less IL code generating
 	/// </summary>>
     public partial class SubdirSettings : IReloadableSettings
     {
-		public static readonly string TabFilePath = "Subdir/__.bytes";
+		public static readonly string[] TabFilePaths = 
+        {
+            "Subdir/__.bytes"
+        };
         static SubdirSettings _instance;
         Dictionary<string, SubdirSetting> _dict = new Dictionary<string, SubdirSetting>();
 
@@ -594,14 +657,19 @@ namespace AppSettings
     #if UNITY_EDITOR
                 if (SettingModule.IsFileSystemMode)
                 {
-                    SettingModule.WatchSetting(TabFilePath, (path) =>
+                    for (var j = 0; j < TabFilePaths.Length; j++)
                     {
-                        if (path.Replace("\\", "/").EndsWith(path))
+                        var tabFilePath = TabFilePaths[j];
+                        SettingModule.WatchSetting(tabFilePath, (path) =>
                         {
-                            _instance.ReloadAll();
-                            KLogger.LogConsole_MultiThread("Reload success! -> " + path);
-                        }
-                    });
+                            if (path.Replace("\\", "/").EndsWith(path))
+                            {
+                                _instance.ReloadAll();
+                                KLogger.LogConsole_MultiThread("Reload success! -> " + path);
+                            }
+                        });
+                    }
+
                 }
     #endif
             }
@@ -621,21 +689,25 @@ namespace AppSettings
         /// </summary>
 	    public void ReloadAll()
         {
-	        using (var tableFile = SettingModule.Get(TabFilePath, false))
-	        {
-	            foreach (var row in tableFile)
-	            {
-                    var pk = SubdirSetting.ParsePrimaryKey(row);
-                    SubdirSetting setting;
-                    if (!_dict.TryGetValue(pk, out setting))
+            for (var j = 0; j < TabFilePaths.Length; j++)
+            {
+                var tabFilePath = TabFilePaths[j];
+                using (var tableFile = SettingModule.Get(tabFilePath, false))
+                {
+                    foreach (var row in tableFile)
                     {
-                        setting = new SubdirSetting(row);
-                        _dict[setting.Id] = setting;
+                        var pk = SubdirSetting.ParsePrimaryKey(row);
+                        SubdirSetting setting;
+                        if (!_dict.TryGetValue(pk, out setting))
+                        {
+                            setting = new SubdirSetting(row);
+                            _dict[setting.Id] = setting;
+                        }
+                        else setting.Reload(row);
                     }
-                    else setting.Reload(row);
-	            }
-	            
-	        }
+                }
+            }
+
 	        if (OnReload != null)
 	        {
 	            OnReload();
@@ -652,7 +724,15 @@ namespace AppSettings
                 yield return row;
             }
         }
-        
+
+        /// <summary>
+        /// GetEnumerator for `MoveNext`: Subdir
+        /// </summary> 
+	    public static IEnumerator GetEnumerator()
+	    {
+	        return GetInstance()._dict.Values.GetEnumerator();
+	    }
+         
 	    /// <summary>
         /// Get class by primary key: Subdir
         /// </summary>
@@ -669,7 +749,7 @@ namespace AppSettings
     }
 
 	/// <summary>
-	/// Auto Generate for Tab File: Subdir/__.bytes
+	/// Auto Generate for Tab File: "Subdir/__.bytes"
     /// Singleton class for less memory use
 	/// </summary>
 	public partial class SubdirSetting : TableRowParser
@@ -710,12 +790,15 @@ namespace AppSettings
 	}
 
 	/// <summary>
-	/// Auto Generate for Tab File: Subdir/SubSubDir/Example3.bytes
+	/// Auto Generate for Tab File: "Subdir/SubSubDir/Example3.bytes"
     /// No use of generic and reflection, for better performance,  less IL code generating
 	/// </summary>>
     public partial class SubdirSubSubDirExample3Settings : IReloadableSettings
     {
-		public static readonly string TabFilePath = "Subdir/SubSubDir/Example3.bytes";
+		public static readonly string[] TabFilePaths = 
+        {
+            "Subdir/SubSubDir/Example3.bytes"
+        };
         static SubdirSubSubDirExample3Settings _instance;
         Dictionary<string, SubdirSubSubDirExample3Setting> _dict = new Dictionary<string, SubdirSubSubDirExample3Setting>();
 
@@ -746,14 +829,19 @@ namespace AppSettings
     #if UNITY_EDITOR
                 if (SettingModule.IsFileSystemMode)
                 {
-                    SettingModule.WatchSetting(TabFilePath, (path) =>
+                    for (var j = 0; j < TabFilePaths.Length; j++)
                     {
-                        if (path.Replace("\\", "/").EndsWith(path))
+                        var tabFilePath = TabFilePaths[j];
+                        SettingModule.WatchSetting(tabFilePath, (path) =>
                         {
-                            _instance.ReloadAll();
-                            KLogger.LogConsole_MultiThread("Reload success! -> " + path);
-                        }
-                    });
+                            if (path.Replace("\\", "/").EndsWith(path))
+                            {
+                                _instance.ReloadAll();
+                                KLogger.LogConsole_MultiThread("Reload success! -> " + path);
+                            }
+                        });
+                    }
+
                 }
     #endif
             }
@@ -773,21 +861,25 @@ namespace AppSettings
         /// </summary>
 	    public void ReloadAll()
         {
-	        using (var tableFile = SettingModule.Get(TabFilePath, false))
-	        {
-	            foreach (var row in tableFile)
-	            {
-                    var pk = SubdirSubSubDirExample3Setting.ParsePrimaryKey(row);
-                    SubdirSubSubDirExample3Setting setting;
-                    if (!_dict.TryGetValue(pk, out setting))
+            for (var j = 0; j < TabFilePaths.Length; j++)
+            {
+                var tabFilePath = TabFilePaths[j];
+                using (var tableFile = SettingModule.Get(tabFilePath, false))
+                {
+                    foreach (var row in tableFile)
                     {
-                        setting = new SubdirSubSubDirExample3Setting(row);
-                        _dict[setting.Id] = setting;
+                        var pk = SubdirSubSubDirExample3Setting.ParsePrimaryKey(row);
+                        SubdirSubSubDirExample3Setting setting;
+                        if (!_dict.TryGetValue(pk, out setting))
+                        {
+                            setting = new SubdirSubSubDirExample3Setting(row);
+                            _dict[setting.Id] = setting;
+                        }
+                        else setting.Reload(row);
                     }
-                    else setting.Reload(row);
-	            }
-	            
-	        }
+                }
+            }
+
 	        if (OnReload != null)
 	        {
 	            OnReload();
@@ -804,7 +896,15 @@ namespace AppSettings
                 yield return row;
             }
         }
-        
+
+        /// <summary>
+        /// GetEnumerator for `MoveNext`: SubdirSubSubDirExample3
+        /// </summary> 
+	    public static IEnumerator GetEnumerator()
+	    {
+	        return GetInstance()._dict.Values.GetEnumerator();
+	    }
+         
 	    /// <summary>
         /// Get class by primary key: SubdirSubSubDirExample3
         /// </summary>
@@ -821,7 +921,7 @@ namespace AppSettings
     }
 
 	/// <summary>
-	/// Auto Generate for Tab File: Subdir/SubSubDir/Example3.bytes
+	/// Auto Generate for Tab File: "Subdir/SubSubDir/Example3.bytes"
     /// Singleton class for less memory use
 	/// </summary>
 	public partial class SubdirSubSubDirExample3Setting : TableRowParser

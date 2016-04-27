@@ -63,7 +63,8 @@ public class KUGUIDemoMain : MonoBehaviour
             // Do some UI stuff
         });
 
-        Debug.Log("[SettingModule]Table: " + ExampleSettings.TabFilePath);
+        Debug.Log("[SettingModule]Table: " + string.Join(",", ExampleSettings.TabFilePaths));
+
         foreach (ExampleSetting exampleInfo in ExampleSettings.GetAll())
         {
             Debug.Log(string.Format("Name: {0}", exampleInfo.Name));
@@ -73,6 +74,9 @@ public class KUGUIDemoMain : MonoBehaviour
         Debuger.Assert(info.Name == "Test1");
         var info2 = SubdirExample2Settings.Get(2);
         Debuger.Assert(info2.Name == "Test2");
+
+        var info3 = AppConfigSettings.Get("Test.Cat1");
+        Debuger.Assert(info3.Value == "Cat1");
 
         ExampleSettings.OnReload = () =>
         {

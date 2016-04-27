@@ -151,12 +151,15 @@ namespace {{ NameSpace }}
 
 {% for file in Files %}
 	/// <summary>
-	/// Auto Generate for Tab File: {{ file.TabFilePath }}
+	/// Auto Generate for Tab File: {{ file.TabFilePaths }}
     /// No use of generic and reflection, for better performance,  less IL code generating
 	/// </summary>>
     public partial class {{file.ClassName}}Settings : IReloadableSettings
     {
-		public static readonly string TabFilePath = ""{{ file.TabFilePath }}"";
+		public static readonly string[] TabFilePaths = 
+        {
+            {{ file.TabFilePaths }}
+        };
         static {{file.ClassName}}Settings _instance;
         Dictionary<{{ file.PrimaryKeyField.FormatType }}, {{file.ClassName}}Setting> _dict = new Dictionary<{{ file.PrimaryKeyField.FormatType }}, {{file.ClassName}}Setting>();
 
@@ -187,14 +190,19 @@ namespace {{ NameSpace }}
     #if UNITY_EDITOR
                 if (SettingModule.IsFileSystemMode)
                 {
-                    SettingModule.WatchSetting(TabFilePath, (path) =>
+                    for (var j = 0; j < TabFilePaths.Length; j++)
                     {
-                        if (path.Replace(""\\"", ""/"").EndsWith(path))
+                        var tabFilePath = TabFilePaths[j];
+                        SettingModule.WatchSetting(tabFilePath, (path) =>
                         {
-                            _instance.ReloadAll();
-                            KLogger.LogConsole_MultiThread(""Reload success! -> "" + path);
-                        }
-                    });
+                            if (path.Replace(""\\"", ""/"").EndsWith(path))
+                            {
+                                _instance.ReloadAll();
+                                KLogger.LogConsole_MultiThread(""Reload success! -> "" + path);
+                            }
+                        });
+                    }
+
                 }
     #endif
             }
@@ -214,21 +222,25 @@ namespace {{ NameSpace }}
         /// </summary>
 	    public void ReloadAll()
         {
-	        using (var tableFile = SettingModule.Get(TabFilePath, false))
-	        {
-	            foreach (var row in tableFile)
-	            {
-                    var pk = {{ file.ClassName }}Setting.ParsePrimaryKey(row);
-                    {{file.ClassName}}Setting setting;
-                    if (!_dict.TryGetValue(pk, out setting))
+            for (var j = 0; j < TabFilePaths.Length; j++)
+            {
+                var tabFilePath = TabFilePaths[j];
+                using (var tableFile = SettingModule.Get(tabFilePath, false))
+                {
+                    foreach (var row in tableFile)
                     {
-                        setting = new {{file.ClassName}}Setting(row);
-                        _dict[setting.{{ file.PrimaryKeyField.Name }}] = setting;
+                        var pk = {{ file.ClassName }}Setting.ParsePrimaryKey(row);
+                        {{file.ClassName}}Setting setting;
+                        if (!_dict.TryGetValue(pk, out setting))
+                        {
+                            setting = new {{file.ClassName}}Setting(row);
+                            _dict[setting.{{ file.PrimaryKeyField.Name }}] = setting;
+                        }
+                        else setting.Reload(row);
                     }
-                    else setting.Reload(row);
-	            }
-	            
-	        }
+                }
+            }
+
 	        if (OnReload != null)
 	        {
 	            OnReload();
@@ -245,7 +257,15 @@ namespace {{ NameSpace }}
                 yield return row;
             }
         }
-        
+
+        /// <summary>
+        /// GetEnumerator for `MoveNext`: {{ file.ClassName }}
+        /// </summary> 
+	    public static IEnumerator GetEnumerator()
+	    {
+	        return GetInstance()._dict.Values.GetEnumerator();
+	    }
+         
 	    /// <summary>
         /// Get class by primary key: {{ file.ClassName }}
         /// </summary>
@@ -262,7 +282,7 @@ namespace {{ NameSpace }}
     }
 
 	/// <summary>
-	/// Auto Generate for Tab File: {{ file.TabFilePath }}
+	/// Auto Generate for Tab File: {{ file.TabFilePaths }}
     /// Singleton class for less memory use
 	/// </summary>
 	public partial class {{file.ClassName}}Setting : TableRowParser
@@ -383,7 +403,7 @@ namespace {{ NameSpace }}
                 var allFiles = Directory.GetFiles(findDir, "*.*", SearchOption.AllDirectories);
                 var allFilesCount = allFiles.Length;
                 var nowFileIndex = -1; // 开头+1， 起始为0
-                var files = new List<Hash>();
+                var results = new List<TableCompileResult>();
                 foreach (var excelPath in allFiles)
                 {
                     nowFileIndex++;
@@ -435,21 +455,18 @@ namespace {{ NameSpace }}
                                         ignoreThisClassName = true;
                                         break;
                                     }
-                                    
+
                                 }
                             }
                             // 添加模板值
                             if (!ignoreThisClassName)
                             {
-                                var customExtraStr = CustomExtraString != null ? CustomExtraString(compileResult) : null;
-
-                                var renderTemplateHash = Hash.FromAnonymousObject(new TableTemplateVars(compileResult, customExtraStr));
-                                files.Add(renderTemplateHash);
+                                results.Add(compileResult);
                             }
 
                             var compiledFileInfo = new FileInfo(compileToPath);
                             compiledFileInfo.LastWriteTime = srcFileInfo.LastWriteTime;
-                            
+
                         }
                     }
                 }
@@ -465,8 +482,34 @@ namespace {{ NameSpace }}
                 }
                 else
                 {
+
+                    // 根据编译结果，构建vars，同class名字的，进行合并
+                    var templateVars = new Dictionary<string, TableTemplateVars>();
+                    foreach (var compileResult in results)
+                    {
+                        var customExtraStr = CustomExtraString != null ? CustomExtraString(compileResult) : null;
+
+                        var templateVar = new TableTemplateVars(compileResult, customExtraStr);
+                        if (!templateVars.ContainsKey(templateVar.ClassName))
+                            templateVars.Add(templateVar.ClassName, templateVar);
+                        else
+                        {
+                            templateVars[templateVar.ClassName].Paths.Add(compileResult.TabFilePath);
+                        }
+                    }
+
+                    // 整合成字符串模版使用的List
+                    var templateHashes = new List<Hash>();
+                    foreach (var kv in templateVars)
+                    {
+                        var templateVar = kv.Value;
+                        var renderTemplateHash = Hash.FromAnonymousObject(templateVar);
+                        templateHashes.Add(renderTemplateHash);
+                    }
+
+
                     var nameSpace = "AppSettings";
-                    GenerateCode(genCodeFilePath, nameSpace, files);
+                    GenerateCode(genCodeFilePath, nameSpace, templateHashes);
                 }
 
             }
@@ -524,7 +567,20 @@ namespace {{ NameSpace }}
     /// </summary>
     public class TableTemplateVars
     {
-        public string TabFilePath { get; set; }
+        public List<string> Paths = new List<string>();
+
+        /// <summary>
+        ///  构建成一个数组["aaa", "bbb"]
+        /// </summary>
+        public string TabFilePaths
+        {
+            get
+            {
+                var paths = "\"" + string.Join("\", \"", Paths.ToArray()) + "\"";
+                return paths;
+            }
+        }
+
         public string ClassName { get; set; }
         public List<TableColumnVars> FieldsInternal { get; set; } // column + type
 
@@ -550,9 +606,10 @@ namespace {{ NameSpace }}
 
         public List<Hash> Columns2DefaultValus { get; set; } // column + Default Values
 
-        public TableTemplateVars(TableCompileResult compileResult, string extraString) : base()
+        public TableTemplateVars(TableCompileResult compileResult, string extraString)
+            : base()
         {
-             TabFilePath = compileResult.TabFilePath;
+            Paths.Add(compileResult.TabFilePath);
             ClassName = compileResult.ClassName;
             FieldsInternal = compileResult.FieldsInternal;
             PrimaryKey = compileResult.PrimaryKey;

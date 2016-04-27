@@ -251,6 +251,11 @@ namespace CosmosTable
                 in className.Split(new[] {'_'}, StringSplitOptions.RemoveEmptyEntries)
                 select (name[0].ToString().ToUpper() + name.Substring(1, name.Length - 1)))
                 .ToArray());
+
+            // 去掉+号后面的字符
+            var plusSignIndex = className.IndexOf("+");
+            className = className.Substring(0, plusSignIndex == -1 ? className.Length : plusSignIndex);
+
             renderVars.ClassName = className;
             renderVars.TabFilePath = tabFilePath;
 

@@ -28,6 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using KEngine;
 
 /// <summary>
 /// 一个List，具有缓存在磁盘的功能！高性能写入！ 不重复的key, HashSet
