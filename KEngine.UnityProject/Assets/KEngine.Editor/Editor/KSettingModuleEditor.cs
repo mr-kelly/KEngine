@@ -570,6 +570,13 @@ namespace {{ NameSpace }}
     /// </summary>
     public class TableTemplateVars
     {
+        public delegate string CustomClassNameDelegate(string originClassName, string filePath);
+
+        /// <summary>
+        /// You can custom class name
+        /// </summary>
+        public static CustomClassNameDelegate CustomClassNameFunc;
+
         public List<string> Paths = new List<string>();
 
         /// <summary>
@@ -613,9 +620,31 @@ namespace {{ NameSpace }}
             : base()
         {
             var tabFilePath = compileResult.TabFilePath;
+            Paths.Add(compileResult.TabFilePath);
+
+            ClassName = DefaultClassNameParse(tabFilePath);
+            // 可自定义Class Name
+            if (CustomClassNameFunc != null)
+                ClassName = CustomClassNameFunc(ClassName, tabFilePath);
+
+            FieldsInternal = compileResult.FieldsInternal;
+            PrimaryKey = compileResult.PrimaryKey;
+            Columns2DefaultValus = new List<Hash>();
+
+            Extra = extraString;
+        }
+
+        /// <summary>
+        /// get a class name from tab file path, default strategy
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        string DefaultClassNameParse(string tabFilePath)
+        {
             // 未处理路径的类名, 去掉后缀扩展名
             var classNameOrigin = Path.ChangeExtension(tabFilePath, null);
 
+            // 子目录合并，首字母大写, 组成class name
             var className = classNameOrigin.Replace("/", "_").Replace("\\", "_");
             className = className.Replace(" ", "");
             className = string.Join("", (from name
@@ -623,19 +652,11 @@ namespace {{ NameSpace }}
                                          select (name[0].ToString().ToUpper() + name.Substring(1, name.Length - 1)))
                 .ToArray());
 
-
-            Paths.Add(compileResult.TabFilePath);
-
             // 去掉+号后面的字符
             var plusSignIndex = className.IndexOf("+");
             className = className.Substring(0, plusSignIndex == -1 ? className.Length : plusSignIndex);
+            return className;
 
-            ClassName = className;
-            FieldsInternal = compileResult.FieldsInternal;
-            PrimaryKey = compileResult.PrimaryKey;
-            Columns2DefaultValus = new List<Hash>();
-
-            Extra = extraString;
         }
     }
 }
