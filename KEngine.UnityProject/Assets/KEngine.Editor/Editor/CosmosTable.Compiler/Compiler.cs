@@ -72,7 +72,7 @@ namespace CosmosTable
         /// </summary>
         public string ExportTabExt = ".bytes";
         // 被认为是注释的表头
-        public string[] CommentColumnStartsWith = { "Comment", "#" };
+        public string[] CommentStartsWith = { "Comment", "#" };
 
 
         public CompilerConfig()
@@ -254,7 +254,7 @@ namespace CosmosTable
         /// <returns></returns>
         private bool CheckCommentString(string colNameStr)
         {
-            foreach (var commentStartsWith in _config.CommentColumnStartsWith)
+            foreach (var commentStartsWith in _config.CommentStartsWith)
             {
                 if (colNameStr.ToLower().StartsWith(commentStartsWith.ToLower()))
                 {

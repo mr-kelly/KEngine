@@ -7,4 +7,5 @@ AssetBundleExt	.bytes
 IsLoadAssetBundle	1	
 UIModuleBridge	KEngine.UI.UGUIBridge	
 SettingSourcePath	Product/SettingSource	
-SettingPath	Assets/Resources/Setting	Folder in Resources	
+SettingCompiledPath	Assets/Resources/Setting	settings where compile to?	
+SettingResourcesPath	Setting	Folder in Resources	

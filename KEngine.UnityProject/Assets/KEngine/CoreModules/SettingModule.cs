@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using System.Text;
@@ -11,11 +12,32 @@ namespace KEngine.Modules
     /// </summary>
     public class SettingModule : SettingModuleBase
     {
-        private static bool _isEditor;
+        public delegate byte[] LoadSettingFuncDelegate(string filePath);
+        public delegate byte[] SettingBytesFilterDelegate(byte[] bytes);
+
+        /// <summary>
+        /// Filter the loaded bytes, which settings file may be encrypted, so you can manipulate the bytes
+        /// </summary>
+        public static SettingBytesFilterDelegate SettingBytesFilter;
+
+        /// <summary>
+        /// Override the default load file strategy
+        /// </summary>
+        public static LoadSettingFuncDelegate CustomLoadSetting;
+
+        private static readonly bool IsEditor;
         static SettingModule()
         {
-            _isEditor = Application.isEditor;
+            IsEditor = Application.isEditor;
         }
+
+        /// <summary>
+        /// internal constructor
+        /// </summary>
+        internal SettingModule()
+        {
+        }
+
         /// <summary>
         /// Load KEngineConfig.txt 's `SettingPath`
         /// </summary>
@@ -23,7 +45,7 @@ namespace KEngine.Modules
         {
             get
             {
-                return Path.GetFileName(AppEngine.GetConfig("SettingPath"));
+                return AppEngine.GetConfig("SettingResourcesPath");
             }
         }
 
@@ -52,7 +74,19 @@ namespace KEngine.Modules
         /// <returns></returns>
         protected override string LoadSetting(string path)
         {
-            string fileContent;
+            byte[] fileContent = CustomLoadSetting != null ? CustomLoadSetting(path) : DefaultLoadSetting(path);
+            return Encoding.UTF8.GetString(fileContent);
+        }
+
+        /// <summary>
+        /// Default load setting strategry,  editor load file, runtime resources.load
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static byte[] DefaultLoadSetting(string path)
+        {
+            byte[] fileContent;
+
             if (IsFileSystemMode)
                 fileContent = LoadSettingFromFile(path);
             else
@@ -65,10 +99,12 @@ namespace KEngine.Modules
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        private string LoadSettingFromFile(string path)
+        private static byte[] LoadSettingFromFile(string path)
         {
             var resPath = GetFileSystemPath(path);
-            return File.ReadAllText(resPath);
+            var bytes = File.ReadAllBytes(resPath);
+            bytes = SettingBytesFilter != null ? SettingBytesFilter(bytes) : bytes;
+            return bytes;
         }
 
         private static string GetFileSystemPath(string path)
@@ -95,7 +131,7 @@ namespace KEngine.Modules
                 return;
             }
             if (_cacheWatchers == null)
-                 _cacheWatchers = new Dictionary<string, FileSystemWatcher>();
+                _cacheWatchers = new Dictionary<string, FileSystemWatcher>();
             FileSystemWatcher watcher;
             var dirPath = Path.GetDirectoryName(GetFileSystemPath(path));
             if (!_cacheWatchers.TryGetValue(dirPath, out watcher))
@@ -118,15 +154,13 @@ namespace KEngine.Modules
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        private string LoadSettingFromResources(string path)
+        private static byte[] LoadSettingFromResources(string path)
         {
             var resPath = SettingFolderName + "/" + Path.ChangeExtension(path, null);
             var fileContentAsset = Resources.Load(resPath) as TextAsset;
-            var fileContent = Encoding.UTF8.GetString(fileContentAsset.bytes);
-            return fileContent;
+            var bytes = SettingBytesFilter != null ? SettingBytesFilter(fileContentAsset.bytes) : fileContentAsset.bytes;
+            return bytes;
         }
-
-
 
         /// <summary>
         /// whether or not using file system file, in unity editor mode only
@@ -135,7 +169,7 @@ namespace KEngine.Modules
         {
             get
             {
-                if (_isEditor)
+                if (IsEditor)
                     return true;
                 return false;
 

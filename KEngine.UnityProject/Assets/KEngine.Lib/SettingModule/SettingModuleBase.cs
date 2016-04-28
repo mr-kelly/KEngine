@@ -31,7 +31,7 @@ using CosmosTable;
 namespace KEngine.Modules
 {
     /// <summary>
-    /// For all class `XXXInfos`
+    /// For all class `XXXSettings`
     /// </summary>
     public interface IReloadableSettings
     {

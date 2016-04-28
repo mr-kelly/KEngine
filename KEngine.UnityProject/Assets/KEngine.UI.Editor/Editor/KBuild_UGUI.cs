@@ -38,8 +38,7 @@ namespace KEngine.Editor
         [MenuItem("KEngine/UI(UGUI)/Export Current UI")]
         public static void ExportCurrentUI()
         {
-            var UIName = Path.GetFileNameWithoutExtension(EditorApplication.currentScene);
-
+            //var UIName = Path.GetFileNameWithoutExtension(EditorApplication.currentScene);
             var windowAssets = GameObject.FindObjectsOfType<KUIWindowAsset>();
             if (windowAssets.Length <= 0)
             {
@@ -52,7 +51,6 @@ namespace KEngine.Editor
                     var uiName = windowAsset.name;
                     KBuildTools.BuildAssetBundle(windowAsset.gameObject, GetBuildRelPath(uiName));
                 }
-
             }
         }
 
@@ -68,7 +66,7 @@ namespace KEngine.Editor
             if (mainCamera != null)
                 GameObject.DestroyImmediate(mainCamera);
 
-            GameObject uiObj = new GameObject("UI");
+            GameObject uiObj = new GameObject("NewUI_" + Path.GetRandomFileName());
             uiObj.layer = (int)UnityLayerDef.UI;
             var canvas = uiObj.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -100,6 +98,9 @@ namespace KEngine.Editor
 
         public override void Export(string path)
         {
+            EditorApplication.OpenScene(path);
+
+            ExportCurrentUI();
         }
 
         public override string GetDirectory()
