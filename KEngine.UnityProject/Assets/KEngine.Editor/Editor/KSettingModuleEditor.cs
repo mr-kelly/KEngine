@@ -187,7 +187,7 @@ namespace {{ NameSpace }}
             {
                 _instance = new {{file.ClassName}}Settings();
 
-                _instance.ReloadAll();
+                _instance._ReloadAll(true);
     #if UNITY_EDITOR
                 if (SettingModule.IsFileSystemMode)
                 {
@@ -219,9 +219,17 @@ namespace {{ NameSpace }}
         }
 
         /// <summary>
+        /// Do reload the setting file: {{ file.ClassName }}, no exception when duplicate primary key
+        /// </summary>
+        public void ReloadAll()
+        {
+            _ReloadAll(false);
+        }
+
+        /// <summary>
         /// Do reload the setting file: {{ file.ClassName }}
         /// </summary>
-	    public void ReloadAll()
+	    void _ReloadAll(bool throwWhenDuplicatePrimaryKey)
         {
             for (var j = 0; j < TabFilePaths.Length; j++)
             {
@@ -237,7 +245,11 @@ namespace {{ NameSpace }}
                             setting = new {{file.ClassName}}Setting(row);
                             _dict[setting.{{ file.PrimaryKeyField.Name }}] = setting;
                         }
-                        else setting.Reload(row);
+                        else 
+                        {
+                            if (throwWhenDuplicatePrimaryKey) throw new System.Exception(string.Format(""DuplicateKey, Class: {0}, File: {1}, Key: {2}"", this.GetType().Name, tabFilePath, pk));
+                            else setting.Reload(row);
+                        }
                     }
                 }
             }

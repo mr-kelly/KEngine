@@ -25,6 +25,7 @@
 #endregion
 
 using System.IO;
+using KEngine.UI;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -39,8 +40,20 @@ namespace KEngine.Editor
         {
             var UIName = Path.GetFileNameWithoutExtension(EditorApplication.currentScene);
 
-            var uiRoot = GameObject.Find("UI");
-            KBuildTools.BuildAssetBundle(uiRoot, GetBuildRelPath(UIName));
+            var windowAssets = GameObject.FindObjectsOfType<KUIWindowAsset>();
+            if (windowAssets.Length <= 0)
+            {
+                KLogger.LogError("Not found KUIWindowAsset in scene `{0}`", EditorApplication.currentScene);
+            }
+            else
+            {
+                foreach (var windowAsset in windowAssets)
+                {
+                    var uiName = windowAsset.name;
+                    KBuildTools.BuildAssetBundle(windowAsset.gameObject, GetBuildRelPath(uiName));
+                }
+
+            }
         }
 
         public static string GetBuildRelPath(string uiName)

@@ -78,14 +78,14 @@ namespace AppSettings
 
 
 	/// <summary>
-	/// Auto Generate for Tab File: "AppConfig+Category.bytes", "AppConfig.bytes"
+	/// Auto Generate for Tab File: "AppConfig+Category.bytes", "AppConfig+Category2.bytes", "AppConfig.bytes"
     /// No use of generic and reflection, for better performance,  less IL code generating
 	/// </summary>>
     public partial class AppConfigSettings : IReloadableSettings
     {
 		public static readonly string[] TabFilePaths = 
         {
-            "AppConfig+Category.bytes", "AppConfig.bytes"
+            "AppConfig+Category.bytes", "AppConfig+Category2.bytes", "AppConfig.bytes"
         };
         static AppConfigSettings _instance;
         Dictionary<string, AppConfigSetting> _dict = new Dictionary<string, AppConfigSetting>();
@@ -113,7 +113,7 @@ namespace AppSettings
             {
                 _instance = new AppConfigSettings();
 
-                _instance.ReloadAll();
+                _instance._ReloadAll(true);
     #if UNITY_EDITOR
                 if (SettingModule.IsFileSystemMode)
                 {
@@ -145,9 +145,17 @@ namespace AppSettings
         }
 
         /// <summary>
+        /// Do reload the setting file: AppConfig, no exception when duplicate primary key
+        /// </summary>
+        public void ReloadAll()
+        {
+            _ReloadAll(false);
+        }
+
+        /// <summary>
         /// Do reload the setting file: AppConfig
         /// </summary>
-	    public void ReloadAll()
+	    void _ReloadAll(bool throwWhenDuplicatePrimaryKey)
         {
             for (var j = 0; j < TabFilePaths.Length; j++)
             {
@@ -163,7 +171,11 @@ namespace AppSettings
                             setting = new AppConfigSetting(row);
                             _dict[setting.Id] = setting;
                         }
-                        else setting.Reload(row);
+                        else 
+                        {
+                            if (throwWhenDuplicatePrimaryKey) throw new System.Exception(string.Format("DuplicateKey, Class: {0}, File: {1}, Key: {2}", this.GetType().Name, tabFilePath, pk));
+                            else setting.Reload(row);
+                        }
                     }
                 }
             }
@@ -209,7 +221,7 @@ namespace AppSettings
     }
 
 	/// <summary>
-	/// Auto Generate for Tab File: "AppConfig+Category.bytes", "AppConfig.bytes"
+	/// Auto Generate for Tab File: "AppConfig+Category.bytes", "AppConfig+Category2.bytes", "AppConfig.bytes"
     /// Singleton class for less memory use
 	/// </summary>
 	public partial class AppConfigSetting : TableRowParser
@@ -285,7 +297,7 @@ namespace AppSettings
             {
                 _instance = new ExampleSettings();
 
-                _instance.ReloadAll();
+                _instance._ReloadAll(true);
     #if UNITY_EDITOR
                 if (SettingModule.IsFileSystemMode)
                 {
@@ -317,9 +329,17 @@ namespace AppSettings
         }
 
         /// <summary>
+        /// Do reload the setting file: Example, no exception when duplicate primary key
+        /// </summary>
+        public void ReloadAll()
+        {
+            _ReloadAll(false);
+        }
+
+        /// <summary>
         /// Do reload the setting file: Example
         /// </summary>
-	    public void ReloadAll()
+	    void _ReloadAll(bool throwWhenDuplicatePrimaryKey)
         {
             for (var j = 0; j < TabFilePaths.Length; j++)
             {
@@ -335,7 +355,11 @@ namespace AppSettings
                             setting = new ExampleSetting(row);
                             _dict[setting.Id] = setting;
                         }
-                        else setting.Reload(row);
+                        else 
+                        {
+                            if (throwWhenDuplicatePrimaryKey) throw new System.Exception(string.Format("DuplicateKey, Class: {0}, File: {1}, Key: {2}", this.GetType().Name, tabFilePath, pk));
+                            else setting.Reload(row);
+                        }
                     }
                 }
             }
@@ -481,7 +505,7 @@ namespace AppSettings
             {
                 _instance = new SubdirExample2Settings();
 
-                _instance.ReloadAll();
+                _instance._ReloadAll(true);
     #if UNITY_EDITOR
                 if (SettingModule.IsFileSystemMode)
                 {
@@ -513,9 +537,17 @@ namespace AppSettings
         }
 
         /// <summary>
+        /// Do reload the setting file: SubdirExample2, no exception when duplicate primary key
+        /// </summary>
+        public void ReloadAll()
+        {
+            _ReloadAll(false);
+        }
+
+        /// <summary>
         /// Do reload the setting file: SubdirExample2
         /// </summary>
-	    public void ReloadAll()
+	    void _ReloadAll(bool throwWhenDuplicatePrimaryKey)
         {
             for (var j = 0; j < TabFilePaths.Length; j++)
             {
@@ -531,7 +563,11 @@ namespace AppSettings
                             setting = new SubdirExample2Setting(row);
                             _dict[setting.Id] = setting;
                         }
-                        else setting.Reload(row);
+                        else 
+                        {
+                            if (throwWhenDuplicatePrimaryKey) throw new System.Exception(string.Format("DuplicateKey, Class: {0}, File: {1}, Key: {2}", this.GetType().Name, tabFilePath, pk));
+                            else setting.Reload(row);
+                        }
                     }
                 }
             }
@@ -653,7 +689,7 @@ namespace AppSettings
             {
                 _instance = new SubdirSettings();
 
-                _instance.ReloadAll();
+                _instance._ReloadAll(true);
     #if UNITY_EDITOR
                 if (SettingModule.IsFileSystemMode)
                 {
@@ -685,9 +721,17 @@ namespace AppSettings
         }
 
         /// <summary>
+        /// Do reload the setting file: Subdir, no exception when duplicate primary key
+        /// </summary>
+        public void ReloadAll()
+        {
+            _ReloadAll(false);
+        }
+
+        /// <summary>
         /// Do reload the setting file: Subdir
         /// </summary>
-	    public void ReloadAll()
+	    void _ReloadAll(bool throwWhenDuplicatePrimaryKey)
         {
             for (var j = 0; j < TabFilePaths.Length; j++)
             {
@@ -703,7 +747,11 @@ namespace AppSettings
                             setting = new SubdirSetting(row);
                             _dict[setting.Id] = setting;
                         }
-                        else setting.Reload(row);
+                        else 
+                        {
+                            if (throwWhenDuplicatePrimaryKey) throw new System.Exception(string.Format("DuplicateKey, Class: {0}, File: {1}, Key: {2}", this.GetType().Name, tabFilePath, pk));
+                            else setting.Reload(row);
+                        }
                     }
                 }
             }
@@ -825,7 +873,7 @@ namespace AppSettings
             {
                 _instance = new SubdirSubSubDirExample3Settings();
 
-                _instance.ReloadAll();
+                _instance._ReloadAll(true);
     #if UNITY_EDITOR
                 if (SettingModule.IsFileSystemMode)
                 {
@@ -857,9 +905,17 @@ namespace AppSettings
         }
 
         /// <summary>
+        /// Do reload the setting file: SubdirSubSubDirExample3, no exception when duplicate primary key
+        /// </summary>
+        public void ReloadAll()
+        {
+            _ReloadAll(false);
+        }
+
+        /// <summary>
         /// Do reload the setting file: SubdirSubSubDirExample3
         /// </summary>
-	    public void ReloadAll()
+	    void _ReloadAll(bool throwWhenDuplicatePrimaryKey)
         {
             for (var j = 0; j < TabFilePaths.Length; j++)
             {
@@ -875,7 +931,11 @@ namespace AppSettings
                             setting = new SubdirSubSubDirExample3Setting(row);
                             _dict[setting.Id] = setting;
                         }
-                        else setting.Reload(row);
+                        else 
+                        {
+                            if (throwWhenDuplicatePrimaryKey) throw new System.Exception(string.Format("DuplicateKey, Class: {0}, File: {1}, Key: {2}", this.GetType().Name, tabFilePath, pk));
+                            else setting.Reload(row);
+                        }
                     }
                 }
             }
