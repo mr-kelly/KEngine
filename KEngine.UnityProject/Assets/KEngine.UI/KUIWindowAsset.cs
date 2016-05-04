@@ -30,6 +30,7 @@ namespace KEngine.UI
     /// <summary>
     /// Mark for build UI window
     /// </summary>
+    [AddComponentMenu("KEngine/KUIWindowAsset")]
     public class KUIWindowAsset : MonoBehaviour
     {
         public string StringArgument;
