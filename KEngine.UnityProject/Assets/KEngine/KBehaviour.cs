@@ -28,6 +28,7 @@ using KEngine;
 using UnityEngine;
 
 /// <summary>
+/// KEngine MonoBehaivour
 /// Without Update, With some cache
 /// </summary>
 public abstract class KBehaviour : MonoBehaviour

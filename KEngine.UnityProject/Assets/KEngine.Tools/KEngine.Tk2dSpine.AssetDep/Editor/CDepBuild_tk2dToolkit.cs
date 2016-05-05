@@ -99,9 +99,9 @@ public partial class KDependencyBuild
             KLogger.Log("Null Sprite Collection {0}", path);
             return "";   // !!! SpriteCollection可能动态生成的，不打包它
         }
-        bool needBuild = KBuildTools.CheckNeedBuild(path);
+        bool needBuild = BuildTools.CheckNeedBuild(path);
         if (needBuild)
-            KBuildTools.MarkBuildVersion(path);
+            BuildTools.MarkBuildVersion(path);
 
         path = __GetPrefabBuildPath(path);
 

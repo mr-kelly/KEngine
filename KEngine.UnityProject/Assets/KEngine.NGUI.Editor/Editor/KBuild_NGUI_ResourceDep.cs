@@ -95,7 +95,7 @@ public partial class KBuild_NGUI_ResourceDep : KBuild_Base
             }
             else
             {
-                KBuildTools.BuildAssetBundle(tempPanelObject, GetBuildRelPath(uiName));
+                BuildTools.BuildAssetBundle(tempPanelObject, GetBuildRelPath(uiName));
             }
             DestroyTempPrefab(tempPanelObject);
         }
@@ -177,7 +177,7 @@ public partial class KBuild_NGUI_ResourceDep : KBuild_Base
         if (AnchorObject == null)
         {
             //if (showMsg)
-            //    KBuildTools.ShowDialog("找不到UIRoot/PanelRoot/Anchor");
+            //    BuildTools.ShowDialog("找不到UIRoot/PanelRoot/Anchor");
             //else
             Debug.LogError("找不到UIRoot/PanelRoot/Anchor");
             return null;
@@ -186,7 +186,7 @@ public partial class KBuild_NGUI_ResourceDep : KBuild_Base
         if (AnchorObject.transform.childCount != 1)
         {
             //if (showMsg)
-            //    KBuildTools.ShowDialog("UI结构错误，Ahchor下应该只有一个节点");
+            //    BuildTools.ShowDialog("UI结构错误，Ahchor下应该只有一个节点");
             //else
             Debug.LogError("UI结构错误，Ahchor下应该只有一个节点");
             return null;

@@ -288,7 +288,7 @@ namespace KEngine.ResourceDep.Builder
                 return CheckNeedBuildAsset(path);
             }
 
-            var needBuild = !KAssetVersionControl.TryCheckExistRecord(path);
+            var needBuild = !AssetVersionControl.TryCheckExistRecord(path);
             if (!needBuild && !InternalEditorUtility.inBatchMode)
             {
                 Debug.LogWarning("Builtin resource handled, no Need To Build " + path);
@@ -304,7 +304,7 @@ namespace KEngine.ResourceDep.Builder
         private static bool CheckNeedBuildAsset(string assetPath)
         {
             // 判断是否需要打包，根据要在依赖判断之后哦
-            if (!KAssetVersionControl.TryCheckNeedBuildWithMeta(assetPath))
+            if (!AssetVersionControl.TryCheckNeedBuildWithMeta(assetPath))
             {
                 if (!InternalEditorUtility.inBatchMode)
                 {
@@ -361,7 +361,7 @@ namespace KEngine.ResourceDep.Builder
             uint crc = 0;
             var time = DateTime.Now;
             // 最终完整路径
-            var buildToFullPath = KBuildTools.MakeSureExportPath(path, buildTarget, quality) +
+            var buildToFullPath = BuildTools.MakeSureExportPath(path, buildTarget, quality) +
                            AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt);
             var buildToRelativePath = AbsPath2RelativePath(buildToFullPath);//buildToFullPath.Replace(workdirPath, "").Substring(1); // 转换成相对路径，避免路径过程无法打包的问题
 
@@ -372,12 +372,12 @@ namespace KEngine.ResourceDep.Builder
             if (unityAssetType == UnityAssetType.Builtin || unityAssetType == UnityAssetType.Memory)
             {
                 var buildAssetPath = GetBuildAssetPath(asset);
-                KAssetVersionControl.TryMarkRecord(buildAssetPath);
+                AssetVersionControl.TryMarkRecord(buildAssetPath);
                 BuildedPool.Add(buildAssetPath);
             }
             else
             {
-                KAssetVersionControl.TryMarkBuildVersion(assetPath);
+                AssetVersionControl.TryMarkBuildVersion(assetPath);
                 BuildedPool.Add(assetPath);
             }
 
@@ -410,7 +410,7 @@ namespace KEngine.ResourceDep.Builder
                     depFileRelativeBuildPath = new List<string>();
 
                 var manifestPath = path + ".manifest";
-                fullManifestPath = KBuildTools.MakeSureExportPath(manifestPath, buildTarget, quality) +
+                fullManifestPath = BuildTools.MakeSureExportPath(manifestPath, buildTarget, quality) +
                                    AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt);
                 var relativeManifestPath = AbsPath2RelativePath(fullManifestPath); // 转成相对路径
 
@@ -864,7 +864,7 @@ namespace KEngine.ResourceDep.Builder
         [MenuItem("Assets/Build Asset Bundles with KEngine.ResourceDep (Rebuild Version)", false, 1001)]
         public static void MenuBuildUnityObjectRebuild()
         {
-            using (new KAssetVersionControl(true))
+            using (new AssetVersionControl(true))
             {
                 MenuBuildUnityObject();
             }
@@ -873,7 +873,7 @@ namespace KEngine.ResourceDep.Builder
         [MenuItem("Assets/Build Asset Bundles with KEngine.ResourceDep (Diff Version)", false, 1002)]
         public static void MenuBuildUnityObjectDiff()
         {
-            using (new KAssetVersionControl(false))
+            using (new AssetVersionControl(false))
             {
                 MenuBuildUnityObject();
             }

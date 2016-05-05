@@ -46,9 +46,9 @@ public class KDepBuild_Material
         {
             string path = AssetDatabase.GetAssetPath(mat);
 
-            bool needBuild = KAssetVersionControl.TryCheckNeedBuildWithMeta(path);
+            bool needBuild = AssetVersionControl.TryCheckNeedBuildWithMeta(path);
             if (needBuild)
-                KAssetVersionControl.TryMarkBuildVersion(path);
+                AssetVersionControl.TryMarkBuildVersion(path);
 
             path = KDependencyBuild.__GetPrefabBuildPath(path);
             buildResult = KDependencyBuild.__DoBuildScriptableObject("Material/Material_" + path, sMat, needBuild);
@@ -121,9 +121,9 @@ public class KDepBuild_Material
 
         //var shaderFlag = string.Format("Shader:{0}:{1}", fileShader.name, shaderAssetPath);  // 构造一个标记
 
-        bool needBuild = KAssetVersionControl.TryCheckFileBuild(shaderAssetPath);
+        bool needBuild = AssetVersionControl.TryCheckFileBuild(shaderAssetPath);
         if (needBuild)
-            KAssetVersionControl.TryMarkBuildVersion(shaderAssetPath);
+            AssetVersionControl.TryMarkBuildVersion(shaderAssetPath);
 
         var cleanShaderName = GetShaderNameToBuild(fileShader);
         var result = KDependencyBuild.DoBuildAssetBundle("Shader/Shader_" + cleanShaderName, fileShader, needBuild);

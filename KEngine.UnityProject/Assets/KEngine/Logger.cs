@@ -42,11 +42,13 @@ namespace KEngine
         Error,
     }
 
-    [Obsolete("The name 'Logger' conflict with Unity 5 'KLogger', use 'KLogger' instead, at 2016/04/08")]
+    [Obsolete("The name 'Logger' conflict with Unity 5 'Logger', use 'KLogger' instead, at 2016/04/08")]
     public class Logger : KLogger
     {}
-    /// Frequent Used,
-    /// A File logger + Debug Tools
+
+    /// <summary>
+    /// KEngine Logger, file write + console output
+    /// </summary>
     public class KLogger
     {
         public static KLogLevel LogLevel = KLogLevel.Info;
@@ -87,7 +89,6 @@ namespace KEngine
         static KLogger()
         {
             // isDebugBuild先预存起来，因为它是一个get_属性, 在非Unity主线程里不能用，导致多线程网络打印log时报错
-
             try
             {
                 //IsDebugBuild = UnityEngine.Debug.isDebugBuild;

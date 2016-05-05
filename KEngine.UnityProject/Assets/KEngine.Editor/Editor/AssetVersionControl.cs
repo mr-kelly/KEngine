@@ -33,12 +33,17 @@ using Object = UnityEngine.Object;
 
 namespace KEngine.Editor
 {
+    [Obsolete("Please use AssetVersionControl instead!")]
+    public class KAssetVersionControl : AssetVersionControl
+    {
+    }
+
     /// <summary>
     /// 基于Tab表格的纯文本简单资源差异管理器
     /// </summary>
-    public class KAssetVersionControl : IDisposable
+    public class AssetVersionControl : IDisposable
     {
-        public static KAssetVersionControl Current;
+        public static AssetVersionControl Current;
 
         private bool _isRebuild = false;
 
@@ -61,7 +66,7 @@ namespace KEngine.Editor
         /// 资源打包周期版本管理
         /// </summary>
         /// <param name="rebuild">如果是rebuild，将无视之前的差异打包信息</param>
-        public KAssetVersionControl(bool rebuild = false)
+        public AssetVersionControl(bool rebuild = false)
         {
             if (Current != null)
             {
@@ -78,7 +83,7 @@ namespace KEngine.Editor
 
             //KDependencyBuild.Clear();
 
-            KBuildTools.AfterBuildAssetBundleEvent += OnAfterBuildAssetBundleEvent;
+            BuildTools.AfterBuildAssetBundleEvent += OnAfterBuildAssetBundleEvent;
         }
 
         public void Dispose()
@@ -95,7 +100,7 @@ namespace KEngine.Editor
             //KDependencyBuild.SaveBuildAction();
 
             Current = null;
-            KBuildTools.AfterBuildAssetBundleEvent -= OnAfterBuildAssetBundleEvent;
+            BuildTools.AfterBuildAssetBundleEvent -= OnAfterBuildAssetBundleEvent;
             //KDependencyBuild.Clear();
         }
 

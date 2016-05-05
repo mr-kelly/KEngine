@@ -50,9 +50,9 @@ public class KDepBuild_AudioSource : IDepBuildProcessor
     public static string BuildAudioClip(AudioClip audioClip)
     {
         string assetPath = AssetDatabase.GetAssetPath(audioClip);
-        bool needBuild = KAssetVersionControl.TryCheckNeedBuildWithMeta(assetPath);
+        bool needBuild = AssetVersionControl.TryCheckNeedBuildWithMeta(assetPath);
         if (needBuild)
-            KAssetVersionControl.TryMarkBuildVersion(assetPath);
+            AssetVersionControl.TryMarkBuildVersion(assetPath);
 
         var result = KDependencyBuild.DoBuildAssetBundle("Audio/Audio_" + audioClip.name, audioClip, needBuild);
 

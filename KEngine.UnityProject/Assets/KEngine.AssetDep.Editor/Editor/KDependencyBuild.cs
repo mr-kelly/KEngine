@@ -275,7 +275,7 @@ public class KDependencyBuild
             if (!IsJustCollect && realBuildOrJustPath)
             {
                 //BuildedCache[fullAssetPath] = true;
-                KBuildTools.BuildAssetBundle(asset, path);
+                BuildTools.BuildAssetBundle(asset, path);
                 hasBuilded = true;
             }
         }
@@ -313,7 +313,7 @@ public class KDependencyBuild
                 AddCache(fullAssetPath);
                 if (!IsJustCollect && realBuildOrJustPath)
                 {
-                    KBuildTools.BuildScriptableObject(so, fullAssetPath);
+                    BuildTools.BuildScriptableObject(so, fullAssetPath);
                     hasBuilded = true;
                 }
             }
@@ -361,9 +361,9 @@ public class KDependencyBuild
         }
 
         string assetPath = AssetDatabase.GetAssetPath(tex);
-        bool needBuild = KAssetVersionControl.TryCheckNeedBuildWithMeta(assetPath);
+        bool needBuild = AssetVersionControl.TryCheckNeedBuildWithMeta(assetPath);
         if (needBuild)
-            KAssetVersionControl.TryMarkBuildVersion(assetPath);
+            AssetVersionControl.TryMarkBuildVersion(assetPath);
 
         Texture newTex;
         if (tex is Texture2D)
@@ -458,9 +458,9 @@ public class KDependencyBuild
         //fontAssetPath = __GetPrefabBuildPath(fontAssetPath).Replace("Atlas_", "");
         //string[] splitArr = fontAssetPath.Split('/');
 
-        bool needBuild = KAssetVersionControl.TryCheckNeedBuildWithMeta(fontAssetPath);
+        bool needBuild = AssetVersionControl.TryCheckNeedBuildWithMeta(fontAssetPath);
         if (needBuild)
-            KAssetVersionControl.TryMarkBuildVersion(fontAssetPath);
+            AssetVersionControl.TryMarkBuildVersion(fontAssetPath);
 
         var result = DoBuildAssetBundle("Font/Font_" + font.name, font, needBuild);
 
@@ -484,7 +484,7 @@ public class KDependencyBuild
         var fileName = Path.GetFileNameWithoutExtension(cleanPath);
         var buildPath = string.Format("{0}/{1}_{0}{2}", saveCacheFolderName, fileName,
             AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt));
-        var needBuild = KAssetVersionControl.TryCheckNeedBuildWithMeta(cleanPath);
+        var needBuild = AssetVersionControl.TryCheckNeedBuildWithMeta(cleanPath);
 
         var texture = new Texture2D(1, 1);
 
@@ -524,7 +524,7 @@ public class KDependencyBuild
         var result = KDependencyBuild.DoBuildAssetBundle(buildPath, texture, needBuild);
 
         if (needBuild)
-            KAssetVersionControl.TryMarkBuildVersion(cleanPath);
+            AssetVersionControl.TryMarkBuildVersion(cleanPath);
 
         return result.Path;
     }

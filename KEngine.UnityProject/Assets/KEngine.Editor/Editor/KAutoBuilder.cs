@@ -218,7 +218,7 @@ namespace KEngine.Editor
         {
             PlayerPrefs.DeleteAll();
             PlayerPrefs.Save();
-            KBuildTools.ShowDialog("Prefs Cleared!");
+            BuildTools.ShowDialog("Prefs Cleared!");
         }
     }
 
@@ -255,7 +255,7 @@ namespace KEngine.Editor
 
         public static string GetResourceExportPath()
         {
-            var resourcePath = KBuildTools.GetExportPath(EditorUserBuildSettings.activeBuildTarget,
+            var resourcePath = BuildTools.GetExportPath(EditorUserBuildSettings.activeBuildTarget,
                 KResourceModule.Quality);
             return resourcePath;
         }

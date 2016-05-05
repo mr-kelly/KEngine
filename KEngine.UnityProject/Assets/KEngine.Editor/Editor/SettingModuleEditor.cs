@@ -3,7 +3,7 @@
 // KEngine - Toolset and framework for Unity3D
 // ===================================
 // 
-// Filename: KSettingModuleEditor.cs
+// Filename: SettingModuleEditor.cs
 // Date:     2015/12/03
 // Author:  Kelly
 // Email: 23110388@qq.com
@@ -40,7 +40,7 @@ namespace KEngine.Editor
     /// For SettingModule
     /// </summary>
     [InitializeOnLoad]
-    public class KSettingModuleEditor
+    public class SettingModuleEditor
     {
         /// <summary>
         /// 是否自动在编译配置表时生成静态代码，如果不需要，外部设置false
@@ -81,7 +81,7 @@ namespace KEngine.Editor
         /// </summary>
         private static bool _isPopUpConfirm = false;
 
-        static KSettingModuleEditor()
+        static SettingModuleEditor()
         {
             var path = SettingSourcePath;
             if (Directory.Exists(path))
@@ -98,7 +98,7 @@ namespace KEngine.Editor
                         _isPopUpConfirm = false;
                     });
                 });
-                Debug.Log("[KSettingModuleEditor]Watching directory: " + SettingSourcePath);
+                Debug.Log("[SettingModuleEditor]Watching directory: " + SettingSourcePath);
             }
         }
 
@@ -111,7 +111,7 @@ namespace KEngine.Editor
 
             var codeTemplates = new Dictionary<string, string>()
             {
-                {KSettingModuleTemplate.GenCodeTemplate, genCodeFilePath},
+                {SettingModuleTemplate.GenCodeTemplate, genCodeFilePath},
             };
 
             foreach (var kv in codeTemplates)

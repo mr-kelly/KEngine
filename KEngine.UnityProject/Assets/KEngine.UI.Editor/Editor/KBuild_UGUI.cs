@@ -49,7 +49,7 @@ namespace KEngine.Editor
                 foreach (var windowAsset in windowAssets)
                 {
                     var uiName = windowAsset.name;
-                    KBuildTools.BuildAssetBundle(windowAsset.gameObject, GetBuildRelPath(uiName));
+                    BuildTools.BuildAssetBundle(windowAsset.gameObject, GetBuildRelPath(uiName));
                 }
             }
         }

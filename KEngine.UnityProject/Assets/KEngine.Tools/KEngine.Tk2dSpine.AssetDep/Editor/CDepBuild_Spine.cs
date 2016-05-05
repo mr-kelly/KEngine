@@ -35,15 +35,15 @@ public partial class KDependencyBuild
         string path = AssetDatabase.GetAssetPath(data);
 
         // DataAsset
-        bool needBuildDataAsset = KBuildTools.CheckNeedBuild(path);
+        bool needBuildDataAsset = BuildTools.CheckNeedBuild(path);
         if (needBuildDataAsset)
-            KBuildTools.MarkBuildVersion(path);
+            BuildTools.MarkBuildVersion(path);
 
         // Spine的JSON
         string textAssetPath = AssetDatabase.GetAssetPath(data.skeletonJSON);
-        bool needBuildJsonTextAsset = KBuildTools.CheckNeedBuild(textAssetPath);
+        bool needBuildJsonTextAsset = BuildTools.CheckNeedBuild(textAssetPath);
         if (needBuildJsonTextAsset)
-            KBuildTools.MarkBuildVersion(textAssetPath);
+            BuildTools.MarkBuildVersion(textAssetPath);
 
         //string originPath = path;
         //string tmpPath = "Assets/~TempSkeletonDataAsset.asset";
@@ -58,9 +58,9 @@ public partial class KDependencyBuild
 
         string spriteColPath = BuildSpriteCollection(data.spriteCollection);
         string spriteColAssetPath = AssetDatabase.GetAssetPath(data.spriteCollection.gameObject);
-        bool needBuildSpriteCol = KBuildTools.CheckNeedBuild(spriteColAssetPath);
+        bool needBuildSpriteCol = BuildTools.CheckNeedBuild(spriteColAssetPath);
         if (needBuildSpriteCol)
-            KBuildTools.MarkBuildVersion(spriteColAssetPath);
+            BuildTools.MarkBuildVersion(spriteColAssetPath);
 
         SkeletonDataAsset copyData = GameObject.Instantiate(data) as SkeletonDataAsset;
         copyData.spriteCollection = null; // 挖空图集, 保留Json!

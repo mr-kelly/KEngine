@@ -89,9 +89,9 @@ public class KDepBuild_UGUI
             KLogger.LogWarning("Sprite: {0} is packing!!!", sprite.name);
 
         string assetPath = AssetDatabase.GetAssetPath(sprite);
-        bool needBuild = KAssetVersionControl.TryCheckNeedBuildWithMeta(assetPath);
+        bool needBuild = AssetVersionControl.TryCheckNeedBuildWithMeta(assetPath);
         if (needBuild)
-            KAssetVersionControl.TryMarkBuildVersion(assetPath);
+            AssetVersionControl.TryMarkBuildVersion(assetPath);
 
         string path = KDependencyBuild.__GetPrefabBuildPath(assetPath);
         if (string.IsNullOrEmpty(path))

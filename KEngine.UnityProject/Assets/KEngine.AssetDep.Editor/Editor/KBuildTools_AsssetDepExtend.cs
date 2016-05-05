@@ -26,6 +26,7 @@
 
 using System.IO;
 using KEngine;
+using KEngine.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -34,10 +35,10 @@ public partial class KBuildTools_AssetDep
 {
     static KBuildTools_AssetDep()
     {
-        KBuildTools.BeforeBuildAssetBundleEvent -= BeforeBuildAssetBundle;
-        KBuildTools.BeforeBuildAssetBundleEvent += BeforeBuildAssetBundle;
-        KBuildTools.AfterBuildAssetBundleEvent -= AfterBuildAssetBundle;
-        KBuildTools.AfterBuildAssetBundleEvent += AfterBuildAssetBundle;
+        BuildTools.BeforeBuildAssetBundleEvent -= BeforeBuildAssetBundle;
+        BuildTools.BeforeBuildAssetBundleEvent += BeforeBuildAssetBundle;
+        BuildTools.AfterBuildAssetBundleEvent -= AfterBuildAssetBundle;
+        BuildTools.AfterBuildAssetBundleEvent += AfterBuildAssetBundle;
     }
 
 

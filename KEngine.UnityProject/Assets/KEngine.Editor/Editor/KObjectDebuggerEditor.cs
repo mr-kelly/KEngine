@@ -25,8 +25,12 @@
 #endregion
 
 using System.Reflection;
+using KEngine;
 using UnityEditor;
 
+/// <summary>
+/// KObjectDebugger的Inspector具体信息输出
+/// </summary>
 [CustomEditor(typeof (KObjectDebugger))]
 public class KObjectDebuggerEditor : Editor
 {
