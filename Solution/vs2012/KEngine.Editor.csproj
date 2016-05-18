@@ -71,6 +71,12 @@
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\AppEngineInspector.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\AppEngineInspector.cs</Link>
     </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\AssetVersionControl.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\AssetVersionControl.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\BuildTools.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\BuildTools.cs</Link>
+    </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\CommandLine.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\CommandLine.cs</Link>
     </Compile>
@@ -80,14 +86,11 @@
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\CosmosTable.Compiler\SimpleExcelFile.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\CosmosTable.Compiler\SimpleExcelFile.cs</Link>
     </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\KAssetVersionControl.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\KAssetVersionControl.cs</Link>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\ExcelFile.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\ExcelFile.cs</Link>
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\KAutoBuilder.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\KAutoBuilder.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\KBuildTools.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\KBuildTools.cs</Link>
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\KCommonProductPrefabExporter.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\KCommonProductPrefabExporter.cs</Link>
@@ -95,17 +98,17 @@
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\KEngineUtils.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\KEngineUtils.cs</Link>
     </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\KExcelFile.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\KExcelFile.cs</Link>
-    </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\KObjectDebuggerEditor.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\KObjectDebuggerEditor.cs</Link>
     </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\KSettingModuleEditor.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\KSettingModuleEditor.cs</Link>
-    </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\ResourcesBuild\KResourceBuilder.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\ResourcesBuild\KResourceBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\SettingModuleEditor.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\SettingModuleEditor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\SettingModuleTemplate.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\SettingModuleTemplate.cs</Link>
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\UnityLock\UnityLock.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\UnityLock\UnityLock.cs</Link>

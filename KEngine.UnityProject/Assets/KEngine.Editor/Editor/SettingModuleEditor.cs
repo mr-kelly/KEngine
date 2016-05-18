@@ -347,7 +347,7 @@ namespace KEngine.Editor
         public List<string> Paths = new List<string>();
 
         /// <summary>
-        ///  构建成一个数组["aaa", "bbb"]
+        ///  构建成一个数组"aaa", "bbb"
         /// </summary>
         public string TabFilePaths
         {

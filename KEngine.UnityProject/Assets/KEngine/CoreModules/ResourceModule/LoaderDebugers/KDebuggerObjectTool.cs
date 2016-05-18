@@ -109,6 +109,7 @@ public class KDebuggerObjectTool
             var bigTypeObjName = string.Format("__{0}__", bigType);
             var bigTypeObj = GameObject.Find(bigTypeObjName) ?? new GameObject(bigTypeObjName);
             GameObject.DontDestroyOnLoad(bigTypeObj);
+            bigTypeObj.transform.SetAsFirstSibling();
 
             theParent = new GameObject(smallType).transform;
             KTool.SetChild(theParent, bigTypeObj.transform);

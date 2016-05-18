@@ -103,8 +103,7 @@ PS: 如果在Unity未打开情况下进行Excel表的修改保存，将无法**�
 
 
 # 美术人员使用指南
-
-_ResourcesBuild_中依次建好产品化所需的目录，如UI、Effect、Audio目录，资源依序放入。
+在目录**_ResourcesBuild_**中依次建好产品化所需的目录，如UI、Effect、Audio目录，资源依序放入。
 
 程序需要根据项目需求，在构建系统写入适当的脚本对各个目录进行分别打包。
 
