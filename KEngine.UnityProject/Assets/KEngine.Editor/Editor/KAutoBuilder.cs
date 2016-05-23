@@ -222,7 +222,7 @@ namespace KEngine.Editor
         }
     }
 
-    public class CSymbolLinkHelper
+    public class ResourcesSymbolLinkHelper
     {
         public static string AssetBundlesLinkPath
         {
@@ -263,7 +263,7 @@ namespace KEngine.Editor
         [MenuItem("KEngine/Symbol Link Resources/Link Builded Resource -> StreamingAssets or Resources")]
         public static void SymbolLinkResource()
         {
-            KSymbolLinkHelper.DeleteAllLinks(CSymbolLinkHelper.AssetBundlesLinkPath);
+            KSymbolLinkHelper.DeleteAllLinks(ResourcesSymbolLinkHelper.AssetBundlesLinkPath);
 
             var exportPath = GetResourceExportPath();
             var linkPath = GetLinkPath();
@@ -275,10 +275,10 @@ namespace KEngine.Editor
 		[MenuItem("KEngine/Symbol Link Resources/Remove StreamingAssets or Resources links")]
 		public static void RemoveSymbolLinkResource()
 		{
-			KSymbolLinkHelper.DeleteAllLinks(CSymbolLinkHelper.AssetBundlesLinkPath);
-			Debug.Log ("Remove " + CSymbolLinkHelper.AssetBundlesLinkPath);
+			KSymbolLinkHelper.DeleteAllLinks(ResourcesSymbolLinkHelper.AssetBundlesLinkPath);
+			Debug.Log ("Remove " + ResourcesSymbolLinkHelper.AssetBundlesLinkPath);
 
-			AssetDatabase.DeleteAsset(CSymbolLinkHelper.AssetBundlesLinkPath);
+			AssetDatabase.DeleteAsset(ResourcesSymbolLinkHelper.AssetBundlesLinkPath);
 
 			AssetDatabase.Refresh ();
 		}

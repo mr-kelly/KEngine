@@ -26,6 +26,7 @@
 
 using System.IO;
 using KEngine.UI;
+using KUnityEditorTools;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -33,11 +34,30 @@ using UnityEngine.UI;
 
 namespace KEngine.Editor
 {
+    [InitializeOnLoad]
     public class KUGUIBuilder : KBuild_Base
     {
+        static KUGUIBuilder()
+        {
+            KUnityEditorEventCatcher.OnWillPlayEvent -= OnWillPlayEvent;
+            KUnityEditorEventCatcher.OnWillPlayEvent += OnWillPlayEvent;
+
+        }
+
+        private static void OnWillPlayEvent()
+        {
+            // Auto Link resources when play!
+            if (!Directory.Exists(ResourcesSymbolLinkHelper.GetLinkPath()))
+            {
+                KLogger.LogWarning("Auto Link Bundle Resources Path... {0}", ResourcesSymbolLinkHelper.GetLinkPath());
+                ResourcesSymbolLinkHelper.SymbolLinkResource();
+            }
+        }
+
         [MenuItem("KEngine/UI(UGUI)/Export Current UI")]
         public static void ExportCurrentUI()
         {
+
             //var UIName = Path.GetFileNameWithoutExtension(EditorApplication.currentScene);
             var windowAssets = GameObject.FindObjectsOfType<KUIWindowAsset>();
             if (windowAssets.Length <= 0)
@@ -66,32 +86,51 @@ namespace KEngine.Editor
             if (mainCamera != null)
                 GameObject.DestroyImmediate(mainCamera);
 
-            GameObject uiObj = new GameObject("NewUI_" + Path.GetRandomFileName());
+            var uiName = Path.GetFileNameWithoutExtension(EditorApplication.currentScene);
+            if (string.IsNullOrEmpty(uiName) || GameObject.Find(uiName) != null) // default use scene name, if exist create random name
+            {
+                uiName = "NewUI_" + Path.GetRandomFileName();
+            }
+            GameObject uiObj = new GameObject(uiName);
             uiObj.layer = (int)UnityLayerDef.UI;
+            uiObj.AddComponent<KUIWindowAsset>();
+
+            var uiPanel = new GameObject("Image").AddComponent<Image>();
+            uiPanel.transform.parent = uiObj.transform;
+            KTool.ResetLocalTransform(uiPanel.transform);
+
             var canvas = uiObj.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             uiObj.AddComponent<CanvasScaler>();
             uiObj.AddComponent<GraphicRaycaster>();
 
-            var evtSystemObj = new GameObject("EventSystem");
-            evtSystemObj.AddComponent<EventSystem>();
-            evtSystemObj.AddComponent<StandaloneInputModule>();
-            evtSystemObj.AddComponent<TouchInputModule>();
+            if (GameObject.Find("EventSystem") == null)
+            {
+                var evtSystemObj = new GameObject("EventSystem");
+                evtSystemObj.AddComponent<EventSystem>();
+                evtSystemObj.AddComponent<StandaloneInputModule>();
+                evtSystemObj.AddComponent<TouchInputModule>();
 
-            GameObject cameraObj = new GameObject("Camera");
-            cameraObj.layer = (int)UnityLayerDef.UI;
+            }
 
-            Camera camera = cameraObj.AddComponent<Camera>();
-            camera.clearFlags = CameraClearFlags.Skybox;
-            camera.depth = 0;
-            camera.backgroundColor = Color.grey;
-            camera.cullingMask = 1 << (int)UnityLayerDef.UI;
-            camera.orthographicSize = 1f;
-            camera.orthographic = true;
-            camera.nearClipPlane = -2f;
-            camera.farClipPlane = 2f;
+            if (GameObject.Find("Camera") == null)
+            {
+                GameObject cameraObj = new GameObject("Camera");
+                cameraObj.layer = (int)UnityLayerDef.UI;
 
-            camera.gameObject.AddComponent<AudioListener>();
+                Camera camera = cameraObj.AddComponent<Camera>();
+                camera.clearFlags = CameraClearFlags.Skybox;
+                camera.depth = 0;
+                camera.backgroundColor = Color.grey;
+                camera.cullingMask = 1 << (int)UnityLayerDef.UI;
+                camera.orthographicSize = 1f;
+                camera.orthographic = true;
+                camera.nearClipPlane = -2f;
+                camera.farClipPlane = 2f;
+
+                camera.gameObject.AddComponent<AudioListener>();
+
+            }
 
             Selection.activeGameObject = uiObj;
         }

@@ -34,6 +34,15 @@ using UnityEngine;
 namespace KEngine
 {
     /// <summary>
+    /// Entry
+    /// </summary>
+    public interface IAppEntry
+    {
+        IEnumerator OnBeforeInitModules();
+        IEnumerator OnFinishInitModules();
+    }
+
+    /// <summary>
     /// Cosmos Engine - Unity3D Game Develop Framework
     /// </summary>
     public class AppEngine : MonoBehaviour
@@ -100,27 +109,31 @@ namespace KEngine
         /// </summary>
         public bool IsInited { get; private set; }
 
-        public delegate IEnumerator CoroutineDelegate();
+        /// <summary>
+        /// AppEngine must be new by static function New(xxx)!
+        /// This is a flag to identity whether AddComponent from Unity
+        /// </summary>
+        private bool _isNewByStatic = false;
 
-        private CoroutineDelegate BeforeInitModules = null;
-        private CoroutineDelegate AfterInitModules = null;
+        public IAppEntry AppEntry { get; private set; }
 
+        [Obsolete("Use New(GameObject, IAppEntry, IModule[]) instead!")]
         public static AppEngine New(GameObject gameObjectToAttach, IModule[] modules)
         {
-            return New(gameObjectToAttach, modules, null, null);
+            return New(gameObjectToAttach, null, modules);
         }
 
         /// <summary>
         /// Engine entry.... all begins from here
         /// </summary>
-        public static AppEngine New(GameObject gameObjectToAttach, IModule[] modules, CoroutineDelegate before,
-            CoroutineDelegate after)
+        public static AppEngine New(GameObject gameObjectToAttach, IAppEntry entry, IModule[] modules)
         {
             Debuger.Assert(gameObjectToAttach != null && modules != null);
             AppEngine appEngine = gameObjectToAttach.AddComponent<AppEngine>();
+            appEngine._isNewByStatic = true;
             appEngine.GameModules = modules;
-            appEngine.BeforeInitModules = before;
-            appEngine.AfterInitModules = after;
+            appEngine.AppEntry = entry;
+
             return appEngine;
         }
 
@@ -136,6 +149,11 @@ namespace KEngine
             EngineInstance = this;
 
             Init();
+        }
+
+        void Start()
+        {
+            Debuger.Assert(_isNewByStatic);
         }
 
         private void Init()
@@ -175,15 +193,15 @@ namespace KEngine
 
             yield return StartCoroutine(DoInitModules(baseModules));
 
-            KLogger.Log("Finish Init ResourceManager + UIManager!");
+            KLogger.Log("Finish Init ResourceManager");
 
-            if (BeforeInitModules != null)
-                yield return StartCoroutine(BeforeInitModules());
+            if (AppEntry != null)
+                yield return StartCoroutine(AppEntry.OnBeforeInitModules());
 
 
             yield return StartCoroutine(DoInitModules(GameModules));
-            if (AfterInitModules != null)
-                yield return StartCoroutine(AfterInitModules());
+            if (AppEntry != null)
+                yield return StartCoroutine(AppEntry.OnFinishInitModules());
 
             IsInited = true;
         }

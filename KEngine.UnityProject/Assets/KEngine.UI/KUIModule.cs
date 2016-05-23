@@ -38,17 +38,23 @@ namespace KEngine.UI
         public UnityEngine.Object Asset;
     }
 
+    [Obsolete("Use UIModule instead of KUIModule")]
+    public class KUIModule : UIModule
+    {
+        
+    }
+
     /// <summary>
     /// UI Module
     /// </summary>
-    public class KUIModule : KEngine.IModule
+    public class UIModule : KEngine.IModule
     {
         private class _InstanceClass
         {
-            public static KUIModule _Instance = new KUIModule();
+            public static UIModule _Instance = new UIModule();
         }
 
-        public static KUIModule Instance
+        public static UIModule Instance
         {
             get { return _InstanceClass._Instance; }
         }
@@ -82,7 +88,7 @@ namespace KEngine.UI
         public static event Action<UIController> OnOpenEvent;
         public static event Action<UIController> OnCloseEvent;
 
-        private KUIModule()
+        public UIModule()
         {
         }
 
@@ -93,7 +99,7 @@ namespace KEngine.UI
             if (!string.IsNullOrEmpty(configUiBridge))
             {
                 var uiBridgeTypeName = string.Format("{0}", configUiBridge);
-                var uiBridgeType = Type.GetType(uiBridgeTypeName);
+                var uiBridgeType = KTool.FindType(uiBridgeTypeName);
                 if (uiBridgeType != null)
                 {
                     UiBridge = Activator.CreateInstance(uiBridgeType) as IUIBridge;

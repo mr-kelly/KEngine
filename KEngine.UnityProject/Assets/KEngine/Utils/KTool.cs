@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -113,6 +114,39 @@ namespace KEngine
             return a;
         }
 
+        /// <summary>
+        /// Find Type from every assembly
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="qualifiedTypeName"></param>
+        /// <returns></returns>
+        public static Type FindType(string qualifiedTypeName)
+        {
+            Type t = Type.GetType(qualifiedTypeName);
+
+            if (t != null)
+            {
+                return t;
+            }
+            else
+            {
+                Assembly[] Assemblies = AppDomain.CurrentDomain.GetAssemblies();
+                for (int n = 0; n < Assemblies.Length; n++)
+                {
+                    Assembly asm = Assemblies[n];
+                    t = asm.GetType(qualifiedTypeName);
+                    if (t != null)
+                        return t;
+                }
+                return null;
+            }
+        }
+
+
+        /// <summary>
+        /// Destroy a game object's children
+        /// </summary>
+        /// <param name="go"></param>
         public static void DestroyGameObjectChildren(GameObject go)
         {
             var tran = go.transform;
