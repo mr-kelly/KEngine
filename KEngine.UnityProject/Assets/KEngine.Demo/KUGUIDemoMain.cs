@@ -48,16 +48,16 @@ public class KUGUIDemoMain : MonoBehaviour
             new IModule[]
             {
                 //KGameSettings.Instance,
-                KUIModule.Instance,
+                UIModule.Instance,
             });
 
         while (!engine.IsInited)
             yield return null;
 
         var uiName = "DemoHome";
-        KUIModule.Instance.OpenWindow(uiName);
+        UIModule.Instance.OpenWindow(uiName);
 
-        KUIModule.Instance.CallUI(uiName, (ui, args) =>
+        UIModule.Instance.CallUI(uiName, (ui, args) =>
         {
             // Do some UI stuff
         });

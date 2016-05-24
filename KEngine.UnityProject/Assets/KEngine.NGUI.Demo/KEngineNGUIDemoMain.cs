@@ -43,7 +43,7 @@ public class KEngineNGUIDemoMain : MonoBehaviour
             null,
             new IModule[]
             {
-                KUIModule.Instance,
+                UIModule.Instance,
                 //KGameSettings.Instance,
 
             });
@@ -52,16 +52,16 @@ public class KEngineNGUIDemoMain : MonoBehaviour
 
         //TestLoadLevelAdditiveAsync();
 
-        KUIModule.Instance.OpenWindow("Test");
+        UIModule.Instance.OpenWindow("Test");
 
-        KUIModule.Instance.CallUI("Test", (ui, _) =>
+        UIModule.Instance.CallUI("Test", (ui, _) =>
         {
             // Do some UI stuff
         });
 
         yield return new WaitForSeconds(2f);
         KLogger.Log("Opening KUITestSubWindow");
-        KUIModule.Instance.OpenWindow("TestSub");
+        UIModule.Instance.OpenWindow("TestSub");
 
     }
 

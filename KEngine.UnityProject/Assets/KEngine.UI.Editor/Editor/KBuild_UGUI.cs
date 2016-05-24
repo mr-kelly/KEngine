@@ -54,9 +54,14 @@ namespace KEngine.Editor
             }
         }
 
-        [MenuItem("KEngine/UI(UGUI)/Export Current UI")]
+        [MenuItem("KEngine/UI(UGUI)/Export Current UI %&e")]
         public static void ExportCurrentUI()
         {
+            if (EditorApplication.isPlaying)
+            {
+                KLogger.LogError("Cannot export in playing mode! Please stop!");
+                return;
+            }
 
             //var UIName = Path.GetFileNameWithoutExtension(EditorApplication.currentScene);
             var windowAssets = GameObject.FindObjectsOfType<KUIWindowAsset>();
