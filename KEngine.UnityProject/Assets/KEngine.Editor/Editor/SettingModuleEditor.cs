@@ -148,6 +148,8 @@ namespace KEngine.Editor
 
                 }
             }
+            // make unity compile
+            AssetDatabase.Refresh();
         }
         /// <summary>
         /// Compile one directory 's all settings, and return behaivour results
@@ -165,7 +167,7 @@ namespace KEngine.Editor
             // excel compiler
             var compiler = new Compiler(new CompilerConfig());
 
-            var excelExt = new HashSet<string>() { ".xls", ".xlsx" };
+            var excelExt = new HashSet<string>() { ".xls", ".xlsx", ".tsv" };
             var findDir = sourcePath;
             try
             {

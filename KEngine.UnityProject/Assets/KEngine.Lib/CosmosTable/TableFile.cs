@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Text;
 
 namespace CosmosTable
 {
@@ -69,7 +70,7 @@ namespace CosmosTable
 
         protected internal int _colCount;  // 列数
 
-        protected internal Dictionary<string, HeaderInfo> Headers = new Dictionary<string, HeaderInfo>();
+        public readonly Dictionary<string, HeaderInfo> Headers = new Dictionary<string, HeaderInfo>();
         protected internal Dictionary<int, string[]> TabInfo = new Dictionary<int, string[]>();
 
         /// <summary>
@@ -96,13 +97,18 @@ namespace CosmosTable
         }
 
         // 直接从文件, 传入完整目录，跟通过资源管理器自动生成完整目录不一样，给art库用的
-        public static TableFile LoadFromFile(string fileFullPath)
+        public static TableFile LoadFromFile(string fileFullPath, Encoding encoding = null)
         {
+            if (encoding == null)
+            {
+                encoding = Encoding.UTF8; // default encoding
+            }
+
             using (FileStream fileStream = new FileStream(fileFullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             // 不会锁死, 允许其它程序打开
             {
 
-                StreamReader oReader = new StreamReader(fileStream, System.Text.Encoding.UTF8);
+                StreamReader oReader = new StreamReader(fileStream, encoding);
                 return new TableFile(oReader.ReadToEnd());
             }
         }
@@ -345,7 +351,7 @@ namespace CosmosTable
             TableRow rowT;
             if (!Rows.TryGetValue(row, out rowT))
             {
-                OnException(TableFileExceptionType.NotFoundRow);
+                OnException(TableFileExceptionType.NotFoundRow, row.ToString());
                 return null;
             }
 

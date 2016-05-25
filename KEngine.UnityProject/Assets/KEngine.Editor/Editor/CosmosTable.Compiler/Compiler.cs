@@ -27,7 +27,7 @@ namespace CosmosTable
         public List<TableColumnVars> FieldsInternal { get; set; } // column + type
 
         public string PrimaryKey { get; set; }
-        public SimpleExcelFile ExcelFile { get; internal set; }
+        public ITableSourceFile ExcelFile { get; internal set; }
 
         public TableCompileResult()
         {
@@ -99,7 +99,7 @@ namespace CosmosTable
             _config = cfg;
         }
 
-        private TableCompileResult DoCompilerExcelReader(string path, SimpleExcelFile excelFile, string compileToFilePath = null, string compileBaseDir = null, bool doCompile = true)
+        private TableCompileResult DoCompilerExcelReader(string path, ITableSourceFile excelFile, string compileToFilePath = null, string compileBaseDir = null, bool doCompile = true)
         {
             var renderVars = new TableCompileResult();
             renderVars.ExcelFile = excelFile;
@@ -280,8 +280,13 @@ namespace CosmosTable
             if (!Directory.Exists(compileToFileDirPath))
                 Directory.CreateDirectory(compileToFileDirPath);
 
-            var excelFile = new SimpleExcelFile(path);
-            var hash = DoCompilerExcelReader(path, excelFile, compileToFilePath, compileBaseDir, doRealCompile);
+            var ext = Path.GetExtension(path);
+
+            ITableSourceFile sourceFile;
+            if (ext == ".tsv") sourceFile = new SimpleTSVFile(path);
+            else sourceFile = new SimpleExcelFile(path);
+            
+            var hash = DoCompilerExcelReader(path, sourceFile, compileToFilePath, compileBaseDir, doRealCompile);
             return hash;
 
         }

@@ -2,21 +2,91 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Text;
 using NPOI.SS.UserModel;
 
 namespace CosmosTable
 {
     /// <summary>
-    /// 简单的NPOI Excel封装
+    /// 读取带有头部、声明和注释的文件表格
     /// </summary>
-    public class SimpleExcelFile
+    public interface ITableSourceFile
+    {
+        Dictionary<string, int> ColName2Index { get; set; }
+        Dictionary<int, string> Index2ColName { get; set; }
+        Dictionary<string, string> ColName2Statement { get; set; }//  string,or something
+        Dictionary<string, string> ColName2Comment { get; set; }// string comment
+        int GetRowsCount();
+        int GetColumnCount();
+        string GetString(string columnName, int row);
+    }
+
+    /// <summary>
+    /// TSV格式的支持
+    /// </summary>
+    public class SimpleTSVFile : ITableSourceFile
+    {
+        public Dictionary<string, int> ColName2Index { get; set; }
+        public Dictionary<int, string> Index2ColName { get; set; }
+        public Dictionary<string, string> ColName2Statement { get; set; }
+        public Dictionary<string, string> ColName2Comment { get; set; }
+
+        private TableFile _tableFile;
+        private int _columnCount;
+        public SimpleTSVFile(string filePath)
+        {
+            ColName2Index = new Dictionary<string, int>();
+            Index2ColName = new Dictionary<int, string>();
+            ColName2Statement = new Dictionary<string, string>();
+            ColName2Comment = new Dictionary<string, string>();
+            ParseTsv(filePath);
+        }
+
+        private void ParseTsv(string filePath)
+        {
+            _tableFile = TableFile.LoadFromFile(filePath, Encoding.GetEncoding("GBK"));
+            _columnCount = _tableFile.GetColumnCount();
+
+
+            // 通过TableFile注册头信息
+            var commentRow = _tableFile.GetRow(1);
+            foreach (var kv in _tableFile.Headers)
+            {
+                var header = kv.Value;
+                ColName2Index[header.HeaderName] = header.ColumnIndex;
+                Index2ColName[header.ColumnIndex] = header.HeaderName;
+                ColName2Statement[header.HeaderName] = header.HeaderMeta;
+                ColName2Comment[header.HeaderName] = commentRow[header.ColumnIndex];
+            }
+        }
+        public int GetRowsCount()
+        {
+            return _tableFile.GetRowCount() - 1; // 减去注释行
+        }
+
+        public int GetColumnCount()
+        {
+            return _columnCount;
+        }
+
+        public string GetString(string columnName, int dataRow)
+        {
+            return _tableFile.GetRow(dataRow + 1 + 1)[columnName]; // 1行开始，并且多了说明行，+2
+        }
+    }
+
+    /// <summary>
+    /// 简单的NPOI Excel封装, 支持xls, xlsx 和 tsv
+    /// 带有头部、声明、注释
+    /// </summary>
+    public class SimpleExcelFile : ITableSourceFile
     {
         //private Workbook Workbook_;
         //private Worksheet Worksheet_;
-        public Dictionary<string, int> ColName2Index;
-        public Dictionary<int, string> Index2ColName;
-        public Dictionary<string, string> ColName2Statement; //  string,or something
-        public Dictionary<string, string> ColName2Comment; // string comment
+        public Dictionary<string, int> ColName2Index { get; set; }
+        public Dictionary<int, string> Index2ColName { get; set; }
+        public Dictionary<string, string> ColName2Statement { get; set; } //  string,or something
+        public Dictionary<string, string> ColName2Comment { get; set; } // string comment
 
         /// <summary>
         /// Header, Statement, Comment, at lease 3 rows
@@ -28,14 +98,28 @@ namespace CosmosTable
         private string Path;
         private IWorkbook Workbook;
         private ISheet Worksheet;
-        public bool IsLoadSuccess = true;
+        private TableFile _tableFile;
+        //public bool IsLoadSuccess = true;
         private int _columnCount;
 
         public SimpleExcelFile(string excelPath)
         {
             Path = excelPath;
+            ColName2Index = new Dictionary<string, int>();
+            Index2ColName = new Dictionary<int, string>();
+            ColName2Statement = new Dictionary<string, string>();
+            ColName2Comment = new Dictionary<string, string>();
 
-            using (var file = new FileStream(excelPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) // no isolation
+            ParseExcel(excelPath);
+        }
+
+        /// <summary>
+        /// Parse Excel file to data grid
+        /// </summary>
+        /// <param name="filePath"></param>
+        private void ParseExcel(string filePath)
+        {
+            using (var file = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) // no isolation
             {
                 try
                 {
@@ -43,12 +127,12 @@ namespace CosmosTable
                 }
                 catch (Exception e)
                 {
-                    throw new Exception(string.Format("无法打开Excel: {0}, 可能原因：正在打开？或是Office2007格式（尝试另存为）？ {1}", excelPath,
+                    throw new Exception(string.Format("无法打开Excel: {0}, 可能原因：正在打开？或是Office2007格式（尝试另存为）？ {1}", filePath,
                         e.Message));
                     //IsLoadSuccess = false;
                 }
             }
-            if (IsLoadSuccess)
+            //if (IsLoadSuccess)
             {
                 if (Workbook == null)
                     throw new Exception("Null Workbook");
@@ -62,11 +146,6 @@ namespace CosmosTable
                 var sheetRowCount = GetWorksheetCount();
                 if (sheetRowCount < PreserverRowCount)
                     throw new Exception(string.Format("At lease {0} rows of this excel", sheetRowCount));
-
-                ColName2Index = new Dictionary<string, int>();
-                Index2ColName = new Dictionary<int, string>();
-                ColName2Statement = new Dictionary<string, string>();
-                ColName2Comment = new Dictionary<string, string>();
 
                 // 列头名
                 var headerRow = Worksheet.GetRow(0);
@@ -100,7 +179,6 @@ namespace CosmosTable
                 }
             }
         }
-
         /// <summary>
         /// 是否存在列名
         /// </summary>
