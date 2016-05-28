@@ -1,9 +1,7 @@
 package com.github.KEngine;
 import android.app.Activity;
-import android.content.pm.ApplicationInfo;
 import android.content.res.AssetManager;
 import com.unity3d.player.UnityPlayer;
-
 import java.io.InputStream;
 import java.util.Hashtable;
 
@@ -29,13 +27,12 @@ public class AndroidHelper {
     static void init(Object activity) {
         if (!isInit) {
             sActivity = (Activity)activity;
-            final ApplicationInfo applicationInfo = sActivity.getApplicationInfo();
             sAssetManager = sActivity.getAssets();
             isInit = true;
         }
     }
-    @SuppressWarnings("unchecked")
-    public static  boolean isFileExists(String path)
+//    @SuppressWarnings("unchecked")
+    public static boolean isAssetExists(String path)
     {
         boolean ret = false;
         if(mFileTable.containsKey(path))
@@ -57,8 +54,8 @@ public class AndroidHelper {
         }
         return ret;
     }
-    @SuppressWarnings("unchecked")
-    public static byte[] getBytes(String path)
+//    @SuppressWarnings("unchecked")
+    public static byte[] getAssetBytes(String path)
     {
         byte[] mBytes = null;
         if(sAssetManager != null)
@@ -87,9 +84,9 @@ public class AndroidHelper {
         return mBytes;
     }
 
-    public static  String getString(String path)
+    public static String getAssetString(String path)
     {
-        byte[] mBytes = getBytes(path);
+        byte[] mBytes = getAssetBytes(path);
         if(mBytes != null)
         {
             try

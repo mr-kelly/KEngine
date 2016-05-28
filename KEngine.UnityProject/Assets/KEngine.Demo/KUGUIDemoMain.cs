@@ -26,6 +26,7 @@
 
 using System.Collections;
 using System.IO;
+using System.Text;
 using AppSettings;
 using KEngine;
 using KEngine.CoreModules;
@@ -82,6 +83,12 @@ public class KUGUIDemoMain : MonoBehaviour
             var reloadedInfo = ExampleSettings.Get("C_9888");
             KLogger.Log("Reload ExampleInfos! Now info: {0} -> {1}", "C_9888", reloadedInfo.Name);
         };
+
+
+
+        KLogger.Log("Start reading streamingAssets Test...");
+        KLogger.Info("Reading from streamingAssets, content: {0}", Encoding.UTF8.GetString(KResourceModule.LoadSyncFromStreamingAssets("TestFile.txt")));
+
     }
     //private void OnGameSettingsInit()
     //{
