@@ -121,12 +121,12 @@ public static class KEngineExtensions
 
     public static bool HasRigidbody(this GameObject gobj)
     {
-        return (gobj.rigidbody != null);
+        return (gobj.GetComponent<Rigidbody>() != null);
     }
 
     public static bool HasAnimation(this GameObject gobj)
     {
-        return (gobj.animation != null);
+        return (gobj.GetComponent<Animation>() != null);
     }
 
     public static void SetSpeed(this Animation anim, float newSpeed)

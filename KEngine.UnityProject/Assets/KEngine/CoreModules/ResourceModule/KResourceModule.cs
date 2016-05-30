@@ -91,7 +91,7 @@ namespace KEngine
 
         public static KResourceQuality Quality = KResourceQuality.Sd;
 
-        public static KResourceInAppPathType DefaultInAppPathType = KResourceInAppPathType.ResourcesAssetsPath;
+        public static KResourceInAppPathType DefaultInAppPathType = KResourceInAppPathType.StreamingAssetsPath;
 
         public static float TextureScale
         {

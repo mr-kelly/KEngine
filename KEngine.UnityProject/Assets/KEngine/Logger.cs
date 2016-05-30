@@ -64,7 +64,11 @@ namespace KEngine
         {
             if (!_hasRegisterLogCallback)
             {
+#if UNITY_5
+                Application.logMessageReceivedThreaded += OnLogCallback;
+#else
                 Application.RegisterLogCallbackThreaded(OnLogCallback);
+#endif
                 _hasRegisterLogCallback = true;
             }
             LogCallbackEvent += callback;
@@ -74,7 +78,11 @@ namespace KEngine
         {
             if (!_hasRegisterLogCallback)
             {
+#if UNITY_5
+                Application.logMessageReceivedThreaded -= OnLogCallback;
+#else
                 Application.RegisterLogCallbackThreaded(OnLogCallback);
+#endif
                 _hasRegisterLogCallback = true;
             }
             LogCallbackEvent -= callback;

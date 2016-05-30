@@ -24,6 +24,7 @@
 
 #endregion
 
+#if !UNITY_5
 using KEngine;
 using KEngine.Editor;
 using UnityEditor;
@@ -101,3 +102,4 @@ public class KDepBuild_UGUI
         return result.Path;
     }
 }
+#endif

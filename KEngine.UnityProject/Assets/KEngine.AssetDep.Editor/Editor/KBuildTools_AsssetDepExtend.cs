@@ -24,6 +24,7 @@
 
 #endregion
 
+#if !UNITY_5
 using System.IO;
 using KEngine;
 using KEngine.Editor;
@@ -117,3 +118,4 @@ public partial class KBuildTools_AssetDep
 
     #endregion
 }
+#endif

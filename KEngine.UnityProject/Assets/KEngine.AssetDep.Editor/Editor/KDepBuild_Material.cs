@@ -24,6 +24,7 @@
 
 #endregion
 
+#if !UNITY_5
 using System.Collections.Generic;
 using KEngine;
 using KEngine.Editor;
@@ -270,3 +271,4 @@ public class KDepBuild_Material
         return null;
     }
 }
+#endif

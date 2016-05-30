@@ -1,5 +1,5 @@
 ManifestFileVersion: 0
-CRC: 272657641
+CRC: 231799378
 AssetBundleManifest:
   AssetBundleInfos:
     Info_0:
@@ -25,7 +25,9 @@ AssetBundleManifest:
     Info_5:
       Name: ui/demohome.unity.bytes
       Dependencies:
-        Dependency_0: ui/demohome.prefab.bytes
+        Dependency_0: ui/textures/button_green.png.bytes
+        Dependency_1: ui/textures/button_red.png.bytes
+        Dependency_2: ui/textures/button_yellow.png.bytes
     Info_6:
       Name: ui/textures/button_green.png.bytes
       Dependencies: {}

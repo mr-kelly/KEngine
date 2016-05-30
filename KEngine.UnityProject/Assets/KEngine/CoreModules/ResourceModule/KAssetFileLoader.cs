@@ -2,29 +2,30 @@
 
 // KEngine - Toolset and framework for Unity3D
 // ===================================
-// 
+//
 // Filename: KAssetFileLoader.cs
 // Date:     2015/12/03
 // Author:  Kelly
 // Email: 23110388@qq.com
 // Github: https://github.com/mr-kelly/KEngine
-// 
+//
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 3.0 of the License, or (at your option) any later version.
-// 
+//
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library.
 
 #endregion
 
 using System.Collections;
+using System.IO;
 using KEngine;
 using UnityEngine;
 
@@ -37,8 +38,6 @@ namespace KEngine
     public class KAssetFileLoader : KAbstractResourceLoader
     {
         public delegate void CAssetFileBridgeDelegate(bool isOk, UnityEngine.Object resultObj);
-
-        private string AssetInBundleName; // AssetBundle里的名字, Resources時不用  TODO: 暂时没用额
 
         public UnityEngine.Object Asset
         {
@@ -75,13 +74,12 @@ namespace KEngine
             var loaderMode = (KAssetBundleLoaderMode)args[0];
 
             base.Init(url, args);
-            KResourceModule.Instance.StartCoroutine(_Init(Url, null, loaderMode));
+            KResourceModule.Instance.StartCoroutine(_Init(Url, loaderMode));
         }
 
-        private IEnumerator _Init(string path, string assetName, KAssetBundleLoaderMode loaderMode)
+        private IEnumerator _Init(string path, KAssetBundleLoaderMode loaderMode)
         {
             IsLoadAssetBundle = KEngine.AppEngine.GetConfig("IsLoadAssetBundle").ToInt32() != 0;
-            AssetInBundleName = assetName;
 
             UnityEngine.Object getAsset = null;
             if (!IsLoadAssetBundle)
@@ -122,34 +120,32 @@ namespace KEngine
                 var assetBundle = _bundleLoader.Bundle;
 
                 System.DateTime beginTime = System.DateTime.Now;
-                if (AssetInBundleName == null)
+#if UNITY_5
+                // Unity 5 下，不能用mainAsset, 要取对象名
+                var abAssetName = Path.GetFileNameWithoutExtension(Url).ToLower();
+                var request = assetBundle.LoadAssetAsync(abAssetName);
+                while (!request.isDone)
                 {
-                    // 经过AddWatch调试，.mainAsset这个getter第一次执行时特别久，要做序列化
-                    //AssetBundleRequest request = assetBundle.LoadAsync("", typeof(Object));// mainAsset
-                    //while (!request.isDone)
-                    //{
-                    //    yield return null;
-                    //}
-                    try
-                    {
-                        Debuger.Assert(getAsset = assetBundle.mainAsset);
-                    }
-                    catch
-                    {
-                        KLogger.LogError("[OnAssetBundleLoaded:mainAsset]{0}", path);
-                    }
+                    yield return null;
                 }
-                else
-                {
-                    // TODO: 未测试过这几行!~~
-                    AssetBundleRequest request = assetBundle.LoadAsync(AssetInBundleName, typeof(Object));
-                    while (!request.isDone)
-                    {
-                        yield return null;
-                    }
+                Debuger.Assert(getAsset = request.asset);
 
-                    getAsset = request.asset;
+#else
+                // 经过AddWatch调试，.mainAsset这个getter第一次执行时特别久，要做序列化
+                //AssetBundleRequest request = assetBundle.LoadAsync("", typeof(Object));// mainAsset
+                //while (!request.isDone)
+                //{
+                //    yield return null;
+                //}
+                try
+                {
+                    Debuger.Assert(getAsset = assetBundle.mainAsset);
                 }
+                catch
+                {
+                    KLogger.LogError("[OnAssetBundleLoaded:mainAsset]{0}", path);
+                }
+#endif
 
                 KResourceModule.LogLoadTime("AssetFileBridge", path, beginTime);
 

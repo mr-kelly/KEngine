@@ -90,7 +90,7 @@ namespace KEngine.Modules
             if (IsFileSystemMode)
                 fileContent = LoadSettingFromFile(path);
             else
-                fileContent = LoadSettingFromResources(path);
+                fileContent = LoadSettingFromStreamingAssets(path);
             return fileContent;
         }
 
@@ -109,10 +109,11 @@ namespace KEngine.Modules
 
         private static string GetFileSystemPath(string path)
         {
-            var resPath = "Assets/Resources/" + SettingFolderName + "/" + path;
+            var resPath = "Assets/StreamingAssets/" + SettingFolderName + "/" + path;
             return resPath;
         }
 
+#if UNITY_EDITOR
         /// <summary>
         /// Cache all the FileSystemWatcher, prevent the duplicated one
         /// </summary>
@@ -148,17 +149,31 @@ namespace KEngine.Modules
                 action(path);
             };
         }
+#endif
 
         /// <summary>
         /// Load from unity Resources folder
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
+        [Obsolete("LoadSettingFromStreamingAssets instead!")]
         private static byte[] LoadSettingFromResources(string path)
         {
             var resPath = SettingFolderName + "/" + Path.ChangeExtension(path, null);
             var fileContentAsset = Resources.Load(resPath) as TextAsset;
             var bytes = SettingBytesFilter != null ? SettingBytesFilter(fileContentAsset.bytes) : fileContentAsset.bytes;
+            return bytes;
+        }
+        /// <summary>
+        /// KEngine 3 后，增加同步loadStreamingAssets文件，统一只用StreamingAsset路径
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        private static byte[] LoadSettingFromStreamingAssets(string path)
+        {
+            var resPath = SettingFolderName + "/" + Path.ChangeExtension(path, null);
+            var bytes = KResourceModule.LoadSyncFromStreamingAssets(resPath);
+            bytes = SettingBytesFilter != null ? SettingBytesFilter(bytes) : bytes;
             return bytes;
         }
 

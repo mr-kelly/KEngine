@@ -24,9 +24,11 @@
 
 #endregion
 
+#if !UNITY_5
 /// <summary>
 /// TODO: Mesh
 /// </summary>
 //public partial class KDependencyBuild
 //{
 //}
+#endif

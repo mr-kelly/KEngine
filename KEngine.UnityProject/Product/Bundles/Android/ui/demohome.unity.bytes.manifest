@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 321849352
+CRC: 360385279
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 5e9692950e04fe68475d9439ad200df2
+    Hash: 03cea1319507c8ead0dc0fafac7fb738
   TypeTreeHash:
     serializedVersion: 2
-    Hash: dfd08b21dcb96b010346a32351d70ab9
+    Hash: b76ef58c06ab6f4444c9084b5c17f3c8
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -26,23 +26,23 @@ ClassTypes:
 - Class: 104
   Script: {instanceID: 0}
 - Class: 114
-  Script: {fileID: -619905303, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
-- Class: 114
-  Script: {fileID: 1077351063, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
-- Class: 114
-  Script: {fileID: 1997211142, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  Script: {fileID: 11500000, guid: 327bf15252499524ca2de7a67ab4f467, type: 3}
 - Class: 114
   Script: {fileID: 1392445389, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+- Class: 114
+  Script: {fileID: 1980459831, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+- Class: 114
+  Script: {fileID: -619905303, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
 - Class: 114
   Script: {fileID: 1301386320, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
 - Class: 114
   Script: {fileID: -765806418, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
 - Class: 114
+  Script: {fileID: 1077351063, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+- Class: 114
   Script: {fileID: 708705254, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
 - Class: 114
-  Script: {fileID: 1980459831, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
-- Class: 114
-  Script: {fileID: 11500000, guid: 327bf15252499524ca2de7a67ab4f467, type: 3}
+  Script: {fileID: 1997211142, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
 - Class: 115
   Script: {instanceID: 0}
 - Class: 128
@@ -60,4 +60,6 @@ ClassTypes:
 Assets:
 - Assets/BundleResources/UI/DemoHome.unity
 Dependencies:
-- E:/Workspace/KSFramework/KEngine/KEngine.UnityProject/Product/Bundles/Android/ui/demohome.prefab.bytes
+- E:/Workspace/KSFramework/KEngine/KEngine.UnityProject/Product/Bundles/Android/ui/textures/button_green.png.bytes
+- E:/Workspace/KSFramework/KEngine/KEngine.UnityProject/Product/Bundles/Android/ui/textures/button_red.png.bytes
+- E:/Workspace/KSFramework/KEngine/KEngine.UnityProject/Product/Bundles/Android/ui/textures/button_yellow.png.bytes

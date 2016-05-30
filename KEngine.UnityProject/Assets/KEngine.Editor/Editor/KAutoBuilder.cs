@@ -176,7 +176,11 @@ namespace KEngine.Editor
             BuildOptions opt = isDevelopment
                 ? (BuildOptions.Development | BuildOptions.AllowDebugging | BuildOptions.ConnectWithProfiler)
                 : BuildOptions.None;
+#if UNITY_5
+            return PerformBuild("Apps/IOSProjects/" + ipaName, BuildTarget.iOS, opt);
+#else
             return PerformBuild("Apps/IOSProjects/" + ipaName, BuildTarget.iPhone, opt);
+#endif
         }
 
         [MenuItem("KEngine/AutoBuilder/Android")]

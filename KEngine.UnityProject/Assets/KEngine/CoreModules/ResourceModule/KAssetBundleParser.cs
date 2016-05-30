@@ -84,12 +84,20 @@ namespace KEngine
             switch (Mode)
             {
                 case CAssetBundleParserMode.Async:
-                    CreateRequest = AssetBundle.CreateFromMemory(abBytes);
+#if UNITY_5
+                    CreateRequest = AssetBundle.LoadFromMemoryAsync(abBytes);
+#else
+					CreateRequest = AssetBundle.CreateFromMemory(abBytes);
+#endif
                     CreateRequest.priority = _autoPriority++; // 后进先出, 一个一个来
                     KResourceModule.Instance.StartCoroutine(WaitCreateAssetBundle(CreateRequest));
                     break;
                 case CAssetBundleParserMode.Sync:
-                    OnFinish(AssetBundle.CreateFromMemoryImmediate(abBytes));
+#if UNITY_5
+                    OnFinish(AssetBundle.LoadFromMemory(abBytes));
+#else
+					OnFinish(AssetBundle.CreateFromMemoryImmediate(abBytes));
+#endif
                     break;
                 default:
                     throw new Exception("Error CAssetBundleParserMode: " + Mode);

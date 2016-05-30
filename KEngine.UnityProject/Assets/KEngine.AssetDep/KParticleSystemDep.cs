@@ -42,7 +42,7 @@ public class KParticleSystemDep : KAssetDep
     {
         var p = (ParticleSystem) DependencyComponent;
         p.Stop(); // 先暂停粒子播放
-        var pRenderer = (ParticleSystemRenderer) p.renderer;
+        var pRenderer = (ParticleSystemRenderer) p.GetComponent<Renderer>();
 
         pRenderer.enabled = false;
         LoadMaterial(path, (mat) =>

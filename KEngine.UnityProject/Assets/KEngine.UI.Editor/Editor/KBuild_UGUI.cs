@@ -28,6 +28,9 @@ using System.IO;
 using KEngine.UI;
 using KUnityEditorTools;
 using UnityEditor;
+#if UNITY_5
+using UnityEditor.SceneManagement;
+#endif
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -35,14 +38,62 @@ using UnityEngine.UI;
 namespace KEngine.Editor
 {
     [InitializeOnLoad]
-    public class KUGUIBuilder : KBuild_Base
+    public class KUGUIBuilder
+#if !UNITY_5
+        : KBuild_Base
+#endif
     {
         static KUGUIBuilder()
         {
             KUnityEditorEventCatcher.OnWillPlayEvent -= OnWillPlayEvent;
             KUnityEditorEventCatcher.OnWillPlayEvent += OnWillPlayEvent;
-
+            KUnityEditorEventCatcher.OnSaveSceneEvent -= OnSaveScene;
+            KUnityEditorEventCatcher.OnSaveSceneEvent += OnSaveScene;
         }
+
+        private static void OnSaveScene()
+        {
+#if UNITY_5
+            if (!EditorSceneManager.GetActiveScene().path.StartsWith("Assets/" + KEngineDef.ResourcesBuildDir + "/UI"))
+                return;
+            // Unity 5模式，自动把需要打包的资源，转成Prefab放置到UI下
+            Debug.Log("Save Scene... " + EditorSceneManager.GetActiveScene().path);
+            UISceneToPrefabs();
+#endif
+        }
+#if UNITY_5
+        /// <summary>
+        /// Unity 5下，将场景中的UI对象转成Prefab
+        /// </summary>
+        private static void UISceneToPrefabs()
+        {
+            var windowAssets = GetUIWIndoeAssetsFromCurrentScene();
+            var uiPrefabDir = "Assets/" + KEngineDef.ResourcesBuildDir + "/UI";
+            if (!Directory.Exists(uiPrefabDir))
+                Directory.CreateDirectory(uiPrefabDir);
+
+            foreach (var windowAsset in windowAssets)
+            {
+                var uiPrefabPath = uiPrefabDir + "/" + windowAsset.name+".prefab";
+                //if (File.Exists(uiPrefabPath))
+                //{
+                //    var srcPrefab = AssetDatabase.LoadAssetAtPath(uiPrefabPath, typeof (UnityEngine.Object));
+                //    var newPrefab = PrefabUtility.ReplacePrefab(windowAsset.gameObject, srcPrefab, ReplacePrefabOptions.Default);
+                //    EditorUtility.SetDirty(newPrefab);
+                //}
+                //else
+                {
+                    var prefab = PrefabUtility.CreatePrefab(uiPrefabPath, windowAsset.gameObject, ReplacePrefabOptions.Default);
+                    EditorUtility.SetDirty(prefab);
+                }
+
+                AssetDatabase.ImportAsset(uiPrefabPath, ImportAssetOptions.ForceSynchronousImport);
+                Debug.Log("Create UIWindowAsset to prfab: " + uiPrefabPath);
+            }
+            EditorApplication.SaveAssets();
+        }
+
+#endif
 
         private static void OnWillPlayEvent()
         {
@@ -57,26 +108,39 @@ namespace KEngine.Editor
         [MenuItem("KEngine/UI(UGUI)/Export Current UI %&e")]
         public static void ExportCurrentUI()
         {
+#if !UNITY_5
             if (EditorApplication.isPlaying)
             {
                 KLogger.LogError("Cannot export in playing mode! Please stop!");
                 return;
             }
 
+            foreach(var windowAsset in windowAssets)
+            {
+                BuildTools.BuildAssetBundle(windowAsset.gameObject, GetBuildRelPath(uiName));
+            }
+#else
+            UISceneToPrefabs();
+            BuildTools.BuildAllAssetBundles();
+#endif
+        }
+
+        static KUIWindowAsset[] GetUIWIndoeAssetsFromCurrentScene()
+        {
+
             //var UIName = Path.GetFileNameWithoutExtension(EditorApplication.currentScene);
             var windowAssets = GameObject.FindObjectsOfType<KUIWindowAsset>();
             if (windowAssets.Length <= 0)
             {
-                KLogger.LogError("Not found KUIWindowAsset in scene `{0}`", EditorApplication.currentScene);
+#if UNITY_5
+                var currentScene = EditorSceneManager.GetActiveScene().path;
+#else
+                var currentScene = EditorApplication.currentScene;
+#endif
+                KLogger.LogError("Not found KUIWindowAsset in scene `{0}`", currentScene);
             }
-            else
-            {
-                foreach (var windowAsset in windowAssets)
-                {
-                    var uiName = windowAsset.name;
-                    BuildTools.BuildAssetBundle(windowAsset.gameObject, GetBuildRelPath(uiName));
-                }
-            }
+
+            return windowAssets;
         }
 
         public static string GetBuildRelPath(string uiName)
@@ -87,11 +151,16 @@ namespace KEngine.Editor
         [MenuItem("KEngine/UI(UGUI)/Create UI(UGUI)")]
         public static void CreateNewUI()
         {
+#if UNITY_5
+            var currentScene = EditorSceneManager.GetActiveScene().path;
+#else
+            var currentScene = EditorApplication.currentScene;
+#endif
             GameObject mainCamera = GameObject.Find("Main Camera");
             if (mainCamera != null)
                 GameObject.DestroyImmediate(mainCamera);
 
-            var uiName = Path.GetFileNameWithoutExtension(EditorApplication.currentScene);
+            var uiName = Path.GetFileNameWithoutExtension(currentScene);
             if (string.IsNullOrEmpty(uiName) || GameObject.Find(uiName) != null) // default use scene name, if exist create random name
             {
                 uiName = "NewUI_" + Path.GetRandomFileName();
@@ -114,7 +183,9 @@ namespace KEngine.Editor
                 var evtSystemObj = new GameObject("EventSystem");
                 evtSystemObj.AddComponent<EventSystem>();
                 evtSystemObj.AddComponent<StandaloneInputModule>();
+#if !UNITY_5
                 evtSystemObj.AddComponent<TouchInputModule>();
+#endif
 
             }
 
@@ -140,10 +211,10 @@ namespace KEngine.Editor
             Selection.activeGameObject = uiObj;
         }
 
+#if !UNITY_5
         public override void Export(string path)
         {
             EditorApplication.OpenScene(path);
-
             ExportCurrentUI();
         }
 
@@ -156,5 +227,6 @@ namespace KEngine.Editor
         {
             return "*.unity";
         }
+#endif
     }
 }

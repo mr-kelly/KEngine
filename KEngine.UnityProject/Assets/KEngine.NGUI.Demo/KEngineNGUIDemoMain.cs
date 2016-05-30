@@ -24,10 +24,13 @@
 
 #endregion
 
+
 using System.Collections;
 using KEngine;
 using KEngine.CoreModules;
+#if !UNITY_5
 using KEngine.ResourceDep;
+#endif
 using KEngine.UI;
 using UnityEngine;
 
@@ -67,8 +70,12 @@ public class KEngineNGUIDemoMain : MonoBehaviour
 
     void TestLoadLevelAdditiveAsync()
     {
+#if !UNITY_5
         KLogger.Log("Load Scene");
         ResourceDepUtils.LoadLevelAdditiveAsync("BundleResources/NGUI/TestNGUI.unity");
+#else
+        KLogger.LogError("Not support on Unity 5.x");
+#endif
     }
 
     // Update is called once per frame

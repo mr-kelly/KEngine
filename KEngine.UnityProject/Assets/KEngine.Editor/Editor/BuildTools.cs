@@ -43,11 +43,53 @@ namespace KEngine.Editor
 
     public partial class BuildTools
     {
+#if !UNITY_5
         private static int PushedAssetCount = 0;
 
         public static event Action<UnityEngine.Object, string, string> BeforeBuildAssetBundleEvent;
         public static event Action<UnityEngine.Object, string, string> AfterBuildAssetBundleEvent;
+#endif
 
+
+#if UNITY_5
+        /// <summary>
+        /// Unity 5新AssetBundle系统，需要为打包的AssetBundle配置名称
+        /// 
+        /// 直接将KEngine配置的BundleResources目录整个自动配置名称，因为这个目录本来就是整个导出
+        /// </summary>
+        [MenuItem("KEngine/AssetBundle/Make Names from [BundleResources]")]
+        public static void MakeAssetBundleNames()
+        {
+            var dir = "Assets/" + KEngineDef.ResourcesBuildDir + "/";
+            foreach (var filepath in Directory.GetFiles(dir, "*.*", SearchOption.AllDirectories))
+            {
+                if (filepath.EndsWith(".meta")) continue;
+
+                var importer = AssetImporter.GetAtPath(filepath);
+                if (importer == null)
+                {
+                    KLogger.LogError("Not found: {0}", filepath);
+                    continue;
+                }
+                var bundleName = filepath.Substring(dir.Length, filepath.Length - dir.Length);
+                importer.assetBundleName = bundleName + AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt);
+            }
+
+            KLogger.Log("Make all asset name successs!");
+            
+        }
+
+        [MenuItem("KEngine/AssetBundle/Build All")]
+        public static void BuildAllAssetBundles()
+        {
+            MakeAssetBundleNames();
+            var outputPath = GetExportPath(EditorUserBuildSettings.activeBuildTarget);
+            KLogger.Log("Asset bundle start build to: {0}", outputPath);
+            BuildPipeline.BuildAssetBundles(outputPath, BuildAssetBundleOptions.DeterministicAssetBundle, EditorUserBuildSettings.activeBuildTarget);
+
+        }
+
+#endif
         #region 打包功能
 
         /// <summary>
@@ -96,7 +138,7 @@ namespace KEngine.Editor
             switch (platfrom)
             {
                 case BuildTarget.Android:
-                case BuildTarget.iPhone:
+                case BuildTarget.iOS:
                 case BuildTarget.StandaloneWindows:
                     var platformName = KResourceModule.BuildPlatformName;
                     if (quality != KResourceQuality.Sd) // SD no need add
@@ -132,6 +174,7 @@ namespace KEngine.Editor
             }
         }
 
+#if !UNITY_5
         public static void PushAssetBundle(Object asset, string path)
         {
             BuildPipeline.PushAssetDependencies();
@@ -154,7 +197,9 @@ namespace KEngine.Editor
             PushedAssetCount--;
         }
 
-        #endregion
+#endif
+
+#endregion
 
         public static void BuildError(string fmt, params string[] args)
         {
@@ -162,6 +207,7 @@ namespace KEngine.Editor
             Debug.LogError(string.Format(fmt, args));
         }
 
+#if !UNITY_5
         public static uint BuildAssetBundle(Object asset, string path)
         {
             return BuildAssetBundle(asset, path, EditorUserBuildSettings.activeBuildTarget, KResourceModule.Quality);
@@ -252,6 +298,7 @@ namespace KEngine.Editor
             }
             return crc;
         }
+#endif
 
         /// <summary>
         /// 检查如果有依赖，报出
@@ -298,6 +345,7 @@ namespace KEngine.Editor
             BuildTools.CheckAndLogDependencies(assetPath);
         }
 
+#if !UNITY_5
         private static void _DoBuild(out uint crc, Object asset, Object[] subAssets, string path, string relativePath,
             BuildTarget buildTarget)
         {
@@ -358,6 +406,7 @@ namespace KEngine.Editor
             return crc;
         }
 
+#endif
         public static void CopyFolder(string sPath, string dPath)
         {
             if (!Directory.Exists(dPath))

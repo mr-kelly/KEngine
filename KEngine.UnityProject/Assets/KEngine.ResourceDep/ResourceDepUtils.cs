@@ -23,6 +23,7 @@
 
 #endregion
 
+#if !UNITY_5
 using System;
 using UnityEngine;
 using System.Collections;
@@ -310,3 +311,4 @@ namespace KEngine.ResourceDep
         }
     }
 }
+#endif

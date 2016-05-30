@@ -10,6 +10,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEditor.Callbacks;
 
@@ -115,6 +116,21 @@ namespace KUnityEditorTools
             set
             {
                 _OnPostBuildPlayerEvent = value;
+            }
+        }
+        /// <summary>
+        /// Save Scene事件
+        /// </summary>
+        internal static System.Action _onSaveSceneEvent;
+        public static System.Action OnSaveSceneEvent
+        {
+            get
+            {
+                return _onSaveSceneEvent;
+            }
+            set
+            {
+                _onSaveSceneEvent= value;
             }
         }
 
@@ -227,4 +243,21 @@ namespace KUnityEditorTools
         }
     }
 
+    internal class SaveSceneAssetModificationProcessor : UnityEditor.AssetModificationProcessor
+    {
+        public static string[] OnWillSaveAssets(string[] paths)
+        {
+            foreach (string path in paths)
+            {
+                if (path.Contains(".unity"))
+                {
+                    //scenePath = Path.GetDirectoryName(path);
+                    //sceneName = Path.GetFileNameWithoutExtension(path);
+                    KUnityEditorEventCatcher._onSaveSceneEvent();
+                }
+            }
+
+            return paths;
+        }
+    }
 }

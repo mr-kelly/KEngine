@@ -941,16 +941,16 @@ namespace KEngine
                 if (child.GetComponent<ParticleSystem>() != null)
                 {
                     var particleSystem = child.GetComponent<ParticleSystem>();
-                    if (particleSystem.renderer.sharedMaterial != null)
-                        particleSystem.renderer.sharedMaterial.renderQueue = renderQueue;
+                    if (particleSystem.GetComponent<Renderer>().sharedMaterial != null)
+                        particleSystem.GetComponent<Renderer>().sharedMaterial.renderQueue = renderQueue;
                 }
             }
             if (parent.GetComponent<ParticleSystem>() != null)
             {
                 var particleSystem = parent.GetComponent<ParticleSystem>();
                 //bug 当同一个窗口有多个使用相同的Material时，其它组件的Material在关闭后会被释放
-                if (particleSystem.renderer.sharedMaterial != null)
-                    particleSystem.renderer.sharedMaterial.renderQueue = renderQueue;
+                if (particleSystem.GetComponent<Renderer>().sharedMaterial != null)
+                    particleSystem.GetComponent<Renderer>().sharedMaterial.renderQueue = renderQueue;
             }
         }
 
@@ -987,7 +987,7 @@ namespace KEngine
 
                 Vector3 realLocalPos =
                     targetGameObject.transform.InverseTransformPoint(oldCircle.gameObject.transform.position);
-                newCircle.center = oldCircle.center + (Vector2)realLocalPos;
+                newCircle.offset = oldCircle.offset + (Vector2)realLocalPos;
                 return newCircle;
             }
             else if (collider2d is BoxCollider2D)
@@ -998,7 +998,7 @@ namespace KEngine
                 newBox.size = oldBox.size;
                 //newBox.center = oldBox.center;
                 Vector3 realLocalPos = targetGameObject.transform.InverseTransformPoint(oldBox.gameObject.transform.position);
-                newBox.center = oldBox.center + (Vector2)realLocalPos;
+                newBox.offset = oldBox.offset + (Vector2)realLocalPos;
                 return newBox;
             }
             KLogger.LogError("Error Collider: {0}", collider2d);
@@ -1014,7 +1014,7 @@ namespace KEngine
                 CircleCollider2D newCircle = targetGameObject.AddComponent<CircleCollider2D>();
                 newCircle.isTrigger = oldCircle.isTrigger;
                 newCircle.radius = oldCircle.radius;
-                newCircle.center = oldCircle.center;
+                newCircle.offset = oldCircle.center;
             }
             else if (collider is BoxCollider)
             {
@@ -1022,7 +1022,7 @@ namespace KEngine
                 BoxCollider2D newBox = targetGameObject.AddComponent<BoxCollider2D>();
                 newBox.isTrigger = oldBox.isTrigger;
                 newBox.size = oldBox.size;
-                newBox.center = oldBox.center;
+                newBox.offset = oldBox.center;
             }
         }
 

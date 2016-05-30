@@ -83,8 +83,35 @@ namespace KEngine
             return newLoader;
         }
 
+#if UNITY_5
+        private static bool _hasPreloadAssetBundleManifest = false;
+        private static AssetBundle _mainAssetBundle;
+        private static AssetBundleManifest _assetBundleManifest;
+        /// <summary>
+        /// Unity5下，使用manifest进行AssetBundle的加载
+        /// </summary>
+        static void PreLoadManifest()
+        {
+            if (_hasPreloadAssetBundleManifest)
+                return;
+
+            _hasPreloadAssetBundleManifest = true;
+            var mainAssetBundlePath = string.Format("{0}/{1}", KResourceModule.StreamingPlatformPathWithoutFileProtocol,
+                KResourceModule.BuildPlatformName);
+            _mainAssetBundle = AssetBundle.LoadFromMemory(KResourceModule.LoadSyncFromStreamingAssets(mainAssetBundlePath));
+            _assetBundleManifest = _mainAssetBundle.LoadAsset("AssetBundleManifest") as AssetBundleManifest;
+
+            Debuger.Assert(_mainAssetBundle);
+            Debuger.Assert(_assetBundleManifest);
+        }
+#endif
+
         protected override void Init(string url, params object[] args)
         {
+#if UNITY_5
+            PreLoadManifest();
+#endif
+
             base.Init(url);
 
             _loaderMode = (KAssetBundleLoaderMode)args[0];
@@ -137,6 +164,30 @@ namespace KEngine
         }
         private IEnumerator LoadAssetBundle(string relativeUrl)
         {
+#if UNITY_5
+            // Unity 5下，自动进行依赖加载
+            var abPath = relativeUrl.ToLower();
+            var deps = _assetBundleManifest.GetAllDependencies(abPath);
+            var depLoaders = new KAssetBundleLoader[deps.Length];
+            for (var d = 0; d < deps.Length; d++)
+            {
+                var dep = deps[d];
+                depLoaders[d] = KAssetBundleLoader.Load(dep);
+            }
+            for (var l = 0; l < depLoaders.Length; l++)
+            {
+                var loader = depLoaders[l];
+                while (!loader.IsCompleted)
+                {
+                    yield return null;
+                }
+            }
+#endif
+
+#if UNITY_5
+            // Unity 5 AssetBundle自动转小写
+            relativeUrl = relativeUrl.ToLower();
+#endif
             var bytesLoader = KBytesLoader.Load(relativeUrl, _inAppPathType, _loaderMode);
             while (!bytesLoader.IsCompleted)
             {

@@ -42,12 +42,18 @@ namespace KEngine.UI
         {
             EventSystem = new GameObject("EventSystem").AddComponent<EventSystem>();
             EventSystem.gameObject.AddComponent<StandaloneInputModule>();
+#if !UNITY_5
             EventSystem.gameObject.AddComponent<TouchInputModule>();
+#endif
         }
 
         public UIController CreateUIController(GameObject uiObj, string uiTemplateName)
         {
+#if UNITY_5
+            UIController uiBase = uiObj.AddComponent(Types.GetType("KUI" + uiTemplateName, "Assembly-CSharp")) as UIController;
+#else
             UIController uiBase = uiObj.AddComponent("KUI" + uiTemplateName) as UIController;
+#endif
             KEngine.Debuger.Assert(uiBase);
             return uiBase;
         }
@@ -63,7 +69,11 @@ namespace KEngine.UI
 
         public IEnumerator LoadUIAsset(CUILoadState loadState, UILoadRequest request)
         {
+#if UNITY_5
+            string path = string.Format("UI/{0}.prefab{1}", loadState.TemplateName, KEngine.AppEngine.GetConfig("AssetBundleExt"));
+#else
             string path = string.Format("UI/{0}_UI{1}", loadState.TemplateName, KEngine.AppEngine.GetConfig("AssetBundleExt"));
+#endif
             var assetLoader = KStaticAssetLoader.Load(path);
             loadState.UIResourceLoader = assetLoader; // 基本不用手工释放的
             while (!assetLoader.IsCompleted)

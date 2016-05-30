@@ -82,8 +82,9 @@ namespace KEngine.Editor
             SetupHistory();
 
             //KDependencyBuild.Clear();
-
+#if !UNITY_5
             BuildTools.AfterBuildAssetBundleEvent += OnAfterBuildAssetBundleEvent;
+#endif
         }
 
         public void Dispose()
@@ -100,7 +101,9 @@ namespace KEngine.Editor
             //KDependencyBuild.SaveBuildAction();
 
             Current = null;
+#if !UNITY_5
             BuildTools.AfterBuildAssetBundleEvent -= OnAfterBuildAssetBundleEvent;
+#endif
             //KDependencyBuild.Clear();
         }
 
@@ -109,7 +112,7 @@ namespace KEngine.Editor
             //BuildedList.Add(arg3);
         }
 
-        #region 资源版本管理相关
+#region 资源版本管理相关
 
         public class BuildRecord
         {
@@ -291,6 +294,11 @@ namespace KEngine.Editor
         /// <returns></returns>
         private bool DoCheckBuild(string filePath, bool log = true)
         {
+#if UNITY_5
+            var currentScene = UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene().path;
+#else
+            var currentScene = EditorApplication.currentScene;
+#endif
             BuildRecord assetMd5;
             if (!File.Exists(filePath))
             {
@@ -301,7 +309,7 @@ namespace KEngine.Editor
                 {
                     KLogger.LogError(
                         "[DoCheckBuild]Find unity_builtin_extra resource to build!! Please check it! current scene: {0}",
-                        EditorApplication.currentScene);
+                        currentScene);
                 }
                 return false;
             }
@@ -389,7 +397,7 @@ namespace KEngine.Editor
             Current.MarkBuildVersion(sourceFiles);
         }
 
-        #endregion
+#endregion
 
         public static bool TryIsRebuild()
         {
