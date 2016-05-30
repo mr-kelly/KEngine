@@ -1,0 +1,18 @@
+ManifestFileVersion: 0
+CRC: 1805378455
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: e3c1c2338215d52d5476140f4ec6ea2f
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 9dea23ffc7e96552740e12d1ee5309d8
+HashAppended: 0
+ClassTypes:
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+Assets:
+- Assets/BundleResources/UI/Textures/button_green.png
+Dependencies: []

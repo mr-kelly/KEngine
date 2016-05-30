@@ -1,0 +1,46 @@
+ManifestFileVersion: 0
+CRC: 272657641
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: consola.ttf.bytes
+      Dependencies: {}
+    Info_1:
+      Name: ngui/testngui.unity.bytes
+      Dependencies:
+        Dependency_0: consola.ttf.bytes
+        Dependency_1: ngui/atlas/commonuiatlas.prefab.bytes
+        Dependency_2: ui/textures/button_red.png.bytes
+    Info_2:
+      Name: ngui/atlas/commonuiatlas.mat.bytes
+      Dependencies:
+        Dependency_0: ngui/atlas/commonuiatlas.png.bytes
+    Info_3:
+      Name: ngui/atlas/commonuiatlas.png.bytes
+      Dependencies: {}
+    Info_4:
+      Name: ngui/atlas/commonuiatlas.prefab.bytes
+      Dependencies:
+        Dependency_0: ngui/atlas/commonuiatlas.mat.bytes
+    Info_5:
+      Name: ui/demohome.unity.bytes
+      Dependencies:
+        Dependency_0: ui/demohome.prefab.bytes
+    Info_6:
+      Name: ui/textures/button_green.png.bytes
+      Dependencies: {}
+    Info_7:
+      Name: ui/textures/button_green_border.png.bytes
+      Dependencies: {}
+    Info_8:
+      Name: ui/textures/button_red.png.bytes
+      Dependencies: {}
+    Info_9:
+      Name: ui/textures/button_yellow.png.bytes
+      Dependencies: {}
+    Info_10:
+      Name: ui/demohome.prefab.bytes
+      Dependencies:
+        Dependency_0: ui/textures/button_green.png.bytes
+        Dependency_1: ui/textures/button_red.png.bytes
+        Dependency_2: ui/textures/button_yellow.png.bytes

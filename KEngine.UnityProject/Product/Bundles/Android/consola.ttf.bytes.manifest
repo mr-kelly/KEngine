@@ -1,0 +1,22 @@
+ManifestFileVersion: 0
+CRC: 667940687
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 187c98934dd471d1fa4e2e6a166dca9a
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: fa3924242a2a156456239784e70a9a9d
+HashAppended: 0
+ClassTypes:
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 128
+  Script: {instanceID: 0}
+Assets:
+- Assets/BundleResources/CONSOLA.TTF
+Dependencies: []
