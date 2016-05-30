@@ -10,6 +10,8 @@
 /KEngine.UnityProject/*.sln.DotSettings
 /KEngine.UnityProject/*.suo
 
+/KEngine.UnityProject/Assets/StreamingAssets/Bundles
+
 /KEngine.UnityProject/Assets/Resources/NGUIShaders.meta
 /KEngine.UnityProject/Assets/NGUI
 /KEngine.UnityProject/Assets/AssetStoreTools

@@ -58,11 +58,6 @@ public class KUGUIDemoMain : MonoBehaviour
         var uiName = "DemoHome";
         UIModule.Instance.OpenWindow(uiName);
 
-        UIModule.Instance.CallUI(uiName, (ui, args) =>
-        {
-            // Do some UI stuff
-        });
-
         Debug.Log("[SettingModule]Table: " + string.Join(",", ExampleSettings.TabFilePaths));
 
         foreach (ExampleSetting exampleInfo in ExampleSettings.GetAll())
@@ -86,8 +81,15 @@ public class KUGUIDemoMain : MonoBehaviour
 
 
 
+
         KLogger.Log("Start reading streamingAssets Test...");
-        KLogger.Info("Reading from streamingAssets, content: {0}", Encoding.UTF8.GetString(KResourceModule.LoadSyncFromStreamingAssets("TestFile.txt")));
+        UIModule.Instance.CallUI(uiName, (ui, args) =>
+        {
+            var tip = string.Format("Reading from streamingAssets, content: {0}", Encoding.UTF8.GetString(KResourceModule.LoadSyncFromStreamingAssets("TestFile.txt")));
+            var demoHome = ui as KUIDemoHome;
+            demoHome.TipLabel.text += tip;
+            // Do some UI stuff
+        });
 
     }
     //private void OnGameSettingsInit()

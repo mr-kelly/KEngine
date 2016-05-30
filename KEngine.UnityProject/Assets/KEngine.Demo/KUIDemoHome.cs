@@ -37,6 +37,7 @@ public class KUIDemoHome : UIController
 {
     private Button Button1;
     private Text HomeLabel;
+    public Text TipLabel;
 
     public override void OnInit()
     {
@@ -46,6 +47,7 @@ public class KUIDemoHome : UIController
         Debuger.Assert(Button1);
 
         HomeLabel = GetControl<Text>("HomeText");
+        TipLabel = GetControl<Text>("Tip");
 
         Button1.onClick.AddListener(() => KLogger.LogWarning("Click Home Button!"));
     }
