@@ -54,8 +54,11 @@ namespace KEngine.Editor
         private static void OnSaveScene()
         {
 #if UNITY_5
-            if (!EditorSceneManager.GetActiveScene().path.StartsWith("Assets/" + KEngineDef.ResourcesBuildDir + "/UI"))
+            var scenePath = EditorSceneManager.GetActiveScene().path;
+            if (!scenePath.Contains("Assets/" + KEngineDef.ResourcesEditDir+ "/UI") && 
+                !scenePath.Contains("Assets/" + KEngineDef.ResourcesBuildDir+ "/UI"))
                 return;
+
             // Unity 5模式，自动把需要打包的资源，转成Prefab放置到UI下
             Debug.Log("Save Scene... " + EditorSceneManager.GetActiveScene().path);
             UISceneToPrefabs();
