@@ -233,10 +233,7 @@ namespace KEngine
             {
                 if (RenderWatcher == null)
                     RenderWatcher = new CFpsWatcher(0.95f);
-                GUILayout.BeginVertical(GUILayout.Width(300));
-                GUILayout.Label(string.Format("Memory: {0:F3}KB", UnityEngine.Profiler.GetMonoUsedSize() / 1024f));
-                GUILayout.Label(RenderWatcher.Watch("FPS: {0:N0}", 1f / Time.deltaTime));
-                GUILayout.EndVertical();
+                RenderWatcher.OnGUIHandler();
             }
         }
         static string ConfigFilePath = "Assets/Resources/KEngineConfig.txt";
@@ -262,7 +259,7 @@ namespace KEngine
 
                 _configsTable = new TableFile(new TableFileConfig
                 {
-                    Content = configContent, 
+                    Content = configContent,
                     OnExceptionEvent = (ex, args) =>
                     {
                         if (ex != TableFileExceptionType.DuplicatedKey)
@@ -349,12 +346,28 @@ namespace KEngine
         private float Value;
         private float Sensitivity;
 
+        private string _cacheMemoryStr;
+        private string _cacheFPSStr;
+
         public CFpsWatcher(float sensitivity)
         {
             Value = 0f;
             Sensitivity = sensitivity;
         }
 
+        public void OnGUIHandler()
+        {
+            if (Time.frameCount % 30 == 0 || _cacheMemoryStr == null || _cacheFPSStr == null)
+            {
+                _cacheMemoryStr = string.Format("Memory: {0:F3}KB", UnityEngine.Profiler.GetMonoUsedSize() / 1024f);
+                _cacheFPSStr = Watch("FPS: {0:N0}", 1f / Time.deltaTime);
+            }
+
+            GUILayout.BeginVertical(GUILayout.Width(300));
+            GUILayout.Label(_cacheMemoryStr);
+            GUILayout.Label(_cacheFPSStr);
+            GUILayout.EndVertical();
+        }
         public string Watch(string format, float value)
         {
             Value = Value * Sensitivity + value * (1f - Sensitivity);
