@@ -74,7 +74,18 @@ namespace KEngine.Editor
         /// <summary>
         /// 生成代码吗？它的路径配置
         /// </summary>
-        public static string SettingCodePath = "Assets/AppSettings.cs";
+        public static string SettingCodePath
+        {
+            get
+            {
+                var compilePath = AppEngine.GetConfig("SettingCompileCodePath", false);
+                if (string.IsNullOrEmpty(compilePath))
+                {
+                    return "Assets/AppSettings.cs"; // default value
+                }
+                return compilePath;
+            }
+        }
 
         /// <summary>
         /// 标记，是否正在打开提示配置变更对话框

@@ -300,7 +300,7 @@ namespace KEngine
         {
             EnsureConfigTab();
 
-            var conf = ConfigsTable.FindByPrimaryKey(key);
+            var conf = ConfigsTable.FindByPrimaryKey(key, showLog);
             if (conf == null)
             {
                 if (showLog)

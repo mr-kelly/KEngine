@@ -380,8 +380,9 @@ namespace CosmosTable
         /// Get object of the primary key (pk in meta header)
         /// </summary>
         /// <param name="primaryKey"></param>
+        /// <param name="throwError">Whether or not throw exception</param>
         /// <returns></returns>
-        public TableRow FindByPrimaryKey(object primaryKey)
+        public TableRow FindByPrimaryKey(object primaryKey, bool throwError = true)
         {
             TableRow ret;
 
@@ -389,7 +390,8 @@ namespace CosmosTable
                 return ret;
             else
             {
-                OnException(TableFileExceptionType.NotFoundPrimaryKey, primaryKey.ToString());
+                if (throwError)
+                    OnException(TableFileExceptionType.NotFoundPrimaryKey, primaryKey.ToString());
                 return null;
             }
         }
