@@ -322,11 +322,20 @@ namespace KEngine
             newUrl = StreamingPlatformPath + url;
 
             // 注意，StreamingAssetsPath在Android平台時，壓縮在apk里面，不要做文件檢查了
-            if (Application.platform != RuntimePlatform.Android &&
-                !File.Exists(StreamingPlatformPathWithoutFileProtocol + url))
+            if (!Application.isEditor && Application.platform == RuntimePlatform.Android)
             {
-                return false;
+                if (!KEngineAndroidPlugin.IsAssetExists(ResourceFolderPlatformPath + url))
+                    return false;
             }
+            else
+            {
+                // Editor, 非android运行，直接进行文件检查
+                if (!File.Exists(StreamingPlatformPathWithoutFileProtocol + url))
+                {
+                    return false;
+                }
+            }
+
             // Windows/Edtiro平台下，进行大小敏感判断
             if (Application.isEditor)
             {
@@ -539,8 +548,8 @@ namespace KEngine
         {
             get
             {
-                string editorAssetBundlePath = Path.Combine(Application.dataPath,
-                    KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleBuildRelPath)); // for editoronly
+                string editorAssetBundlePath = Application.dataPath + "/" +
+                    KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleBuildRelPath); // for editoronly
 
                 return editorAssetBundlePath;
             }
