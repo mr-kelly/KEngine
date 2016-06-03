@@ -82,6 +82,11 @@ namespace KEngine.Editor
         [MenuItem("KEngine/AssetBundle/Build All")]
         public static void BuildAllAssetBundles()
         {
+            if (EditorApplication.isPlaying)
+            {
+                KLogger.LogError("Cannot build in playing mode! Please stop!");
+                return;
+            }
             MakeAssetBundleNames();
             var outputPath = GetExportPath(EditorUserBuildSettings.activeBuildTarget);
             KLogger.Log("Asset bundle start build to: {0}", outputPath);

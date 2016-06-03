@@ -47,7 +47,7 @@ namespace KEngine.UI
     /// <summary>
     /// UI Module
     /// </summary>
-    public class UIModule : KEngine.IModule
+    public class UIModule : KEngine.IModuleInitable
     {
         private class _InstanceClass
         {

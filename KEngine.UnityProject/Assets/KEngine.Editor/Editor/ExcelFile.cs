@@ -34,7 +34,7 @@ namespace KEngine.Editor
 {
 
     /// <summary>
-    /// 基于NPOI操作Excel文件
+    /// 基于NPOI操作Excel文件, 读取，首行是列名
     /// </summary>
     public class ExcelFile
     {

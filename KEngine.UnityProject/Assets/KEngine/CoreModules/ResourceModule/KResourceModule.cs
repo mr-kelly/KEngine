@@ -78,7 +78,7 @@ namespace KEngine
         PersistentDataPathPriority,
     }
 
-    public class KResourceModule : MonoBehaviour, KEngine.IModule
+    public class KResourceModule : MonoBehaviour, KEngine.IModuleInitable
     {
         public delegate void ASyncLoadABAssetDelegate(Object asset, object[] args);
 

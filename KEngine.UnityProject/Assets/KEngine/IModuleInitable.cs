@@ -3,7 +3,7 @@
 // KEngine - Toolset and framework for Unity3D
 // ===================================
 // 
-// Filename: IModule.cs
+// Filename: IModuleInitable.cs
 // Date:     2015/12/03
 // Author:  Kelly
 // Email: 23110388@qq.com
@@ -30,9 +30,9 @@ using System.Collections;
 namespace KEngine
 {
     /// <summary>
-    /// CosmosEngine's Module must has IEnumerator Init method
+    /// KEngine's Module must has IEnumerator Init method
     /// </summary>
-    public interface IModule
+    public interface IModuleInitable
     {
         IEnumerator Init();
     }

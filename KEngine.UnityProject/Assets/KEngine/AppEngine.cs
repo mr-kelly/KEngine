@@ -53,7 +53,7 @@ namespace KEngine
         /// <summary>
         /// To Display FPS in the Debug Mode (Debug.isDebugBuild is true)
         /// </summary>
-        public static CFpsWatcher RenderWatcher { get; private set; } // 帧数监听器
+        static FpsWatcher RenderWatcher { get; set; } // 帧数监听器
 
         /// <summary>
         /// In Init func has a check if the user has the write privillige
@@ -102,7 +102,7 @@ namespace KEngine
         /// <summary>
         /// Modules passed from the CosmosEngine.New function. All your custom game logic modules
         /// </summary>
-        public KEngine.IModule[] GameModules { get; private set; }
+        public KEngine.IModuleInitable[] GameModules { get; private set; }
 
         /// <summary>
         /// 是否初始化完成
@@ -117,8 +117,8 @@ namespace KEngine
 
         public IAppEntry AppEntry { get; private set; }
 
-        [Obsolete("Use New(GameObject, IAppEntry, IModule[]) instead!")]
-        public static AppEngine New(GameObject gameObjectToAttach, IModule[] modules)
+        [Obsolete("Use New(GameObject, IAppEntry, IModuleInitable[]) instead!")]
+        public static AppEngine New(GameObject gameObjectToAttach, IModuleInitable[] modules)
         {
             return New(gameObjectToAttach, null, modules);
         }
@@ -126,7 +126,7 @@ namespace KEngine
         /// <summary>
         /// Engine entry.... all begins from here
         /// </summary>
-        public static AppEngine New(GameObject gameObjectToAttach, IAppEntry entry, IModule[] modules)
+        public static AppEngine New(GameObject gameObjectToAttach, IAppEntry entry, IModuleInitable[] modules)
         {
             Debuger.Assert(gameObjectToAttach != null && modules != null);
             AppEngine appEngine = gameObjectToAttach.AddComponent<AppEngine>();
@@ -185,7 +185,7 @@ namespace KEngine
         /// </summary>
         private IEnumerator DoInit()
         {
-            var baseModules = new KEngine.IModule[]
+            var baseModules = new KEngine.IModuleInitable[]
             {
                 // 基础2件套
                 KResourceModule.Instance,
@@ -206,11 +206,11 @@ namespace KEngine
             IsInited = true;
         }
 
-        private IEnumerator DoInitModules(IList<IModule> modules)
+        private IEnumerator DoInitModules(IList<IModuleInitable> modules)
         {
             var startInitTime = 0f;
             var startMem = 0f;
-            foreach (IModule initModule in modules)
+            foreach (IModuleInitable initModule in modules)
             {
                 if (Debug.isDebugBuild)
                 {
@@ -232,7 +232,7 @@ namespace KEngine
             if (ShowFps)
             {
                 if (RenderWatcher == null)
-                    RenderWatcher = new CFpsWatcher(0.95f);
+                    RenderWatcher = new FpsWatcher(0.95f);
                 RenderWatcher.OnGUIHandler();
             }
         }
@@ -341,7 +341,7 @@ namespace KEngine
         // StreamingAssets inner folder name, when build, will link the Bundle build Path to here
     }
 
-    public class CFpsWatcher
+    class FpsWatcher
     {
         private float Value;
         private float Sensitivity;
@@ -349,7 +349,7 @@ namespace KEngine
         private string _cacheMemoryStr;
         private string _cacheFPSStr;
 
-        public CFpsWatcher(float sensitivity)
+        public FpsWatcher(float sensitivity)
         {
             Value = 0f;
             Sensitivity = sensitivity;

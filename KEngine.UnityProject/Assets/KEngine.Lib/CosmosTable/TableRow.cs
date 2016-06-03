@@ -100,7 +100,7 @@ namespace CosmosTable
 
     }
 
-    public class TableRow : TableRowParser
+    public partial class TableRow : TableRowParser
     {
         /// <summary>
         /// TableRow's row number of table

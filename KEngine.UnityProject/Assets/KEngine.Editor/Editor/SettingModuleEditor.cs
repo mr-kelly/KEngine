@@ -28,6 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using CosmosTable;
 using DotLiquid;
 using KUnityEditorTools;
@@ -249,6 +250,15 @@ namespace KEngine.Editor
                     var templateVars = new Dictionary<string, TableTemplateVars>();
                     foreach (var compileResult in results)
                     {
+                        // 判断本文件是否忽略代码生成，用正则表达式
+                        var settingCodeIgnorePattern = AppEngine.GetConfig("SettingCodeIgnorePattern", false);
+                        if (!string.IsNullOrEmpty(settingCodeIgnorePattern))
+                        {
+                            var ignoreRegex = new Regex(settingCodeIgnorePattern);
+                            if (ignoreRegex.IsMatch(compileResult.TabFilePath))
+                                continue; // ignore this 
+                        }
+
                         var customExtraStr = CustomExtraString != null ? CustomExtraString(compileResult) : null;
 
                         var templateVar = new TableTemplateVars(compileResult, customExtraStr);

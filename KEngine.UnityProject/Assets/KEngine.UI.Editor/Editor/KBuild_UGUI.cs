@@ -111,12 +111,13 @@ namespace KEngine.Editor
         [MenuItem("KEngine/UI(UGUI)/Export Current UI %&e")]
         public static void ExportCurrentUI()
         {
-#if !UNITY_5
             if (EditorApplication.isPlaying)
             {
                 KLogger.LogError("Cannot export in playing mode! Please stop!");
                 return;
             }
+#if !UNITY_5
+
 
             foreach(var windowAsset in windowAssets)
             {
