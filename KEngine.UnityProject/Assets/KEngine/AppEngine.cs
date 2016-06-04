@@ -27,7 +27,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
+using System.IO;
 using CosmosTable;
 using UnityEngine;
 
@@ -61,17 +61,6 @@ namespace KEngine
         public static bool IsRootUser; // 是否越狱iOS
 
         public static AppEngine EngineInstance { get; private set; }
-
-        private static TableFile _configsTable;
-
-        public static TableFile ConfigsTable
-        {
-            get
-            {
-                EnsureConfigTab();
-                return _configsTable;
-            }
-        }
 
         //private static AppVersion _appVersion = null;
 
@@ -236,99 +225,61 @@ namespace KEngine
                 RenderWatcher.OnGUIHandler();
             }
         }
-        static string ConfigFilePath = "Assets/Resources/KEngineConfig.txt";
+
+        private static EngineConfigs _engineConfigs;
+
         /// <summary>
-        /// Ensure the CEngineConfig file loaded.
+        /// Ensure Configs load
         /// </summary>
-        public static TableFile EnsureConfigTab(bool reload = false)
+        /// <param name="forceReload"></param>
+        public static EngineConfigs PreloadConfigs(bool forceReload = false)
         {
-            if (_configsTable == null || reload)
+            if (_engineConfigs != null && !forceReload)
+                return _engineConfigs;
+
+            string configContent = null;
+            if (Application.isEditor && !Application.isPlaying)
             {
-                string configContent;
-                if (Application.isEditor && !Application.isPlaying)
-                {
-                    // prevent Resources.Load fail on Batch Mode
-                    configContent = System.IO.File.ReadAllText(ConfigFilePath);
-                }
-                else
-                {
-                    var textAsset = Resources.Load<TextAsset>("KEngineConfig");
-                    Debuger.Assert(textAsset);
-                    configContent = textAsset.text;
-                }
-
-                _configsTable = new TableFile(new TableFileConfig
-                {
-                    Content = configContent,
-                    OnExceptionEvent = (ex, args) =>
-                    {
-                        if (ex != TableFileExceptionType.DuplicatedKey)
-                        {
-                            var sb = new StringBuilder();
-                            sb.Append(ex.ToString());
-                            sb.Append(": ");
-                            foreach (var s in args)
-                            {
-                                sb.Append(s);
-                                sb.Append(", ");
-                            }
-                            throw new Exception(sb.ToString());
-                        }
-                    },
-                });
+                // prevent Resources.Load fail on Batch Mode
+                var filePath = "Assets/Resources/AppConfigs.txt";
+                if (File.Exists(filePath))
+                    configContent = System.IO.File.ReadAllText(filePath);
             }
-            return _configsTable;
+            else
+            {
+                var textAsset = Resources.Load<TextAsset>("AppConfigs");
+                if (textAsset != null)
+                    configContent = textAsset.text;
+            }
+
+            _engineConfigs = new EngineConfigs(configContent);
+            return _engineConfigs;
         }
 
         /// <summary>
-        /// Check whetehr exist a config key
+        /// Get config from ini config file or the default ini string
         /// </summary>
+        /// <param name="section"></param>
         /// <param name="key"></param>
+        /// <param name="showLog"></param>
         /// <returns></returns>
-        public static bool HasConfig(string key)
+        public static string GetConfig(string section, string key, bool showLog = true)
         {
-            return ConfigsTable.HasPrimaryKey(key);
-        }
-
-        /// <summary>
-        /// Get Config from the CEngineConfig file through key
-        /// </summary>
-        public static string GetConfig(string key, bool showLog = true)
-        {
-            EnsureConfigTab();
-
-            var conf = ConfigsTable.FindByPrimaryKey(key, showLog);
-            if (conf == null)
+            PreloadConfigs();
+            var value = _engineConfigs.GetConfig(section, key, false);
+            if (value == null)
             {
                 if (showLog)
-                    KLogger.LogError("Cannot get CosmosConfig: {0}", key);
-                return null;
+                    KLogger.LogError("Cannot get config, section: {0}, key: {1}", section, key);
             }
-            return conf["Value"] as string;
+            return value;
         }
 
         public static string GetConfig(KEngineDefaultConfigs cfg)
         {
-            return GetConfig(cfg.ToString());
+            return GetConfig("KEngine", cfg.ToString());
         }
 
-        public static void SetConfig(string key, string value)
-        {
-            EnsureConfigTab();
-            if (!Application.isEditor)
-            {
-                KLogger.LogError("Set Config is Editor only");
-                return;
-            }
-
-            var item = ConfigsTable.FindByPrimaryKey(key);
-            var writer = new TabFileWriter(ConfigsTable);
-            var row = writer.GetRow(item.RowNumber);
-            var rowInfo = KEngineInfo.Wrap(row);
-            rowInfo.Value = value;
-
-            writer.Save(ConfigFilePath);
-        }
     }
 
     public enum KEngineDefaultConfigs

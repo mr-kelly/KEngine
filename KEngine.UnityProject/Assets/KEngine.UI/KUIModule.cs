@@ -94,7 +94,7 @@ namespace KEngine.UI
 
         public IEnumerator Init()
         {
-            var configUiBridge = AppEngine.GetConfig("UIModuleBridge");
+            var configUiBridge = AppEngine.GetConfig("KEngine.UI", "UIModuleBridge");
 
             if (!string.IsNullOrEmpty(configUiBridge))
             {

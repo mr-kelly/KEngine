@@ -45,7 +45,7 @@ namespace KEngine.Modules
         {
             get
             {
-                return AppEngine.GetConfig("SettingResourcesPath");
+                return AppEngine.GetConfig("KEngine.Setting", "SettingResourcesPath");
             }
         }
 

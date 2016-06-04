@@ -79,7 +79,7 @@ namespace KEngine
 
         private IEnumerator _Init(string path, KAssetBundleLoaderMode loaderMode)
         {
-            IsLoadAssetBundle = KEngine.AppEngine.GetConfig("IsLoadAssetBundle").ToInt32() != 0;
+            IsLoadAssetBundle = KEngine.AppEngine.GetConfig("KEngine", "IsLoadAssetBundle").ToInt32() != 0;
 
             UnityEngine.Object getAsset = null;
             if (!IsLoadAssetBundle)

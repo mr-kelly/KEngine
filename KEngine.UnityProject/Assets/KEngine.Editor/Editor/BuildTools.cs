@@ -126,8 +126,7 @@ namespace KEngine.Editor
         public static string GetExportPath(BuildTarget platfrom, KResourceQuality quality = KResourceQuality.Sd)
         {
             string basePath =
-                Path.GetFullPath(Application.dataPath + "/" +
-                                 KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleBuildRelPath) + "/");
+                Path.GetFullPath(KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleBuildRelPath));
 
             if (File.Exists(basePath))
             {

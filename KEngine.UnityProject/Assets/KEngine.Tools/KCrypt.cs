@@ -55,7 +55,7 @@ namespace KEngine
         /// 加密成功返回加密后的字符串，失败返回源串
         public string EncryptDES(string encryptString)
         {
-            string encryptKey = AppEngine.GetConfig("CryptKey"); // 钥匙
+            string encryptKey = AppEngine.GetConfig("KEngine", "CryptKey") ?? "testkey"; // 钥匙
             try
             {
                 byte[] rgbKey = Encoding.UTF8.GetBytes(encryptKey.Substring(0, 8));
@@ -81,7 +81,7 @@ namespace KEngine
         /// 解密成功返回解密后的字符串，失败返源串
         public string DecryptDES(string decryptString)
         {
-            string decryptKey = AppEngine.GetConfig("CryptKey");
+            string decryptKey = AppEngine.GetConfig("KEngine", "CryptKey") ?? "testkey";
             try
             {
                 byte[] rgbKey = Encoding.UTF8.GetBytes(decryptKey);

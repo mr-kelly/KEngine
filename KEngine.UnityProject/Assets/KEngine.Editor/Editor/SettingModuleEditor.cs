@@ -79,7 +79,7 @@ namespace KEngine.Editor
         {
             get
             {
-                var compilePath = AppEngine.GetConfig("SettingCompileCodePath", false);
+                var compilePath = AppEngine.GetConfig("KEngine.Setting", "SettingCompileCodePath", false);
                 if (string.IsNullOrEmpty(compilePath))
                 {
                     return "Assets/AppSettings.cs"; // default value
@@ -251,7 +251,7 @@ namespace KEngine.Editor
                     foreach (var compileResult in results)
                     {
                         // 判断本文件是否忽略代码生成，用正则表达式
-                        var settingCodeIgnorePattern = AppEngine.GetConfig("SettingCodeIgnorePattern", false);
+                        var settingCodeIgnorePattern = AppEngine.GetConfig("KEngine.Setting", "SettingCodeIgnorePattern", false);
                         if (!string.IsNullOrEmpty(settingCodeIgnorePattern))
                         {
                             var ignoreRegex = new Regex(settingCodeIgnorePattern);
@@ -316,7 +316,7 @@ namespace KEngine.Editor
         {
             get
             {
-                var sourcePath = AppEngine.GetConfig("SettingSourcePath");
+                var sourcePath = AppEngine.GetConfig("KEngine.Setting", "SettingSourcePath");
                 return sourcePath;
             }
         }
@@ -345,7 +345,7 @@ namespace KEngine.Editor
                 KLogger.LogError("Need to KEngineConfig: SettingSourcePath");
                 return;
             }
-            var compilePath = AppEngine.GetConfig("SettingCompiledPath");
+            var compilePath = AppEngine.GetConfig("KEngine.Setting", "SettingCompiledPath");
             if (string.IsNullOrEmpty(compilePath))
             {
                 KLogger.LogError("Need to KEngineConfig: SettingCompiledPath");

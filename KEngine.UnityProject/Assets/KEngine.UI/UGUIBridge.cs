@@ -70,7 +70,7 @@ namespace KEngine.UI
         public IEnumerator LoadUIAsset(CUILoadState loadState, UILoadRequest request)
         {
 #if UNITY_5
-            string path = string.Format("UI/{0}.prefab{1}", loadState.TemplateName, KEngine.AppEngine.GetConfig("AssetBundleExt"));
+            string path = string.Format("UI/{0}.prefab{1}", loadState.TemplateName, KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt));
 #else
             string path = string.Format("UI/{0}_UI{1}", loadState.TemplateName, KEngine.AppEngine.GetConfig("AssetBundleExt"));
 #endif

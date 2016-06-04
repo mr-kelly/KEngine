@@ -33,7 +33,7 @@ using UnityEngine;
 /// Load from Local hard disk or
 /// Load from a AssetBundles..
 /// </summary>
-public class KSettingManager : KEngine.IModule
+public class KSettingManager : KEngine.IModuleInitable
 {
     private static KSettingManager _Instance;
 
@@ -86,7 +86,7 @@ public class KSettingManager : KEngine.IModule
 
     private IEnumerator InitSetting()
     {
-        var assetLoader = KStaticAssetLoader.Load("GameSetting" + KEngine.AppEngine.GetConfig("AssetBundleExt"), null);
+        var assetLoader = KStaticAssetLoader.Load("GameSetting" + KEngine.AppEngine.GetConfig("KEngine", "AssetBundleExt"), null);
         while (!assetLoader.IsCompleted)
             yield return null;
 

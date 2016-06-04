@@ -149,7 +149,7 @@ namespace KEngine.Editor
 
         public static string GetBuildRelPath(string uiName)
         {
-            return string.Format("UI/{0}_UI{1}", uiName, KEngine.AppEngine.GetConfig("AssetBundleExt"));
+            return string.Format("UI/{0}_UI{1}", uiName, KEngine.AppEngine.GetConfig("KEngine", "AssetBundleExt"));
         }
 
         [MenuItem("KEngine/UI(UGUI)/Create UI(UGUI)")]

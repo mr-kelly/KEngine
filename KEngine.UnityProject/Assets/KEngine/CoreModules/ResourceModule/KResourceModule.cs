@@ -145,7 +145,7 @@ namespace KEngine
         /// </summary>
         public static string EditorProductFullPath
         {
-            get { return Path.Combine(Application.dataPath, ProductRelPath); }
+            get { return Path.GetFullPath(ProductRelPath); }
         }
 
         /// <summary>
@@ -185,7 +185,7 @@ namespace KEngine
         /// <returns></returns>
         public static string GetAssetBundlePath(string path, params object[] formats)
         {
-            return string.Format(path + KEngine.AppEngine.GetConfig("AssetBundleExt"), formats);
+            return string.Format(path + KEngine.AppEngine.GetConfig("KEngine", "AssetBundleExt"), formats);
         }
 
         // 检查资源是否存在
@@ -544,12 +544,11 @@ namespace KEngine
         /// Unity Editor load AssetBundle directly from the Asset Bundle Path,
         /// whth file:// protocol
         /// </summary>
-        public static string EditorAssetBundlePath
+        public static string EditorAssetBundleFullPath
         {
             get
             {
-                string editorAssetBundlePath = Application.dataPath + "/" +
-                    KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleBuildRelPath); // for editoronly
+                string editorAssetBundlePath = Path.GetFullPath(KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleBuildRelPath)); // for editoronly
 
                 return editorAssetBundlePath;
             }
@@ -585,8 +584,8 @@ namespace KEngine
                 case RuntimePlatform.OSXEditor:
                     {
                         ApplicationPath = string.Format("{0}{1}/", GetFileProtocol(), editorProductPath);
-                        StreamingPlatformPath = GetFileProtocol() + EditorAssetBundlePath + "/" + BuildPlatformName + "/";
-                        StreamingPlatformPathWithoutFileProtocol = EditorAssetBundlePath + "/" + BuildPlatformName + "/";
+                        StreamingPlatformPath = GetFileProtocol() + EditorAssetBundleFullPath + "/" + BuildPlatformName + "/";
+                        StreamingPlatformPathWithoutFileProtocol = EditorAssetBundleFullPath + "/" + BuildPlatformName + "/";
                         ResourceFolderPlatformPath = string.Format("{0}/{1}/", BundlesDirName, GetBuildPlatformName());
                         // Resources folder
                     }

@@ -44,7 +44,7 @@ public class KEngineNGUIDemoMain : MonoBehaviour
         var app = KEngine.AppEngine.New(
             gameObject,
             null,
-            new IModule[]
+            new IModuleInitable[]
             {
                 UIModule.Instance,
                 //KGameSettings.Instance,

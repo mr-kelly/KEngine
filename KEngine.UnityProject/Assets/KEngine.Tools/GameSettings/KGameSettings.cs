@@ -34,7 +34,7 @@ using UnityEngine;
 namespace KEngine.CoreModules
 {
     [Obsolete("Use SettingModule instead!")]
-    public class KGameSettings : IModule
+    public class KGameSettings : IModuleInitable
     {
         private class _InstanceClass
         {

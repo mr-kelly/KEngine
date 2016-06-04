@@ -27,6 +27,7 @@
 using System;
 using System.IO;
 using System.Reflection;
+using IniParser.Model;
 using KUnityEditorTools;
 using UnityEditor;
 using UnityEngine;
@@ -80,11 +81,6 @@ namespace KEngine.Editor
             _headerStyle.normal.textColor = Color.white;
         }
 
-        private string GetConfValue(string key)
-        {
-            return AppEngine.GetConfig(key);
-        }
-
         /// <summary>
         /// Set AppVersion of KEngineConfig.txt
         /// </summary>
@@ -105,7 +101,7 @@ namespace KEngine.Editor
         /// <param name="value"></param>
         public static void SetConfValue(string key, string value)
         {
-            AppEngine.SetConfig(key, value);
+            //AppEngine.SetConfig(key, value);
         }
 
         private void OnGUI()
@@ -130,23 +126,33 @@ namespace KEngine.Editor
                 }
             }
 
-            EditorGUILayout.LabelField("== KEngineConfig.txt ==");
-            bool tabDirty = false;
-            foreach (var item in AppEngine.ConfigsTable.GetAll())
+            EditorGUILayout.LabelField("== AppConfigs.txt ==");
+            //bool tabDirty = false;
+            var configs = AppEngine.PreloadConfigs();
+            foreach (var sectionData in configs.GetSections())
             {
-                string value = item["Value"];
-                string newValue = EditorGUILayout.TextField(item["Key"], value);
-                if (value != newValue)
+                EditorGUILayout.Space();
+                EditorGUILayout.LabelField("[" + sectionData.SectionName + "]");
+
+                foreach (var key in sectionData.Keys)
                 {
-                    AppEngine.SetConfig(item["Key"], newValue);
-                    tabDirty = true;
+                    string value = key.Value;
+                    EditorGUILayout.BeginHorizontal();
+                    EditorGUILayout.LabelField(key.KeyName);
+                    EditorGUILayout.LabelField(value);
+                    EditorGUILayout.EndHorizontal();
+                    //string newValue = EditorGUILayout.TextField(key.KeyName, value);
+                    //if (value != newValue)
+                    //{
+                    //    tabDirty = true;
+                    //}
                 }
             }
 
-            if (tabDirty)
-            {
-                AssetDatabase.Refresh();
-            }
+            //if (tabDirty)
+            //{
+            //    AssetDatabase.Refresh();
+            //}
 
         }
     }

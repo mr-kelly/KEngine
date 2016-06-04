@@ -56,7 +56,7 @@ namespace KEngine.Editor
         {
             string[] args = System.Environment.GetCommandLineArgs();
 
-            string productPath = Path.Combine(Application.dataPath, KEngine.AppEngine.GetConfig("ProductRelPath"));
+            string productPath = KEngine.AppEngine.GetConfig("KEngine", "ProductRelPath");
 
             if (!Directory.Exists(productPath))
             {
@@ -123,8 +123,7 @@ namespace KEngine.Editor
 
             ParseArgs(ref opt, ref outputpath);
 
-            string fullPath = System.IO.Path.Combine(Application.dataPath,
-                System.IO.Path.Combine(KEngine.AppEngine.GetConfig("ProductRelPath"), outputpath));
+            string fullPath = System.IO.Path.Combine(KEngine.AppEngine.GetConfig("KEngine", "ProductRelPath"), outputpath);
 
             string fullDir = System.IO.Path.GetDirectoryName(fullPath);
 
