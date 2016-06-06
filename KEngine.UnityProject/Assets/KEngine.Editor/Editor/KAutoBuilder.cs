@@ -232,20 +232,9 @@ namespace KEngine.Editor
             get
             {
                 // StreamingAssetsPath
-                if (KResourceModule.DefaultInAppPathType == KResourceInAppPathType.StreamingAssetsPath)
-                    return "Assets/StreamingAssets/" +
-                           KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.StreamingBundlesFolderName);
+                return "Assets/StreamingAssets/" +
+                       KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.StreamingBundlesFolderName);
                         // hold asset bundles
-                if (KResourceModule.DefaultInAppPathType == KResourceInAppPathType.ResourcesAssetsPath)
-                    return "Assets/Resources/" +
-                           KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.StreamingBundlesFolderName);
-                        // hold asset bundles"
-                if (KResourceModule.DefaultInAppPathType == KResourceInAppPathType.PersistentAssetsPath)
-                    return Application.persistentDataPath + "/" +
-                           KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.StreamingBundlesFolderName); 
-
-                KLogger.LogError("[AssetBundlesLinkPath]Invalid {0}", KResourceModule.DefaultInAppPathType);
-                return null;
             }
         }
 

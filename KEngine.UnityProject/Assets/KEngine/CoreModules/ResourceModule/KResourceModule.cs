@@ -41,25 +41,6 @@ namespace KEngine
     }
 
     /// <summary>
-    /// In App Path, 指Streaming Assets目录或Resources目录，使用哪一种方式去加载AssetBundle
-    /// StreamingAssets目录，不能使用同步语法去加载，但Resources可以
-    /// 使用StreamingAssets读取AssetBundle，还是使用Resources目录使用AssetBundle？
-    /// </summary>
-    public enum KResourceInAppPathType
-    {
-        Invalid,
-        PersistentAssetsPath, // 使用PersitentDataPath目录，可以使用File.Read
-        StreamingAssetsPath,
-
-        ResourcesAssetsPath,
-
-        /// <summary>
-        /// 将采用KResourceModule中的DefaultInAppPathType来设置
-        /// </summary>
-        Default,
-    }
-
-    /// <summary>
     /// 资源路径优先级，优先使用
     /// </summary>
     public enum KResourcePathPriorityType
@@ -90,8 +71,6 @@ namespace KEngine
         }
 
         public static KResourceQuality Quality = KResourceQuality.Sd;
-
-        public static KResourceInAppPathType DefaultInAppPathType = KResourceInAppPathType.StreamingAssetsPath;
 
         public static float TextureScale
         {
@@ -189,11 +168,10 @@ namespace KEngine
         }
 
         // 检查资源是否存在
-        public static bool ContainsResourceUrl(string resourceUrl,
-            KResourceInAppPathType inAppPathType = KResourceInAppPathType.StreamingAssetsPath)
+        public static bool ContainsResourceUrl(string resourceUrl)
         {
             string fullPath;
-            return GetResourceFullPath(resourceUrl, out fullPath, inAppPathType, false);
+            return GetResourceFullPath(resourceUrl, out fullPath, false);
         }
 
         /// <summary>
@@ -203,11 +181,10 @@ namespace KEngine
         /// <param name="inAppPathType"></param>
         /// <param name="isLog"></param>
         /// <returns></returns>
-        public static string GetResourceFullPath(string url,
-            KResourceInAppPathType inAppPathType = KResourceInAppPathType.Default, bool isLog = true)
+        public static string GetResourceFullPath(string url, bool isLog = true)
         {
             string fullPath;
-            if (GetResourceFullPath(url, out fullPath, inAppPathType, isLog))
+            if (GetResourceFullPath(url, out fullPath, isLog))
                 return fullPath;
 
             return null;
@@ -222,36 +199,18 @@ namespace KEngine
         /// <param name="isLog"></param>
         /// <returns></returns>
         public static bool GetResourceFullPath(string url, out string fullPath,
-            KResourceInAppPathType inAppPathType = KResourceInAppPathType.Default, bool isLog = true)
+             bool isLog = true)
         {
             if (string.IsNullOrEmpty(url))
                 KLogger.LogError("尝试获取一个空的资源路径！");
-
-            if (inAppPathType == KResourceInAppPathType.Default)
-                inAppPathType = DefaultInAppPathType;
 
             string docUrl;
             bool hasDocUrl = TryGetDocumentResourceUrl(url, out docUrl);
 
             string inAppUrl;
             bool hasInAppUrl;
-            if (inAppPathType == KResourceInAppPathType.StreamingAssetsPath)
             {
                 hasInAppUrl = TryGetInAppStreamingUrl(url, out inAppUrl);
-            }
-            else if (inAppPathType == KResourceInAppPathType.ResourcesAssetsPath)
-            {
-                hasInAppUrl = TryGetInAppResourcesFolderUrl(url, out inAppUrl); // 使用Resources某
-            }
-            else if (inAppPathType == KResourceInAppPathType.PersistentAssetsPath)
-            {
-                hasInAppUrl = TryGetPersitentResourceUrl(url, out inAppUrl);
-            }
-            else
-            {
-                KLogger.LogError("[GetResourceFullPath]Invalid InAppPathType: {0}", DefaultInAppPathType);
-                hasInAppUrl = false;
-                inAppUrl = null;
             }
 
             if (ResourcePathPriorityType == KResourcePathPriorityType.PersistentDataPathPriority) // 優先下載資源模式
@@ -298,17 +257,6 @@ namespace KEngine
             return Application.persistentDataPath;
         }
 
-        /// <summary>
-        /// 使用Resources来放置AssetBundle
-        /// </summary>
-        /// <param name="relativePath"></param>
-        /// <param name="inAppUrl"></param>
-        /// <returns></returns>
-        private static bool TryGetInAppResourcesFolderUrl(string relativePath, out string inAppUrl)
-        {
-            inAppUrl = ResourceFolderPlatformPath + relativePath;
-            return true;
-        }
 
         /// <summary>
         /// (not android ) only! Android资源不在目录！
@@ -572,7 +520,7 @@ namespace KEngine
         /// <returns></returns>
         public static KAbstractResourceLoader LoadBundle(string path, KAssetFileLoader.AssetFileBridgeDelegate callback = null)
         {
-            var request = KAssetFileLoader.Load(path, callback, KAssetBundleLoaderMode.StreamingAssetsWwwSync);
+            var request = KAssetFileLoader.Load(path, callback, KAssetBundleLoaderMode.Sync);
             return request;
         }
 

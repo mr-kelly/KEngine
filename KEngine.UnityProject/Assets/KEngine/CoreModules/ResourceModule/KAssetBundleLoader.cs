@@ -34,12 +34,8 @@ namespace KEngine
 {
     public enum KAssetBundleLoaderMode
     {
-        Default,
-        PersitentDataPathSync, // Use PersistentDataPath!
-        StreamingAssetsWww, // default, use WWW class -> StreamingAssets Path
-        StreamingAssetsWwwSync, // default, use ResourceModule.LoadSyncFromStreamingAssets
-        ResourcesLoadAsync, // -> Resources path
-        ResourcesLoad, // -> Resources Path
+        Async,
+        Sync,
     }
 
     // 調用WWWLoader
@@ -68,10 +64,10 @@ namespace KEngine
         /// <summary>
         /// AssetBundle读取原字节目录
         /// </summary>
-        private KResourceInAppPathType _inAppPathType;
+        //private KResourceInAppPathType _inAppPathType;
 
         public static KAssetBundleLoader Load(string url, CAssetBundleLoaderDelegate callback = null,
-            KAssetBundleLoaderMode loaderMode = KAssetBundleLoaderMode.Default)
+            KAssetBundleLoaderMode loaderMode = KAssetBundleLoaderMode.Async)
         {
             LoaderDelgate newCallback = null;
             if (callback != null)
@@ -117,48 +113,6 @@ namespace KEngine
 
             _loaderMode = (KAssetBundleLoaderMode)args[0];
 
-            // 如果是默认模式，则要判断ResourceModule.InAppPathType的默认为依据
-            if (_loaderMode == KAssetBundleLoaderMode.Default)
-            {
-                _inAppPathType = KResourceModule.DefaultInAppPathType;
-                switch (_inAppPathType)
-                {
-                    case KResourceInAppPathType.StreamingAssetsPath:
-                        _loaderMode = KAssetBundleLoaderMode.StreamingAssetsWww;
-                        break;
-                    case KResourceInAppPathType.ResourcesAssetsPath:
-                        _loaderMode = KAssetBundleLoaderMode.ResourcesLoad;
-                        break;
-                    case KResourceInAppPathType.PersistentAssetsPath:
-                        _loaderMode = KAssetBundleLoaderMode.PersitentDataPathSync;
-                        break;
-                    default:
-                        KLogger.LogError("Error DefaultInAppPathType: {0}", _inAppPathType);
-                        break;
-                }
-            }
-            // 不同的AssetBundle加载方式，对应不同的路径
-            switch (_loaderMode)
-            {
-                case KAssetBundleLoaderMode.ResourcesLoad:
-                case KAssetBundleLoaderMode.ResourcesLoadAsync:
-                    _inAppPathType = KResourceInAppPathType.ResourcesAssetsPath;
-                    break;
-                case KAssetBundleLoaderMode.StreamingAssetsWww:
-                    _inAppPathType = KResourceInAppPathType.StreamingAssetsPath;
-                    break;
-                case KAssetBundleLoaderMode.StreamingAssetsWwwSync:
-                    _inAppPathType = KResourceInAppPathType.StreamingAssetsPath;
-                    break;
-                case KAssetBundleLoaderMode.PersitentDataPathSync:
-                    _inAppPathType = KResourceInAppPathType.PersistentAssetsPath;
-                    break;
-                default:
-                    KLogger.LogError("[KAssetBundleLoader:Init]Unknow loader mode: {0}", _loaderMode);
-                    break;
-            }
-
-
             if (NewAssetBundleLoaderEvent != null)
                 NewAssetBundleLoaderEvent(url);
 
@@ -192,7 +146,7 @@ namespace KEngine
             // Unity 5 AssetBundle自动转小写
             relativeUrl = relativeUrl.ToLower();
 #endif
-            var bytesLoader = KBytesLoader.Load(relativeUrl, _inAppPathType, _loaderMode);
+            var bytesLoader = KBytesLoader.Load(relativeUrl, _loaderMode);
             while (!bytesLoader.IsCompleted)
             {
                 yield return null;

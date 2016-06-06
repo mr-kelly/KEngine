@@ -40,21 +40,20 @@ namespace KEngine
         public byte[] Bytes { get; private set; }
         private KWWWLoader _wwwLoader;
 
-        private KResourceInAppPathType _inAppPathType;
         private KAssetBundleLoaderMode _loaderMode;
 
-        public static KBytesLoader Load(string path, KResourceInAppPathType inAppPathType, KAssetBundleLoaderMode loaderMode)
+        public static KBytesLoader Load(string path, KAssetBundleLoaderMode loaderMode)
         {
-            var newLoader = AutoNew<KBytesLoader>(path, null, false, inAppPathType, loaderMode);
+            var newLoader = AutoNew<KBytesLoader>(path, null, false, loaderMode);
 
             return newLoader;
         }
 
         private string FullUrl;
 
-        private IEnumerator CoLoad(string url, KResourceInAppPathType type, KAssetBundleLoaderMode loaderMode)
+        private IEnumerator CoLoad(string url, KAssetBundleLoaderMode loaderMode)
         {
-            if (KResourceModule.GetResourceFullPath(url, out FullUrl, _inAppPathType))
+            if (KResourceModule.GetResourceFullPath(url, out FullUrl))
             {
 
             }
@@ -64,14 +63,8 @@ namespace KEngine
                     KLogger.LogError("[KBytesLoader]Error Path: {0}", url);
                 OnFinish(null);
             }
-            if (_inAppPathType == KResourceInAppPathType.PersistentAssetsPath)
             {
-                Progress = .5f;
-                Bytes = File.ReadAllBytes(FullUrl);
-            }
-            else if (_inAppPathType == KResourceInAppPathType.StreamingAssetsPath)
-            {
-                if (_loaderMode == KAssetBundleLoaderMode.StreamingAssetsWwwSync)
+                if (_loaderMode == KAssetBundleLoaderMode.Sync)
                 {
                     var loadSyncPath = string.Format("{0}/{1}", KResourceModule.StreamingPlatformPathWithoutFileProtocol, url);
                     Bytes = KResourceModule.LoadSyncFromStreamingAssets(loadSyncPath);
@@ -99,64 +92,15 @@ namespace KEngine
                     Bytes = _wwwLoader.Www.bytes;
                 }
             }
-            else if (_inAppPathType == KResourceInAppPathType.ResourcesAssetsPath) // 使用Resources文件夹模式
-            {
-                var pathExt = Path.GetExtension(FullUrl); // Resources.Load无需扩展名
-                var pathWithoutExt = FullUrl.Substring(0,
-                    FullUrl.Length - pathExt.Length);
-                if (_loaderMode == KAssetBundleLoaderMode.ResourcesLoad)
-                {
-                    var textAsset = Resources.Load<TextAsset>(pathWithoutExt);
-                    if (textAsset == null)
-                    {
-                        KLogger.LogError("[KBytesLoader]Cannot Resources.Load from : {0}", pathWithoutExt);
-                        OnFinish(null);
-                        yield break;
-                    }
 
-                    Bytes = textAsset.bytes;
-                    Resources.UnloadAsset(textAsset);
-                }
-                else if (_loaderMode == KAssetBundleLoaderMode.ResourcesLoadAsync)
-                {
-                    var loadReq = Resources.LoadAsync<TextAsset>(pathWithoutExt);
-                    while (!loadReq.isDone)
-                    {
-                        Progress = loadReq.progress / 2f; // 最多50%， 要算上Parser的嘛
-                    }
-                    var loadAsset = loadReq.asset;
-                    var loadTextAsset = loadAsset as TextAsset;
-                    if (loadTextAsset == null)
-                    {
-                        KLogger.LogError("[KBytesLoader]Error Resources.LoadAsync: {0}", url);
-                        OnFinish(null);
-                        yield break;
-                    }
-                    Bytes = loadTextAsset.bytes;
-                    Resources.UnloadAsset(loadTextAsset);
-                }
-                else
-                {
-                    KLogger.LogError("[KBytesLoader]Unvalid LoaderMode on Resources Load Mode: {0}", _loaderMode);
-                    OnFinish(null);
-                    yield break;
-                }
-            }
-            else
-            {
-                KLogger.LogError("[KBytesLoader]Error InAppPathType: {0}", KResourceModule.DefaultInAppPathType);
-                OnFinish(null);
-                yield break;
-            }
             OnFinish(Bytes);
         }
         protected override void Init(string url, params object[] args)
         {
             base.Init(url, args);
 
-            _inAppPathType = (KResourceInAppPathType)args[0];
-            _loaderMode = (KAssetBundleLoaderMode)args[1];
-            KResourceModule.Instance.StartCoroutine(CoLoad(url, _inAppPathType, _loaderMode));
+            _loaderMode = (KAssetBundleLoaderMode)args[0];
+            KResourceModule.Instance.StartCoroutine(CoLoad(url, _loaderMode));
 
         }
 

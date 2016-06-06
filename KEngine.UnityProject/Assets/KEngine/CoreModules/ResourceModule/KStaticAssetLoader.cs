@@ -48,7 +48,7 @@ namespace KEngine
             get { return _assetFileLoader.Progress; }
         }
 
-        public static KStaticAssetLoader Load(string url, KAssetFileLoader.AssetFileBridgeDelegate callback = null, KAssetBundleLoaderMode loaderMode = KAssetBundleLoaderMode.Default)
+        public static KStaticAssetLoader Load(string url, KAssetFileLoader.AssetFileBridgeDelegate callback = null, KAssetBundleLoaderMode loaderMode = KAssetBundleLoaderMode.Async)
         {
             LoaderDelgate newCallback = null;
             if (callback != null)
