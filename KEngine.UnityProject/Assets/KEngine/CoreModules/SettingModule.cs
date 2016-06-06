@@ -135,8 +135,18 @@ namespace KEngine.Modules
                 _cacheWatchers = new Dictionary<string, FileSystemWatcher>();
             FileSystemWatcher watcher;
             var dirPath = Path.GetDirectoryName(GetFileSystemPath(path));
+            dirPath = dirPath.Replace("\\", "/");
+
+            if (!Directory.Exists(dirPath))
+            {
+                KLogger.LogError("[WatchSetting] Not found Dir: {0}", dirPath);
+                return;
+            }
             if (!_cacheWatchers.TryGetValue(dirPath, out watcher))
+            {
                 _cacheWatchers[dirPath] = watcher = new FileSystemWatcher(dirPath);
+                KLogger.Log("Watching Setting Dir: {0}", dirPath);
+            }
 
             watcher.IncludeSubdirectories = false;
             watcher.Path = dirPath;
@@ -146,6 +156,7 @@ namespace KEngine.Modules
             watcher.InternalBufferSize = 2048;
             watcher.Changed += (sender, e) =>
             {
+                KLogger.LogConsole_MultiThread("Setting changed: {0}", e.FullPath);
                 action(path);
             };
         }
