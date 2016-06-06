@@ -37,6 +37,7 @@ namespace KEngine
         Default,
         PersitentDataPathSync, // Use PersistentDataPath!
         StreamingAssetsWww, // default, use WWW class -> StreamingAssets Path
+        StreamingAssetsWwwSync, // default, use ResourceModule.LoadSyncFromStreamingAssets
         ResourcesLoadAsync, // -> Resources path
         ResourcesLoad, // -> Resources Path
     }
@@ -146,6 +147,9 @@ namespace KEngine
                 case KAssetBundleLoaderMode.StreamingAssetsWww:
                     _inAppPathType = KResourceInAppPathType.StreamingAssetsPath;
                     break;
+                case KAssetBundleLoaderMode.StreamingAssetsWwwSync:
+                    _inAppPathType = KResourceInAppPathType.StreamingAssetsPath;
+                    break;
                 case KAssetBundleLoaderMode.PersitentDataPathSync:
                     _inAppPathType = KResourceInAppPathType.PersistentAssetsPath;
                     break;
@@ -172,7 +176,7 @@ namespace KEngine
             for (var d = 0; d < deps.Length; d++)
             {
                 var dep = deps[d];
-                depLoaders[d] = KAssetBundleLoader.Load(dep);
+                depLoaders[d] = KAssetBundleLoader.Load(dep, null, _loaderMode);
             }
             for (var l = 0; l < depLoaders.Length; l++)
             {

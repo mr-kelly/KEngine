@@ -71,25 +71,33 @@ namespace KEngine
             }
             else if (_inAppPathType == KResourceInAppPathType.StreamingAssetsPath)
             {
-                _wwwLoader = KWWWLoader.Load(FullUrl);
-                while (!_wwwLoader.IsCompleted)
+                if (_loaderMode == KAssetBundleLoaderMode.StreamingAssetsWwwSync)
                 {
-                    Progress = _wwwLoader.Progress / 2f; // 最多50%， 要算上Parser的嘛
-                    yield return null;
+                    var loadSyncPath = string.Format("{0}/{1}", KResourceModule.StreamingPlatformPathWithoutFileProtocol, url);
+                    Bytes = KResourceModule.LoadSyncFromStreamingAssets(loadSyncPath);
                 }
-
-                if (!_wwwLoader.IsSuccess)
+                else
                 {
-                    //if (AssetBundlerLoaderErrorEvent != null)
-                    //{
-                    //    AssetBundlerLoaderErrorEvent(this);
-                    //}
-                    KLogger.LogError("[KBytesLoader]Error Load WWW: {0}", url);
-                    OnFinish(null);
-                    yield break;
-                }
+                    _wwwLoader = KWWWLoader.Load(FullUrl);
+                    while (!_wwwLoader.IsCompleted)
+                    {
+                        Progress = _wwwLoader.Progress / 2f; // 最多50%， 要算上Parser的嘛
+                        yield return null;
+                    }
 
-                Bytes = _wwwLoader.Www.bytes;
+                    if (!_wwwLoader.IsSuccess)
+                    {
+                        //if (AssetBundlerLoaderErrorEvent != null)
+                        //{
+                        //    AssetBundlerLoaderErrorEvent(this);
+                        //}
+                        KLogger.LogError("[KBytesLoader]Error Load WWW: {0}", url);
+                        OnFinish(null);
+                        yield break;
+                    }
+
+                    Bytes = _wwwLoader.Www.bytes;
+                }
             }
             else if (_inAppPathType == KResourceInAppPathType.ResourcesAssetsPath) // 使用Resources文件夹模式
             {

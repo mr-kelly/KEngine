@@ -37,7 +37,7 @@ namespace KEngine
     /// </summary>
     public class KAssetFileLoader : KAbstractResourceLoader
     {
-        public delegate void CAssetFileBridgeDelegate(bool isOk, UnityEngine.Object resultObj);
+        public delegate void AssetFileBridgeDelegate(bool isOk, UnityEngine.Object resultObj);
 
         public UnityEngine.Object Asset
         {
@@ -58,7 +58,7 @@ namespace KEngine
 
         private KAssetBundleLoader _bundleLoader;
 
-        public static KAssetFileLoader Load(string path, CAssetFileBridgeDelegate assetFileLoadedCallback = null, KAssetBundleLoaderMode loaderMode = KAssetBundleLoaderMode.Default)
+        public static KAssetFileLoader Load(string path, AssetFileBridgeDelegate assetFileLoadedCallback = null, KAssetBundleLoaderMode loaderMode = KAssetBundleLoaderMode.Default)
         {
             LoaderDelgate realcallback = null;
             if (assetFileLoadedCallback != null)
@@ -123,12 +123,22 @@ namespace KEngine
 #if UNITY_5
                 // Unity 5 下，不能用mainAsset, 要取对象名
                 var abAssetName = Path.GetFileNameWithoutExtension(Url).ToLower();
-                var request = assetBundle.LoadAssetAsync(abAssetName);
-                while (!request.isDone)
+                if (loaderMode == KAssetBundleLoaderMode.StreamingAssetsWwwSync ||
+                    loaderMode == KAssetBundleLoaderMode.PersitentDataPathSync ||
+                    loaderMode == KAssetBundleLoaderMode.ResourcesLoad)
                 {
-                    yield return null;
+                    getAsset = assetBundle.LoadAsset(abAssetName);
+                    Debuger.Assert(getAsset);
                 }
-                Debuger.Assert(getAsset = request.asset);
+                else
+                {
+                    var request = assetBundle.LoadAssetAsync(abAssetName);
+                    while (!request.isDone)
+                    {
+                        yield return null;
+                    }
+                    Debuger.Assert(getAsset = request.asset);
+                }
 
 #else
                 // 经过AddWatch调试，.mainAsset这个getter第一次执行时特别久，要做序列化

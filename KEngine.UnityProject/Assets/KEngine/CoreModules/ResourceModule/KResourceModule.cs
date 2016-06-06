@@ -555,6 +555,28 @@ namespace KEngine
         }
 
         /// <summary>
+        /// Load Async Asset Bundle
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static KAbstractResourceLoader LoadBundleAsync(string path)
+        {
+            var request = KAssetFileLoader.Load(path);
+            return request;
+        }
+
+        /// <summary>
+        /// load asset bundle immediatly
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static KAbstractResourceLoader LoadBundle(string path, KAssetFileLoader.AssetFileBridgeDelegate callback = null)
+        {
+            var request = KAssetFileLoader.Load(path, callback, KAssetBundleLoaderMode.StreamingAssetsWwwSync);
+            return request;
+        }
+
+        /// <summary>
         /// Load file from streamingAssets. On Android will use plugin to do that.
         /// </summary>
         /// <param name="path">relative path,  when file is "file:///android_asset/test.txt", the pat is "test.txt"</param>

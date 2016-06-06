@@ -48,7 +48,7 @@ namespace KEngine
         }
 
         // TODO: 无视AssetName暂时！
-        public static KInstanceAssetLoader Load(string url, KAssetFileLoader.CAssetFileBridgeDelegate callback = null)
+        public static KInstanceAssetLoader Load(string url, KAssetFileLoader.AssetFileBridgeDelegate callback = null)
         {
             var loader = AutoNew<KInstanceAssetLoader>(url, (ok, resultObject) =>
             {

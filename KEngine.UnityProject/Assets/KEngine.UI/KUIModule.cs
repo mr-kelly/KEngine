@@ -425,6 +425,7 @@ namespace KEngine.UI
 
             UnityEngine.Object.Destroy(uiState.UIWindow.gameObject);
 
+            uiState.UIResourceLoader.Release();
             uiState.UIWindow = null;
 
             UIWindows.Remove(name);
