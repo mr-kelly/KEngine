@@ -157,7 +157,7 @@ namespace KEngine.UI
         /// </summary>
         protected void OpenWindow(string uiName, params object[] args)
         {
-            KUIModule.Instance.OpenWindow(uiName, args);
+            UIModule.Instance.OpenWindow(uiName, args);
         }
 
         /// <summary>
@@ -166,7 +166,7 @@ namespace KEngine.UI
         /// <param name="uiName"></param>
         protected void CloseWindow(string uiName = null)
         {
-            KUIModule.Instance.CloseWindow(uiName ?? UIName);
+            UIModule.Instance.CloseWindow(uiName ?? UIName);
         }
 
 

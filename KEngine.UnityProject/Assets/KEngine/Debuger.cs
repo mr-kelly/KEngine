@@ -53,12 +53,21 @@ namespace KEngine
 
         public static void Assert(bool result)
         {
-            if (result)
-                return;
+            Assert(result, null);
+        }
 
-            KLogger.LogErrorWithStack("Assertion Failed!", 2);
+        public static void Assert(bool result, string msg, params object[] args)
+        {
+            if (!result)
+            {
+                string formatMsg = "Assert Failed! ";
+                if (!string.IsNullOrEmpty(msg))
+                    formatMsg += string.Format(msg, args);
 
-            throw new Exception("Assert"); // 中断当前调用
+                KLogger.LogErrorWithStack(formatMsg, 2);
+
+                throw new Exception(formatMsg); // 中断当前调用
+            }
         }
 
         public static void Assert(int result)

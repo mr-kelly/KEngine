@@ -2,23 +2,23 @@
 
 // KEngine - Toolset and framework for Unity3D
 // ===================================
-// 
+//
 // Filename: KEngineNGUIDemoMain.cs
 // Date:     2015/12/03
 // Author:  Kelly
 // Email: 23110388@qq.com
 // Github: https://github.com/mr-kelly/KEngine
-// 
+//
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 3.0 of the License, or (at your option) any later version.
-// 
+//
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library.
 
@@ -40,29 +40,28 @@ public class KEngineNGUIDemoMain : MonoBehaviour
 
         var app = KEngine.AppEngine.New(
             gameObject,
+            null,
             new IModule[]
             {
-                KUIModule.Instance,
+                UIModule.Instance,
                 //KGameSettings.Instance,
-                
-            },
-            null,
-            null);
+
+            });
         while (!app.IsInited)
             yield return null;
 
         //TestLoadLevelAdditiveAsync();
 
-        KUIModule.Instance.OpenWindow("Test");
+        UIModule.Instance.OpenWindow("Test");
 
-        KUIModule.Instance.CallUI("Test", (ui, _) =>
+        UIModule.Instance.CallUI("Test", (ui, _) =>
         {
             // Do some UI stuff
         });
 
         yield return new WaitForSeconds(2f);
-        KLogger.Log("Opening KUITestSubWindow"); 
-        KUIModule.Instance.OpenWindow("TestSub");
+        KLogger.Log("Opening KUITestSubWindow");
+        UIModule.Instance.OpenWindow("TestSub");
 
     }
 

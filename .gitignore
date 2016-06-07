@@ -39,3 +39,4 @@ _gsdata_
 
 # Unity Dll
 /Build/*
+/KEngine.UnityProject/PluginsSrc/KEngine.Android/out

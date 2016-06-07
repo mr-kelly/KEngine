@@ -91,7 +91,7 @@ namespace KEngine
 
         public static KResourceQuality Quality = KResourceQuality.Sd;
 
-        public static KResourceInAppPathType DefaultInAppPathType = KResourceInAppPathType.PersistentAssetsPath;
+        public static KResourceInAppPathType DefaultInAppPathType = KResourceInAppPathType.ResourcesAssetsPath;
 
         public static float TextureScale
         {
@@ -544,6 +544,20 @@ namespace KEngine
 
                 return editorAssetBundlePath;
             }
+        }
+
+        /// <summary>
+        /// Load file from streamingAssets. On Android will use plugin to do that.
+        /// </summary>
+        /// <param name="path">relative path,  when file is "file:///android_asset/test.txt", the pat is "test.txt"</param>
+        /// <returns></returns>
+        public static byte[] LoadSyncFromStreamingAssets(string path)
+        {
+            if (Application.platform == RuntimePlatform.Android)
+                return KEngineAndroidPlugin.GetAssetBytes(path);
+
+            var fullPath = Path.Combine(Application.streamingAssetsPath, path);
+            return File.ReadAllBytes(fullPath);
         }
 
         /// <summary>

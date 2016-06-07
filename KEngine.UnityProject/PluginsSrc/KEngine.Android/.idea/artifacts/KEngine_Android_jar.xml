@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="KEngine.Android:jar">
+    <output-path>$PROJECT_DIR$/../../Assets/Plugins/Android/libs</output-path>
+    <root id="archive" name="KEngine.Android.jar">
+      <element id="module-output" name="KEngine.Android" />
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/META-INF/MANIFEST.MF" />
+      </element>
+    </root>
+  </artifact>
+</component>

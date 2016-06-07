@@ -43,7 +43,7 @@ namespace {{ NameSpace }}
 	/// <summary>
     /// All settings list here, so you can reload all settings manully from the list.
 	/// </summary>
-    public partial class SettingsDefine
+    public partial class SettingsManager
     {
         private static IReloadableSettings[] _settingsList;
         public static IReloadableSettings[] SettingsList
@@ -60,23 +60,22 @@ namespace {{ NameSpace }}
                 return _settingsList;
             }
         }
+
 #if UNITY_EDITOR
-        static bool HasAllReload = false;
         [UnityEditor.MenuItem(""KEngine/Settings/Try Reload All Settings Code"")]
+#endif
 	    public static void AllSettingsReload()
 	    {
 	        for (var i = 0; i < SettingsList.Length; i++)
 	        {
 	            var settings = SettingsList[i];
-                if (HasAllReload) settings.ReloadAll();
-                HasAllReload = true;
+                settings.ReloadAll();
 
 	            KLogger.Log(""Reload settings: {0}, Row Count: {1}"", settings.GetType(), settings.Count);
 
 	        }
 	    }
 
-#endif
     }
 
 {% for file in Files %}
