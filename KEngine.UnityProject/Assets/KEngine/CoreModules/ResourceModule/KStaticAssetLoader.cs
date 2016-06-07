@@ -48,7 +48,7 @@ namespace KEngine
             get { return _assetFileLoader.Progress; }
         }
 
-        public static KStaticAssetLoader Load(string url, KAssetFileLoader.AssetFileBridgeDelegate callback = null, KAssetBundleLoaderMode loaderMode = KAssetBundleLoaderMode.Async)
+        public static KStaticAssetLoader Load(string url, KAssetFileLoader.AssetFileBridgeDelegate callback = null, LoaderMode loaderMode = LoaderMode.Async)
         {
             LoaderDelgate newCallback = null;
             if (callback != null)
@@ -61,7 +61,7 @@ namespace KEngine
 
         protected override void Init(string path, params object[] args)
         {
-            var loaderMode = (KAssetBundleLoaderMode)args[0];
+            var loaderMode = (LoaderMode)args[0];
 
             base.Init(path, args);
             if (string.IsNullOrEmpty(path))

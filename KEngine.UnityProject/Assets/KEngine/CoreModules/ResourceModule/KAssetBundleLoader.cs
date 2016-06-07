@@ -32,7 +32,10 @@ using UnityEngine;
 
 namespace KEngine
 {
-    public enum KAssetBundleLoaderMode
+    /// <summary>
+    /// 加载模式，同步或异步
+    /// </summary>
+    public enum LoaderMode
     {
         Async,
         Sync,
@@ -59,7 +62,7 @@ namespace KEngine
         /// <summary>
         /// AssetBundle加载方式
         /// </summary>
-        private KAssetBundleLoaderMode _loaderMode;
+        private LoaderMode _loaderMode;
 
         /// <summary>
         /// AssetBundle读取原字节目录
@@ -67,7 +70,7 @@ namespace KEngine
         //private KResourceInAppPathType _inAppPathType;
 
         public static KAssetBundleLoader Load(string url, CAssetBundleLoaderDelegate callback = null,
-            KAssetBundleLoaderMode loaderMode = KAssetBundleLoaderMode.Async)
+            LoaderMode loaderMode = LoaderMode.Async)
         {
             LoaderDelgate newCallback = null;
             if (callback != null)
@@ -111,7 +114,7 @@ namespace KEngine
 
             base.Init(url);
 
-            _loaderMode = (KAssetBundleLoaderMode)args[0];
+            _loaderMode = (LoaderMode)args[0];
 
             if (NewAssetBundleLoaderEvent != null)
                 NewAssetBundleLoaderEvent(url);

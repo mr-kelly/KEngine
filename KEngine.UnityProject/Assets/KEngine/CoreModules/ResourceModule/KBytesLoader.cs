@@ -40,9 +40,9 @@ namespace KEngine
         public byte[] Bytes { get; private set; }
         private KWWWLoader _wwwLoader;
 
-        private KAssetBundleLoaderMode _loaderMode;
+        private LoaderMode _loaderMode;
 
-        public static KBytesLoader Load(string path, KAssetBundleLoaderMode loaderMode)
+        public static KBytesLoader Load(string path, LoaderMode loaderMode)
         {
             var newLoader = AutoNew<KBytesLoader>(path, null, false, loaderMode);
 
@@ -51,7 +51,7 @@ namespace KEngine
 
         private string FullUrl;
 
-        private IEnumerator CoLoad(string url, KAssetBundleLoaderMode loaderMode)
+        private IEnumerator CoLoad(string url, LoaderMode loaderMode)
         {
             if (KResourceModule.GetResourceFullPath(url, out FullUrl))
             {
@@ -64,7 +64,7 @@ namespace KEngine
                 OnFinish(null);
             }
             {
-                if (_loaderMode == KAssetBundleLoaderMode.Sync)
+                if (_loaderMode == LoaderMode.Sync)
                 {
                     var loadSyncPath = string.Format("{0}/{1}", KResourceModule.StreamingPlatformPathWithoutFileProtocol, url);
                     Bytes = KResourceModule.LoadSyncFromStreamingAssets(loadSyncPath);
@@ -99,7 +99,7 @@ namespace KEngine
         {
             base.Init(url, args);
 
-            _loaderMode = (KAssetBundleLoaderMode)args[0];
+            _loaderMode = (LoaderMode)args[0];
             KResourceModule.Instance.StartCoroutine(CoLoad(url, _loaderMode));
 
         }

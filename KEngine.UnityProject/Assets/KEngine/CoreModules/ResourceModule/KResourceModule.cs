@@ -520,7 +520,7 @@ namespace KEngine
         /// <returns></returns>
         public static KAbstractResourceLoader LoadBundle(string path, KAssetFileLoader.AssetFileBridgeDelegate callback = null)
         {
-            var request = KAssetFileLoader.Load(path, callback, KAssetBundleLoaderMode.Sync);
+            var request = KAssetFileLoader.Load(path, callback, LoaderMode.Sync);
             return request;
         }
 

@@ -148,11 +148,15 @@ namespace KEngine.Editor
                     if (quality != KResourceQuality.Sd) // SD no need add
                         platformName += quality.ToString().ToUpper();
 
-                    path = basePath + platformName + "/";
+                    path = basePath + "/" + platformName + "/";
                     break;
                 default:
                     BuildTools.ShowDialog("构建平台配置错误");
                     throw new System.Exception("构建平台配置错误");
+            }
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
             }
             return path;
         }

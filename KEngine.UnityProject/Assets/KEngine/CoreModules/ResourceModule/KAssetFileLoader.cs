@@ -58,7 +58,7 @@ namespace KEngine
 
         private KAssetBundleLoader _bundleLoader;
 
-        public static KAssetFileLoader Load(string path, AssetFileBridgeDelegate assetFileLoadedCallback = null, KAssetBundleLoaderMode loaderMode = KAssetBundleLoaderMode.Async)
+        public static KAssetFileLoader Load(string path, AssetFileBridgeDelegate assetFileLoadedCallback = null, LoaderMode loaderMode = LoaderMode.Async)
         {
             LoaderDelgate realcallback = null;
             if (assetFileLoadedCallback != null)
@@ -71,13 +71,13 @@ namespace KEngine
 
         protected override void Init(string url, params object[] args)
         {
-            var loaderMode = (KAssetBundleLoaderMode)args[0];
+            var loaderMode = (LoaderMode)args[0];
 
             base.Init(url, args);
             KResourceModule.Instance.StartCoroutine(_Init(Url, loaderMode));
         }
 
-        private IEnumerator _Init(string path, KAssetBundleLoaderMode loaderMode)
+        private IEnumerator _Init(string path, LoaderMode loaderMode)
         {
             IsLoadAssetBundle = KEngine.AppEngine.GetConfig("KEngine", "IsLoadAssetBundle").ToInt32() != 0;
 
@@ -123,7 +123,7 @@ namespace KEngine
 #if UNITY_5
                 // Unity 5 下，不能用mainAsset, 要取对象名
                 var abAssetName = Path.GetFileNameWithoutExtension(Url).ToLower();
-                if (loaderMode == KAssetBundleLoaderMode.Sync)
+                if (loaderMode == LoaderMode.Sync)
                 {
                     getAsset = assetBundle.LoadAsset(abAssetName);
                     Debuger.Assert(getAsset);
