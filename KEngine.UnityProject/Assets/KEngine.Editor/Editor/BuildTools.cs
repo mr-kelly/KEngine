@@ -68,14 +68,14 @@ namespace KEngine.Editor
                 var importer = AssetImporter.GetAtPath(filepath);
                 if (importer == null)
                 {
-                    KLogger.LogError("Not found: {0}", filepath);
+                    Log.LogError("Not found: {0}", filepath);
                     continue;
                 }
                 var bundleName = filepath.Substring(dir.Length, filepath.Length - dir.Length);
                 importer.assetBundleName = bundleName + AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt);
             }
 
-            KLogger.Log("Make all asset name successs!");
+            Log.Info("Make all asset name successs!");
             
         }
 
@@ -84,12 +84,12 @@ namespace KEngine.Editor
         {
             if (EditorApplication.isPlaying)
             {
-                KLogger.LogError("Cannot build in playing mode! Please stop!");
+                Log.LogError("Cannot build in playing mode! Please stop!");
                 return;
             }
             MakeAssetBundleNames();
             var outputPath = GetExportPath(EditorUserBuildSettings.activeBuildTarget);
-            KLogger.Log("Asset bundle start build to: {0}", outputPath);
+            Log.Info("Asset bundle start build to: {0}", outputPath);
             BuildPipeline.BuildAssetBundles(outputPath, BuildAssetBundleOptions.DeterministicAssetBundle, EditorUserBuildSettings.activeBuildTarget);
 
         }
@@ -256,7 +256,7 @@ namespace KEngine.Editor
 
                     var tmpTexPath = string.Format("Assets/Tex_{0}_{1}.png", memoryTexture.name, Path.GetRandomFileName());
 
-                    KLogger.LogWarning("【BuildAssetBundle】Build一个非Asset 的Texture: {0}", memoryTexture.name);
+                    Log.LogWarning("【BuildAssetBundle】Build一个非Asset 的Texture: {0}", memoryTexture.name);
 
                     File.WriteAllBytes(tmpTexPath, memoryTexture.EncodeToPNG());
                     AssetDatabase.ImportAsset(tmpTexPath,
@@ -272,7 +272,7 @@ namespace KEngine.Editor
                     }
                     catch (Exception e)
                     {
-                        KLogger.LogException(e);
+                        Log.LogException(e);
                     }
 
                     File.Delete(tmpTexPath);
@@ -301,7 +301,7 @@ namespace KEngine.Editor
             }
             else
             {
-                //KLogger.LogError("[Wrong asse Type] {0}", asset.GetType());
+                //Log.LogError("[Wrong asse Type] {0}", asset.GetType());
                 _DoBuild(out crc, asset, null, path, relativePath, buildTarget);
             }
             return crc;
@@ -335,7 +335,7 @@ namespace KEngine.Editor
                         var depAssetPath = AssetDatabase.GetAssetPath(depAsset);
                         depSb.AppendLine(string.Format("{0} --> {1} <{2}>", depAssetPath, depAsset.name, depAsset.GetType()));
                     }
-                    KLogger.Log("[BuildAssetBundle]Asset: {0} has dependencies: \n{1}", assetPath, depSb.ToString());
+                    Log.Info("[BuildAssetBundle]Asset: {0} has dependencies: \n{1}", assetPath, depSb.ToString());
                 }
             }
         }
@@ -384,7 +384,7 @@ namespace KEngine.Editor
                 BuildAssetBundleOptions.DeterministicAssetBundle,
                 buildTarget);
 
-            KLogger.Log("生成文件： {0}, 耗时: {1:F5}", path, (DateTime.Now - time).TotalSeconds);
+            Log.DoLog("生成文件： {0}, 耗时: {1:F5}", path, (DateTime.Now - time).TotalSeconds);
 
             if (AfterBuildAssetBundleEvent != null)
                 AfterBuildAssetBundleEvent(asset, path, relativePath);
@@ -522,7 +522,7 @@ namespace KEngine.Editor
 
             if (string.IsNullOrEmpty(pythonExe))
             {
-                KLogger.LogError("无法找到py.exe, 或python指令");
+                Log.LogError("无法找到py.exe, 或python指令");
                 return "Error: Not found python";
             }
 
@@ -539,7 +539,7 @@ namespace KEngine.Editor
                 process.StartInfo.RedirectStandardOutput = true;
 
                 var tips = string.Format("ExecutePython: {0} {1}", process.StartInfo.FileName, process.StartInfo.Arguments);
-                KLogger.Log(tips);
+                Log.Info(tips);
                 EditorUtility.DisplayProgressBar("Python...", tips, .5f);
 
                 process.Start();
@@ -548,7 +548,7 @@ namespace KEngine.Editor
 
                 process.WaitForExit();
 
-                KLogger.Log("PyExecuteResult: {0}", allOutput);
+                Log.Info("PyExecuteResult: {0}", allOutput);
 
                 EditorUtility.ClearProgressBar();
 
@@ -570,7 +570,7 @@ namespace KEngine.Editor
                 }
                 else
                 {
-                    KLogger.LogError("[SymbolLinkFolder]Error on OS: {0}", os.ToString());
+                    Log.LogError("[SymbolLinkFolder]Error on OS: {0}", os.ToString());
                 }
             }
 
@@ -593,7 +593,7 @@ namespace KEngine.Editor
                 }
                 else
                 {
-                    KLogger.LogError("[SymbolLinkFolder]Error on OS: {0}", os.ToString());
+                    Log.LogError("[SymbolLinkFolder]Error on OS: {0}", os.ToString());
                 }
             }
             */

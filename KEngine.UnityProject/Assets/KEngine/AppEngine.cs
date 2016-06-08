@@ -76,7 +76,7 @@ namespace KEngine
         //            var appVersionStr = GetConfig(KEngineDefaultConfigs.AppVersion);
         //            if (string.IsNullOrEmpty(appVersionStr))
         //            {
-        //                KLogger.LogError("Cannot find AppVersion in KEngineConfig.txt, use 1.0.0.0 as default");
+        //                Log.LogError("Cannot find AppVersion in KEngineConfig.txt, use 1.0.0.0 as default");
         //                appVersionStr = "1.0.0.0.alpha.default";
         //            }
         //            _appVersion = new AppVersion(appVersionStr);
@@ -132,7 +132,7 @@ namespace KEngine
 
             if (EngineInstance != null)
             {
-                KLogger.LogError("Duplicated Instance Engine!!!");
+                Log.LogError("Duplicated Instance Engine!!!");
             }
 
             EngineInstance = this;
@@ -151,20 +151,20 @@ namespace KEngine
 
             if (Debug.isDebugBuild)
             {
-                KLogger.Log("====================================================================================");
-                KLogger.Log("Application.platform = {0}", Application.platform);
-                KLogger.Log("Application.dataPath = {0} , WritePermission: {1}", Application.dataPath, IsRootUser);
-                KLogger.Log("Application.streamingAssetsPath = {0} , WritePermission: {1}",
+                Log.Info("====================================================================================");
+                Log.Info("Application.platform = {0}", Application.platform);
+                Log.Info("Application.dataPath = {0} , WritePermission: {1}", Application.dataPath, IsRootUser);
+                Log.Info("Application.streamingAssetsPath = {0} , WritePermission: {1}",
                     Application.streamingAssetsPath, KTool.HasWriteAccessToFolder(Application.streamingAssetsPath));
-                KLogger.Log("Application.persistentDataPath = {0} , WritePermission: {1}", Application.persistentDataPath,
+                Log.Info("Application.persistentDataPath = {0} , WritePermission: {1}", Application.persistentDataPath,
                     KTool.HasWriteAccessToFolder(Application.persistentDataPath));
-                KLogger.Log("Application.temporaryCachePath = {0} , WritePermission: {1}", Application.temporaryCachePath,
+                Log.Info("Application.temporaryCachePath = {0} , WritePermission: {1}", Application.temporaryCachePath,
                     KTool.HasWriteAccessToFolder(Application.temporaryCachePath));
-                KLogger.Log("Application.unityVersion = {0}", Application.unityVersion);
-                KLogger.Log("SystemInfo.deviceModel = {0}", SystemInfo.deviceModel);
-                KLogger.Log("SystemInfo.deviceUniqueIdentifier = {0}", SystemInfo.deviceUniqueIdentifier);
-                KLogger.Log("SystemInfo.graphicsDeviceVersion = {0}", SystemInfo.graphicsDeviceVersion);
-                KLogger.Log("====================================================================================");
+                Log.Info("Application.unityVersion = {0}", Application.unityVersion);
+                Log.Info("SystemInfo.deviceModel = {0}", SystemInfo.deviceModel);
+                Log.Info("SystemInfo.deviceUniqueIdentifier = {0}", SystemInfo.deviceUniqueIdentifier);
+                Log.Info("SystemInfo.graphicsDeviceVersion = {0}", SystemInfo.graphicsDeviceVersion);
+                Log.Info("====================================================================================");
             }
             StartCoroutine(DoInit());
         }
@@ -182,7 +182,7 @@ namespace KEngine
 
             yield return StartCoroutine(DoInitModules(baseModules));
 
-            KLogger.Log("Finish Init ResourceManager");
+            Log.Info("Finish Init ResourceManager");
 
             if (AppEntry != null)
                 yield return StartCoroutine(AppEntry.OnBeforeInitModules());
@@ -210,7 +210,7 @@ namespace KEngine
                 if (Debug.isDebugBuild)
                 {
                     var nowMem = GC.GetTotalMemory(false);
-                    KLogger.Log("Init Module: #{0}# Time:{1}, DiffMem:{2}, NowMem:{3}", initModule.GetType().FullName,
+                    Log.Info("Init Module: #{0}# Time:{1}, DiffMem:{2}, NowMem:{3}", initModule.GetType().FullName,
                         Time.time - startInitTime, nowMem - startMem, nowMem);
                 }
             }
@@ -270,7 +270,7 @@ namespace KEngine
             if (value == null)
             {
                 if (showLog)
-                    KLogger.LogError("Cannot get config, section: {0}, key: {1}", section, key);
+                    Log.LogError("Cannot get config, section: {0}, key: {1}", section, key);
             }
             return value;
         }

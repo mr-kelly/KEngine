@@ -378,7 +378,7 @@ namespace KEngine
                 shader = Shader.Find(shaderName);
                 CacheShaders[shaderName] = shader;
                 if (shader == null)
-                    KLogger.LogError("缺少Shader：{0}  ， 检查Graphics Settings的预置shader", shaderName);
+                    Log.LogError("缺少Shader：{0}  ， 检查Graphics Settings的预置shader", shaderName);
             }
 
             return shader;
@@ -452,7 +452,7 @@ namespace KEngine
                         convertedObj = BitConverter.ToUInt64(bytes, offset);
                         break;
                     default:
-                        KLogger.LogError("Unsupport Type {0} in StrBytesToArray(), You can custom this.", typeCode);
+                        Log.LogError("Unsupport Type {0} in StrBytesToArray(), You can custom this.", typeCode);
                         Debuger.Assert(false);
                         break;
                 }
@@ -617,9 +617,9 @@ namespace KEngine
             var nCron = NCrontab.CrontabSchedule.Parse(cron);
             var now = DateTime.Now; // 这里涉及到手机本地时间, 不能使用UtcNow
             var next = nCron.GetNextOccurrence(now, DateTime.Now.AddDays(1));
-            KLogger.Log("Cron:{0}, now: {1}, next: {2}", cron, now, next);
+            Log.DoLog("Cron:{0}, now: {1}, next: {2}", cron, now, next);
             var span = next - now;
-            KLogger.Log(span.TotalMinutes.ToString());
+            Log.DoLog(span.TotalMinutes.ToString());
             return span.TotalMinutes < 1;
         }
         */
@@ -728,7 +728,7 @@ namespace KEngine
                 }
                 catch (Exception)
                 {
-                    KLogger.LogError("not find argument index: \"{0}\" in array: {1}", paramKey, args);
+                    Log.LogError("not find argument index: \"{0}\" in array: {1}", paramKey, args);
                 }
             }
 
@@ -765,7 +765,7 @@ namespace KEngine
             if (trans == null)
             {
                 if (isLog)
-                    KLogger.LogError("Get Child Error: " + uri);
+                    Log.LogError("Get Child Error: " + uri);
                 return default(T);
             }
 
@@ -780,7 +780,7 @@ namespace KEngine
             if (trans == null)
             {
                 if (isLog)
-                    KLogger.LogError("Get Child Error: " + uri);
+                    Log.LogError("Get Child Error: " + uri);
                 return default(T);
             }
 
@@ -808,7 +808,7 @@ namespace KEngine
             GameObject obj = DFSFindObject(findTrans, name);
             if (obj == null)
             {
-                KLogger.LogError("Find GemeObject Error: " + name);
+                Log.LogError("Find GemeObject Error: " + name);
                 return null;
             }
 
@@ -1001,7 +1001,7 @@ namespace KEngine
                 newBox.offset = oldBox.offset + (Vector2)realLocalPos;
                 return newBox;
             }
-            KLogger.LogError("Error Collider: {0}", collider2d);
+            Log.LogError("Error Collider: {0}", collider2d);
             return null;
         }
 
@@ -1300,7 +1300,7 @@ namespace KEngine
         {
             if (string.IsNullOrEmpty(str))
             {
-                KLogger.LogWarning("传入的值为空！请检查");
+                Log.LogWarning("传入的值为空！请检查");
                 return false;
             }
             var pattern = @"^\d*$";

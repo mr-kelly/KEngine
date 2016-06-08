@@ -153,7 +153,7 @@ namespace KEngine.Modules
         {
             if (!IsFileSystemMode)
             {
-                KLogger.LogError("[WatchSetting] Available in Unity Editor mode only!");
+                Log.LogError("[WatchSetting] Available in Unity Editor mode only!");
                 return;
             }
             if (_cacheWatchers == null)
@@ -164,13 +164,13 @@ namespace KEngine.Modules
 
             if (!Directory.Exists(dirPath))
             {
-                KLogger.LogError("[WatchSetting] Not found Dir: {0}", dirPath);
+                Log.LogError("[WatchSetting] Not found Dir: {0}", dirPath);
                 return;
             }
             if (!_cacheWatchers.TryGetValue(dirPath, out watcher))
             {
                 _cacheWatchers[dirPath] = watcher = new FileSystemWatcher(dirPath);
-                KLogger.Log("Watching Setting Dir: {0}", dirPath);
+                Log.Info("Watching Setting Dir: {0}", dirPath);
             }
 
             watcher.IncludeSubdirectories = false;
@@ -181,7 +181,7 @@ namespace KEngine.Modules
             watcher.InternalBufferSize = 2048;
             watcher.Changed += (sender, e) =>
             {
-                KLogger.LogConsole_MultiThread("Setting changed: {0}", e.FullPath);
+                Log.LogConsole_MultiThread("Setting changed: {0}", e.FullPath);
                 action(path);
             };
         }

@@ -91,7 +91,7 @@ namespace KEngine.Editor
 
         //    SetConfValue(KEngineDefaultConfigs.AppVersion.ToString(), appVersion.ToString());
 
-        //    KLogger.Log("Save AppVersion to KEngineConfig.txt: {0}", appVersion.ToString());
+        //    Log.DoLog("Save AppVersion to KEngineConfig.txt: {0}", appVersion.ToString());
         //}
 
         /// <summary>

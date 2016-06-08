@@ -69,7 +69,7 @@ namespace KEngine
         {
             if (!isOk)
             {
-                KLogger.LogError("[KTextureLoader:OnAssetLoaded]Is not OK: {0}", this.Url);
+                Log.LogError("[KTextureLoader:OnAssetLoaded]Is not OK: {0}", this.Url);
             }
 
             OnFinish(obj);

@@ -130,7 +130,7 @@ namespace KEngine.Editor
             if (!Directory.Exists(fullDir))
                 Directory.CreateDirectory(fullDir);
 
-            KLogger.Log("Build Client {0} to: {1}", tag, fullPath);
+            Log.Info("Build Client {0} to: {1}", tag, fullPath);
             BuildPipeline.BuildPlayer(GetScenePaths(), fullPath, tag, opt);
 
             return fullPath;

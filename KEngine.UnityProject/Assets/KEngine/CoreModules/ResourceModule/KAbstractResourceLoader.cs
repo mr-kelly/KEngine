@@ -232,7 +232,7 @@ namespace KEngine
             KAbstractResourceLoader loader;
             if (string.IsNullOrEmpty(url))
             {
-                KLogger.LogError("[{0}:AutoNew]url为空", typeof(T));
+                Log.LogError("[{0}:AutoNew]url为空", typeof(T));
             }
 
             if (forceCreateNew || !typesDict.TryGetValue(url, out loader))
@@ -256,7 +256,7 @@ namespace KEngine
                 if (loader.RefCount < 0)
                 {
                     //loader.IsDisposed = false;  // 转死回生的可能
-                    KLogger.LogError("Error RefCount!");
+                    Log.LogError("Error RefCount!");
                 }
             }
 
@@ -312,13 +312,13 @@ namespace KEngine
                 }
                 catch (Exception e)
                 {
-                    KLogger.LogException(e);
+                    Log.LogException(e);
                 }
             }
 
             if (CacheLoaderToRemoveFromUnUsed.Count > 0)
             {
-                KLogger.LogError("[DoGarbageCollect]CacheLoaderToRemoveFromUnUsed muse be empty!!");
+                Log.LogError("[DoGarbageCollect]CacheLoaderToRemoveFromUnUsed muse be empty!!");
             }
         }
 
@@ -367,7 +367,7 @@ namespace KEngine
                 if (IsReadyDisposed)
                 {
                     //Dispose();
-                    KLogger.Trace("[BaseResourceLoader:OnFinish]时，准备Disposed {0}", Url);
+                    Log.Trace("[BaseResourceLoader:OnFinish]时，准备Disposed {0}", Url);
                 }
             };
 
@@ -385,7 +385,7 @@ namespace KEngine
                 if (IsCompleted)
                 {
                     if (ResultObject == null)
-                        KLogger.LogWarning("Null ResultAsset {0}", Url);
+                        Log.LogWarning("Null ResultAsset {0}", Url);
                     callback(ResultObject != null, ResultObject);
                 }
                 else
@@ -413,7 +413,7 @@ namespace KEngine
         {
             if (IsReadyDisposed && Debug.isDebugBuild)
             {
-                KLogger.LogWarning("[{0}]Too many dipose! {1}, Count: {2}", GetType().Name, this.Url, RefCount);
+                Log.LogWarning("[{0}]Too many dipose! {1}, Count: {2}", GetType().Name, this.Url, RefCount);
             }
 
             RefCount--;
@@ -424,7 +424,7 @@ namespace KEngine
                 {
                     if (RefCount < 0)
                     {
-                        KLogger.LogError("[{3}]RefCount< 0, {0} : {1}, NowRefCount: {2}, Will be fix to 0", GetType().Name,
+                        Log.LogError("[{3}]RefCount< 0, {0} : {1}, NowRefCount: {2}, Will be fix to 0", GetType().Name,
                             Url, RefCount, GetType());
 
                         RefCount = Mathf.Max(0, RefCount);
@@ -432,7 +432,7 @@ namespace KEngine
 
                     if (UnUsesLoaders.ContainsKey(this))
                     {
-                        KLogger.LogError("[{1}]UnUsesLoader exists: {0}", this, GetType());
+                        Log.LogError("[{1}]UnUsesLoader exists: {0}", this, GetType());
                     }
                 }
 
@@ -466,7 +466,7 @@ namespace KEngine
                     var bRemove = typeDict.Remove(Url);
                     if (!bRemove)
                     {
-                        KLogger.LogWarning("[{0}:Dispose]No Url: {1}, Cur RefCount: {2}", type.Name, Url, RefCount);
+                        Log.LogWarning("[{0}:Dispose]No Url: {1}, Cur RefCount: {2}", type.Name, Url, RefCount);
                     }
                 }
             }
@@ -490,7 +490,7 @@ namespace KEngine
                 return;
             if (RefCount != 1)
             {
-                KLogger.LogWarning("[ForceDisose]Use force dispose to dispose loader, recommend this loader RefCount == 1");
+                Log.LogWarning("[ForceDisose]Use force dispose to dispose loader, recommend this loader RefCount == 1");
             }
             Dispose();
         }

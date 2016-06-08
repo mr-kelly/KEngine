@@ -160,7 +160,7 @@ namespace KEngine
                 {
                     AssetBundlerLoaderErrorEvent(this);
                 }
-                KLogger.LogError("[KAssetBundleLoader]Error Load Bytes AssetBundle: {0}", relativeUrl);
+                Log.LogError("[KAssetBundleLoader]Error Load Bytes AssetBundle: {0}", relativeUrl);
                 OnFinish(null);
                 yield break;
             }
@@ -184,7 +184,7 @@ namespace KEngine
             Progress = 1f;
             var assetBundle = BundleParser.Bundle;
             if (assetBundle == null)
-                KLogger.LogError("WWW.assetBundle is NULL: {0}", RelativeResourceUrl);
+                Log.LogError("WWW.assetBundle is NULL: {0}", RelativeResourceUrl);
 
             OnFinish(assetBundle);
 
@@ -218,7 +218,7 @@ namespace KEngine
             {
                 if (Url.Contains("Arial"))
                 {
-                    KLogger.LogError("要释放Arial字体！！错啦！！builtinextra:{0}", Url);
+                    Log.LogError("要释放Arial字体！！错啦！！builtinextra:{0}", Url);
                     //UnityEditor.EditorApplication.isPaused = true;
                 }
             }

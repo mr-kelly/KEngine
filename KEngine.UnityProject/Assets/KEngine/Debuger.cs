@@ -47,7 +47,7 @@ namespace KEngine
             if (string.IsNullOrEmpty(formatStr))
                 formatStr = "[Check Null] Failed!";
 
-            KLogger.LogError("[!!!]" + formatStr, args);
+            Log.LogError("[!!!]" + formatStr, args);
             return false;
         }
 
@@ -64,7 +64,7 @@ namespace KEngine
                 if (!string.IsNullOrEmpty(msg))
                     formatMsg += string.Format(msg, args);
 
-                KLogger.LogErrorWithStack(formatMsg, 2);
+                Log.LogErrorWithStack(formatMsg, 2);
 
                 throw new Exception(formatMsg); // 中断当前调用
             }
@@ -104,7 +104,7 @@ namespace KEngine
             double s = (UnityEngine.Time.realtimeSinceStartup - RecordTime[RecordPos]);
             if (printLog)
             {
-                KLogger.Log("[RecordTime] {0} use {1}s", RecordKey[RecordPos], s);
+                Log.Info("[RecordTime] {0} use {1}s", RecordKey[RecordPos], s);
             }
             return string.Format("[RecordTime] {0} use {1}s.", RecordKey[RecordPos], s);
         }
@@ -131,7 +131,7 @@ namespace KEngine
             double millseconds = timespan.TotalMilliseconds;
             decimal seconds = (decimal)millseconds / 1000m;
 
-            KLogger.LogWarning(outputStr, seconds.ToString("F7")); // 7位精度
+            Log.LogWarning(outputStr, seconds.ToString("F7")); // 7位精度
         }
 
         #endregion

@@ -64,8 +64,8 @@ namespace KEngine.Editor
         public override void OnInspectorGUI()
         {
             var engine = target as AppEngine;
-            //KLogger.LogLevel
-            KLogger.LogLevel = (KLogLevel) EditorGUILayout.EnumPopup("KLogger Level", KLogger.LogLevel);
+            //Log.LogLevel
+            Log.LogLevel = (KLogLevel) EditorGUILayout.EnumPopup("Log Level", Log.LogLevel);
             EditorGUILayout.LabelField("Modules Count: ", engine.GameModules.Length.ToString());
 
             _showModules = EditorGUILayout.Foldout(_showModules, "Modules");

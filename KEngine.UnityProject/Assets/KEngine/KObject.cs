@@ -84,7 +84,7 @@ namespace KEngine
 
         public static void RemoveDebugObject(object obj)
         {
-            if (!KLogger.IsUnityEditor || !Application.isPlaying || IsApplicationQuited)
+            if (!Log.IsUnityEditor || !Application.isPlaying || IsApplicationQuited)
                 return;
 
             KAsync.AddMainThreadCall(() =>
@@ -99,14 +99,14 @@ namespace KEngine
                 }
                 catch (Exception e)
                 {
-                    KLogger.LogError(e.Message);
+                    Log.LogError(e.Message);
                 }
             });
         }
 
         public static void CreateDebugObject(object obj)
         {
-            if (!KLogger.IsUnityEditor || !Application.isPlaying || IsApplicationQuited)
+            if (!Log.IsUnityEditor || !Application.isPlaying || IsApplicationQuited)
                 return;
 
             KAsync.AddMainThreadCall(() =>
@@ -124,16 +124,16 @@ namespace KEngine
                 }
                 catch (Exception e)
                 {
-                    KLogger.LogError(e.Message);
+                    Log.LogError(e.Message);
                 }
             });
         }
 
         private void Awake()
         {
-            if (!KLogger.IsUnityEditor)
+            if (!Log.IsUnityEditor)
             {
-                KLogger.LogError("Error Open KObjectDebugger on not Unity Editor");
+                Log.LogError("Error Open KObjectDebugger on not Unity Editor");
                 return;
             }
             _cacheGameObject = gameObject;

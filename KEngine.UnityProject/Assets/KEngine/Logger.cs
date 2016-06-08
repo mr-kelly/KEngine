@@ -3,7 +3,7 @@
 // KEngine - Toolset and framework for Unity3D
 // ===================================
 // 
-// Filename: KLogger.cs
+// Filename: Log.cs
 // Date:     2015/12/03
 // Author:  Kelly
 // Email: 23110388@qq.com
@@ -42,14 +42,14 @@ namespace KEngine
         Error,
     }
 
-    [Obsolete("The name 'Logger' conflict with Unity 5 'Logger', use 'KLogger' instead, at 2016/04/08")]
-    public class Logger : KLogger
+    [Obsolete("The name 'Logger' conflict with Unity 5 'Logger', use 'Log' instead, at 2016/04/08")]
+    public class Logger : Log
     {}
 
     /// <summary>
     /// KEngine Logger, file write + console output
     /// </summary>
-    public class KLogger
+    public class Log
     {
         public static KLogLevel LogLevel = KLogLevel.Info;
 
@@ -94,7 +94,7 @@ namespace KEngine
 
         public static event Action<string> LogErrorEvent;
 
-        static KLogger()
+        static Log()
         {
             // isDebugBuild先预存起来，因为它是一个get_属性, 在非Unity主线程里不能用，导致多线程网络打印log时报错
             try
@@ -104,8 +104,8 @@ namespace KEngine
             }
             catch (Exception e)
             {
-                KLogger.LogConsole_MultiThread("KLogger Static Constructor Failed!");
-                KLogger.LogConsole_MultiThread(e.Message + " , " + e.StackTrace);
+                Log.LogConsole_MultiThread("Log Static Constructor Failed!");
+                Log.LogConsole_MultiThread(e.Message + " , " + e.StackTrace);
             }
         }
 
@@ -209,7 +209,7 @@ namespace KEngine
         public static void LogConsole_MultiThread(string log, params object[] args)
         {
             if (IsUnityEditor)
-                Log(log, args);
+                DoLog(string.Format(log, args), KLogLevel.Info);
             else
                 Console.WriteLine(log, args);
         }
@@ -231,11 +231,6 @@ namespace KEngine
         //}
         public static void Info(string log, params object[] args)
         {
-            Log(log, args);
-        }
-
-        public static void Log(string log, params object[] args)
-        {
             DoLog(string.Format(log, args), KLogLevel.Info);
         }
 
@@ -247,7 +242,7 @@ namespace KEngine
                 sb.Append(logs[i].ToString());
                 sb.Append(", ");
             }
-            Log(sb.ToString());
+            DoLog(sb.ToString(), KLogLevel.Info);
         }
 
         public static void LogException(Exception e)
@@ -281,9 +276,20 @@ namespace KEngine
             return sf;
         }
 
+        public static void Error(string err, params object[] args)
+        {
+            LogErrorWithStack(string.Format(err, args), 2);
+        }
+
         public static void LogError(string err, params object[] args)
         {
             LogErrorWithStack(string.Format(err, args), 2);
+        }
+
+        public static void Warning(string err, params object[] args)
+        {
+            string log = string.Format(err, args);
+            DoLog(log, KLogLevel.Warning);
         }
 
         public static void LogWarning(string err, params object[] args)

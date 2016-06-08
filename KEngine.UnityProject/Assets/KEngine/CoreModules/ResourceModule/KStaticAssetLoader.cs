@@ -65,7 +65,7 @@ namespace KEngine
 
             base.Init(path, args);
             if (string.IsNullOrEmpty(path))
-                KLogger.LogError("StaticAssetLoader 空资源路径!");
+                Log.LogError("StaticAssetLoader 空资源路径!");
 
             _assetFileLoader = KAssetFileLoader.Load(path, (_isOk, _obj) =>
             {
