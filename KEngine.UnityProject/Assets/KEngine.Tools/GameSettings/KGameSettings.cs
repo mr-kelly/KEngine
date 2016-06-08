@@ -59,7 +59,7 @@ namespace KEngine.CoreModules
         public IEnumerator Init()
         {
             if (this.InitAction == null)
-                KLogger.LogError("GameSettings沒有定義初始化行為！！！");
+                Log.LogError("GameSettings沒有定義初始化行為！！！");
             else
                 InitAction();
             yield return new WaitForEndOfFrame();
@@ -181,7 +181,7 @@ namespace KEngine.CoreModules
             Dictionary<string, CBaseInfo> dict;
             if (SettingInfos.TryGetValue(typeof (T), out dict))
             {
-                //KLogger.Log(dict.Count+"");
+                //Log.Info(dict.Count+"");
                 List<T> list = new List<T>();
                 foreach (CBaseInfo item in dict.Values)
                 {
@@ -192,7 +192,7 @@ namespace KEngine.CoreModules
                 return list;
             }
             else
-                KLogger.LogError("找不到类型配置{0}, 总类型数{1}", typeof (T).Name, SettingInfos.Count);
+                Log.LogError("找不到类型配置{0}, 总类型数{1}", typeof (T).Name, SettingInfos.Count);
 
             return null;
         }
@@ -212,13 +212,13 @@ namespace KEngine.CoreModules
                 else
                 {
                     if (printLog)
-                        KLogger.LogError("找不到类型{0} Id为{1}的配置对象, 类型表里共有对象{2}", typeof (T).Name, id, dict.Count);
+                        Log.LogError("找不到类型{0} Id为{1}的配置对象, 类型表里共有对象{2}", typeof (T).Name, id, dict.Count);
                 }
             }
             else
             {
                 if (printLog)
-                    KLogger.LogError("嘗試Id {0}, 找不到类型配置{1}, 总类型数{2}", id, typeof (T).Name, SettingInfos.Count);
+                    Log.LogError("嘗試Id {0}, 找不到类型配置{1}, 总类型数{2}", id, typeof (T).Name, SettingInfos.Count);
             }
 
             return null;
@@ -254,7 +254,7 @@ namespace KEngine.CoreModules
                 int tryInt;
                 if (!int.TryParse(Id, out tryInt))
                 {
-                    KLogger.LogError("錯誤解析Int Id - {0}", GetType());
+                    Log.LogError("錯誤解析Int Id - {0}", GetType());
                 }
 
                 _CacheIntId = tryInt;
@@ -305,7 +305,7 @@ namespace KEngine.CoreModules
                     if (!tabFile.HasColumn(field.Name))
                     {
                         if (Debug.isDebugBuild)
-                            KLogger.LogError("表{0} 找不到表头{1}", type.Name, field.Name);
+                            Log.LogError("表{0} 找不到表头{1}", type.Name, field.Name);
                         continue;
                     }
                     okFields.AddLast(field);
@@ -426,7 +426,7 @@ namespace KEngine.CoreModules
                 //}
                 else
                 {
-                    KLogger.LogWarning("未知类型: {0}", fieldName);
+                    Log.LogWarning("未知类型: {0}", fieldName);
                     value = null;
                 }
 
@@ -441,7 +441,7 @@ namespace KEngine.CoreModules
                         }
                         catch
                         {
-                            KLogger.LogError("转型错误...{0}", value.ToString());
+                            Log.LogError("转型错误...{0}", value.ToString());
                         }
                     }
                 }

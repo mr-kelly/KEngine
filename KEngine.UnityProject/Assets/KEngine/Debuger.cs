@@ -47,7 +47,7 @@ namespace KEngine
             if (string.IsNullOrEmpty(formatStr))
                 formatStr = "[Check Null] Failed!";
 
-            Log.LogError("[!!!]" + formatStr, args);
+            Log.Error("[!!!]" + formatStr, args);
             return false;
         }
 
@@ -131,7 +131,7 @@ namespace KEngine
             double millseconds = timespan.TotalMilliseconds;
             decimal seconds = (decimal)millseconds / 1000m;
 
-            Log.LogWarning(outputStr, seconds.ToString("F7")); // 7位精度
+            Log.Warning(outputStr, seconds.ToString("F7")); // 7位精度
         }
 
         #endregion

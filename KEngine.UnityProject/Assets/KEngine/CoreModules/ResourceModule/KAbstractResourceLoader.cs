@@ -232,7 +232,7 @@ namespace KEngine
             KAbstractResourceLoader loader;
             if (string.IsNullOrEmpty(url))
             {
-                Log.LogError("[{0}:AutoNew]url为空", typeof(T));
+                Log.Error("[{0}:AutoNew]url为空", typeof(T));
             }
 
             if (forceCreateNew || !typesDict.TryGetValue(url, out loader))
@@ -256,7 +256,7 @@ namespace KEngine
                 if (loader.RefCount < 0)
                 {
                     //loader.IsDisposed = false;  // 转死回生的可能
-                    Log.LogError("Error RefCount!");
+                    Log.Error("Error RefCount!");
                 }
             }
 
@@ -318,7 +318,7 @@ namespace KEngine
 
             if (CacheLoaderToRemoveFromUnUsed.Count > 0)
             {
-                Log.LogError("[DoGarbageCollect]CacheLoaderToRemoveFromUnUsed muse be empty!!");
+                Log.Error("[DoGarbageCollect]CacheLoaderToRemoveFromUnUsed muse be empty!!");
             }
         }
 
@@ -385,7 +385,7 @@ namespace KEngine
                 if (IsCompleted)
                 {
                     if (ResultObject == null)
-                        Log.LogWarning("Null ResultAsset {0}", Url);
+                        Log.Warning("Null ResultAsset {0}", Url);
                     callback(ResultObject != null, ResultObject);
                 }
                 else
@@ -413,7 +413,7 @@ namespace KEngine
         {
             if (IsReadyDisposed && Debug.isDebugBuild)
             {
-                Log.LogWarning("[{0}]Too many dipose! {1}, Count: {2}", GetType().Name, this.Url, RefCount);
+                Log.Warning("[{0}]Too many dipose! {1}, Count: {2}", GetType().Name, this.Url, RefCount);
             }
 
             RefCount--;
@@ -424,7 +424,7 @@ namespace KEngine
                 {
                     if (RefCount < 0)
                     {
-                        Log.LogError("[{3}]RefCount< 0, {0} : {1}, NowRefCount: {2}, Will be fix to 0", GetType().Name,
+                        Log.Error("[{3}]RefCount< 0, {0} : {1}, NowRefCount: {2}, Will be fix to 0", GetType().Name,
                             Url, RefCount, GetType());
 
                         RefCount = Mathf.Max(0, RefCount);
@@ -432,7 +432,7 @@ namespace KEngine
 
                     if (UnUsesLoaders.ContainsKey(this))
                     {
-                        Log.LogError("[{1}]UnUsesLoader exists: {0}", this, GetType());
+                        Log.Error("[{1}]UnUsesLoader exists: {0}", this, GetType());
                     }
                 }
 
@@ -466,7 +466,7 @@ namespace KEngine
                     var bRemove = typeDict.Remove(Url);
                     if (!bRemove)
                     {
-                        Log.LogWarning("[{0}:Dispose]No Url: {1}, Cur RefCount: {2}", type.Name, Url, RefCount);
+                        Log.Warning("[{0}:Dispose]No Url: {1}, Cur RefCount: {2}", type.Name, Url, RefCount);
                     }
                 }
             }
@@ -490,7 +490,7 @@ namespace KEngine
                 return;
             if (RefCount != 1)
             {
-                Log.LogWarning("[ForceDisose]Use force dispose to dispose loader, recommend this loader RefCount == 1");
+                Log.Warning("[ForceDisose]Use force dispose to dispose loader, recommend this loader RefCount == 1");
             }
             Dispose();
         }

@@ -37,17 +37,17 @@ public class CTk2dSpriteDep : KAssetDep
     {
         if (string.IsNullOrEmpty(resourcePath))
         {
-            KLogger.LogError("[ProcessTk2dSprite]Null ResourcePath {0}", gameObject.name);
+            Log.Error("[ProcessTk2dSprite]Null ResourcePath {0}", gameObject.name);
             return;
         }
 
         var loader = CTk2dSpriteCollectionDep.LoadSpriteCollection(resourcePath, (_obj) =>
         {
             tk2dSpriteCollectionData colData = _obj as tk2dSpriteCollectionData;
-            KLogger.Assert(colData);
+            Log.Assert(colData);
             if (!IsDestroy)
             {
-                KLogger.Assert(DependencyComponent is tk2dBaseSprite);
+                Log.Assert(DependencyComponent is tk2dBaseSprite);
                 tk2dBaseSprite sprite = (tk2dBaseSprite)DependencyComponent;
                 sprite.Collection = colData;
                 sprite.Build();
@@ -55,7 +55,7 @@ public class CTk2dSpriteDep : KAssetDep
             }
             OnFinishLoadDependencies(colData);  // 返回GameObject而已哦
             //else
-            //    KLogger.LogWarning("GameObject maybe destroy!");
+            //    Log.Warning("GameObject maybe destroy!");
         });
         ResourceLoaders.Add(loader);
     }

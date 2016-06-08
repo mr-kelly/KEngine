@@ -100,7 +100,7 @@ namespace KEngine
 
             if (stopwatch.IsRunning)
             {
-                Log.LogError("Running stopwatch need reset: {0}", key);
+                Log.Error("Running stopwatch need reset: {0}", key);
             }
 
             stopwatch.Reset();
@@ -124,7 +124,7 @@ namespace KEngine
             System.Diagnostics.Stopwatch stopwatch;
             if (!m_WachterDictionary.TryGetValue(key, out stopwatch))
             {
-                Log.LogError("Not exist Stopwatch: {0}", key);
+                Log.Error("Not exist Stopwatch: {0}", key);
                 return;
             }
             long lastMem = 0;
@@ -138,7 +138,7 @@ namespace KEngine
 
             string format = "[Watcher] {0}, Time: {1}s, MemDiff: {2}KB";
             var memDiff = GC.GetTotalMemory(false) - lastMem; // byte
-            Log.LogError(string.Format(format,
+            Log.Error(string.Format(format,
                 string.IsNullOrEmpty(name) ? key : name, seconds.ToString("F7"),
                 memDiff/1000f)); // 7位精度
         }

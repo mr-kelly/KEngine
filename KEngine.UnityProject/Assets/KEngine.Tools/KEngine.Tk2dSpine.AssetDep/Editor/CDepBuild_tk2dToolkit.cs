@@ -39,7 +39,7 @@ public partial class KDependencyBuild
         }
         else
         {
-            KLogger.LogWarning("空的SpriteCollectionData在SpriteCollection");
+            Log.Warning("空的SpriteCollectionData在SpriteCollection");
         }
     }
 
@@ -63,7 +63,7 @@ public partial class KDependencyBuild
     {
         if (baseSprite.Collection == null)
         {
-            KLogger.LogError("Null sprite Collection: {0}", baseSprite.gameObject.name);
+            Log.Error("Null sprite Collection: {0}", baseSprite.gameObject.name);
             return;
         }
         string spriteCollectionPath = BuildSpriteCollection(baseSprite.Collection);
@@ -87,16 +87,16 @@ public partial class KDependencyBuild
     {
         if (data == null)
         {
-            KLogger.LogError("[BuildSpriteColleccion]Null SpriteCol Data!!!");
+            Log.Error("[BuildSpriteColleccion]Null SpriteCol Data!!!");
             return "";
         }
         GameObject spriteColPrefab = PrefabUtility.FindPrefabRoot(data.gameObject) as GameObject;
-        KLogger.Assert(spriteColPrefab);
+        Log.Assert(spriteColPrefab);
 
         string path = AssetDatabase.GetAssetPath(spriteColPrefab);  // prefab只用来获取路径，不打包不挖空
         if (string.IsNullOrEmpty(path))
         {
-            KLogger.Log("Null Sprite Collection {0}", path);
+            Log.Info("Null Sprite Collection {0}", path);
             return "";   // !!! SpriteCollection可能动态生成的，不打包它
         }
         bool needBuild = BuildTools.CheckNeedBuild(path);

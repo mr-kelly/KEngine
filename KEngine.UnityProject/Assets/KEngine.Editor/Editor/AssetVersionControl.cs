@@ -70,14 +70,14 @@ namespace KEngine.Editor
         {
             if (Current != null)
             {
-                Log.LogError("New a KAssetVersionControl, but already has annother instance using! Be careful!");
+                Log.Error("New a KAssetVersionControl, but already has annother instance using! Be careful!");
             }
 
             Current = this;
 
             _isRebuild = rebuild;
 
-            Log.LogWarning("================== KAssetVersionControl Begin ======================");
+            Log.Warning("================== KAssetVersionControl Begin ======================");
 
             SetupHistory();
 
@@ -303,11 +303,11 @@ namespace KEngine.Editor
             if (!File.Exists(filePath))
             {
                 if (log)
-                    Log.LogError("[DoCheckBuild]Not Found 无法找到文件 {0}", filePath);
+                    Log.Error("[DoCheckBuild]Not Found 无法找到文件 {0}", filePath);
 
                 if (filePath.Contains("unity_builtin_extra"))
                 {
-                    Log.LogError(
+                    Log.Error(
                         "[DoCheckBuild]Find unity_builtin_extra resource to build!! Please check it! current scene: {0}",
                         currentScene);
                 }

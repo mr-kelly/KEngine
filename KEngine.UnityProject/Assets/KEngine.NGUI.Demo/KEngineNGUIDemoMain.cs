@@ -63,7 +63,7 @@ public class KEngineNGUIDemoMain : MonoBehaviour
         });
 
         yield return new WaitForSeconds(2f);
-        KLogger.Log("Opening KUITestSubWindow");
+        Log.Info("Opening KUITestSubWindow");
         UIModule.Instance.OpenWindow("TestSub");
 
     }
@@ -71,10 +71,10 @@ public class KEngineNGUIDemoMain : MonoBehaviour
     void TestLoadLevelAdditiveAsync()
     {
 #if !UNITY_5
-        KLogger.Log("Load Scene");
+        Log.Info("Load Scene");
         ResourceDepUtils.LoadLevelAdditiveAsync("BundleResources/NGUI/TestNGUI.unity");
 #else
-        KLogger.LogError("Not support on Unity 5.x");
+        Log.LogError("Not support on Unity 5.x");
 #endif
     }
 

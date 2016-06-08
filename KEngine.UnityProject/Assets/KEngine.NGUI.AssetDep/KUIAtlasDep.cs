@@ -72,13 +72,13 @@ public class KUIAtlasDep : KAssetDep
 
             gameObj.name = resourcePath;
             UIAtlas atlas = gameObj.GetComponent<UIAtlas>();
-            KLogger.Assert(atlas);
+            Debuger.Assert(atlas);
 
             if (!exist)
             {
                 // Wait Load Material
                 var colDep = gameObj.GetComponent<KAssetDep>();
-                KLogger.Assert(colDep && colDep.GetType() == typeof (KUIAtlasDep)); // CResourceDependencyType.UI_ATLAS);
+                Debuger.Assert(colDep && colDep.GetType() == typeof (KUIAtlasDep)); // CResourceDependencyType.UI_ATLAS);
                 // 依赖材质Material, 加载后是Material
                 colDep.AddFinishCallback((assetDep, _obj) =>
                 {
@@ -89,7 +89,7 @@ public class KUIAtlasDep : KAssetDep
                         atlas.spriteMaterial = _mat; // 注意，这一行性能消耗非常的大！
                     }
                     else
-                        KLogger.LogWarning("Atlas依赖的材质多次加载了（未缓存)!!!!!!!!!!!!!");
+                        Log.LogWarning("Atlas依赖的材质多次加载了（未缓存)!!!!!!!!!!!!!");
 
                     if (callback != null)
                         callback(atlas);

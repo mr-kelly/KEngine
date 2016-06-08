@@ -148,7 +148,7 @@ namespace KEngine.Editor
                             // 不同，会触发编译，强制停止Unity后再继续写入
                             if (EditorApplication.isPlaying)
                             {
-                                Log.LogError("[CAUTION]AppSettings code modified! Force stop Unity playing");
+                                Log.Error("[CAUTION]AppSettings code modified! Force stop Unity playing");
                                 EditorApplication.isPlaying = false;
                             }
                             File.WriteAllText(exportPath, genCode);
@@ -220,7 +220,7 @@ namespace KEngine.Editor
                         }
                         if (doCompile)
                         {
-                            Log.LogWarning("[SettingModule]Compile from {0} to {1}", excelPath, compileToPath);
+                            Log.Warning("[SettingModule]Compile from {0} to {1}", excelPath, compileToPath);
 
                             var compileResult = compiler.Compile(excelPath, compileToPath, compileBaseDir, doCompile);
 
@@ -237,11 +237,11 @@ namespace KEngine.Editor
                 // 根据模板生成所有代码,  如果不是强制重建，无需进行代码编译
                 if (!AutoGenerateCode)
                 {
-                    Log.LogWarning("Ignore Gen Settings code");
+                    Log.Warning("Ignore Gen Settings code");
                 }
                 else if (!force)
                 {
-                    Log.LogWarning("Ignore Gen Settings Code, not a forcing compiling");
+                    Log.Warning("Ignore Gen Settings Code, not a forcing compiling");
                 }
                 else
                 {
@@ -342,13 +342,13 @@ namespace KEngine.Editor
             var sourcePath = SettingSourcePath;//AppEngine.GetConfig("SettingSourcePath");
             if (string.IsNullOrEmpty(sourcePath))
             {
-                Log.LogError("Need to KEngineConfig: SettingSourcePath");
+                Log.Error("Need to KEngineConfig: SettingSourcePath");
                 return;
             }
             var compilePath = AppEngine.GetConfig("KEngine.Setting", "SettingCompiledPath");
             if (string.IsNullOrEmpty(compilePath))
             {
-                Log.LogError("Need to KEngineConfig: SettingCompiledPath");
+                Log.Error("Need to KEngineConfig: SettingCompiledPath");
                 return;
             }
             CompileTabConfigs(sourcePath, compilePath, SettingCodePath, SettingExtension, force);

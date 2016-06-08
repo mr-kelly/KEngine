@@ -51,7 +51,7 @@ public class KActionRecords : KBehaviour
             {
                 if (IsApplicationQuited || !Application.isPlaying)
                 {
-                    KLogger.LogErrorWithStack("[错误埋点]Error Instance Action Recods!  请查看堆栈, 尽快修复！！！");
+                    Log.LogErrorWithStack("[错误埋点]Error Instance Action Recods!  请查看堆栈, 尽快修复！！！");
                     return null;
                 }
                 _instance = (new GameObject("__ActionRecorder__")).AddComponent<KActionRecords>();
@@ -148,7 +148,7 @@ public class KActionRecords : KBehaviour
     {
         if (waitCallback == null)
         {
-            KLogger.LogError("[AddListener]waitCallback Cannnot null!");
+            Log.Error("[AddListener]waitCallback Cannnot null!");
             return;
         }
         var key = MakeKey(type, subType);
@@ -169,7 +169,7 @@ public class KActionRecords : KBehaviour
     {
         if (emGentor == null)
         {
-            KLogger.LogError("[AddListener]emGentor Cannnot null!");
+            Log.Error("[AddListener]emGentor Cannnot null!");
             return;
         }
         var key = MakeKey(type, subType);

@@ -68,7 +68,7 @@ namespace KEngine.Editor
                 var importer = AssetImporter.GetAtPath(filepath);
                 if (importer == null)
                 {
-                    Log.LogError("Not found: {0}", filepath);
+                    Log.Error("Not found: {0}", filepath);
                     continue;
                 }
                 var bundleName = filepath.Substring(dir.Length, filepath.Length - dir.Length);
@@ -84,7 +84,7 @@ namespace KEngine.Editor
         {
             if (EditorApplication.isPlaying)
             {
-                Log.LogError("Cannot build in playing mode! Please stop!");
+                Log.Error("Cannot build in playing mode! Please stop!");
                 return;
             }
             MakeAssetBundleNames();
@@ -256,7 +256,7 @@ namespace KEngine.Editor
 
                     var tmpTexPath = string.Format("Assets/Tex_{0}_{1}.png", memoryTexture.name, Path.GetRandomFileName());
 
-                    Log.LogWarning("【BuildAssetBundle】Build一个非Asset 的Texture: {0}", memoryTexture.name);
+                    Log.Warning("【BuildAssetBundle】Build一个非Asset 的Texture: {0}", memoryTexture.name);
 
                     File.WriteAllBytes(tmpTexPath, memoryTexture.EncodeToPNG());
                     AssetDatabase.ImportAsset(tmpTexPath,
@@ -301,7 +301,7 @@ namespace KEngine.Editor
             }
             else
             {
-                //Log.LogError("[Wrong asse Type] {0}", asset.GetType());
+                //Log.Error("[Wrong asse Type] {0}", asset.GetType());
                 _DoBuild(out crc, asset, null, path, relativePath, buildTarget);
             }
             return crc;
@@ -522,7 +522,7 @@ namespace KEngine.Editor
 
             if (string.IsNullOrEmpty(pythonExe))
             {
-                Log.LogError("无法找到py.exe, 或python指令");
+                Log.Error("无法找到py.exe, 或python指令");
                 return "Error: Not found python";
             }
 
@@ -570,7 +570,7 @@ namespace KEngine.Editor
                 }
                 else
                 {
-                    Log.LogError("[SymbolLinkFolder]Error on OS: {0}", os.ToString());
+                    Log.Error("[SymbolLinkFolder]Error on OS: {0}", os.ToString());
                 }
             }
 
@@ -593,7 +593,7 @@ namespace KEngine.Editor
                 }
                 else
                 {
-                    Log.LogError("[SymbolLinkFolder]Error on OS: {0}", os.ToString());
+                    Log.Error("[SymbolLinkFolder]Error on OS: {0}", os.ToString());
                 }
             }
             */

@@ -87,7 +87,7 @@ namespace KEngine
         {
             if (resultObj == null)
             {
-                Log.LogError("[KMaterialLoader:OnFinishe] Null Material: {0}", Url);
+                Log.Error("[KMaterialLoader:OnFinishe] Null Material: {0}", Url);
             }
             base.OnFinish(resultObj);
         }
@@ -140,10 +140,10 @@ namespace KEngine
                 if (shader == null)
                 {
                     shader = KTool.FindShader(sMat.ShaderName);
-                    Log.LogWarning("无法加载Shader资源: {0}, 使用Shaders.Find代替", sMat.ShaderName);
+                    Log.Warning("无法加载Shader资源: {0}, 使用Shaders.Find代替", sMat.ShaderName);
                     if (shader == null)
                     {
-                        Log.LogWarning("找不到Shader: {0}, 使用Diffuse临时代替", sMat.ShaderName);
+                        Log.Warning("找不到Shader: {0}, 使用Diffuse临时代替", sMat.ShaderName);
                         shader = KTool.FindShader("Diffuse");
                     }
                 }
@@ -173,7 +173,7 @@ namespace KEngine
                             var tex = texLoader.Asset;
                             if (tex == null)
                             {
-                                Log.LogError("找不到纹理: {0}", texturePath);
+                                Log.Error("找不到纹理: {0}", texturePath);
                             }
                             else
                             {
@@ -217,7 +217,7 @@ namespace KEngine
                 mat.SetFloat(propName, float.Parse(propValue));
             }
             else
-                Log.LogError("[_SetMatRange]Cannot find shader property: {0}", propName);
+                Log.Error("[_SetMatRange]Cannot find shader property: {0}", propName);
         }
 
         private void _SetMatColor(Material mat, string colorPropName, string _colorStr) // 设置材质Shader的颜色
@@ -232,7 +232,7 @@ namespace KEngine
                 if (mat.HasProperty(colorPropName))
                     mat.SetColor(colorPropName, color);
                 else
-                    Log.LogError("[_SetMatColor]Cannot find shader property: {0}", colorPropName);
+                    Log.Error("[_SetMatColor]Cannot find shader property: {0}", colorPropName);
             }
         }
 
@@ -249,7 +249,7 @@ namespace KEngine
                 mat.SetTextureOffset(matPropName, offset);
             }
             //else
-            //    Log.LogError("找不到纹理: {0}", texturePath);
+            //    Log.Error("找不到纹理: {0}", texturePath);
             //}
         }
     }

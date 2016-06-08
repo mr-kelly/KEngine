@@ -378,7 +378,7 @@ namespace KEngine
                 shader = Shader.Find(shaderName);
                 CacheShaders[shaderName] = shader;
                 if (shader == null)
-                    Log.LogError("缺少Shader：{0}  ， 检查Graphics Settings的预置shader", shaderName);
+                    Log.Error("缺少Shader：{0}  ， 检查Graphics Settings的预置shader", shaderName);
             }
 
             return shader;
@@ -452,7 +452,7 @@ namespace KEngine
                         convertedObj = BitConverter.ToUInt64(bytes, offset);
                         break;
                     default:
-                        Log.LogError("Unsupport Type {0} in StrBytesToArray(), You can custom this.", typeCode);
+                        Log.Error("Unsupport Type {0} in StrBytesToArray(), You can custom this.", typeCode);
                         Debuger.Assert(false);
                         break;
                 }
@@ -728,7 +728,7 @@ namespace KEngine
                 }
                 catch (Exception)
                 {
-                    Log.LogError("not find argument index: \"{0}\" in array: {1}", paramKey, args);
+                    Log.Error("not find argument index: \"{0}\" in array: {1}", paramKey, args);
                 }
             }
 
@@ -765,7 +765,7 @@ namespace KEngine
             if (trans == null)
             {
                 if (isLog)
-                    Log.LogError("Get Child Error: " + uri);
+                    Log.Error("Get Child Error: " + uri);
                 return default(T);
             }
 
@@ -780,7 +780,7 @@ namespace KEngine
             if (trans == null)
             {
                 if (isLog)
-                    Log.LogError("Get Child Error: " + uri);
+                    Log.Error("Get Child Error: " + uri);
                 return default(T);
             }
 
@@ -808,7 +808,7 @@ namespace KEngine
             GameObject obj = DFSFindObject(findTrans, name);
             if (obj == null)
             {
-                Log.LogError("Find GemeObject Error: " + name);
+                Log.Error("Find GemeObject Error: " + name);
                 return null;
             }
 
@@ -1001,7 +1001,7 @@ namespace KEngine
                 newBox.offset = oldBox.offset + (Vector2)realLocalPos;
                 return newBox;
             }
-            Log.LogError("Error Collider: {0}", collider2d);
+            Log.Error("Error Collider: {0}", collider2d);
             return null;
         }
 
@@ -1300,7 +1300,7 @@ namespace KEngine
         {
             if (string.IsNullOrEmpty(str))
             {
-                Log.LogWarning("传入的值为空！请检查");
+                Log.Warning("传入的值为空！请检查");
                 return false;
             }
             var pattern = @"^\d*$";

@@ -125,7 +125,7 @@ namespace KEngine
             Progress = 1;
             if (IsReadyDisposed)
             {
-                Log.LogError("[KWWWLoader]Too early release: {0}", url);
+                Log.Error("[KWWWLoader]Too early release: {0}", url);
                 OnFinish(null);
                 yield break;
             }
@@ -140,9 +140,9 @@ namespace KEngine
                 if (url.StartsWith(fileProtocol))
                 {
                     string fileRealPath = url.Replace(fileProtocol, "");
-                    Log.LogError("File {0} Exist State: {1}", fileRealPath, System.IO.File.Exists(fileRealPath));
+                    Log.Error("File {0} Exist State: {1}", fileRealPath, System.IO.File.Exists(fileRealPath));
                 }
-                Log.LogError("[KWWWLoader:Error]{0} {1}", Www.error, url);
+                Log.Error("[KWWWLoader:Error]{0} {1}", Www.error, url);
 
                 OnFinish(null);
                 yield break;
@@ -167,7 +167,7 @@ namespace KEngine
 
                 while (Debug.isDebugBuild && !IsReadyDisposed)
                 {
-                    Log.LogError("[KWWWLoader]Not Disposed Yet! : {0}", this.Url);
+                    Log.Error("[KWWWLoader]Not Disposed Yet! : {0}", this.Url);
                     yield return null;
                 }
             }

@@ -49,7 +49,7 @@ public class KUIDemoHome : UIController
         HomeLabel = GetControl<Text>("HomeText");
         TipLabel = GetControl<Text>("Tip");
 
-        Button1.onClick.AddListener(() => KLogger.LogWarning("Click Home Button!"));
+        Button1.onClick.AddListener(() => Log.LogWarning("Click Home Button!"));
     }
 
     public override void OnOpen(params object[] args)

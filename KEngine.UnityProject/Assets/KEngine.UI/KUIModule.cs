@@ -70,7 +70,7 @@ namespace KEngine.UI
             set
             {
                 _loadingUICount = value;
-                if (_loadingUICount < 0) Log.LogError("Error ---- LoadingUICount < 0");
+                if (_loadingUICount < 0) Log.Error("Error ---- LoadingUICount < 0");
             }
         }
 
@@ -107,7 +107,7 @@ namespace KEngine.UI
                 }
                 else
                 {
-                    Log.LogError("Cannot find UIBridge Type: {0}", uiBridgeTypeName);
+                    Log.Error("Cannot find UIBridge Type: {0}", uiBridgeTypeName);
                 }
             }
 
@@ -256,7 +256,7 @@ namespace KEngine.UI
             if (!UIWindows.TryGetValue(name, out uiState))
             {
                 if (Debug.isDebugBuild)
-                    Log.LogWarning("[CloseWindow]没有加载的UIWindow: {0}", name);
+                    Log.Warning("[CloseWindow]没有加载的UIWindow: {0}", name);
                 return; // 未开始Load
             }
 
@@ -368,7 +368,7 @@ namespace KEngine.UI
         {
             if (UIWindows.ContainsKey(windowTemplateName))
             {
-                Log.LogError("[LoadWindow]多次重复LoadWindow: {0}", windowTemplateName);
+                Log.Error("[LoadWindow]多次重复LoadWindow: {0}", windowTemplateName);
             }
             Debuger.Assert(!UIWindows.ContainsKey(windowTemplateName));
 
@@ -465,7 +465,7 @@ namespace KEngine.UI
             CUILoadState uiState;
             if (!UIWindows.TryGetValue(uiName, out uiState))
             {
-                Log.LogError("找不到UIState: {0}", uiName);
+                Log.Error("找不到UIState: {0}", uiName);
                 return;
             }
 

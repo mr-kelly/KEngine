@@ -45,7 +45,7 @@ public class KDepBuild_ParticleSystem : IDepBuildProcessor
         }
         else
         {
-            KLogger.LogWarning("没有Material的粒子: {0}", particle.gameObject.name);
+            Log.Warning("没有Material的粒子: {0}", particle.gameObject.name);
         }
     }
 }

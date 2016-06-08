@@ -442,7 +442,7 @@ public class KTabFile : IDisposable, IKTabReadble, IEnumerable<KTabFile.RowInter
     {
         if (row > TabInfo.Count || column > ColCount || row <= 0 || column <= 0) //  || column > ColIndex.Count
         {
-            Log.LogError("Wrong row-{0} or column-{1}", row, column);
+            Log.Error("Wrong row-{0} or column-{1}", row, column);
             return false;
         }
         string content = Convert.ToString(value);

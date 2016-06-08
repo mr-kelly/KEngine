@@ -99,7 +99,7 @@ namespace KEngine
                 }
                 catch (Exception e)
                 {
-                    Log.LogError(e.Message);
+                    Log.Error(e.Message);
                 }
             });
         }
@@ -124,7 +124,7 @@ namespace KEngine
                 }
                 catch (Exception e)
                 {
-                    Log.LogError(e.Message);
+                    Log.Error(e.Message);
                 }
             });
         }
@@ -133,7 +133,7 @@ namespace KEngine
         {
             if (!Log.IsUnityEditor)
             {
-                Log.LogError("Error Open KObjectDebugger on not Unity Editor");
+                Log.Error("Error Open KObjectDebugger on not Unity Editor");
                 return;
             }
             _cacheGameObject = gameObject;

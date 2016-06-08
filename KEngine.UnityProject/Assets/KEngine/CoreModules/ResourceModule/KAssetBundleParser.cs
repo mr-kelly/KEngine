@@ -123,7 +123,7 @@ namespace KEngine
                 var timeLimit = Mode == CAssetBundleParserMode.Async ? 1f : .3f;
                 if (useTime > timeLimit) // 超过一帧时间肯定了
                 {
-                    Log.LogWarning("[KAssetBundleParser] Parse Too long time: {0},  used time: {1}", RelativePath,
+                    Log.Warning("[KAssetBundleParser] Parse Too long time: {0},  used time: {1}", RelativePath,
                         useTime);
                 }
             }
@@ -143,7 +143,7 @@ namespace KEngine
                 const float timeout = 5f;
                 if (Time.time - startTime > timeout)
                 {
-                    Log.LogWarning("[CAssetBundlerParser]{0} 解压/读取Asset太久了! 花了{1}秒, 超过 {2}秒", RelativePath,
+                    Log.Warning("[CAssetBundlerParser]{0} 解压/读取Asset太久了! 花了{1}秒, 超过 {2}秒", RelativePath,
                         Time.time - startTime, timeout);
                 }
             }

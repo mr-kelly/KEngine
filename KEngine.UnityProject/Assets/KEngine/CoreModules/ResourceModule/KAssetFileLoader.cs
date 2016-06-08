@@ -90,7 +90,7 @@ namespace KEngine
                 getAsset = Resources.Load<UnityEngine.Object>(path);
                 if (getAsset == null)
                 {
-                    Log.LogError("Asset is NULL(from Resources Folder): {0}", path);
+                    Log.Error("Asset is NULL(from Resources Folder): {0}", path);
                 }
                 OnFinish(getAsset);
             }
@@ -111,7 +111,7 @@ namespace KEngine
 
                 if (!_bundleLoader.IsSuccess)
                 {
-                    Log.LogError("[KAssetFileLoader]Load BundleLoader Failed(Error) when Finished: {0}", path);
+                    Log.Error("[KAssetFileLoader]Load BundleLoader Failed(Error) when Finished: {0}", path);
                     _bundleLoader.Release();
                     OnFinish(null);
                     yield break;
@@ -151,7 +151,7 @@ namespace KEngine
                 }
                 catch
                 {
-                    Log.LogError("[OnAssetBundleLoaded:mainAsset]{0}", path);
+                    Log.Error("[OnAssetBundleLoaded:mainAsset]{0}", path);
                 }
 #endif
 
@@ -159,7 +159,7 @@ namespace KEngine
 
                 if (getAsset == null)
                 {
-                    Log.LogError("Asset is NULL: {0}", path);
+                    Log.Error("Asset is NULL: {0}", path);
                 }
 
             }
@@ -200,7 +200,7 @@ namespace KEngine
                 //var bRemove = Caches.Remove(Url);
                 //if (!bRemove)
                 //{
-                //    Log.LogWarning("[DisposeTheCache]Remove Fail(可能有两个未完成的，同时来到这) : {0}", Url);
+                //    Log.Warning("[DisposeTheCache]Remove Fail(可能有两个未完成的，同时来到这) : {0}", Url);
                 //}
             }
             //else

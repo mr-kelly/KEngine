@@ -60,7 +60,7 @@ namespace KEngine
             else
             {
                 if (Debug.isDebugBuild)
-                    Log.LogError("[KBytesLoader]Error Path: {0}", url);
+                    Log.Error("[KBytesLoader]Error Path: {0}", url);
                 OnFinish(null);
             }
             {
@@ -84,7 +84,7 @@ namespace KEngine
                         //{
                         //    AssetBundlerLoaderErrorEvent(this);
                         //}
-                        Log.LogError("[KBytesLoader]Error Load WWW: {0}", url);
+                        Log.Error("[KBytesLoader]Error Load WWW: {0}", url);
                         OnFinish(null);
                         yield break;
                     }

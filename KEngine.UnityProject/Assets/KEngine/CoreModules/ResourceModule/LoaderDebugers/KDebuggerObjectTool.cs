@@ -68,7 +68,7 @@ public class KDebuggerObjectTool
         }
         catch (Exception e)
         {
-            Log.LogError(string.Format("[SetParent]{0}->{1}->{2}", bigType, smallType, e.Message));
+            Log.Error(string.Format("[SetParent]{0}->{1}->{2}", bigType, smallType, e.Message));
         }
 
         theParent.gameObject.name = GetNameWithCount(smallType, typeCount);

@@ -139,7 +139,7 @@ namespace KEngine.ResourceDep.Builder
                 {
                     // 无视Mono Scrpt BuiltIn类型
                     if (depObjType != typeof(MonoScript))
-                        KLogger.LogError("Un handle Libray builtin resource, Type:{0}, Name: {1}", depObjType, @object.name);
+                        Log.Error("Un handle Libray builtin resource, Type:{0}, Name: {1}", depObjType, @object.name);
                 }
             }
 
@@ -320,7 +320,7 @@ namespace KEngine.ResourceDep.Builder
             {
                 if (!InternalEditorUtility.inBatchMode)
                 {
-                    KLogger.LogWarning("Asset {0}, Type: {1}, no need build", assetPath, extType);
+                    Log.Warning("Asset {0}, Type: {1}, no need build", assetPath, extType);
                 }
                 return false;
             }
@@ -423,13 +423,13 @@ namespace KEngine.ResourceDep.Builder
                 //catch (Exception e)
                 //{
                 //    // 会出现DirectoryNotFound，但是目录明明就存在！ 先Catch
-                //    KLogger.LogError("Exception: {0}", e.Message);
+                //    Log.Error("Exception: {0}", e.Message);
                 //    var dirPath = Path.GetDirectoryName(fullManifestPath);
                 //    if (Directory.Exists(dirPath))
-                //        KLogger.LogError("Directory Exists: {0}", dirPath);
+                //        Log.Error("Directory Exists: {0}", dirPath);
                 //    else
                 //    {
-                //        KLogger.LogError("Directory not exists: {0}", dirPath);
+                //        Log.Error("Directory not exists: {0}", dirPath);
                 //    }
                 //}
             }
@@ -437,12 +437,12 @@ namespace KEngine.ResourceDep.Builder
             if (result)
             {
                 var abInfo = new FileInfo(buildToFullPath);
-                KLogger.Log("Build AssetBundle： {0} / CRC: {1} / Time: {2:F4}s / Size: {3:F3}KB / FullPath: {4} / RelPath: {5}", path, crc, (DateTime.Now - time).TotalSeconds,
+                Log.Info("Build AssetBundle： {0} / CRC: {1} / Time: {2:F4}s / Size: {3:F3}KB / FullPath: {4} / RelPath: {5}", path, crc, (DateTime.Now - time).TotalSeconds,
                     abInfo.Length / 1024d, buildToFullPath, buildToRelativePath);
             }
             else
             {
-                KLogger.LogError("生成文件失败： {0}, crc: {1} 耗时: {2:F5}, 完整路径: {3}", path, crc,
+                Log.Error("生成文件失败： {0}, crc: {1} 耗时: {2:F5}, 完整路径: {3}", path, crc,
                     (DateTime.Now - time).TotalSeconds, buildToFullPath);
             }
             return new BuildBundleResult
@@ -523,7 +523,7 @@ namespace KEngine.ResourceDep.Builder
             {
                 if (depObj == null)
                 {
-                    KLogger.LogError("Found NULL obj when collect dep from '{0}'", buildObj);
+                    Log.Error("Found NULL obj when collect dep from '{0}'", buildObj);
                     continue;
                 }
                 var buildAssetPath = GetBuildAssetPath(depObj);
@@ -575,7 +575,7 @@ namespace KEngine.ResourceDep.Builder
             {
                 if (depInfo.Asset == null)
                 {
-                    KLogger.LogError("Null Object on Path: {0}", depInfo.BuildAssetPath);
+                    Log.Error("Null Object on Path: {0}", depInfo.BuildAssetPath);
                     continue;
                 }
                 if (!HasPushDep(depInfo.Asset))
@@ -599,7 +599,7 @@ namespace KEngine.ResourceDep.Builder
 
             if (String.IsNullOrEmpty(assetPath))
             {
-                KLogger.LogError("Error on Obj: {0}", unityObject.name);
+                Log.Error("Error on Obj: {0}", unityObject.name);
                 return null;
             }
 
@@ -611,7 +611,7 @@ namespace KEngine.ResourceDep.Builder
             //var shadersPrefab = AssetDatabase.LoadAssetAtPath(ShadersPrefabUnityAssetPath, typeof(GameObject));
             //if (shadersPrefab == null)
             //{
-            //    KLogger.LogError("Cannot find the shaders prefab: {0}", ShadersPrefabUnityAssetPath);
+            //    Log.Error("Cannot find the shaders prefab: {0}", ShadersPrefabUnityAssetPath);
             //}
             //else
             //{
@@ -725,7 +725,7 @@ namespace KEngine.ResourceDep.Builder
                     return AssetExtType.Ttf;
                 else
                 {
-                    KLogger.LogWarning("Un handle Libray builtin resource, Type:{0}, Name: {1}", depObjType, obj.name);
+                    Log.Warning("Un handle Libray builtin resource, Type:{0}, Name: {1}", depObjType, obj.name);
                 }
             }
 
@@ -793,7 +793,7 @@ namespace KEngine.ResourceDep.Builder
                 BuildPipeline.PopAssetDependencies();
             }
 
-            KLogger.Log("Clear pushed ResourceDep pool count: {0}", DependencyPool.Count);
+            Log.Info("Clear pushed ResourceDep pool count: {0}", DependencyPool.Count);
             DependencyPool.Clear();
         }
 
@@ -812,7 +812,7 @@ namespace KEngine.ResourceDep.Builder
                 if (File.Exists(tmpFile))
                     File.Delete(tmpFile);
             }
-            KLogger.Log("Clear Temp Files Count: {0}, Files: {1}", TempFiles.Count,
+            Log.Info("Clear Temp Files Count: {0}, Files: {1}", TempFiles.Count,
                 String.Join("\n", TempFiles.ToArray()));
             TempFiles.Clear();
 
@@ -822,11 +822,11 @@ namespace KEngine.ResourceDep.Builder
                 if (Directory.Exists(tmpDir))
                     Directory.Delete(tmpDir, true);
             }
-            KLogger.Log("Clear Temp Dirs Count: {0}, Files: {1}", TempDirs.Count, String.Join("\n", TempDirs.ToArray()));
+            Log.Info("Clear Temp Dirs Count: {0}, Files: {1}", TempDirs.Count, String.Join("\n", TempDirs.ToArray()));
             TempDirs.Clear();
             AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
 
-            KLogger.Log("Builded AssetBundle Count: {0}, They are: \n {1}", BuildedPool.Count, String.Join("\n", BuildedPool.KToArray()));
+            Log.Info("Builded AssetBundle Count: {0}, They are: \n {1}", BuildedPool.Count, String.Join("\n", BuildedPool.KToArray()));
         }
 
         [MenuItem("Assets/Build Asset Bundles Without KEngine.ResourceDep", false, 1010)]

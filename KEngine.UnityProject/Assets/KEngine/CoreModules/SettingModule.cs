@@ -153,7 +153,7 @@ namespace KEngine.Modules
         {
             if (!IsFileSystemMode)
             {
-                Log.LogError("[WatchSetting] Available in Unity Editor mode only!");
+                Log.Error("[WatchSetting] Available in Unity Editor mode only!");
                 return;
             }
             if (_cacheWatchers == null)
@@ -164,7 +164,7 @@ namespace KEngine.Modules
 
             if (!Directory.Exists(dirPath))
             {
-                Log.LogError("[WatchSetting] Not found Dir: {0}", dirPath);
+                Log.Error("[WatchSetting] Not found Dir: {0}", dirPath);
                 return;
             }
             if (!_cacheWatchers.TryGetValue(dirPath, out watcher))

@@ -202,7 +202,7 @@ namespace KEngine
              bool isLog = true)
         {
             if (string.IsNullOrEmpty(url))
-                Log.LogError("尝试获取一个空的资源路径！");
+                Log.Error("尝试获取一个空的资源路径！");
 
             string docUrl;
             bool hasDocUrl = TryGetDocumentResourceUrl(url, out docUrl);
@@ -218,7 +218,7 @@ namespace KEngine
                 if (hasDocUrl)
                 {
                     if (Application.isEditor)
-                        Log.LogWarning("[Use PersistentDataPath] {0}", docUrl);
+                        Log.Warning("[Use PersistentDataPath] {0}", docUrl);
                     fullPath = docUrl;
                     return true;
                 }
@@ -228,7 +228,7 @@ namespace KEngine
             if (!hasInAppUrl) // 连本地资源都没有，直接失败吧 ？？ 沒有本地資源但又遠程資源？竟然！!?
             {
                 if (isLog)
-                    Log.LogError("[Not Found] StreamingAssetsPath Url Resource: {0}", url);
+                    Log.Error("[Not Found] StreamingAssetsPath Url Resource: {0}", url);
                 fullPath = null;
                 return false;
             }
@@ -290,7 +290,7 @@ namespace KEngine
                 var result = FileExistsWithDifferentCase(StreamingPlatformPathWithoutFileProtocol + url);
                 if (!result)
                 {
-                    Log.LogError("[大小写敏感]发现一个资源 {0}，大小写出现问题，在Windows可以读取，手机不行，请改表修改！", url);
+                    Log.Error("[大小写敏感]发现一个资源 {0}，大小写出现问题，在Windows可以读取，手机不行，请改表修改！", url);
                 }
             }
             return true;

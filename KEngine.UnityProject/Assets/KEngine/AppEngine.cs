@@ -76,7 +76,7 @@ namespace KEngine
         //            var appVersionStr = GetConfig(KEngineDefaultConfigs.AppVersion);
         //            if (string.IsNullOrEmpty(appVersionStr))
         //            {
-        //                Log.LogError("Cannot find AppVersion in KEngineConfig.txt, use 1.0.0.0 as default");
+        //                Log.Error("Cannot find AppVersion in KEngineConfig.txt, use 1.0.0.0 as default");
         //                appVersionStr = "1.0.0.0.alpha.default";
         //            }
         //            _appVersion = new AppVersion(appVersionStr);
@@ -132,7 +132,7 @@ namespace KEngine
 
             if (EngineInstance != null)
             {
-                Log.LogError("Duplicated Instance Engine!!!");
+                Log.Error("Duplicated Instance Engine!!!");
             }
 
             EngineInstance = this;
@@ -270,7 +270,7 @@ namespace KEngine
             if (value == null)
             {
                 if (showLog)
-                    Log.LogError("Cannot get config, section: {0}, key: {1}", section, key);
+                    Log.Error("Cannot get config, section: {0}, key: {1}", section, key);
             }
             return value;
         }

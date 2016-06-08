@@ -73,7 +73,7 @@ namespace KEngine
                 if (!isOk)
                 {
                     OnFinish(null);
-                    Log.LogError("[InstanceAssetLoader]Error on assetfilebridge loaded... {0}", url);
+                    Log.Error("[InstanceAssetLoader]Error on assetfilebridge loaded... {0}", url);
                     return;
                 }
 

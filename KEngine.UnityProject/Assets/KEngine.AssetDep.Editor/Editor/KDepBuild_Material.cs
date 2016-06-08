@@ -69,7 +69,7 @@ public class KDepBuild_Material
         string matPath = AssetDatabase.GetAssetPath(mat).Replace("Assets/", "");
         if (string.IsNullOrEmpty(matPath))
         {
-            KLogger.LogWarning("没有路径材质Material: {0}   可能是动态创建的？", mat.name);
+            Log.Warning("没有路径材质Material: {0}   可能是动态创建的？", mat.name);
             return null;
         }
 
@@ -111,7 +111,7 @@ public class KDepBuild_Material
 
                 if (fileShader == null)
                 {
-                    KLogger.LogError("Cannot Build Builtin Shader: {0}", shader.name);
+                    Log.Error("Cannot Build Builtin Shader: {0}", shader.name);
                 }
             }
         }
@@ -209,7 +209,7 @@ public class KDepBuild_Material
                 }
                 else
                 {
-                    KLogger.LogWarning("找到一个非Texture2D, Type:{0} Mat:{1} PropName:{2}", tex.GetType(), mm.name, texProp);
+                    Log.Warning("找到一个非Texture2D, Type:{0} Mat:{1} PropName:{2}", tex.GetType(), mm.name, texProp);
                     shaderProp.Type = KSerializeMaterialProperty.ShaderType.RenderTexture;
                         // Shader的RenderTexture不打包，一般由脚本动态生成
                     shaderProp.PropValue = null;
@@ -218,7 +218,7 @@ public class KDepBuild_Material
             }
             else
             {
-                KLogger.Log("[_GetShaderTexProp]处理纹理时发现获取不到纹理, 材质{0}  Shader属性{1}", mm.name, texProp);
+                Log.Info("[_GetShaderTexProp]处理纹理时发现获取不到纹理, 材质{0}  Shader属性{1}", mm.name, texProp);
                 return null;
             }
         }

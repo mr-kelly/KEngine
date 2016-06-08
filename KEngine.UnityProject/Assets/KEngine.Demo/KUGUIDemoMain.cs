@@ -76,13 +76,13 @@ public class KUGUIDemoMain : MonoBehaviour
         ExampleSettings.OnReload = () =>
         {
             var reloadedInfo = ExampleSettings.Get("C_9888");
-            KLogger.Log("Reload ExampleInfos! Now info: {0} -> {1}", "C_9888", reloadedInfo.Name);
+            Log.Info("Reload ExampleInfos! Now info: {0} -> {1}", "C_9888", reloadedInfo.Name);
         };
 
 
 
 
-        KLogger.Log("Start reading streamingAssets Test...");
+        Log.Info("Start reading streamingAssets Test...");
         UIModule.Instance.CallUI(uiName, (ui, args) =>
         {
             var tip = string.Format("Reading from streamingAssets, content: {0}", Encoding.UTF8.GetString(KResourceModule.LoadSyncFromStreamingAssets("TestFile.txt")));
@@ -96,16 +96,16 @@ public class KUGUIDemoMain : MonoBehaviour
     //{
     //    KGameSettings _ = KGameSettings.Instance;
 
-    //    KLogger.Log("Begin Load tab file...");
+    //    Log.Info("Begin Load tab file...");
 
     //    var tabContent =
     //        File.ReadAllText(Application.dataPath + "/" + KEngine.AppEngine.GetConfig("ProductRelPath") +
     //                         "/Setting/test_tab.bytes");
     //    _.LoadTab<CTestTabInfo>(tabContent);
-    //    KLogger.Log("Output the tab file...");
+    //    Log.Info("Output the tab file...");
     //    foreach (CTestTabInfo info in _.GetInfos<CTestTabInfo>())
     //    {
-    //        KLogger.Log("Id:{0}, Name: {1}", info.Id, info.Name);
+    //        Log.Info("Id:{0}, Name: {1}", info.Id, info.Name);
     //    }
     //}
 }

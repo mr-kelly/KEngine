@@ -73,7 +73,7 @@ public partial class KBuildTools_AssetDep
     {
         if (!File.Exists(abPath))
         {
-            KLogger.LogError("[EncryptAssetBundle]Cannot Find File: {0}", abPath);
+            Log.Error("[EncryptAssetBundle]Cannot Find File: {0}", abPath);
             return;
         }
 
@@ -81,7 +81,7 @@ public partial class KBuildTools_AssetDep
         {
             if (stream.Length <= 2)
             {
-                KLogger.LogError("[EncryptAssetBundle]Stream大小过短！ ： {0}", relativePath);
+                Log.Error("[EncryptAssetBundle]Stream大小过短！ ： {0}", relativePath);
                 return;
             }
 
@@ -108,7 +108,7 @@ public partial class KBuildTools_AssetDep
 
     private static void BeforeBuildAssetBundle(Object asset, string path, string relativePath)
     {
-        //KLogger.Log("No Func in BeforeBuildAssetBundle");
+        //Log.Info("No Func in BeforeBuildAssetBundle");
     }
 
     private static void AfterBuildAssetBundle(Object asset, string path, string relativePath)

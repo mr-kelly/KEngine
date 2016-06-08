@@ -137,7 +137,7 @@ public class KNGUIBridge : IUIBridge
         if (comName == "Camera")
             return UiCamera;
 
-        KLogger.Assert(false);
+        Debuger.Assert(false);
         return null;
     }
 
@@ -162,7 +162,7 @@ public class KNGUIBridge : IUIBridge
     {
         GameObject uiRootobj = GameObject.Find("NGUIRoot") ?? new GameObject("NGUIRoot");
         UiRoot = uiRootobj.GetComponent<UIRoot>() ?? uiRootobj.AddComponent<UIRoot>();
-        KLogger.Assert(UiRoot);
+        Debuger.Assert(UiRoot);
         UiRoot.scalingStyle = UIRoot.Scaling.FixedSizeOnMobiles;
 
         // 尝试将NGUI转化成跟2dToolkit镜头一致显示
@@ -183,7 +183,7 @@ public class KNGUIBridge : IUIBridge
 
         Transform panelTrans = panelRootObj.transform;
         PanelRoot = panelRootObj.AddComponent<UIPanel>();
-        KLogger.Assert(PanelRoot);
+        Debuger.Assert(PanelRoot);
         PanelRoot.generateNormals = true;
 
         var uiCamTrans = uiRootobj.transform.Find("UICamera");

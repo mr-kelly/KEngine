@@ -58,7 +58,7 @@ namespace KEngine.AssetDep.Editor
             }
             else
             {
-                KLogger.LogWarning("找不到Label的字体: {0}, 场景: {1}", label.name, EditorApplication.currentScene);
+                Log.Warning("找不到Label的字体: {0}, 场景: {1}", label.name, EditorApplication.currentScene);
             }
         }
     }
@@ -77,7 +77,7 @@ namespace KEngine.AssetDep.Editor
                 sprite.atlas = null;
             }
             else
-                KLogger.LogWarning("UISprite null Atlas: {0}, Scene: {1}", sprite.name, EditorApplication.currentScene);
+                Log.Warning("UISprite null Atlas: {0}, Scene: {1}", sprite.name, EditorApplication.currentScene);
         }
     }
 
@@ -100,7 +100,7 @@ namespace KEngine.AssetDep.Editor
             }
             else
             {
-                //KLogger.Log("缺少Texture的UiTexture: {0}", tex.name);
+                //Log.Info("缺少Texture的UiTexture: {0}", tex.name);
             }
         }
     }
@@ -135,13 +135,13 @@ namespace KEngine.AssetDep.Editor
             }
             var scale = 1f; // TODO: scale read
             GameObject atlasPrefab = PrefabUtility.FindPrefabRoot(atlas.gameObject) as GameObject;
-            KLogger.Assert(atlasPrefab);
+            Log.Assert(atlasPrefab);
             string path = AssetDatabase.GetAssetPath(atlasPrefab); // prefab只用来获取路径，不打包不挖空
             bool needBuild = KAssetVersionControl.TryCheckNeedBuildWithMeta(path);
             if (needBuild)
                 KAssetVersionControl.TryMarkBuildVersion(path);
 
-            KLogger.Assert(path);
+            Log.Assert(path);
 
             path = KDependencyBuild.__GetPrefabBuildPath(path);
 
@@ -205,7 +205,7 @@ namespace KEngine.AssetDep.Editor
             }
             if (uiFont.atlas == null)
             {
-                KLogger.LogError("[BuildUIFont]uiFont Null Atlas: {0}, Scene: {1}", uiFont.name, EditorApplication.currentScene);
+                Log.Error("[BuildUIFont]uiFont Null Atlas: {0}, Scene: {1}", uiFont.name, EditorApplication.currentScene);
                 return "";
             }
             string uiFontPrefabPath = AssetDatabase.GetAssetPath(uiFont.gameObject);

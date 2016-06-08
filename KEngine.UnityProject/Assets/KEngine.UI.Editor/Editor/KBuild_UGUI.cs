@@ -103,7 +103,7 @@ namespace KEngine.Editor
             // Auto Link resources when play!
             if (!Directory.Exists(ResourcesSymbolLinkHelper.GetLinkPath()))
             {
-                Log.LogWarning("Auto Link Bundle Resources Path... {0}", ResourcesSymbolLinkHelper.GetLinkPath());
+                Log.Warning("Auto Link Bundle Resources Path... {0}", ResourcesSymbolLinkHelper.GetLinkPath());
                 ResourcesSymbolLinkHelper.SymbolLinkResource();
             }
         }
@@ -113,7 +113,7 @@ namespace KEngine.Editor
         {
             if (EditorApplication.isPlaying)
             {
-                Log.LogError("Cannot export in playing mode! Please stop!");
+                Log.Error("Cannot export in playing mode! Please stop!");
                 return;
             }
 #if !UNITY_5
@@ -141,7 +141,7 @@ namespace KEngine.Editor
 #else
                 var currentScene = EditorApplication.currentScene;
 #endif
-                Log.LogError("Not found KUIWindowAsset in scene `{0}`", currentScene);
+                Log.Error("Not found KUIWindowAsset in scene `{0}`", currentScene);
             }
 
             return windowAssets;

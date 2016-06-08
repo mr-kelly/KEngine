@@ -59,7 +59,7 @@ namespace KEngine.Editor
                 }
                 catch (Exception e)
                 {
-                    Log.LogError("无法打开Excel: {0}, 可能原因：正在打开？或是Office2007格式（尝试另存为）？ {1}", excelPath, e.Message);
+                    Log.Error("无法打开Excel: {0}, 可能原因：正在打开？或是Office2007格式（尝试另存为）？ {1}", excelPath, e.Message);
                     IsLoadSuccess = false;
                 }
             }
@@ -79,7 +79,7 @@ namespace KEngine.Editor
                     var cell = headerRow.GetCell(columnIndex);
                     if (cell == null)
                     {
-                        //Log.LogError("Null Cel on Column: {0}, File: {1}", columnIndex, excelPath);
+                        //Log.Error("Null Cel on Column: {0}, File: {1}", columnIndex, excelPath);
                         // 可能是空字符串的格子，忽略！
                         continue;
                     }
@@ -151,7 +151,7 @@ namespace KEngine.Editor
         {
             if (!ColName2Index.ContainsKey(columnName))
             {
-                Log.LogError("No Column: {0} of File: {1}", columnName, Path);
+                Log.Error("No Column: {0} of File: {1}", columnName, Path);
                 return;
             }
             var theRow = Worksheet.GetRow(row);
@@ -200,8 +200,8 @@ namespace KEngine.Editor
             }
             //catch (Exception e)
             //{
-            //    Log.LogError(e.Message);
-            //    Log.LogError("是否打开了Excel表？");
+            //    Log.Error(e.Message);
+            //    Log.Error("是否打开了Excel表？");
             //}
         }
     }

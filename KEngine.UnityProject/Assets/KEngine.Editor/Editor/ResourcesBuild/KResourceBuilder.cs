@@ -140,7 +140,7 @@ namespace KEngine.Editor
             }
             catch (Exception e)
             {
-                Log.LogError("[Fail] Auto Build... {0}, Exception: {1}, Used Time: {2}, CurrentScene: {3}, Stack: {4}",
+                Log.Error("[Fail] Auto Build... {0}, Exception: {1}, Used Time: {2}, CurrentScene: {3}, Stack: {4}",
                     export.GetType().Name,
                     e.Message + "," + (e.InnerException != null ? e.InnerException.Message : ""), DateTime.Now - time,
 #if UNITY_5
