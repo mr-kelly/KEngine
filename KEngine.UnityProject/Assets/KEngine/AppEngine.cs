@@ -91,7 +91,7 @@ namespace KEngine
         /// <summary>
         /// Modules passed from the CosmosEngine.New function. All your custom game logic modules
         /// </summary>
-        public KEngine.IModuleInitable[] GameModules { get; private set; }
+        public IList<IModuleInitable> GameModules { get; private set; }
 
         /// <summary>
         /// 是否初始化完成
@@ -115,7 +115,7 @@ namespace KEngine
         /// <summary>
         /// Engine entry.... all begins from here
         /// </summary>
-        public static AppEngine New(GameObject gameObjectToAttach, IAppEntry entry, IModuleInitable[] modules)
+        public static AppEngine New(GameObject gameObjectToAttach, IAppEntry entry, IList<IModuleInitable> modules)
         {
             Debuger.Assert(gameObjectToAttach != null && modules != null);
             AppEngine appEngine = gameObjectToAttach.AddComponent<AppEngine>();
