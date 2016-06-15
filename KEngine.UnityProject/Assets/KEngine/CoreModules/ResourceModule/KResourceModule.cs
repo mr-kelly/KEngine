@@ -525,12 +525,29 @@ namespace KEngine
         }
 
         /// <summary>
+        /// check file exists of streamingAssets. On Android will use plugin to do that.
+        /// </summary>
+        /// <param name="path">relative path,  when file is "file:///android_asset/test.txt", the pat is "test.txt"</param>
+        /// <returns></returns>
+        public static bool IsStreamingAssetsExists(string path)
+        {
+            if (Application.platform == RuntimePlatform.Android)
+                return KEngineAndroidPlugin.IsAssetExists(path);
+
+            var fullPath = Path.Combine(Application.streamingAssetsPath, path);
+            return File.Exists(fullPath);
+        }
+
+        /// <summary>
         /// Load file from streamingAssets. On Android will use plugin to do that.
         /// </summary>
         /// <param name="path">relative path,  when file is "file:///android_asset/test.txt", the pat is "test.txt"</param>
         /// <returns></returns>
         public static byte[] LoadSyncFromStreamingAssets(string path)
         {
+            if (!IsStreamingAssetsExists(path))
+                throw new Exception("Not exist StreamingAssets path: " + path);
+
             if (Application.platform == RuntimePlatform.Android)
                 return KEngineAndroidPlugin.GetAssetBytes(path);
 

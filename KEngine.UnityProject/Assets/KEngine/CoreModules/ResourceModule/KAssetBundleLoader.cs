@@ -96,8 +96,7 @@ namespace KEngine
                 return;
 
             _hasPreloadAssetBundleManifest = true;
-            var mainAssetBundlePath = string.Format("{0}/{1}", KResourceModule.StreamingPlatformPathWithoutFileProtocol,
-                KResourceModule.BuildPlatformName);
+            var mainAssetBundlePath = string.Format("{0}/{1}/{1}", KResourceModule.BundlesDirName,KResourceModule.BuildPlatformName);
             _mainAssetBundle = AssetBundle.LoadFromMemory(KResourceModule.LoadSyncFromStreamingAssets(mainAssetBundlePath));
             _assetBundleManifest = _mainAssetBundle.LoadAsset("AssetBundleManifest") as AssetBundleManifest;
 

@@ -31,7 +31,6 @@ using IniParser;
 using IniParser.Model;
 using IniParser.Model.Formatting;
 using IniParser.Parser;
-using UnityEditor;
 
 namespace KEngine
 {
@@ -63,15 +62,7 @@ SettingCodeIgnorePattern = (I18N/.*)|(StringsTable.*)
 UIModuleBridge = KSFramework.UGUIBridge	
 
 ";
-
-        [MenuItem("Test/TestIni")]
-        public static void Test()
-        {
-            var c = new EngineConfigs(null);
-            c.GetConfig("KEngine.UI", "fuc");
-
-        }
-        private IniData _iniData;
+        private readonly IniData _iniData;
         public EngineConfigs(string customConfigs)
         {
             var parser = new IniDataParser();

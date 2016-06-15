@@ -207,7 +207,7 @@ namespace KEngine.Modules
         /// <returns></returns>
         private static byte[] LoadSettingFromStreamingAssets(string path)
         {
-            var resPath = SettingFolderName + "/" + Path.ChangeExtension(path, null);
+            var resPath = SettingFolderName + "/" + path;
             var bytes = KResourceModule.LoadSyncFromStreamingAssets(resPath);
             bytes = SettingBytesFilter != null ? SettingBytesFilter(bytes) : bytes;
             return bytes;
