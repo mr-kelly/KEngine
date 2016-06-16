@@ -209,19 +209,19 @@ namespace KEngine
         public static void LogConsole_MultiThread(string log, params object[] args)
         {
             if (IsUnityEditor)
-                DoLog(string.Format(log, args), KLogLevel.Info);
+                DoLog(log, args, KLogLevel.Info);
             else
                 Console.WriteLine(log, args);
         }
 
         public static void Trace(string log, params object[] args)
         {
-            DoLog(string.Format(log, args), KLogLevel.Trace);
+            DoLog(log, args, KLogLevel.Trace);
         }
 
         public static void Debug(string log, params object[] args)
         {
-            DoLog(string.Format(log, args), KLogLevel.Debug);
+            DoLog(log, args, KLogLevel.Debug);
         }
 
         //[Obsolete]
@@ -231,7 +231,7 @@ namespace KEngine
         //}
         public static void Info(string log, params object[] args)
         {
-            DoLog(string.Format(log, args), KLogLevel.Info);
+            DoLog(log, args, KLogLevel.Info);
         }
 
         public static void Logs(params object[] logs)
@@ -242,7 +242,7 @@ namespace KEngine
                 sb.Append(logs[i].ToString());
                 sb.Append(", ");
             }
-            DoLog(sb.ToString(), KLogLevel.Info);
+            DoLog(sb.ToString(), null, KLogLevel.Info);
         }
 
         public static void LogException(Exception e)
@@ -261,7 +261,7 @@ namespace KEngine
             string log = string.Format("[ERROR]{0}\n\n{1}:{2}\t{3}", err, sf.GetFileName(), sf.GetFileLineNumber(),
                 sf.GetMethod());
             Console.Write(log);
-            DoLog(log, KLogLevel.Error);
+            DoLog(log, null, KLogLevel.Error);
 
             if (LogErrorEvent != null)
                 LogErrorEvent(err);
@@ -288,14 +288,12 @@ namespace KEngine
 
         public static void Warning(string err, params object[] args)
         {
-            string log = string.Format(err, args);
-            DoLog(log, KLogLevel.Warning);
+            DoLog(err, args, KLogLevel.Warning);
         }
 
         public static void LogWarning(string err, params object[] args)
         {
-            string log = string.Format(err, args);
-            DoLog(log, KLogLevel.Warning);
+            DoLog(err, args, KLogLevel.Warning);
         }
 
         public static void Pause()
@@ -303,10 +301,12 @@ namespace KEngine
             UnityEngine.Debug.Break();
         }
 
-        private static void DoLog(string szMsg, KLogLevel emLevel)
+        private static void DoLog(string szMsg, object[] args, KLogLevel emLevel)
         {
             if (LogLevel > emLevel)
                 return;
+            if (args != null)
+                szMsg = string.Format(szMsg, args);
             szMsg = string.Format("[{0}]{1}\n\n=================================================================\n\n",
                 DateTime.Now.ToString("HH:mm:ss.ffff"), szMsg);
 
