@@ -436,6 +436,7 @@ namespace KEngine
                         buildPlatformName = "Android";
                         break;
                     case "iPhone": // UnityEditor.BuildTarget.iPhone:
+                    case "iOS":
                         buildPlatformName = "IOS";
                         break;
                     default:
