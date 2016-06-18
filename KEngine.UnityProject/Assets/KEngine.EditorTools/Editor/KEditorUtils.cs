@@ -79,7 +79,7 @@ namespace KUnityEditorTools
         /// </summary>
         public static void ClearConsoleLog()
         {
-            Assembly assembly = Assembly.GetAssembly(typeof(ActiveEditorTracker));
+            Assembly assembly = Assembly.GetAssembly(typeof (ActiveEditorTracker));
             Type type = assembly.GetType("UnityEditorInternal.LogEntries");
             MethodInfo method = type.GetMethod("Clear");
             method.Invoke(new object(), null);
@@ -171,6 +171,7 @@ namespace KUnityEditorTools
                 eachCallback(cleanFilePath, fileRelativePath);
             }
         }
+
         /// <summary>
         /// 将丑陋的windows路径，替换掉\字符
         /// </summary>
@@ -214,7 +215,7 @@ namespace KUnityEditorTools
             return retMatches;
         }
 
-        static void AddFileNamesToList(string sourceDir, List<string> allFiles)
+        private static void AddFileNamesToList(string sourceDir, List<string> allFiles)
         {
 
             string[] fileEntries = Directory.GetFiles(sourceDir);
@@ -236,6 +237,27 @@ namespace KUnityEditorTools
 
         }
 
-    }
+        /// <summary>
+        /// 从所有的程序集收集指定类型，public, 包括继承的
+        /// </summary>
+        /// <returns></returns>
+        public static IList<Type> FindAllPublicTypes(Type findType)
+        {
+            var list = new List<Type>();
+            Assembly[] Assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            for (int n = 0; n < Assemblies.Length; n++)
+            {
+                Assembly asm = Assemblies[n];
+                foreach (var type in asm.GetExportedTypes())
+                {
+                    if (findType.IsAssignableFrom(type) || findType == type)
+                    {
+                        list.Add(type);
+                    }
+                }
+            }
+            return list;
+        }
 
+    }
 }
