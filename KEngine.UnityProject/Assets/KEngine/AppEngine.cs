@@ -24,12 +24,15 @@
 
 #endregion
 
+#define USE_UGUI_FPS
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using CosmosTable;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace KEngine
 {
@@ -216,13 +219,17 @@ namespace KEngine
             }
         }
 
-        private void OnGUI()
+#if USE_UGUI_FPS
+        protected virtual void Update()
+#else
+        protected virtual void OnGUI()
+#endif
         {
             if (ShowFps)
             {
                 if (RenderWatcher == null)
                     RenderWatcher = new FpsWatcher(0.95f);
-                RenderWatcher.OnGUIHandler();
+                RenderWatcher.OnUIUpdate();
             }
         }
 
@@ -300,25 +307,51 @@ namespace KEngine
         private string _cacheMemoryStr;
         private string _cacheFPSStr;
 
+#if USE_UGUI_FPS
+        private Text CacheText;
+#endif
+
         public FpsWatcher(float sensitivity)
         {
             Value = 0f;
             Sensitivity = sensitivity;
+#if USE_UGUI_FPS
+            var canvasGameObj = new GameObject("__FPSCanvas__").AddComponent<Canvas>();
+            canvasGameObj.renderMode = RenderMode.ScreenSpaceOverlay;
+            var fpsTextObj = new GameObject("FPSText").AddComponent<Text>();
+            fpsTextObj.transform.SetParent(canvasGameObj.transform);
+            fpsTextObj.rectTransform.pivot = new Vector2(0, 1);
+            fpsTextObj.rectTransform.localPosition = Vector3.zero;
+            fpsTextObj.rectTransform.anchorMin = new Vector2(0, 1);
+            fpsTextObj.rectTransform.anchorMax = new Vector2(0, 1);
+            fpsTextObj.rectTransform.sizeDelta = new Vector2(300, 100);
+            var font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            fpsTextObj.font = font;
+            CacheText = fpsTextObj;
+#endif
         }
 
-        public void OnGUIHandler()
+        public void OnUIUpdate()
         {
             if (Time.frameCount % 30 == 0 || _cacheMemoryStr == null || _cacheFPSStr == null)
             {
                 _cacheMemoryStr = string.Format("Memory: {0:F3}KB", UnityEngine.Profiler.GetMonoUsedSize() / 1024f);
                 _cacheFPSStr = Watch("FPS: {0:N0}", 1f / Time.deltaTime);
+#if USE_UGUI_FPS
+                if (CacheText == null) return;
+                CacheText.text = _cacheMemoryStr + "\n" + _cacheFPSStr;
+#endif
             }
 
+#if !USE_UGUI_FPS
+            // Must run in OnGUI
             GUILayout.BeginVertical(GUILayout.Width(300));
             GUILayout.Label(_cacheMemoryStr);
             GUILayout.Label(_cacheFPSStr);
             GUILayout.EndVertical();
+#endif
         }
+
         public string Watch(string format, float value)
         {
             Value = Value * Sensitivity + value * (1f - Sensitivity);
