@@ -79,7 +79,7 @@ namespace KEngine.Editor
             
         }
 
-        [MenuItem("KEngine/AssetBundle/Build All")]
+        [MenuItem("KEngine/AssetBundle/Build All %&b")]
         public static void BuildAllAssetBundles()
         {
             if (EditorApplication.isPlaying)
