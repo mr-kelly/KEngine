@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace CosmosTable
+namespace KEngine.Table
 {
     /// <summary>
     /// Write the TabFile!

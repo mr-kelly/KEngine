@@ -24,9 +24,9 @@
 using System;
 using System.Collections.Generic;
 
-namespace CosmosTable
+namespace KEngine.Table
 {
-    public class TableRowParser
+    public partial class TableRowParser
     {
         public string Get_String(string value, string defaultValue)
         {

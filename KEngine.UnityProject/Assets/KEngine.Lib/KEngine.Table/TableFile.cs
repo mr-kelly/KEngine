@@ -5,7 +5,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 
-namespace CosmosTable
+namespace KEngine.Table
 {
     public enum TableFileExceptionType
     {

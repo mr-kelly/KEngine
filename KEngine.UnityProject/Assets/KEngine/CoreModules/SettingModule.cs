@@ -28,7 +28,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using System.Text;
-using CosmosTable;
+using KEngine.Table;
 
 namespace KEngine.Modules
 {

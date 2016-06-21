@@ -26,7 +26,7 @@
 
 using System;
 using System.Collections.Generic;
-using CosmosTable;
+using KEngine.Table;
 
 namespace KEngine.Modules
 {
