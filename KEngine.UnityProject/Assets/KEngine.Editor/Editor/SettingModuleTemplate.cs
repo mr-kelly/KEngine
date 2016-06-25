@@ -35,9 +35,9 @@ namespace KEngine.Editor
 
 using System.Collections;
 using System.Collections.Generic;
-using CosmosTable;
 using KEngine;
 using KEngine.Modules;
+using KEngine.Table;
 namespace {{ NameSpace }}
 {
 	/// <summary>
