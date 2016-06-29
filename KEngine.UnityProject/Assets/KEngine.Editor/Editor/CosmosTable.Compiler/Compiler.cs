@@ -198,7 +198,7 @@ namespace CosmosTable
                                     strBuilder.Append("\n");
                             }
 
-                            if (loopColumn > 0 && loopColumn != (columnCount - 1)) // 最后一列不需加tab
+                            if (loopColumn > 0 && loopColumn < columnCount) // 最后一列不需加tab
                                 strBuilder.Append("\t");
 
                             // 如果单元格是字符串，换行符改成\\n

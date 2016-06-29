@@ -29,14 +29,9 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-/*
 /// <summary>
-/// ��������Ui�Ű�ʱ���ж���, by KK
-/// 
-/// ����x, y, z���ֽ��еȾ�����
+/// AlignEditor用于UI编辑的批量对齐。  第一个项目的工具， by chenpeilin
 /// </summary>
-*/
-
 public class AlignEditor : EditorWindow
 {
     public string alignX = "0";
@@ -58,7 +53,7 @@ public class AlignEditor : EditorWindow
         alignY = EditorGUILayout.TextField("Y", alignY);
         alignZ = EditorGUILayout.TextField("Z", alignZ);
         /* ����ѡ�ж���ť */
-        if (GUILayout.Button("Align Selection"))
+        if (GUILayout.Button("Align jelection"))
         {
             GameObject[] gameObjects = this.getSortedGameObjects();
 
@@ -83,7 +78,7 @@ public class AlignEditor : EditorWindow
 
         GUILayout.Label("Other Align");
 
-        GUILayout.BeginHorizontal("");
+        GUILayout.BeginHorizontal();
 
         if (GUILayout.Button("Left/Right Align"))
         {
