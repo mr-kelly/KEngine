@@ -24,11 +24,17 @@
 
 #endregion
 
+#if UNITY_5 || UNITY_4 || UNITY_3
+#define UNITY
+#endif
+
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+#if UNITY
 using UnityEngine;
+#endif
 
 namespace KEngine
 {
@@ -51,37 +57,57 @@ namespace KEngine
     /// </summary>
     public class Log
     {
+        public delegate void LogCallback(string condition, string stackTrace, KLogLevel type);
         public static KLogLevel LogLevel = KLogLevel.Info;
 
-        private static event Application.LogCallback LogCallbackEvent;
+        private static event LogCallback LogCallbackEvent;
         private static bool _hasRegisterLogCallback = false;
 
         /// <summary>
         /// 第一次使用时注册，之所以不放到静态构造器，因为多线程问题
         /// </summary>
         /// <param name="callback"></param>
-        public static void AddLogCallback(Application.LogCallback callback)
+        public static void AddLogCallback(LogCallback callback)
         {
             if (!_hasRegisterLogCallback)
             {
+#if UNITY
 #if UNITY_5
-                Application.logMessageReceivedThreaded += OnLogCallback;
+                Application.logMessageReceivedThreaded += GetUnityLogCallback(OnLogCallback);
 #else
-                Application.RegisterLogCallbackThreaded(OnLogCallback);
+                Application.RegisterLogCallbackThreaded(GetUnityLogCallback(OnLogCallback));
+#endif
 #endif
                 _hasRegisterLogCallback = true;
             }
             LogCallbackEvent += callback;
         }
 
-        public static void RemoveLogCallback(Application.LogCallback callback)
+#if UNITY
+        static Application.LogCallback GetUnityLogCallback(LogCallback callback)
+        {
+            Application.LogCallback unityCallback = (c, s, type) =>
+            {
+                KLogLevel logLevel;
+                if (type == LogType.Error) logLevel = KLogLevel.Error;
+                else if (type == LogType.Warning) logLevel = KLogLevel.Warning;
+                else logLevel = KLogLevel.Info;
+
+                OnLogCallback(c, s, logLevel);
+            };
+            return unityCallback;
+        }
+#endif
+        public static void RemoveLogCallback(LogCallback callback)
         {
             if (!_hasRegisterLogCallback)
             {
+#if UNITY
 #if UNITY_5
-                Application.logMessageReceivedThreaded -= OnLogCallback;
+                Application.logMessageReceivedThreaded += GetUnityLogCallback(callback);
 #else
-                Application.RegisterLogCallbackThreaded(OnLogCallback);
+                Application.RegisterLogCallbackThreaded(GetUnityLogCallback(OnLogCallback));
+#endif
 #endif
                 _hasRegisterLogCallback = true;
             }
@@ -89,17 +115,19 @@ namespace KEngine
         }
 
 
-        //static readonly bool IsDebugBuild = false;
+#if UNITY
         public static readonly bool IsUnityEditor = false;
+#endif
 
         public static event Action<string> LogErrorEvent;
 
         static Log()
         {
+#if UNITY
             // isDebugBuild先预存起来，因为它是一个get_属性, 在非Unity主线程里不能用，导致多线程网络打印log时报错
             try
             {
-                //IsDebugBuild = UnityEngine.Debug.isDebugBuild;
+                //IsDebugBuild = Debug.isDebugBuild;
                 IsUnityEditor = Application.isEditor;
             }
             catch (Exception e)
@@ -107,6 +135,8 @@ namespace KEngine
                 Log.LogConsole_MultiThread("Log Static Constructor Failed!");
                 Log.LogConsole_MultiThread(e.Message + " , " + e.StackTrace);
             }
+#endif
+
         }
 
         /// <summary>
@@ -131,11 +161,11 @@ namespace KEngine
             }
         }
 
-        public static void LogFileCallbackHandler(string condition, string stacktrace, UnityEngine.LogType type)
+        public static void LogFileCallbackHandler(string condition, string stacktrace, KLogLevel type)
         {
             try
             {
-                if (type == LogType.Log)
+                if (type > KLogLevel.Warning)
                     LogToFile(condition + "\n\n");
                 else
                     LogToFile(condition + stacktrace + "\n\n");
@@ -146,7 +176,7 @@ namespace KEngine
             }
         }
 
-        private static void OnLogCallback(string condition, string stacktrace, UnityEngine.LogType type)
+        private static void OnLogCallback(string condition, string stacktrace, KLogLevel type)
         {
             if (LogCallbackEvent != null)
             {
@@ -208,9 +238,11 @@ namespace KEngine
         // 这个使用系统的log，这个很特别，它可以再多线程里用，其它都不能再多线程内用！！！
         public static void LogConsole_MultiThread(string log, params object[] args)
         {
+#if UNITY
             if (IsUnityEditor)
                 DoLog(log, args, KLogLevel.Info);
             else
+#endif
                 Console.WriteLine(log, args);
         }
 
@@ -272,7 +304,7 @@ namespace KEngine
         {
             StackFrame[] stackFrames = new StackTrace(true).GetFrames();
             ;
-            StackFrame sf = stackFrames[Mathf.Min(stack, stackFrames.Length - 1)];
+            StackFrame sf = stackFrames[Math.Min(stack, stackFrames.Length - 1)];
             return sf;
         }
 
@@ -314,13 +346,25 @@ namespace KEngine
             {
                 case KLogLevel.Warning:
                 case KLogLevel.Trace:
+#if UNITY
                     UnityEngine.Debug.LogWarning(szMsg);
+#else
+                    Console.WriteLine(szMsg);
+#endif
                     break;
                 case KLogLevel.Error:
+#if UNITY
                     UnityEngine.Debug.LogError(szMsg);
+#else
+                    Console.WriteLine(szMsg);
+#endif
                     break;
                 default:
+#if UNITY
                     UnityEngine.Debug.Log(szMsg);
+#else
+                    Console.WriteLine(szMsg);
+#endif
                     break;
             }
         }
@@ -364,10 +408,15 @@ namespace KEngine
         {
             string logPath;
 
+#if UNITY
             if (IsUnityEditor)
+#endif
+
                 logPath = "logs/";
+#if UNITY
             else
-                logPath = UnityEngine.Application.persistentDataPath + "/" + "logs/";
+                logPath = Application.persistentDataPath + "/" + "logs/";
+#endif
 
             var now = DateTime.Now;
             var logName = string.Format("game_{0}_{1}_{2}.log", now.Year, now.Month, now.Day);

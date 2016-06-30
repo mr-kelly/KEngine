@@ -60,6 +60,17 @@ namespace KEngine.Table
             return string.IsNullOrEmpty(str) ? default(int) : int.Parse(str);
         }
 
+        public double Get_double(string value, string defaultValue)
+        {
+            var str = Get_string(value, defaultValue);
+            return string.IsNullOrEmpty(str) ? default(double) : double.Parse(str);
+        }
+        
+        public float Get_float(string value, string defaultValue)
+        {
+            var str = Get_string(value, defaultValue);
+            return string.IsNullOrEmpty(str) ? default(float) : float.Parse(str);
+        }
         public uint Get_uint(string value, string defaultValue)
         {
             var str = Get_string(value, defaultValue);
