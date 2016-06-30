@@ -1,12 +1,6 @@
-
-> 已经升级兼容Unity 5，并大量增加新功能到 [unity-5分支](https://github.com/mr-kelly/KEngine/tree/unity-5)
-> 新增KEngine+SLua组合的全功能框架 [KSFramework](https://github.com/mr-kelly/KSFramework)
-
-
 # KEngine
 
 [![Build status](https://ci.appveyor.com/api/projects/status/7x08hdfflwemq60h?svg=true)](https://ci.appveyor.com/project/mr-kelly/kengine)
-
 
 KEngine是一个用于Unity3D引擎的AssetBundle框架。
 
