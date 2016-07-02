@@ -129,7 +129,12 @@ namespace KEngine.Table
             }
         }
 
-        internal TableRow(int rowNumber, Dictionary<string, HeaderInfo> headerInfos)
+        public TableRow(int rowNumber, Dictionary<string, HeaderInfo> headerInfos)
+        {
+            Ctor(rowNumber, headerInfos);
+        }
+
+        private void Ctor(int rowNumber, Dictionary<string, HeaderInfo> headerInfos)
         {
             RowNumber = rowNumber;
             HeaderInfos = headerInfos;

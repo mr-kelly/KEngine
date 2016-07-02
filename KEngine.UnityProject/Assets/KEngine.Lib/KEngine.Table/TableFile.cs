@@ -200,7 +200,7 @@ namespace KEngine.Table
 
                     TabInfo[rowIndex] = splitString1;
 
-                    TableRow newT = new TableRow(rowIndex, Headers);  // the New Object may not be used this time, so cache it!
+                    T newT = (T)Activator.CreateInstance(typeof(T), rowIndex, Headers);  // the New Object may not be used this time, so cache it!
 
                     if (!newT.IsAutoParse)
                         newT.Parse(splitString1);
@@ -219,7 +219,7 @@ namespace KEngine.Table
                             TableRow toT = oldT;
                             // Check Duplicated Primary Key, 使用原来的，不使用新new出来的, 下回合直接用_cachedNewObj
                             OnException(TableFileExceptionType.DuplicatedKey, toT.PrimaryKey.ToString());
-                            newT = toT;
+                            newT = (T)toT;
                         }
                     }
 
@@ -380,7 +380,7 @@ namespace KEngine.Table
             return _colCount;
         }
 
-        public TableRow GetRow(int row)
+        public T GetRow(int row)
         {
             TableRow rowT;
             if (!Rows.TryGetValue(row, out rowT))
@@ -389,7 +389,7 @@ namespace KEngine.Table
                 return null;
             }
 
-            return rowT;
+            return (T)rowT;
         }
 
         public void Dispose()
@@ -416,12 +416,12 @@ namespace KEngine.Table
         /// <param name="primaryKey"></param>
         /// <param name="throwError">Whether or not throw exception</param>
         /// <returns></returns>
-        public TableRow FindByPrimaryKey(object primaryKey, bool throwError = true)
+        public T FindByPrimaryKey(object primaryKey, bool throwError = true)
         {
             TableRow ret;
 
             if (PrimaryKey2Row.TryGetValue(primaryKey, out ret))
-                return ret;
+                return (T)ret;
             else
             {
                 if (throwError)
@@ -435,7 +435,7 @@ namespace KEngine.Table
         /// </summary>
         /// <param name="primaryKey"></param>
         /// <returns></returns>
-        public TableRow GetByPrimaryKey(object primaryKey)
+        public T GetByPrimaryKey(object primaryKey)
         {
             return FindByPrimaryKey(primaryKey);
         }
