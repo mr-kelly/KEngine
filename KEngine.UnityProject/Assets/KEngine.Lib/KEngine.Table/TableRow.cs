@@ -157,7 +157,7 @@ namespace KEngine.Table
         /// <summary>
         /// Store values of this row
         /// </summary>
-        public string[] Values { get; private set; }
+        public string[] Values { get; internal set; }
 
         /// <summary>
         /// Cache save the row values
@@ -165,7 +165,6 @@ namespace KEngine.Table
         /// <param name="cellStrs"></param>
         public virtual void Parse(string[] cellStrs)
         {
-            Values = cellStrs;
         }
 
         /// <summary>
