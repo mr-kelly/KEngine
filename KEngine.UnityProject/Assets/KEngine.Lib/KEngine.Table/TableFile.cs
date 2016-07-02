@@ -38,12 +38,37 @@ namespace KEngine.Table
     public class TableFileConfig
     {
         public string Content;
-
         public char[] Separators = new char[] { '\t' };
         public TableFileExceptionDelegate OnExceptionEvent;
     }
 
-    public partial class TableFile : IDisposable, IEnumerable<TableRow>
+    /// <summary>
+    /// Simple way of default table file
+    /// </summary>
+    public class TableFile : TableFile<TableRow>
+    {
+        public TableFile(string content) : base(content) { }
+        public TableFile() : base() { }
+        public TableFile(string fileFullPath, Encoding encoding) : base(fileFullPath, encoding) { }
+
+        public new static TableFile LoadFromString(string content)
+        {
+            TableFile tabFile = new TableFile(content);
+            return tabFile;
+        }
+
+        public new static TableFile LoadFromFile(string fileFullPath, Encoding encoding = null)
+        {
+            return new TableFile(fileFullPath, encoding);
+
+        }
+    }
+
+    /// <summary>
+    /// Read TSV
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public partial class TableFile<T> : IDisposable, IEnumerable<TableRow> where T : TableRow
     {
         private readonly TableFileConfig _config;
 
@@ -63,9 +88,30 @@ namespace KEngine.Table
         public TableFile(TableFileConfig config)
         {
             _config = config;
-
             if (!string.IsNullOrEmpty(_config.Content))
                 ParseString(_config.Content);
+        }
+
+        public TableFile(string fileFullPath, Encoding encoding)
+        {
+            if (encoding == null)
+            {
+                encoding = Encoding.UTF8; // default encoding
+            }
+
+            // 不会锁死, 允许其它程序打开
+            using (FileStream fileStream = new FileStream(fileFullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            {
+                StreamReader oReader = new StreamReader(fileStream, encoding);
+                //return new TableFile<T>(oReader.ReadToEnd());
+                var config = new TableFileConfig()
+                {
+                    Content = oReader.ReadToEnd()
+                };
+                _config = config;
+                if (!string.IsNullOrEmpty(_config.Content))
+                    ParseString(_config.Content);
+            }
         }
 
         protected internal int _colCount;  // 列数
@@ -89,28 +135,17 @@ namespace KEngine.Table
         }
 
         // 直接从字符串分析
-        public static TableFile LoadFromString(string content)
+        public static TableFile<T> LoadFromString(string content)
         {
-            TableFile tabFile = new TableFile(content);
+            TableFile<T> tabFile = new TableFile<T>(content);
 
             return tabFile;
         }
 
         // 直接从文件, 传入完整目录，跟通过资源管理器自动生成完整目录不一样，给art库用的
-        public static TableFile LoadFromFile(string fileFullPath, Encoding encoding = null)
+        public static TableFile<T> LoadFromFile(string fileFullPath, Encoding encoding = null)
         {
-            if (encoding == null)
-            {
-                encoding = Encoding.UTF8; // default encoding
-            }
-
-            using (FileStream fileStream = new FileStream(fileFullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            // 不会锁死, 允许其它程序打开
-            {
-
-                StreamReader oReader = new StreamReader(fileStream, encoding);
-                return new TableFile(oReader.ReadToEnd());
-            }
+            return new TableFile<T>(fileFullPath, encoding);
         }
 
         protected bool ParseReader(TextReader oReader)
@@ -130,10 +165,11 @@ namespace KEngine.Table
                 return false;
             }
 
-            var metaLineArr = metaLine.Split(_config.Separators, StringSplitOptions.None);
 
             string[] firstLineSplitString = headLine.Split(_config.Separators, StringSplitOptions.None);  // don't remove RemoveEmptyEntries!
             string[] firstLineDef = new string[firstLineSplitString.Length];
+
+            var metaLineArr = metaLine.Split(_config.Separators, StringSplitOptions.None);
             Array.Copy(metaLineArr, 0, firstLineDef, 0, metaLineArr.Length);  // 拷贝，确保不会超出表头的
 
             for (int i = 0; i < firstLineSplitString.Length; i++)
@@ -166,10 +202,10 @@ namespace KEngine.Table
 
                     TableRow newT = new TableRow(rowIndex, Headers);  // the New Object may not be used this time, so cache it!
 
-                    //if (!newT.IsAutoParse)
-                    newT.Parse(splitString1);
-                    //else
-                    //    AutoParse(newT, splitString1);
+                    if (!newT.IsAutoParse)
+                        newT.Parse(splitString1);
+                    else
+                        AutoParse(newT, splitString1);
 
                     if (newT.PrimaryKey != null)
                     {
@@ -198,7 +234,6 @@ namespace KEngine.Table
         /// <summary>
         /// Auto get fields from class definition, use reflection (poor performance warning!)
         /// </summary>
-        [Obsolete("We don't use reflection and generic for better performance")]
         internal FieldInfo[] AutoTabFields
         {
             get
@@ -228,7 +263,6 @@ namespace KEngine.Table
         /// </summary>
         /// <param name="tableRow"></param>
         /// <param name="cellStrs"></param>
-        [Obsolete("We don't use reflection and generic for better performance")]
         protected void AutoParse(TableRow tableRow, string[] cellStrs)
         {
             var type = tableRow.GetType();

@@ -152,7 +152,6 @@ namespace KEngine.Editor
                                 EditorApplication.isPlaying = false;
                             }
                             File.WriteAllText(exportPath, genCode);
-                            return; // 防止Unity出现红色提示错误
                         }
                     }
                     else

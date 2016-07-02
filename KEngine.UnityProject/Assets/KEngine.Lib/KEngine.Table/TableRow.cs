@@ -65,7 +65,7 @@ namespace KEngine.Table
             var str = Get_string(value, defaultValue);
             return string.IsNullOrEmpty(str) ? default(double) : double.Parse(str);
         }
-        
+
         public float Get_float(string value, string defaultValue)
         {
             var str = Get_string(value, defaultValue);
@@ -117,6 +117,17 @@ namespace KEngine.Table
         /// TableRow's row number of table
         /// </summary>
         public int RowNumber { get; internal set; }
+
+        /// <summary>
+        /// 是否自动使用反射解析，不自动，则使用Parse方法
+        /// </summary>
+        public virtual bool IsAutoParse
+        {
+            get
+            {
+                return false;
+            }
+        }
 
         internal TableRow(int rowNumber, Dictionary<string, HeaderInfo> headerInfos)
         {
