@@ -364,7 +364,7 @@ namespace KEngine.Editor
         /// <summary>
         /// You can custom class name
         /// </summary>
-        public static CustomClassNameDelegate CustomClassNameFunc;
+        public static TableTemplateVars.CustomClassNameDelegate CustomClassNameFunc;
 
         public List<string> Paths = new List<string>();
 

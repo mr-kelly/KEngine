@@ -50,7 +50,7 @@ IsLoadAssetBundle = 1
 SettingSourcePath = Product/SettingSource	
 
 ;settings where compile to?	
-SettingCompiledPath = Assets/StreamingAssets/Setting
+SettingCompiledPath = Product/Setting
 
 ;Folder in Resources
 SettingResourcesPath = Setting

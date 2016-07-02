@@ -134,7 +134,8 @@ namespace KEngine.Modules
 
         private static string GetFileSystemPath(string path)
         {
-            var resPath = "Assets/StreamingAssets/" + SettingFolderName + "/" + path;
+            var compilePath = AppEngine.GetConfig("KEngine.Setting", "SettingCompiledPath");
+            var resPath = compilePath + "/" + path;
             return resPath;
         }
 
