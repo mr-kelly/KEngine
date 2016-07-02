@@ -35,7 +35,7 @@ namespace KSFramework.Editor
     /// <summary>
     /// Build App阶段，进行处理的钩子
     /// </summary>
-    public class SettingModuleBuildHandler 
+    public class SettingModuleBuildHandler
     {
         /// <summary>
         /// 标记是否重复执行BeforeBuildApp
@@ -47,13 +47,13 @@ namespace KSFramework.Editor
         /// </summary>
         public static Action<string> OnCopyFile;
 
-            /// <summary>
+        /// <summary>
         /// 完成Scene后，编译DLL后，未出APK前
         /// </summary>
         [PostProcessScene]
         private static void OnPostProcessScene()
         {
-            if (!_hasBeforeBuildApp)
+            if (!_hasBeforeBuildApp && !EditorApplication.isPlayingOrWillChangePlaymode)
             {
                 _hasBeforeBuildApp = true;
                 // 这里是编译前, Setting目录的配置文件拷贝进去StreamingAssetse
