@@ -84,7 +84,7 @@ namespace KEngine
 
         public static void RemoveDebugObject(object obj)
         {
-            if (!Log.IsUnityEditor || !Application.isPlaying || IsApplicationQuited)
+            if (!Application.isEditor || !Application.isPlaying || IsApplicationQuited)
                 return;
 
             KAsync.AddMainThreadCall(() =>
@@ -106,7 +106,7 @@ namespace KEngine
 
         public static void CreateDebugObject(object obj)
         {
-            if (!Log.IsUnityEditor || !Application.isPlaying || IsApplicationQuited)
+            if (!Application.isEditor || !Application.isPlaying || IsApplicationQuited)
                 return;
 
             KAsync.AddMainThreadCall(() =>
@@ -131,7 +131,7 @@ namespace KEngine
 
         private void Awake()
         {
-            if (!Log.IsUnityEditor)
+            if (!Application.isEditor)
             {
                 Log.Error("Error Open KObjectDebugger on not Unity Editor");
                 return;

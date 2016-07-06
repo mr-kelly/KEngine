@@ -20,7 +20,7 @@
     <OutputPath>..\..\Build\Debug\</OutputPath>
     <BaseIntermediateOutputPath>obj\Debug\KEngine.Tools\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants>_DEBUG;DEBUG;TRACE;MS_DOTNET</DefineConstants>
+    <DefineConstants>_DEBUG;DEBUG;TRACE;MS_DOTNET;UNITY_5</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>../../Build/Debug/KEngine.Tools.xml</DocumentationFile>
@@ -32,7 +32,7 @@
     <OutputPath>..\..\Build\Release\</OutputPath>
     <BaseIntermediateOutputPath>obj\Release\KEngine.Tools\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants>MS_DOTNET</DefineConstants>
+    <DefineConstants>MS_DOTNET;UNITY_5</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>../../Build/Release/KEngine.Tools.xml</DocumentationFile>
@@ -184,6 +184,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="KEngine.Lib.csproj">
+      <Project>{ABCAD9CA-1780-52C0-A074-4C970C2949C4}</Project>
+      <Name>KEngine.Lib</Name>
+    </ProjectReference>
     <ProjectReference Include="KEngine.csproj">
       <Project>{062D043A-720C-83D5-7B24-0EACE782E936}</Project>
       <Name>KEngine</Name>

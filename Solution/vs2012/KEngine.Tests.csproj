@@ -20,7 +20,7 @@
     <OutputPath>..\..\Build\Debug\</OutputPath>
     <BaseIntermediateOutputPath>obj\Debug\KEngine.Tests\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants>_DEBUG;DEBUG;TRACE;MS_DOTNET;NUNIT</DefineConstants>
+    <DefineConstants>_DEBUG;DEBUG;TRACE;MS_DOTNET;NUNIT;UNITY_5</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>../../Build/Debug/KEngine.Tests.xml</DocumentationFile>
@@ -32,12 +32,14 @@
     <OutputPath>..\..\Build\Release\</OutputPath>
     <BaseIntermediateOutputPath>obj\Release\KEngine.Tests\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants>MS_DOTNET;NUNIT</DefineConstants>
+    <DefineConstants>MS_DOTNET;NUNIT;UNITY_5</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>../../Build/Release/KEngine.Tests.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="KEngine.AssetDep" />
+    <Reference Include="KEngine.AssetDep.Editor" />
     <Reference Include="System" />
     <Reference Include="UnityEngine">
       <HintPath>..\..\Tools\UnityEngine.dll</HintPath>
@@ -65,17 +67,9 @@
       <Project>{062D043A-720C-83D5-7B24-0EACE782E936}</Project>
       <Name>KEngine</Name>
     </ProjectReference>
-    <ProjectReference Include="KEngine.AssetDep.csproj">
-      <Project>{AD8F6845-9988-8797-C2BA-6C1CAE1267A3}</Project>
-      <Name>KEngine.AssetDep</Name>
-    </ProjectReference>
     <ProjectReference Include="KEngine.Editor.csproj">
       <Project>{BB8AB2E6-A758-A6EC-90EC-16137C598251}</Project>
       <Name>KEngine.Editor</Name>
-    </ProjectReference>
-    <ProjectReference Include="KEngine.AssetDep.Editor.csproj">
-      <Project>{828B060C-EEC2-4EA3-F7CC-B2C66383759C}</Project>
-      <Name>KEngine.AssetDep.Editor</Name>
     </ProjectReference>
     <ProjectReference Include="KEngine.Tools.csproj">
       <Project>{65750BE9-D135-871F-9A70-D09C06F0CBFB}</Project>

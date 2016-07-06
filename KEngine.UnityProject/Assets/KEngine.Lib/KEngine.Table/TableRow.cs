@@ -205,7 +205,7 @@ namespace KEngine.Table
         }
 
         /// <summary>
-        /// Get Value by Indexer
+        /// Get or set Value by Indexer, be careful the `newline` character!
         /// </summary>
         /// <param name="headerName"></param>
         /// <returns></returns>

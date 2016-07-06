@@ -24,6 +24,10 @@
 
 #endregion
 
+#if UNITY_5 || UNITY_4 || UNITY_3
+#define UNITY
+#endif
+
 using System;
 
 namespace KEngine
@@ -85,6 +89,7 @@ namespace KEngine
 
         #region Record Time
 
+#if UNITY
         private static float[] RecordTime = new float[10];
         private static string[] RecordKey = new string[10];
         private static int RecordPos = 0;
@@ -106,6 +111,7 @@ namespace KEngine
             }
             return string.Format("[RecordTime] {0} use {1}s.", RecordKey[RecordPos], s);
         }
+#endif
 
         // 添加性能观察, 使用C#内置
         public static void WatchPerformance(Action del)

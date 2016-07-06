@@ -328,11 +328,6 @@ namespace KEngine
             DoLog(err, args, KLogLevel.Warning);
         }
 
-        public static void Pause()
-        {
-            UnityEngine.Debug.Break();
-        }
-
         private static void DoLog(string szMsg, object[] args, KLogLevel emLevel)
         {
             if (LogLevel > emLevel)

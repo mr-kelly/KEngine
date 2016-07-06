@@ -59,6 +59,7 @@ local UNITY_ENGINE_DLL = "./UnityEngine.dll"-- "C:/Program Files (x86)/Unity/Edi
 local UNITY_UI_DLL = "./UnityEngine.UI.dll" --C:/Program Files (x86)/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/4.6.4/UnityEngine.UI.dll"
 local SharpZipLib_DLL = "../KEngine.UnityProject/Assets/KEngine.Tools/SharpZipLib/ICSharpCode.SharpZipLib.dll"
 local UNITY_EDITOR_DLL = "./UnityEditor.dll" --C:/Program Files (x86)/Unity/Editor/Data/Managed/UnityEditor.dll"
+local IniDll = "../KEngine.UnityProject/Assets/KEngine.Lib/INIFileParser.dll"
 
 ------------------KEngine Base Library --------------------
 project "KEngine.Lib"
@@ -78,6 +79,7 @@ defines
 links
 {
     "System",
+    IniDll,
 }
 
 ------------------KEngine Main--------------------
@@ -94,13 +96,15 @@ files
 
 defines
 {
+    "UNITY_5"
 }
 links
 {
+    IniDll,
     "KEngine.Lib",
     "System",
     UNITY_ENGINE_DLL,
-    -- UNITY_UI_DLL,
+    UNITY_UI_DLL,
 }
 
 ------------------KEngine UIModule--------------------
@@ -117,6 +121,7 @@ files
 
 defines
 {
+    "UNITY_5"
 }
 links
 {
@@ -141,6 +146,7 @@ files
 
 defines
 {
+    "UNITY_5"
 }
 links
 {
@@ -169,10 +175,12 @@ files
 
 defines
 {
+    "UNITY_5"
 }
 
 links
 {
+    IniDll,
     "KEngine.Lib",
     "KEngine",
     "System",
@@ -201,17 +209,20 @@ files
 
 defines
 {
+    "UNITY_5"
 }
 
 links
 {
     "System",
+    "KEngine.Lib",
     "KEngine",
     SharpZipLib_DLL,
     UNITY_ENGINE_DLL
 }
 
 ----------------------- KEngine AssetDep
+--[[
 project "KEngine.AssetDep"
 language "C#"
 kind "SharedLib"
@@ -234,8 +245,10 @@ links
     UNITY_ENGINE_DLL,
     UNITY_UI_DLL,
 }
+]]--
 
 ----------------------- KEngine AssetDep Editor
+--[[
 project "KEngine.AssetDep.Editor"
 language "C#"
 kind "SharedLib"
@@ -263,6 +276,7 @@ links
     UNITY_UI_DLL,
     UNITY_EDITOR_DLL,
 }
+]]--
 
 ----------------------- KEngine Test ----------------
 project "KEngine.Tests"
@@ -278,7 +292,8 @@ files
 
 defines
 {
-    "NUNIT"
+    "NUNIT",
+    "UNITY_5",
 }
 
 links

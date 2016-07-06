@@ -39,19 +39,31 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="INIFileParser">
+      <HintPath>..\..\KEngine.UnityProject\Assets\KEngine.Lib\INIFileParser.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\AssemblyInfo.cs">
       <Link>AssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Lib\CosmosTable\TabFileWriter.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine.Lib\CosmosTable\TabFileWriter.cs</Link>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Lib\Debuger.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Lib\Debuger.cs</Link>
     </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Lib\CosmosTable\TableFile.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine.Lib\CosmosTable\TableFile.cs</Link>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Lib\EngineConfigs.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Lib\EngineConfigs.cs</Link>
     </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Lib\CosmosTable\TableRow.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine.Lib\CosmosTable\TableRow.cs</Link>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Lib\KEngine.Table\TabFileWriter.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Lib\KEngine.Table\TabFileWriter.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Lib\KEngine.Table\TableFile.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Lib\KEngine.Table\TableFile.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Lib\KEngine.Table\TableRow.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Lib\KEngine.Table\TableRow.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Lib\Logger.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Lib\Logger.cs</Link>
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Lib\SettingModule\SettingModuleBase.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Lib\SettingModule\SettingModuleBase.cs</Link>

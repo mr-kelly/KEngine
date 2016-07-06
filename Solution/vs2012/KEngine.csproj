@@ -20,7 +20,7 @@
     <OutputPath>..\..\Build\Debug\</OutputPath>
     <BaseIntermediateOutputPath>obj\Debug\KEngine\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants>_DEBUG;DEBUG;TRACE;MS_DOTNET</DefineConstants>
+    <DefineConstants>_DEBUG;DEBUG;TRACE;MS_DOTNET;UNITY_5</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>../../Build/Debug/KEngine.xml</DocumentationFile>
@@ -32,15 +32,21 @@
     <OutputPath>..\..\Build\Release\</OutputPath>
     <BaseIntermediateOutputPath>obj\Release\KEngine\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants>MS_DOTNET</DefineConstants>
+    <DefineConstants>MS_DOTNET;UNITY_5</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>../../Build/Release/KEngine.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="INIFileParser">
+      <HintPath>..\..\KEngine.UnityProject\Assets\KEngine.Lib\INIFileParser.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="UnityEngine">
       <HintPath>..\..\Tools\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>..\..\Tools\UnityEngine.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -67,6 +73,9 @@
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KBytesLoader.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KBytesLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KEngineAndroidPlugin.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KEngineAndroidPlugin.cs</Link>
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KFontLoader.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\KFontLoader.cs</Link>
@@ -116,14 +125,11 @@
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\SettingModule.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\SettingModule.cs</Link>
     </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Debuger.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Debuger.cs</Link>
-    </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\IAsyncObject.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\IAsyncObject.cs</Link>
     </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\IModule.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\IModule.cs</Link>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\IModuleInitable.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\IModuleInitable.cs</Link>
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\KAsync.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\KAsync.cs</Link>
@@ -136,9 +142,6 @@
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\KObject.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\KObject.cs</Link>
-    </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\Logger.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine\Logger.cs</Link>
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\UnityLayerDef.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\UnityLayerDef.cs</Link>

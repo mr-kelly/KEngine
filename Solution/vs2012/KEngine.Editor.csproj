@@ -20,7 +20,7 @@
     <OutputPath>..\..\Build\Debug\</OutputPath>
     <BaseIntermediateOutputPath>obj\Debug\KEngine.Editor\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants>_DEBUG;DEBUG;TRACE;MS_DOTNET</DefineConstants>
+    <DefineConstants>_DEBUG;DEBUG;TRACE;MS_DOTNET;UNITY_5</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>../../Build/Debug/KEngine.Editor.xml</DocumentationFile>
@@ -32,12 +32,15 @@
     <OutputPath>..\..\Build\Release\</OutputPath>
     <BaseIntermediateOutputPath>obj\Release\KEngine.Editor\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants>MS_DOTNET</DefineConstants>
+    <DefineConstants>MS_DOTNET;UNITY_5</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>../../Build/Release/KEngine.Editor.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="INIFileParser">
+      <HintPath>..\..\KEngine.UnityProject\Assets\KEngine.Lib\INIFileParser.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="UnityEngine">
       <HintPath>..\..\Tools\UnityEngine.dll</HintPath>
@@ -103,6 +106,9 @@
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\ResourcesBuild\KResourceBuilder.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\ResourcesBuild\KResourceBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\SettingModuleBuildHandler.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\SettingModuleBuildHandler.cs</Link>
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\SettingModuleEditor.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\SettingModuleEditor.cs</Link>

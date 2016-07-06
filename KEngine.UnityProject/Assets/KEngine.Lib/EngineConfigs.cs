@@ -25,9 +25,6 @@
 #endregion
 
 using System;
-using UnityEngine;
-using System.Collections;
-using IniParser;
 using IniParser.Model;
 using IniParser.Model.Formatting;
 using IniParser.Parser;

@@ -37,7 +37,10 @@ namespace KEngine.UI
     public class UGUIBridge : IUIBridge
     {
         public EventSystem EventSystem;
-        // Init the UI Bridge, necessary
+
+        /// <summary>
+        /// Init the UI Bridge, necessary
+        /// </summary>
         public void InitBridge()
         {
             EventSystem = new GameObject("EventSystem").AddComponent<EventSystem>();
