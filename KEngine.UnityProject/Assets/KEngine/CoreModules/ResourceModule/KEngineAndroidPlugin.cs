@@ -37,7 +37,7 @@ namespace KEngine
     /// </summary>
     public class KEngineAndroidPlugin
     {
-#if UNITY_ANDROID
+#if !KENGINE_DLL && UNITY_ANDROID
         private static AndroidJavaClass _helper;
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace KEngine
 
         private static void ErrorNotSupport()
         {
-            throw new Exception("[KEngineAndroidPlugin.cs]Error on Android Plugin. Check if KEngine.Android.jar file exist in your Plugins/Android/libs?");
+            throw new Exception("[KEngineAndroidPlugin.cs]Error on Android Plugin. Check if KEngine.Android.jar file exist in your Plugins/Android/libs? KEngine DLL mode also not support.");
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace KEngine
         /// <returns></returns>
         public static bool IsAssetExists(string path)
         {
-#if UNITY_ANDROID
+#if !KENGINE_DLL && UNITY_ANDROID
             return AndroidHelper.CallStatic<bool>("isAssetExists", path);
 #else
             ErrorNotSupport();
@@ -86,7 +86,7 @@ namespace KEngine
         /// <returns></returns>
         public static string GetAssetString(string path)
         {
-#if UNITY_ANDROID
+#if !KENGINE_DLL && UNITY_ANDROID
             return AndroidHelper.CallStatic<string>("getAssetString", path);
 #else
             ErrorNotSupport();
@@ -101,7 +101,7 @@ namespace KEngine
         /// <returns></returns>
         public static byte[] GetAssetBytes(string path)
         {
-#if UNITY_ANDROID
+#if !KENGINE_DLL && UNITY_ANDROID
             return AndroidHelper.CallStatic<byte[]>("getAssetBytes", path);
 #else
             ErrorNotSupport();

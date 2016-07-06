@@ -42,6 +42,7 @@ solution "KEngine.Solution"
     location ("../Solution/" .. (_ACTION or ""))
     debugdir ("../bin") --PATCHED
     debugargs { } --PATCHED
+    defines {"KENGINE_DLL"}
 
 configuration "Debug"
     flags { "Symbols" }

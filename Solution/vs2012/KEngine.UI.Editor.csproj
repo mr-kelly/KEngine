@@ -20,7 +20,7 @@
     <OutputPath>..\..\Build\Debug\</OutputPath>
     <BaseIntermediateOutputPath>obj\Debug\KEngine.UI.Editor\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants>_DEBUG;DEBUG;TRACE;MS_DOTNET;UNITY_5</DefineConstants>
+    <DefineConstants>KENGINE_DLL;_DEBUG;DEBUG;TRACE;MS_DOTNET;UNITY_5</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>../../Build/Debug/KEngine.UI.Editor.xml</DocumentationFile>
@@ -32,7 +32,7 @@
     <OutputPath>..\..\Build\Release\</OutputPath>
     <BaseIntermediateOutputPath>obj\Release\KEngine.UI.Editor\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants>MS_DOTNET;UNITY_5</DefineConstants>
+    <DefineConstants>KENGINE_DLL;MS_DOTNET;UNITY_5</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>../../Build/Release/KEngine.UI.Editor.xml</DocumentationFile>
