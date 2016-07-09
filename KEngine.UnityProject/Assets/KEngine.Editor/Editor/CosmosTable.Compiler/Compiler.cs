@@ -105,7 +105,8 @@ namespace CosmosTable
             renderVars.ExcelFile = excelFile;
             renderVars.FieldsInternal = new List<TableColumnVars>();
 
-            var strBuilder = new StringBuilder();
+            var tableBuilder = new StringBuilder();
+            var rowBuilder = new StringBuilder();
             var ignoreColumns = new HashSet<int>();
             // Header Column
             foreach (var colNameStr in excelFile.ColName2Index.Keys)
@@ -121,8 +122,8 @@ namespace CosmosTable
                     else
                     {
                         if (colIndex > 0)
-                            strBuilder.Append("\t");
-                        strBuilder.Append(colNameStr);
+                            tableBuilder.Append("\t");
+                        tableBuilder.Append(colNameStr);
 
                         string typeName = "string";
                         string defaultVal = "";
@@ -157,7 +158,7 @@ namespace CosmosTable
                     }
                 }
             }
-            strBuilder.Append("\n");
+            tableBuilder.Append("\n");
 
             // Statements rows, keeps
             foreach (var kv in excelFile.ColName2Statement)
@@ -169,10 +170,10 @@ namespace CosmosTable
                 if (ignoreColumns.Contains(colIndex)) // comment column, ignore
                     continue;
                 if (colIndex > 0)
-                    strBuilder.Append("\t");
-                strBuilder.Append(statementStr);
+                    tableBuilder.Append("\t");
+                tableBuilder.Append(statementStr);
             }
-            strBuilder.Append("\n");
+            tableBuilder.Append("\n");
 
             if (doCompile)
             {
@@ -180,6 +181,8 @@ namespace CosmosTable
                 // Data Rows
                 for (var startRow = 0; startRow < excelFile.GetRowsCount(); startRow++)
                 {
+                    rowBuilder.Length = 0;
+                    rowBuilder.Capacity = 0;
                     var columnCount = excelFile.GetColumnCount();
                     for (var loopColumn = 0; loopColumn < columnCount; loopColumn++)
                     {
@@ -195,19 +198,22 @@ namespace CosmosTable
                                     break;
                                 }
                                 if (startRow != 0) // 不是第一行，往添加换行，首列
-                                    strBuilder.Append("\n");
+                                    rowBuilder.Append("\n");
                             }
 
                             if (loopColumn > 0 && loopColumn < columnCount) // 最后一列不需加tab
-                                strBuilder.Append("\t");
+                                rowBuilder.Append("\t");
 
                             // 如果单元格是字符串，换行符改成\\n
                             cellStr = cellStr.Replace("\n", "\\n");
-                            strBuilder.Append(cellStr);
+                            rowBuilder.Append(cellStr);
 
                         }
-
                     }
+
+                    // 如果这行，之后\t或换行符，无其它内容，认为是可以省略的
+                    if (!string.IsNullOrEmpty(rowBuilder.ToString().Trim()))
+                        tableBuilder.Append(rowBuilder);
                 }
             }
             
@@ -229,7 +235,7 @@ namespace CosmosTable
 
             // 是否写入文件
             if (doCompile)
-                File.WriteAllText(exportPath, strBuilder.ToString());
+                File.WriteAllText(exportPath, tableBuilder.ToString());
 
 
             // 基于base dir路径
