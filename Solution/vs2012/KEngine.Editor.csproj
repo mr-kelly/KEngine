@@ -119,6 +119,9 @@
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Editor\Editor\UnityLock\UnityLock.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Editor\Editor\UnityLock\UnityLock.cs</Link>
     </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.EditorTools\Editor\DirectoryWatcher.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.EditorTools\Editor\DirectoryWatcher.cs</Link>
+    </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.EditorTools\Editor\KDefineSymbolsHelper.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.EditorTools\Editor\KDefineSymbolsHelper.cs</Link>
     </Compile>
