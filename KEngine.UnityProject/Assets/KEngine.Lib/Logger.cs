@@ -24,15 +24,11 @@
 
 #endregion
 
-#if UNITY_5 || UNITY_4 || UNITY_3
-#define UNITY
-#endif
-
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-#if UNITY
+#if !KENGINE_DLL
 using UnityEngine;
 #endif
 
@@ -71,7 +67,7 @@ namespace KEngine
         {
             if (!_hasRegisterLogCallback)
             {
-#if UNITY
+#if !KENGINE_DLL
 #if UNITY_5
                 Application.logMessageReceivedThreaded += GetUnityLogCallback(OnLogCallback);
 #else
@@ -83,7 +79,7 @@ namespace KEngine
             LogCallbackEvent += callback;
         }
 
-#if UNITY
+#if !KENGINE_DLL
         static Application.LogCallback GetUnityLogCallback(LogCallback callback)
         {
             Application.LogCallback unityCallback = (c, s, type) =>
@@ -102,7 +98,7 @@ namespace KEngine
         {
             if (!_hasRegisterLogCallback)
             {
-#if UNITY
+#if !KENGINE_DLL
 #if UNITY_5
                 Application.logMessageReceivedThreaded += GetUnityLogCallback(callback);
 #else
@@ -115,7 +111,7 @@ namespace KEngine
         }
 
 
-#if UNITY
+#if !KENGINE_DLL
         public static readonly bool IsUnityEditor = false;
 #endif
 
@@ -238,7 +234,7 @@ namespace KEngine
         // 这个使用系统的log，这个很特别，它可以再多线程里用，其它都不能再多线程内用！！！
         public static void LogConsole_MultiThread(string log, params object[] args)
         {
-#if UNITY
+#if !KENGINE_DLL
             if (IsUnityEditor)
                 DoLog(log, args, KLogLevel.Info);
             else
@@ -341,21 +337,21 @@ namespace KEngine
             {
                 case KLogLevel.Warning:
                 case KLogLevel.Trace:
-#if UNITY
+#if !KENGINE_DLL
                     UnityEngine.Debug.LogWarning(szMsg);
 #else
                     Console.WriteLine(szMsg);
 #endif
                     break;
                 case KLogLevel.Error:
-#if UNITY
+#if !KENGINE_DLL
                     UnityEngine.Debug.LogError(szMsg);
 #else
                     Console.WriteLine(szMsg);
 #endif
                     break;
                 default:
-#if UNITY
+#if !KENGINE_DLL
                     UnityEngine.Debug.Log(szMsg);
 #else
                     Console.WriteLine(szMsg);
@@ -403,12 +399,12 @@ namespace KEngine
         {
             string logPath;
 
-#if UNITY
+#if !KENGINE_DLL
             if (IsUnityEditor)
 #endif
 
                 logPath = "logs/";
-#if UNITY
+#if !KENGINE_DLL
             else
                 logPath = Application.persistentDataPath + "/" + "logs/";
 #endif

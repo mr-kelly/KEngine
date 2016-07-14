@@ -24,7 +24,6 @@
 
 #endregion
 
-#if UNITY_5
 using System;
 using System.IO;
 using KEngine;
@@ -156,4 +155,3 @@ namespace KEngine.Editor
     }
 
 }
-#endif

@@ -263,7 +263,7 @@ public class KDependencyBuild
     public static CDepCollectInfo DoBuildAssetBundle(string path, UnityEngine.Object asset,
         bool realBuildOrJustPath = true)
     {
-        path = Path.ChangeExtension(path, AppEngine.GetConfig("AssetBundleExt"));
+        path = Path.ChangeExtension(path, AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt));
         //asset.name = fullAssetPath;
         var hasBuilded = false;
 
@@ -300,7 +300,7 @@ public class KDependencyBuild
         bool realBuildOrJustPath = true)
     {
         var hasBuilded = false;
-        fullAssetPath = Path.ChangeExtension(fullAssetPath, AppEngine.GetConfig("AssetBundleExt"));
+        fullAssetPath = Path.ChangeExtension(fullAssetPath, AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt));
 
         if (so == null)
         {

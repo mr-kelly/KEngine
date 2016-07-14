@@ -75,7 +75,7 @@ namespace KEngine.UI
 #if UNITY_5
             string path = string.Format("UI/{0}.prefab{1}", loadState.TemplateName, KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt));
 #else
-            string path = string.Format("UI/{0}_UI{1}", loadState.TemplateName, KEngine.AppEngine.GetConfig("AssetBundleExt"));
+            string path = string.Format("UI/{0}_UI{1}", loadState.TemplateName, KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt));
 #endif
             var assetLoader = KStaticAssetLoader.Load(path);
             loadState.UIResourceLoader = assetLoader; // 基本不用手工释放的

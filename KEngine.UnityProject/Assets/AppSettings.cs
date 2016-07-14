@@ -3,21 +3,21 @@
 
 // KEngine - Asset Bundle framework for Unity3D
 // ===================================
-//
+// 
 // Author:  Kelly
 // Email: 23110388@qq.com
 // Github: https://github.com/mr-kelly/KEngine
-//
+// 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 3.0 of the License, or (at your option) any later version.
-//
+// 
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-//
+// 
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library.
 
@@ -28,9 +28,9 @@
 
 using System.Collections;
 using System.Collections.Generic;
-using CosmosTable;
 using KEngine;
 using KEngine.Modules;
+using KEngine.Table;
 namespace AppSettings
 {
 	/// <summary>
@@ -46,7 +46,7 @@ namespace AppSettings
                 if (_settingsList == null)
                 {
                     _settingsList = new IReloadableSettings[]
-                    {
+                    { 
                         AppConfigSettings.GetInstance(),
                         ExampleSettings.GetInstance(),
                         SubdirExample2Settings.GetInstance(),
@@ -82,7 +82,7 @@ namespace AppSettings
 	/// </summary>>
     public partial class AppConfigSettings : IReloadableSettings
     {
-		public static readonly string[] TabFilePaths =
+		public static readonly string[] TabFilePaths = 
         {
             "AppConfig+Category.bytes", "AppConfig+Category2.bytes", "AppConfig+TSV.bytes", "AppConfig.bytes"
         };
@@ -108,7 +108,7 @@ namespace AppSettings
         /// <returns></returns>
 	    public static AppConfigSettings GetInstance()
 	    {
-            if (_instance == null)
+            if (_instance == null) 
             {
                 _instance = new AppConfigSettings();
 
@@ -134,7 +134,7 @@ namespace AppSettings
             }
 	        return _instance;
 	    }
-
+        
         public int Count
         {
             get
@@ -170,7 +170,7 @@ namespace AppSettings
                             setting = new AppConfigSetting(row);
                             _dict[setting.Id] = setting;
                         }
-                        else
+                        else 
                         {
                             if (throwWhenDuplicatePrimaryKey) throw new System.Exception(string.Format("DuplicateKey, Class: {0}, File: {1}, Key: {2}", this.GetType().Name, tabFilePath, pk));
                             else setting.Reload(row);
@@ -198,12 +198,12 @@ namespace AppSettings
 
         /// <summary>
         /// GetEnumerator for `MoveNext`: AppConfig
-        /// </summary>
+        /// </summary> 
 	    public static IEnumerator GetEnumerator()
 	    {
 	        return GetInstance()._dict.Values.GetEnumerator();
 	    }
-
+         
 	    /// <summary>
         /// Get class by primary key: AppConfig
         /// </summary>
@@ -215,7 +215,7 @@ namespace AppSettings
         }
 
         // ========= CustomExtraString begin ===========
-
+        
         // ========= CustomExtraString end ===========
     }
 
@@ -225,17 +225,17 @@ namespace AppSettings
 	/// </summary>
 	public partial class AppConfigSetting : TableRowParser
 	{
-
+		
         /// <summary>
         /// ID Column/编号/主键
         /// </summary>
         public string Id { get; private set;}
-
+        
         /// <summary>
         /// Name/名字
         /// </summary>
         public string Value { get; private set;}
-
+        
 
         internal AppConfigSetting(TableRow row)
         {
@@ -243,9 +243,9 @@ namespace AppSettings
         }
 
         internal void Reload(TableRow row)
-        {
-            Id = row.Get_string(row.Values[0], "");
-            Value = row.Get_string(row.Values[1], "");
+        { 
+            Id = row.Get_string(row.Values[0], ""); 
+            Value = row.Get_string(row.Values[1], ""); 
         }
 
         /// <summary>
@@ -266,7 +266,7 @@ namespace AppSettings
 	/// </summary>>
     public partial class ExampleSettings : IReloadableSettings
     {
-		public static readonly string[] TabFilePaths =
+		public static readonly string[] TabFilePaths = 
         {
             "Example.bytes"
         };
@@ -292,7 +292,7 @@ namespace AppSettings
         /// <returns></returns>
 	    public static ExampleSettings GetInstance()
 	    {
-            if (_instance == null)
+            if (_instance == null) 
             {
                 _instance = new ExampleSettings();
 
@@ -318,7 +318,7 @@ namespace AppSettings
             }
 	        return _instance;
 	    }
-
+        
         public int Count
         {
             get
@@ -354,7 +354,7 @@ namespace AppSettings
                             setting = new ExampleSetting(row);
                             _dict[setting.Id] = setting;
                         }
-                        else
+                        else 
                         {
                             if (throwWhenDuplicatePrimaryKey) throw new System.Exception(string.Format("DuplicateKey, Class: {0}, File: {1}, Key: {2}", this.GetType().Name, tabFilePath, pk));
                             else setting.Reload(row);
@@ -382,12 +382,12 @@ namespace AppSettings
 
         /// <summary>
         /// GetEnumerator for `MoveNext`: Example
-        /// </summary>
+        /// </summary> 
 	    public static IEnumerator GetEnumerator()
 	    {
 	        return GetInstance()._dict.Values.GetEnumerator();
 	    }
-
+         
 	    /// <summary>
         /// Get class by primary key: Example
         /// </summary>
@@ -399,7 +399,7 @@ namespace AppSettings
         }
 
         // ========= CustomExtraString begin ===========
-
+        
         // ========= CustomExtraString end ===========
     }
 
@@ -409,37 +409,37 @@ namespace AppSettings
 	/// </summary>
 	public partial class ExampleSetting : TableRowParser
 	{
-
+		
         /// <summary>
         /// ID Column/编号/主键
         /// </summary>
         public string Id { get; private set;}
-
+        
         /// <summary>
         /// Name/名字
         /// </summary>
         public string Name { get; private set;}
-
+        
         /// <summary>
         /// 用于组合成Id主键
         /// </summary>
         public string KeyString { get; private set;}
-
+        
         /// <summary>
         /// 数据测试
         /// </summary>
         public int Number { get; private set;}
-
+        
         /// <summary>
         /// ArrayTest/测试数组
         /// </summary>
         public string[] StrArray { get; private set;}
-
+        
         /// <summary>
         /// 字典测试
         /// </summary>
         public Dictionary<string,int> StrIntMap { get; private set;}
-
+        
 
         internal ExampleSetting(TableRow row)
         {
@@ -447,13 +447,13 @@ namespace AppSettings
         }
 
         internal void Reload(TableRow row)
-        {
-            Id = row.Get_string(row.Values[0], "");
-            Name = row.Get_string(row.Values[1], "");
-            KeyString = row.Get_string(row.Values[2], "");
-            Number = row.Get_int(row.Values[3], "");
-            StrArray = row.Get_string_array(row.Values[4], "");
-            StrIntMap = row.Get_Dictionary_string_int(row.Values[5], "");
+        { 
+            Id = row.Get_string(row.Values[0], ""); 
+            Name = row.Get_string(row.Values[1], ""); 
+            KeyString = row.Get_string(row.Values[2], ""); 
+            Number = row.Get_int(row.Values[3], ""); 
+            StrArray = row.Get_string_array(row.Values[4], ""); 
+            StrIntMap = row.Get_Dictionary_string_int(row.Values[5], ""); 
         }
 
         /// <summary>
@@ -474,7 +474,7 @@ namespace AppSettings
 	/// </summary>>
     public partial class SubdirExample2Settings : IReloadableSettings
     {
-		public static readonly string[] TabFilePaths =
+		public static readonly string[] TabFilePaths = 
         {
             "Subdir/Example2.bytes"
         };
@@ -500,7 +500,7 @@ namespace AppSettings
         /// <returns></returns>
 	    public static SubdirExample2Settings GetInstance()
 	    {
-            if (_instance == null)
+            if (_instance == null) 
             {
                 _instance = new SubdirExample2Settings();
 
@@ -526,7 +526,7 @@ namespace AppSettings
             }
 	        return _instance;
 	    }
-
+        
         public int Count
         {
             get
@@ -562,7 +562,7 @@ namespace AppSettings
                             setting = new SubdirExample2Setting(row);
                             _dict[setting.Id] = setting;
                         }
-                        else
+                        else 
                         {
                             if (throwWhenDuplicatePrimaryKey) throw new System.Exception(string.Format("DuplicateKey, Class: {0}, File: {1}, Key: {2}", this.GetType().Name, tabFilePath, pk));
                             else setting.Reload(row);
@@ -590,12 +590,12 @@ namespace AppSettings
 
         /// <summary>
         /// GetEnumerator for `MoveNext`: SubdirExample2
-        /// </summary>
+        /// </summary> 
 	    public static IEnumerator GetEnumerator()
 	    {
 	        return GetInstance()._dict.Values.GetEnumerator();
 	    }
-
+         
 	    /// <summary>
         /// Get class by primary key: SubdirExample2
         /// </summary>
@@ -607,7 +607,7 @@ namespace AppSettings
         }
 
         // ========= CustomExtraString begin ===========
-
+        
         // ========= CustomExtraString end ===========
     }
 
@@ -617,17 +617,17 @@ namespace AppSettings
 	/// </summary>
 	public partial class SubdirExample2Setting : TableRowParser
 	{
-
+		
         /// <summary>
         /// ID Column/编号/主键
         /// </summary>
         public int Id { get; private set;}
-
+        
         /// <summary>
         /// Name/名字
         /// </summary>
         public string Name { get; private set;}
-
+        
 
         internal SubdirExample2Setting(TableRow row)
         {
@@ -635,9 +635,9 @@ namespace AppSettings
         }
 
         internal void Reload(TableRow row)
-        {
-            Id = row.Get_int(row.Values[0], "");
-            Name = row.Get_string(row.Values[1], "");
+        { 
+            Id = row.Get_int(row.Values[0], ""); 
+            Name = row.Get_string(row.Values[1], ""); 
         }
 
         /// <summary>
@@ -658,7 +658,7 @@ namespace AppSettings
 	/// </summary>>
     public partial class SubdirSettings : IReloadableSettings
     {
-		public static readonly string[] TabFilePaths =
+		public static readonly string[] TabFilePaths = 
         {
             "Subdir/__.bytes"
         };
@@ -684,7 +684,7 @@ namespace AppSettings
         /// <returns></returns>
 	    public static SubdirSettings GetInstance()
 	    {
-            if (_instance == null)
+            if (_instance == null) 
             {
                 _instance = new SubdirSettings();
 
@@ -710,7 +710,7 @@ namespace AppSettings
             }
 	        return _instance;
 	    }
-
+        
         public int Count
         {
             get
@@ -746,7 +746,7 @@ namespace AppSettings
                             setting = new SubdirSetting(row);
                             _dict[setting.Id] = setting;
                         }
-                        else
+                        else 
                         {
                             if (throwWhenDuplicatePrimaryKey) throw new System.Exception(string.Format("DuplicateKey, Class: {0}, File: {1}, Key: {2}", this.GetType().Name, tabFilePath, pk));
                             else setting.Reload(row);
@@ -774,12 +774,12 @@ namespace AppSettings
 
         /// <summary>
         /// GetEnumerator for `MoveNext`: Subdir
-        /// </summary>
+        /// </summary> 
 	    public static IEnumerator GetEnumerator()
 	    {
 	        return GetInstance()._dict.Values.GetEnumerator();
 	    }
-
+         
 	    /// <summary>
         /// Get class by primary key: Subdir
         /// </summary>
@@ -791,7 +791,7 @@ namespace AppSettings
         }
 
         // ========= CustomExtraString begin ===========
-
+        
         // ========= CustomExtraString end ===========
     }
 
@@ -801,17 +801,17 @@ namespace AppSettings
 	/// </summary>
 	public partial class SubdirSetting : TableRowParser
 	{
-
+		
         /// <summary>
         /// ID Column/编号/主键
         /// </summary>
         public string Id { get; private set;}
-
+        
         /// <summary>
         /// Name/名字
         /// </summary>
         public string Name { get; private set;}
-
+        
 
         internal SubdirSetting(TableRow row)
         {
@@ -819,9 +819,9 @@ namespace AppSettings
         }
 
         internal void Reload(TableRow row)
-        {
-            Id = row.Get_string(row.Values[0], "");
-            Name = row.Get_string(row.Values[1], "");
+        { 
+            Id = row.Get_string(row.Values[0], ""); 
+            Name = row.Get_string(row.Values[1], ""); 
         }
 
         /// <summary>
@@ -842,7 +842,7 @@ namespace AppSettings
 	/// </summary>>
     public partial class SubdirSubSubDirExample3Settings : IReloadableSettings
     {
-		public static readonly string[] TabFilePaths =
+		public static readonly string[] TabFilePaths = 
         {
             "Subdir/SubSubDir/Example3.bytes"
         };
@@ -868,7 +868,7 @@ namespace AppSettings
         /// <returns></returns>
 	    public static SubdirSubSubDirExample3Settings GetInstance()
 	    {
-            if (_instance == null)
+            if (_instance == null) 
             {
                 _instance = new SubdirSubSubDirExample3Settings();
 
@@ -894,7 +894,7 @@ namespace AppSettings
             }
 	        return _instance;
 	    }
-
+        
         public int Count
         {
             get
@@ -930,7 +930,7 @@ namespace AppSettings
                             setting = new SubdirSubSubDirExample3Setting(row);
                             _dict[setting.Id] = setting;
                         }
-                        else
+                        else 
                         {
                             if (throwWhenDuplicatePrimaryKey) throw new System.Exception(string.Format("DuplicateKey, Class: {0}, File: {1}, Key: {2}", this.GetType().Name, tabFilePath, pk));
                             else setting.Reload(row);
@@ -958,12 +958,12 @@ namespace AppSettings
 
         /// <summary>
         /// GetEnumerator for `MoveNext`: SubdirSubSubDirExample3
-        /// </summary>
+        /// </summary> 
 	    public static IEnumerator GetEnumerator()
 	    {
 	        return GetInstance()._dict.Values.GetEnumerator();
 	    }
-
+         
 	    /// <summary>
         /// Get class by primary key: SubdirSubSubDirExample3
         /// </summary>
@@ -975,7 +975,7 @@ namespace AppSettings
         }
 
         // ========= CustomExtraString begin ===========
-
+        
         // ========= CustomExtraString end ===========
     }
 
@@ -985,17 +985,17 @@ namespace AppSettings
 	/// </summary>
 	public partial class SubdirSubSubDirExample3Setting : TableRowParser
 	{
-
+		
         /// <summary>
         /// ID Column/编号/主键
         /// </summary>
         public string Id { get; private set;}
-
+        
         /// <summary>
         /// Name/名字
         /// </summary>
         public string Name { get; private set;}
-
+        
 
         internal SubdirSubSubDirExample3Setting(TableRow row)
         {
@@ -1003,9 +1003,9 @@ namespace AppSettings
         }
 
         internal void Reload(TableRow row)
-        {
-            Id = row.Get_string(row.Values[0], "");
-            Name = row.Get_string(row.Values[1], "");
+        { 
+            Id = row.Get_string(row.Values[0], ""); 
+            Name = row.Get_string(row.Values[1], ""); 
         }
 
         /// <summary>
@@ -1019,5 +1019,5 @@ namespace AppSettings
             return primaryKey;
         }
 	}
-
+ 
 }

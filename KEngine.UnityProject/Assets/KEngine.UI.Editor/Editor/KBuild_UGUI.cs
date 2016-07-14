@@ -118,10 +118,11 @@ namespace KEngine.Editor
             }
 #if !UNITY_5
 
+            var windowAssets = GetUIWIndoeAssetsFromCurrentScene();
 
             foreach(var windowAsset in windowAssets)
             {
-                BuildTools.BuildAssetBundle(windowAsset.gameObject, GetBuildRelPath(uiName));
+                BuildTools.BuildAssetBundle(windowAsset.gameObject, GetBuildRelPath(windowAsset.name));
             }
 #else
             UISceneToPrefabs();

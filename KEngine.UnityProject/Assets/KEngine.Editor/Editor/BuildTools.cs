@@ -142,7 +142,11 @@ namespace KEngine.Editor
             switch (platfrom)
             {
                 case BuildTarget.Android:
+#if UNITY_5
                 case BuildTarget.iOS:
+#else
+                case BuildTarget.iPhone:
+#endif
                 case BuildTarget.StandaloneWindows:
                     var platformName = KResourceModule.BuildPlatformName;
                     if (quality != KResourceQuality.Sd) // SD no need add
@@ -384,7 +388,7 @@ namespace KEngine.Editor
                 BuildAssetBundleOptions.DeterministicAssetBundle,
                 buildTarget);
 
-            Log.DoLog("生成文件： {0}, 耗时: {1:F5}", path, (DateTime.Now - time).TotalSeconds);
+            Log.Info("生成文件： {0}, 耗时: {1:F5}", path, (DateTime.Now - time).TotalSeconds);
 
             if (AfterBuildAssetBundleEvent != null)
                 AfterBuildAssetBundleEvent(asset, path, relativePath);

@@ -149,8 +149,7 @@ namespace KEngine.ResourceDep
             // manifest
             string manifestPath = ResourceDepUtils.GetBuildPath(String.Format("{0}.manifest{1}", relativePath,
                 AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt)));
-            var manifestLoader = KBytesLoader.Load(manifestPath, KResourceInAppPathType.PersistentAssetsPath,
-                KAssetBundleLoaderMode.PersitentDataPathSync);
+            var manifestLoader = KBytesLoader.Load(manifestPath, LoaderMode.Sync);
             //while (!manifestLoader.IsCompleted)
             //    yield return null;
             var manifestBytes = manifestLoader.Bytes;
@@ -223,8 +222,7 @@ namespace KEngine.ResourceDep
             // manifest
             string manifestPath = ResourceDepUtils.GetBuildPath(String.Format("{0}.manifest{1}", relativePath,
                 AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt)));
-            var manifestLoader = KBytesLoader.Load(manifestPath, KResourceInAppPathType.PersistentAssetsPath,
-                KAssetBundleLoaderMode.PersitentDataPathSync);
+            var manifestLoader = KBytesLoader.Load(manifestPath, LoaderMode.Sync);
             while (!manifestLoader.IsCompleted)
                 yield return null;
 
