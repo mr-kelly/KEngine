@@ -1,10 +1,8 @@
-```
 
-KEngine现已同时兼容Unity 4和Unity 5。默认资源AssetBundle使用Unity 5进行构建，在使用Unity 4打开工程后，Asset Bundle需要重新再打包。
+> KEngine现已同时兼容Unity 4和Unity 5。默认资源AssetBundle使用Unity 5进行构建，在使用Unity 4打开工程后，Asset Bundle需要重新再打包。
+> 
+> Unity 5建议直接使用[**KSFramework**](https://github.com/mr-kelly/KSFramework), 整合KEngine+SLua, 并移除一些Unity 4的支持模块。
 
-Unity 5建议直接使用[**KSFramework**](https://github.com/mr-kelly/KSFramework), 整合KEngine+SLua, 并移除一些Unity 4的支持模块。
-
-```
 
 # KEngine
 
