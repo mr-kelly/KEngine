@@ -1,4 +1,29 @@
-﻿using System;
+﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+
+// KEngine - Toolset and framework for Unity3D
+// ===================================
+// 
+// Filename: SettingModuleEditor.cs
+// Date:     2015/12/03
+// Author:  Kelly
+// Email: 23110388@qq.com
+// Github: https://github.com/mr-kelly/KEngine
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3.0 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.
+
+#endregion
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -74,6 +99,10 @@ namespace CosmosTable
         // 被认为是注释的表头
         public string[] CommentStartsWith = { "Comment", "#" };
 
+        /// <summary>
+        /// 定义条件编译指令
+        /// </summary>
+        public string[] ConditionVars;
 
         public CompilerConfig()
         {
@@ -85,6 +114,18 @@ namespace CosmosTable
     /// </summary>
     public class Compiler
     {
+
+        /// <summary>
+        /// 编译时，判断格子的类型
+        /// </summary>
+        public enum CellType
+        {
+            Value,
+            Comment,
+            If,
+            Endif
+        }
+
         private readonly CompilerConfig _config;
 
         public Compiler()
@@ -98,6 +139,7 @@ namespace CosmosTable
         {
             _config = cfg;
         }
+
 
         private TableCompileResult DoCompilerExcelReader(string path, ITableSourceFile excelFile, string compileToFilePath = null, string compileBaseDir = null, bool doCompile = true)
         {
@@ -114,7 +156,7 @@ namespace CosmosTable
                 var colIndex = excelFile.ColName2Index[colNameStr];
                 if (!string.IsNullOrEmpty(colNameStr))
                 {
-                    var isCommentColumn = CheckCommentString(colNameStr);
+                    var isCommentColumn = CheckCellType(colNameStr) == CellType.Comment;
                     if (isCommentColumn)
                     {
                         ignoreColumns.Add(colIndex);
@@ -175,6 +217,8 @@ namespace CosmosTable
             }
             tableBuilder.Append("\n");
 
+            // #if check, 是否正在if false模式, if false时，行被忽略
+            var ifCondtioning = true;
             if (doCompile)
             {
                 // 如果不需要真编译，获取头部信息就够了
@@ -193,10 +237,37 @@ namespace CosmosTable
 
                             if (loopColumn == 0)
                             {
-                                if (CheckCommentString(cellStr)) // 如果行首为#注释字符，忽略这一行)
+                                var cellType = CheckCellType(cellStr);
+                                if (cellType == CellType.Comment) // 如果行首为#注释字符，忽略这一行)
+                                    break;
+
+                                // 进入#if模式
+                                if (cellType == CellType.If)
                                 {
+                                    var ifVars = GetIfVars(cellStr);
+                                    var hasAllVars = true;
+                                    foreach (var var in ifVars)
+                                    {
+                                        if (_config.ConditionVars != null && 
+                                            !_config.ConditionVars.Contains(var)) // 定义的变量，需要全部配置妥当,否则if失败
+                                        {
+                                            hasAllVars = false;
+                                            break;
+                                        }
+                                    }
+                                    ifCondtioning = hasAllVars;
                                     break;
                                 }
+                                if (cellType == CellType.Endif)
+                                {
+                                    ifCondtioning = true;
+                                    break;
+                                }
+
+                                if (!ifCondtioning) // 这一行被#if 忽略掉了
+                                    break;
+
+
                                 if (startRow != 0) // 不是第一行，往添加换行，首列
                                     rowBuilder.Append("\n");
                             }
@@ -253,21 +324,36 @@ namespace CosmosTable
         }
 
         /// <summary>
+        /// 获取#if A B语法的变量名，返回如A B数组
+        /// </summary>
+        /// <param name="cellStr"></param>
+        /// <returns></returns>
+        private string[] GetIfVars(string cellStr)
+        {
+            return cellStr.Replace("#if", "").Trim().Split(new char[] {' '}, StringSplitOptions.RemoveEmptyEntries);
+        }
+
+        /// <summary>
         /// 检查一个表头名，是否是可忽略的注释
         /// 或检查一个字符串
         /// </summary>
         /// <param name="colNameStr"></param>
         /// <returns></returns>
-        private bool CheckCommentString(string colNameStr)
+        private CellType CheckCellType(string colNameStr)
         {
+            if (colNameStr.StartsWith("#if"))
+                return CellType.If;
+            if (colNameStr.StartsWith("#endif"))
+                return CellType.Endif;
             foreach (var commentStartsWith in _config.CommentStartsWith)
             {
-                if (colNameStr.ToLower().StartsWith(commentStartsWith.ToLower()))
+                if (colNameStr.ToLower().Trim().StartsWith(commentStartsWith.ToLower()))
                 {
-                    return true;
+                    return CellType.Comment;
                 }
             }
-            return false;
+
+            return CellType.Value;
         }
 
         /// <summary>

@@ -59,6 +59,10 @@ namespace KEngine.Editor
         /// </example>
         public static string[] GenerateCodeFilesFilter = null;
 
+        /// <summary>
+        /// 条件编译变量
+        /// </summary>
+        public static string[] CompileSettingConditionVars;
 
         /// <summary>
         /// 可以为模板提供额外生成代码块！返回string即可！
@@ -176,7 +180,7 @@ namespace KEngine.Editor
             var results = new List<TableCompileResult>();
             var compileBaseDir = compilePath;
             // excel compiler
-            var compiler = new Compiler(new CompilerConfig());
+            var compiler = new Compiler(new CompilerConfig() {ConditionVars = CompileSettingConditionVars});
 
             var excelExt = new HashSet<string>() { ".xls", ".xlsx", ".tsv" };
             var findDir = sourcePath;
