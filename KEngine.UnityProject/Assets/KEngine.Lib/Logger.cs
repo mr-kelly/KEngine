@@ -119,7 +119,7 @@ namespace KEngine
 
         static Log()
         {
-#if UNITY
+#if !KENGINE_DLL
             // isDebugBuild先预存起来，因为它是一个get_属性, 在非Unity主线程里不能用，导致多线程网络打印log时报错
             try
             {
