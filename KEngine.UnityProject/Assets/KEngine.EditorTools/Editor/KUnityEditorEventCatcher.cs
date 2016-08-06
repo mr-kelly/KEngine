@@ -107,6 +107,12 @@ namespace KUnityEditorTools
 
 
         /// <summary>
+        /// 编译前事件，比较特殊的处理，配合了PostBuildProcess和PostBuildScene
+        /// </summary>
+        public static Action OnBeforeBuildPlayerEvent;
+
+
+        /// <summary>
         /// 编译完成后事件
         /// </summary>
         private static System.Action<BuildTarget, string> _OnPostBuildPlayerEvent;
@@ -162,6 +168,23 @@ namespace KUnityEditorTools
             IsInited = true;
         }
 
+        /// <summary>
+        /// For BeforeBuildEvent, Because in Unity:   PostProcessScene -> PostProcessScene ->.... PostProcessScene -> PostProcessBuild
+        /// When true, waiting PostProcessBuild to revert to false
+        /// </summary>
+        private static bool _beforeBuildFlag = false;
+
+        [PostProcessScene]
+        private static void OnProcessScene()
+        {
+            if (!_beforeBuildFlag && !EditorApplication.isPlayingOrWillChangePlaymode)
+            {
+                _beforeBuildFlag = true;
+
+                if (OnBeforeBuildPlayerEvent != null)
+                    OnBeforeBuildPlayerEvent();
+            }
+        }
         /// <summary>
         /// Unity标准Build后处理函数
         /// </summary>

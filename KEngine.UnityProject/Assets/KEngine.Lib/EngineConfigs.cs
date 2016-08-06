@@ -56,7 +56,7 @@ SettingResourcesPath = Setting
 SettingCodeIgnorePattern = (I18N/.*)|(StringsTable.*)
 
 [KEngine.UI]
-UIModuleBridge = KSFramework.UGUIBridge	
+UIModuleBridge = KEngine.UI.UGUIBridge	
 
 ";
         private readonly IniData _iniData;

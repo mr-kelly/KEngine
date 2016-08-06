@@ -96,8 +96,10 @@ namespace KEngine
                 return;
 
             _hasPreloadAssetBundleManifest = true;
-            var mainAssetBundlePath = string.Format("{0}/{1}/{1}", KResourceModule.BundlesDirName,KResourceModule.BuildPlatformName);
-            _mainAssetBundle = AssetBundle.LoadFromMemory(KResourceModule.LoadSyncFromStreamingAssets(mainAssetBundlePath));
+//            var mainAssetBundlePath = string.Format("{0}/{1}/{1}", KResourceModule.BundlesDirName,KResourceModule.BuildPlatformName);
+            BytesLoader bytesLoader = BytesLoader.Load(KResourceModule.BuildPlatformName, LoaderMode.Sync);//string.Format("{0}/{1}", KResourceModule.BundlesDirName, KResourceModule.BuildPlatformName), LoaderMode.Sync);
+
+            _mainAssetBundle = AssetBundle.LoadFromMemory(bytesLoader.Bytes);//KResourceModule.LoadSyncFromStreamingAssets(mainAssetBundlePath));
             _assetBundleManifest = _mainAssetBundle.LoadAsset("AssetBundleManifest") as AssetBundleManifest;
 
             Debuger.Assert(_mainAssetBundle);
@@ -148,7 +150,7 @@ namespace KEngine
             // Unity 5 AssetBundle自动转小写
             relativeUrl = relativeUrl.ToLower();
 #endif
-            var bytesLoader = KBytesLoader.Load(relativeUrl, _loaderMode);
+            var bytesLoader = BytesLoader.Load(relativeUrl, _loaderMode);
             while (!bytesLoader.IsCompleted)
             {
                 yield return null;

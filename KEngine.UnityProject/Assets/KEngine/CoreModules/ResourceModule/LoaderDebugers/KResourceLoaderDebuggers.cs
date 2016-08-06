@@ -28,55 +28,59 @@ using System;
 using KEngine;
 using UnityEngine;
 
-/// <summary>
-/// 只在编辑器下出现，分别对应一个Loader~生成一个GameObject对象，为了方便调试！
-/// </summary>
-public class KResourceLoaderDebugger : MonoBehaviour
+namespace KEngine
 {
-    public KAbstractResourceLoader TheLoader;
-    public int RefCount;
-    public float FinishUsedTime; // 参考，完成所需时间
-    public static bool IsApplicationQuit = false;
-
-    public static KResourceLoaderDebugger Create(string type, string url, KAbstractResourceLoader loader)
+    /// <summary>
+    /// 只在编辑器下出现，分别对应一个Loader~生成一个GameObject对象，为了方便调试！
+    /// </summary>
+    public class KResourceLoaderDebugger : MonoBehaviour
     {
-        if (IsApplicationQuit) return null;
+        public KAbstractResourceLoader TheLoader;
+        public int RefCount;
+        public float FinishUsedTime; // 参考，完成所需时间
+        public static bool IsApplicationQuit = false;
 
-        const string bigType = "ResourceLoaderDebuger";
-
-        Func<string> getName = () => string.Format("{0}-{1}-{2}", type, url, loader.Desc);
-
-        var newHelpGameObject = new GameObject(getName());
-        KDebuggerObjectTool.SetParent(bigType, type, newHelpGameObject);
-        var newHelp = newHelpGameObject.AddComponent<KResourceLoaderDebugger>();
-        newHelp.TheLoader = loader;
-
-        loader.SetDescEvent += (newDesc) =>
+        public static KResourceLoaderDebugger Create(string type, string url, KAbstractResourceLoader loader)
         {
-            if (loader.RefCount > 0)
-                newHelpGameObject.name = getName();
-        };
+            if (IsApplicationQuit) return null;
+
+            const string bigType = "ResourceLoaderDebuger";
+
+            Func<string> getName = () => string.Format("{0}-{1}-{2}", type, url, loader.Desc);
+
+            var newHelpGameObject = new GameObject(getName());
+            KDebuggerObjectTool.SetParent(bigType, type, newHelpGameObject);
+            var newHelp = newHelpGameObject.AddComponent<KResourceLoaderDebugger>();
+            newHelp.TheLoader = loader;
+
+            loader.SetDescEvent += (newDesc) =>
+            {
+                if (loader.RefCount > 0)
+                    newHelpGameObject.name = getName();
+            };
 
 
-        loader.DisposeEvent += () =>
+            loader.DisposeEvent += () =>
+            {
+                if (!IsApplicationQuit)
+                    KDebuggerObjectTool.RemoveFromParent(bigType, type, newHelpGameObject);
+            };
+
+
+            return newHelp;
+        }
+
+        private void Update()
         {
-            if (!IsApplicationQuit)
-                KDebuggerObjectTool.RemoveFromParent(bigType, type, newHelpGameObject);
-        };
+            RefCount = TheLoader.RefCount;
+            FinishUsedTime = TheLoader.FinishUsedTime;
+        }
 
+        private void OnApplicationQuit()
+        {
+            IsApplicationQuit = true;
+        }
 
-        return newHelp;
     }
 
-    private void Update()
-    {
-        RefCount = TheLoader.RefCount;
-        FinishUsedTime = TheLoader.FinishUsedTime;
-    }
-
-    private void OnApplicationQuit()
-    {
-        IsApplicationQuit = true;
-    }
-    
 }

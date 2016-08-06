@@ -49,6 +49,8 @@ namespace KEngine.Editor
             KUnityEditorEventCatcher.OnWillPlayEvent += OnWillPlayEvent;
             KUnityEditorEventCatcher.OnSaveSceneEvent -= OnSaveScene;
             KUnityEditorEventCatcher.OnSaveSceneEvent += OnSaveScene;
+            KUnityEditorEventCatcher.OnBeforeBuildPlayerEvent -= OnBeforeBuildPlayerEvent;
+            KUnityEditorEventCatcher.OnBeforeBuildPlayerEvent += OnBeforeBuildPlayerEvent;
         }
 
         private static void OnSaveScene()
@@ -98,7 +100,8 @@ namespace KEngine.Editor
 
 #endif
 
-        private static void OnWillPlayEvent()
+
+        private static void OnBeforeBuildPlayerEvent()
         {
             // Auto Link resources when play!
             if (!Directory.Exists(ResourcesSymbolLinkHelper.GetLinkPath()))
@@ -106,6 +109,10 @@ namespace KEngine.Editor
                 Log.Warning("Auto Link Bundle Resources Path... {0}", ResourcesSymbolLinkHelper.GetLinkPath());
                 ResourcesSymbolLinkHelper.SymbolLinkResource();
             }
+        }
+
+        private static void OnWillPlayEvent()
+        {
         }
 
         [MenuItem("KEngine/UI(UGUI)/Export Current UI %&e")]

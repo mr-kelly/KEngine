@@ -27,7 +27,6 @@
 using System;
 using System.Collections;
 using System.IO;
-using KEngine;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -130,16 +129,16 @@ namespace KEngine
         /// <summary>
         /// StreamingAssetsPath/Bundles/Android/ etc.
         /// </summary>
-        public static string StreamingPlatformPath;
+        public static string BundlesPathWithProtocol { get; private set; }
 
-        public static string StreamingPlatformPathWithoutFileProtocol;
+        public static string BundlesPathWithoutFileProtocol { get; private set; }
 
         /// <summary>
-        /// Resources/Bundles/Android/ etc...
+        /// Bundles/Android/ etc... no prefix for streamingAssets
         /// </summary>
-        public static string ResourceFolderPlatformPath;
+        public static string BundlesPathRelative { get; private set; }
 
-        public static string ApplicationPath;
+        public static string ApplicationPath { get; private set; }
 
         public static string DocumentResourcesPathWithoutFileProtocol
         {
@@ -267,18 +266,18 @@ namespace KEngine
         /// <returns></returns>
         public static bool TryGetInAppStreamingUrl(string url, out string newUrl)
         {
-            newUrl = StreamingPlatformPath + url;
+            newUrl = BundlesPathWithProtocol + url;
 
             // 注意，StreamingAssetsPath在Android平台時，壓縮在apk里面，不要做文件檢查了
             if (!Application.isEditor && Application.platform == RuntimePlatform.Android)
             {
-                if (!KEngineAndroidPlugin.IsAssetExists(ResourceFolderPlatformPath + url))
+                if (!KEngineAndroidPlugin.IsAssetExists(BundlesPathRelative + url))
                     return false;
             }
             else
             {
                 // Editor, 非android运行，直接进行文件检查
-                if (!File.Exists(StreamingPlatformPathWithoutFileProtocol + url))
+                if (!File.Exists(BundlesPathWithoutFileProtocol + url))
                 {
                     return false;
                 }
@@ -287,7 +286,7 @@ namespace KEngine
             // Windows/Edtiro平台下，进行大小敏感判断
             if (Application.isEditor)
             {
-                var result = FileExistsWithDifferentCase(StreamingPlatformPathWithoutFileProtocol + url);
+                var result = FileExistsWithDifferentCase(BundlesPathWithoutFileProtocol + url);
                 if (!result)
                 {
                     Log.Error("[大小写敏感]发现一个资源 {0}，大小写出现问题，在Windows可以读取，手机不行，请改表修改！", url);
@@ -365,7 +364,8 @@ namespace KEngine
             if (Debug.isDebugBuild)
             {
                 Log.Info("ResourceManager ApplicationPath: {0}", ApplicationPath);
-                Log.Info("ResourceManager StreamingPlatformPath: {0}", StreamingPlatformPath);
+                Log.Info("ResourceManager BundlesPathWithProtocol: {0}", BundlesPathWithProtocol);
+                Log.Info("ResourceManager BundlesPathWithoutProtocol: {0}", BundlesPathWithoutFileProtocol);
                 Log.Info("ResourceManager DocumentResourcesPath: {0}", DocumentResourcesPath);
                 Log.Info("================================================================================");
             }
@@ -420,7 +420,7 @@ namespace KEngine
         /// <returns>Platform folder Name</returns>
         public static string GetBuildPlatformName()
         {
-            string buildPlatformName = "Win32"; // default
+            string buildPlatformName = "Windows"; // default
 
             if (Application.isEditor)
             {
@@ -428,16 +428,21 @@ namespace KEngine
                 //UnityEditor.EditorUserBuildSettings.activeBuildTarget;
                 switch (buildTarget)
                 {
+                    case "StandaloneOSXIntel":
+                    case "StandaloneOSXIntel64":
+                    case "StandaloneOSXUniversal":
+                        buildPlatformName = "MacOS";
+                        break;
                     case "StandaloneWindows": // UnityEditor.BuildTarget.StandaloneWindows:
                     case "StandaloneWindows64": // UnityEditor.BuildTarget.StandaloneWindows64:
-                        buildPlatformName = "Win32";
+                        buildPlatformName = "Windows";
                         break;
                     case "Android": // UnityEditor.BuildTarget.Android:
                         buildPlatformName = "Android";
                         break;
                     case "iPhone": // UnityEditor.BuildTarget.iPhone:
                     case "iOS":
-                        buildPlatformName = "IOS";
+                        buildPlatformName = "iOS";
                         break;
                     default:
                         Debuger.Assert(false);
@@ -448,15 +453,18 @@ namespace KEngine
             {
                 switch (Application.platform)
                 {
+                    case RuntimePlatform.OSXPlayer:
+                        buildPlatformName = "MacOS";
+                        break;
                     case RuntimePlatform.Android:
                         buildPlatformName = "Android";
                         break;
                     case RuntimePlatform.IPhonePlayer:
-                        buildPlatformName = "IOS";
+                        buildPlatformName = "iOS";
                         break;
                     case RuntimePlatform.WindowsPlayer:
                     case RuntimePlatform.WindowsWebPlayer:
-                        buildPlatformName = "Win32";
+                        buildPlatformName = "Windows";
                         break;
                     default:
                         Debuger.Assert(false);
@@ -564,6 +572,7 @@ namespace KEngine
         {
             string editorProductPath = EditorProductFullPath;
 
+            BundlesPathRelative = string.Format("{0}/{1}/", BundlesDirName, GetBuildPlatformName());
             DocumentResourcesPath = FileProtocol + DocumentResourcesPathWithoutFileProtocol;
 
             switch (Application.platform)
@@ -572,23 +581,21 @@ namespace KEngine
                 case RuntimePlatform.OSXEditor:
                     {
                         ApplicationPath = string.Format("{0}{1}/", GetFileProtocol(), editorProductPath);
-                        StreamingPlatformPath = GetFileProtocol() + EditorAssetBundleFullPath + "/" + BuildPlatformName + "/";
-                        StreamingPlatformPathWithoutFileProtocol = EditorAssetBundleFullPath + "/" + BuildPlatformName + "/";
-                        ResourceFolderPlatformPath = string.Format("{0}/{1}/", BundlesDirName, GetBuildPlatformName());
+                        BundlesPathWithProtocol = GetFileProtocol() + EditorAssetBundleFullPath + "/" + BuildPlatformName + "/";
+                        BundlesPathWithoutFileProtocol = EditorAssetBundleFullPath + "/" + BuildPlatformName + "/";
                         // Resources folder
                     }
                     break;
                 case RuntimePlatform.WindowsPlayer:
                 case RuntimePlatform.OSXPlayer:
-                    {
-                        string path = Application.dataPath.Replace('\\', '/');
-                        path = path.Substring(0, path.LastIndexOf('/') + 1);
-                        ApplicationPath = string.Format("{0}{1}/", GetFileProtocol(), path);
-                        StreamingPlatformPath = string.Format("{0}{1}/{2}/{3}/", GetFileProtocol(), path, BundlesDirName,
+                {
+                        string path = Application.streamingAssetsPath.Replace('\\', '/');//Application.dataPath.Replace('\\', '/');
+//                        path = path.Substring(0, path.LastIndexOf('/') + 1);
+                        ApplicationPath = string.Format("{0}{1}/", GetFileProtocol(), Application.dataPath);
+                        BundlesPathWithProtocol = string.Format("{0}{1}/{2}/{3}/", GetFileProtocol(), path, BundlesDirName,
                             GetBuildPlatformName());
-                        StreamingPlatformPathWithoutFileProtocol = string.Format("{0}/{1}/{2}/", path, BundlesDirName,
+                        BundlesPathWithoutFileProtocol = string.Format("{0}/{1}/{2}/", path, BundlesDirName,
                             GetBuildPlatformName());
-                        ResourceFolderPlatformPath = string.Format("{0}/{1}/", BundlesDirName, GetBuildPlatformName());
                         // Resources folder
                     }
                     break;
@@ -596,11 +603,10 @@ namespace KEngine
                     {
                         ApplicationPath = string.Concat("jar:", GetFileProtocol(), Application.dataPath,
                             string.Format("!/assets/{0}/", BundlesDirName));
-                        StreamingPlatformPath = string.Concat(ApplicationPath, GetBuildPlatformName(), "/");
-                        StreamingPlatformPathWithoutFileProtocol = string.Concat(Application.dataPath,
+                        BundlesPathWithProtocol = string.Concat(ApplicationPath, GetBuildPlatformName(), "/");
+                        BundlesPathWithoutFileProtocol = string.Concat(Application.dataPath,
                             "!/assets/" + BundlesDirName + "/", GetBuildPlatformName() + "/");
                         // 注意，StramingAsset在Android平台中，是在壓縮的apk里，不做文件檢查
-                        ResourceFolderPlatformPath = string.Format("{0}/{1}/", BundlesDirName, GetBuildPlatformName());
                         // Resources folder
                     }
                     break;
@@ -609,11 +615,10 @@ namespace KEngine
                         ApplicationPath =
                             System.Uri.EscapeUriString(GetFileProtocol() + Application.streamingAssetsPath + "/" +
                                                        BundlesDirName + "/"); // MacOSX下，带空格的文件夹，空格字符需要转义成%20
-                        StreamingPlatformPath = string.Format("{0}{1}/", ApplicationPath, GetBuildPlatformName());
+                        BundlesPathWithProtocol = string.Format("{0}{1}/", ApplicationPath, GetBuildPlatformName());
                         // only iPhone need to Escape the fucking Url!!! other platform works without it!!! Keng Die!
-                        StreamingPlatformPathWithoutFileProtocol = Application.streamingAssetsPath + "/" + BundlesDirName + "/" +
+                        BundlesPathWithoutFileProtocol = Application.streamingAssetsPath + "/" + BundlesDirName + "/" +
                                                                    GetBuildPlatformName() + "/";
-                        ResourceFolderPlatformPath = string.Format("{0}/{1}/", BundlesDirName, GetBuildPlatformName());
                         // Resources folder
                     }
                     break;

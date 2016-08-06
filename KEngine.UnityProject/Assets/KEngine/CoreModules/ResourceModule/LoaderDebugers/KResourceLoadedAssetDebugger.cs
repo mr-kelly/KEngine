@@ -24,47 +24,52 @@
 
 #endregion
 
+using KEngine;
 using UnityEngine;
 
-/// <summary>
-/// 对XXXLoader的结果Asset进行Debug显示
-/// </summary>
-public class KResoourceLoadedAssetDebugger : MonoBehaviour
+namespace KEngine
 {
-    public string MemorySize;
-    public UnityEngine.Object TheObject;
-    private const string bigType = "LoadedAssetDebugger";
-    public string Type;
-    private bool IsRemoveFromParent = false;
 
-    public static KResoourceLoadedAssetDebugger Create(string type, string url, UnityEngine.Object theObject)
+    /// <summary>
+    /// 对XXXLoader的结果Asset进行Debug显示
+    /// </summary>
+    public class KResoourceLoadedAssetDebugger : MonoBehaviour
     {
-        var newHelpGameObject = new GameObject(string.Format("LoadedObject-{0}-{1}", type, url));
-        KDebuggerObjectTool.SetParent(bigType, type, newHelpGameObject);
+        public string MemorySize;
+        public UnityEngine.Object TheObject;
+        private const string bigType = "LoadedAssetDebugger";
+        public string Type;
+        private bool IsRemoveFromParent = false;
 
-        var newHelp = newHelpGameObject.AddComponent<KResoourceLoadedAssetDebugger>();
-        newHelp.Type = type;
-        newHelp.TheObject = theObject;
-        newHelp.MemorySize = string.Format("{0:F5}KB", Profiler.GetRuntimeMemorySize(theObject)/1024f);
-        return newHelp;
-    }
-
-    private void Update()
-    {
-        if (TheObject == null && !IsRemoveFromParent)
+        public static KResoourceLoadedAssetDebugger Create(string type, string url, UnityEngine.Object theObject)
         {
-            KDebuggerObjectTool.RemoveFromParent(bigType, Type, gameObject);
-            IsRemoveFromParent = true;
+            var newHelpGameObject = new GameObject(string.Format("LoadedObject-{0}-{1}", type, url));
+            KDebuggerObjectTool.SetParent(bigType, type, newHelpGameObject);
+
+            var newHelp = newHelpGameObject.AddComponent<KResoourceLoadedAssetDebugger>();
+            newHelp.Type = type;
+            newHelp.TheObject = theObject;
+            newHelp.MemorySize = string.Format("{0:F5}KB", UnityEngine.Profiler.GetRuntimeMemorySize(theObject) / 1024f);
+            return newHelp;
         }
-    }
 
-    // 可供调试删资源
-    private void OnDestroy()
-    {
-        if (!IsRemoveFromParent)
+        private void Update()
         {
-            KDebuggerObjectTool.RemoveFromParent(bigType, Type, gameObject);
-            IsRemoveFromParent = true;
+            if (TheObject == null && !IsRemoveFromParent)
+            {
+                KDebuggerObjectTool.RemoveFromParent(bigType, Type, gameObject);
+                IsRemoveFromParent = true;
+            }
+        }
+
+        // 可供调试删资源
+        private void OnDestroy()
+        {
+            if (!IsRemoveFromParent)
+            {
+                KDebuggerObjectTool.RemoveFromParent(bigType, Type, gameObject);
+                IsRemoveFromParent = true;
+            }
         }
     }
 }

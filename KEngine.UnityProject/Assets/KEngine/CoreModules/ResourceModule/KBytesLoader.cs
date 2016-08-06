@@ -33,64 +33,68 @@ namespace KEngine
 {
 
     /// <summary>
-    /// 读取字节，调用WWW或Resources.Load
+    /// 读取字节，调用WWW, 会自动识别Product/Bundles/Platform目录和StreamingAssets路径
     /// </summary>
-    public class KBytesLoader : KAbstractResourceLoader
+    public class BytesLoader : KAbstractResourceLoader
     {
         public byte[] Bytes { get; private set; }
+
+        /// <summary>
+        /// 异步模式中使用了WWWLoader
+        /// </summary>
         private KWWWLoader _wwwLoader;
 
         private LoaderMode _loaderMode;
 
-        public static KBytesLoader Load(string path, LoaderMode loaderMode)
+        public static BytesLoader Load(string path, LoaderMode loaderMode)
         {
-            var newLoader = AutoNew<KBytesLoader>(path, null, false, loaderMode);
-
+            var newLoader = AutoNew<BytesLoader>(path, null, false, loaderMode);
             return newLoader;
         }
 
-        private string FullUrl;
+        private string _fullUrl;
 
-        private IEnumerator CoLoad(string url, LoaderMode loaderMode)
+        private IEnumerator CoLoad(string url)
         {
-            if (KResourceModule.GetResourceFullPath(url, out FullUrl))
+            if (!KResourceModule.GetResourceFullPath(url, out _fullUrl))
             {
+                if (Debug.isDebugBuild)
+                    Log.Error("[BytesLoader]Error Path: {0}", url);
+                OnFinish(null);
+                yield break;
+            }
 
+            if (_loaderMode == LoaderMode.Sync)
+            {
+                var loadSyncPath = string.Format("{0}/{1}", KResourceModule.BundlesPathWithoutFileProtocol, url);
+                if (Application.isEditor) // Editor mode : 读取Product配置目录
+                    Bytes = File.ReadAllBytes(loadSyncPath);
+                else // product mode: read streamingAssetsPath
+                {
+                    Bytes = KResourceModule.LoadSyncFromStreamingAssets(loadSyncPath);
+                }
             }
             else
             {
-                if (Debug.isDebugBuild)
-                    Log.Error("[KBytesLoader]Error Path: {0}", url);
-                OnFinish(null);
-            }
-            {
-                if (_loaderMode == LoaderMode.Sync)
+                _wwwLoader = KWWWLoader.Load(_fullUrl);
+                while (!_wwwLoader.IsCompleted)
                 {
-                    var loadSyncPath = string.Format("{0}/{1}", KResourceModule.StreamingPlatformPathWithoutFileProtocol, url);
-                    Bytes = KResourceModule.LoadSyncFromStreamingAssets(loadSyncPath);
+                    Progress = _wwwLoader.Progress / 2f; // 最多50%， 要算上Parser的嘛
+                    yield return null;
                 }
-                else
+
+                if (!_wwwLoader.IsSuccess)
                 {
-                    _wwwLoader = KWWWLoader.Load(FullUrl);
-                    while (!_wwwLoader.IsCompleted)
-                    {
-                        Progress = _wwwLoader.Progress / 2f; // 最多50%， 要算上Parser的嘛
-                        yield return null;
-                    }
-
-                    if (!_wwwLoader.IsSuccess)
-                    {
-                        //if (AssetBundlerLoaderErrorEvent != null)
-                        //{
-                        //    AssetBundlerLoaderErrorEvent(this);
-                        //}
-                        Log.Error("[KBytesLoader]Error Load WWW: {0}", url);
-                        OnFinish(null);
-                        yield break;
-                    }
-
-                    Bytes = _wwwLoader.Www.bytes;
+                    //if (AssetBundlerLoaderErrorEvent != null)
+                    //{
+                    //    AssetBundlerLoaderErrorEvent(this);
+                    //}
+                    Log.Error("[BytesLoader]Error Load WWW: {0}", url);
+                    OnFinish(null);
+                    yield break;
                 }
+
+                Bytes = _wwwLoader.Www.bytes;
             }
 
             OnFinish(Bytes);
@@ -100,7 +104,7 @@ namespace KEngine
             base.Init(url, args);
 
             _loaderMode = (LoaderMode)args[0];
-            KResourceModule.Instance.StartCoroutine(CoLoad(url, _loaderMode));
+            KResourceModule.Instance.StartCoroutine(CoLoad(url));
 
         }
 
