@@ -41,7 +41,7 @@ namespace KEngine.UI
     [Obsolete("Use UIModule instead of KUIModule")]
     public class KUIModule : UIModule
     {
-        
+
     }
 
     /// <summary>
@@ -171,7 +171,6 @@ namespace KEngine.UI
                 OpenWindow(name, args);
             }
         }
-
 
         /// <summary>
         /// // Dynamic动态窗口，复制基准面板
@@ -386,20 +385,34 @@ namespace KEngine.UI
             return openState;
         }
 
-        private IEnumerator LoadUIAssetBundle(string name, CUILoadState openState)
+        private IEnumerator LoadUIAssetBundle(string name, CUILoadState openState, KCallback callback = null)
         {
+            if (openState.UIResourceLoader != null)
+            {
+                openState.UIResourceLoader.Release(true);// now!
+                Log.Info("Release UI ResourceLoader: {0}", openState.UIResourceLoader.Url);
+                openState.UIResourceLoader = null;
+            }
+
             LoadingUICount++;
 
             var request = new UILoadRequest();
             yield return KResourceModule.Instance.StartCoroutine(UiBridge.LoadUIAsset(openState, request));
 
-            GameObject uiObj = (GameObject) request.Asset;
+            GameObject uiObj = (GameObject)request.Asset;
             // 具体加载逻辑结束...这段应该放到Bridge里
 
             uiObj.SetActive(false);
             uiObj.name = openState.TemplateName;
 
             var uiBase = UiBridge.CreateUIController(uiObj, openState.TemplateName);
+
+            if (openState.UIWindow != null)
+            {
+                Log.Info("Destroy exist UI Window, maybe for reload");
+                GameObject.Destroy(openState.UIWindow.CachedGameObject);
+                openState.UIWindow = null;
+            }
 
             openState.UIWindow = uiBase;
 
@@ -411,15 +424,34 @@ namespace KEngine.UI
             InitWindow(openState, uiBase, openState.OpenWhenFinish, openState.OpenArgs);
 
             LoadingUICount--;
+
+            if (callback != null)
+                callback(null);
         }
 
-        public void DestroyWindow(string name)
+        /// <summary>
+        /// Hot reload a ui asset bundle
+        /// </summary>
+        /// <param name="uiTemplateName"></param>
+        public Coroutine ReloadWindow(string windowTemplateName, KCallback callback)
         {
             CUILoadState uiState;
-            UIWindows.TryGetValue(name, out uiState);
+            UIWindows.TryGetValue(windowTemplateName, out uiState);
             if (uiState == null || uiState.UIWindow == null)
             {
-                Log.Info("{0} has been destroyed", name);
+                Log.Info("{0} has been destroyed", windowTemplateName);
+                return null;
+            }
+            return KResourceModule.Instance.StartCoroutine(LoadUIAssetBundle(windowTemplateName, uiState));
+        }
+
+        public void DestroyWindow(string uiTemplateName)
+        {
+            CUILoadState uiState;
+            UIWindows.TryGetValue(uiTemplateName, out uiState);
+            if (uiState == null || uiState.UIWindow == null)
+            {
+                Log.Info("{0} has been destroyed", uiTemplateName);
                 return;
             }
 
@@ -428,7 +460,7 @@ namespace KEngine.UI
             uiState.UIResourceLoader.Release();
             uiState.UIWindow = null;
 
-            UIWindows.Remove(name);
+            UIWindows.Remove(uiTemplateName);
         }
 
         /// <summary>
@@ -485,7 +517,7 @@ namespace KEngine.UI
         {
             string uiName = typeof(T).Name.Remove(0, 3); // 去掉 "XUI"
 
-            CallUI(uiName, (UIController _uibase, object[] _args) => { callback(_uibase as T, _args); }, args);
+            CallUI(uiName, (_uibase, _args) => { callback(_uibase as T, _args); }, args);
         }
 
         private void OnOpen(CUILoadState uiState, params object[] args)
@@ -499,7 +531,7 @@ namespace KEngine.UI
 
             UIController uiBase = uiState.UIWindow;
 
-            Action doOpenAction = () =>
+            //Action doOpenAction = () =>
             {
                 if (uiBase.gameObject.activeSelf)
                 {
@@ -517,7 +549,7 @@ namespace KEngine.UI
                 });
             };
 
-            doOpenAction();
+            //            doOpenAction();
         }
 
 
@@ -569,7 +601,7 @@ namespace KEngine.UI
 
         public CUILoadState(string uiTemplateName, string uiInstanceName, Type uiControllerType = default(Type))
         {
-            if (uiControllerType == default(Type)) uiControllerType = typeof (UIController);
+            if (uiControllerType == default(Type)) uiControllerType = typeof(UIController);
 
             TemplateName = uiTemplateName;
             InstanceName = uiInstanceName;

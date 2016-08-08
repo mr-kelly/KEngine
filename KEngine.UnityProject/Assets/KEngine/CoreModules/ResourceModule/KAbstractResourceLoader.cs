@@ -408,7 +408,28 @@ namespace KEngine
             }
         }
 
-        // 后边改变吧~~不叫Dispose!
+        /// <summary>
+        /// 当被执行了ReleaseNow，这里控制成true； DoDipose的其它类，根据这个来判断自己是否也需要releaseNow
+        /// </summary>
+        protected internal bool IsBeenReleaseNow = false;
+
+        /// <summary>
+        /// 执行Release，并立刻出发残余清理
+        /// </summary>
+        public virtual void Release(bool now)
+        {
+            if (now)
+                IsBeenReleaseNow = true;
+
+            Release();
+
+            if (now)
+                DoGarbageCollect();
+        }
+
+        /// <summary>
+        /// 释放资源，减少引用计数
+        /// </summary>
         public virtual void Release()
         {
             if (IsReadyDisposed && Debug.isDebugBuild)
@@ -440,11 +461,18 @@ namespace KEngine
                 UnUsesLoaders[this] = Time.time;
 
                 IsReadyDisposed = true;
+                OnReadyDisposed();
 
                 //DoGarbageCollect();
             }
         }
 
+        /// <summary>
+        /// 引用为0时，进入准备Disposed状态时触发
+        /// </summary>
+        protected virtual void OnReadyDisposed()
+        {
+        }
         //protected bool RealDisposed = false;
 
         /// <summary>

@@ -34,7 +34,7 @@ using UnityEngine;
 
 namespace KEngine
 {
-    public enum KLogLevel
+    public enum LogLevel
     {
         All = 0,
         Trace,
@@ -53,8 +53,8 @@ namespace KEngine
     /// </summary>
     public class Log
     {
-        public delegate void LogCallback(string condition, string stackTrace, KLogLevel type);
-        public static KLogLevel LogLevel = KLogLevel.Info;
+        public delegate void LogCallback(string condition, string stackTrace, LogLevel type);
+        public static LogLevel LogLevel = LogLevel.Info;
 
         private static event LogCallback LogCallbackEvent;
         private static bool _hasRegisterLogCallback = false;
@@ -84,10 +84,10 @@ namespace KEngine
         {
             Application.LogCallback unityCallback = (c, s, type) =>
             {
-                KLogLevel logLevel;
-                if (type == LogType.Error) logLevel = KLogLevel.Error;
-                else if (type == LogType.Warning) logLevel = KLogLevel.Warning;
-                else logLevel = KLogLevel.Info;
+                LogLevel logLevel;
+                if (type == LogType.Error) logLevel = LogLevel.Error;
+                else if (type == LogType.Warning) logLevel = LogLevel.Warning;
+                else logLevel = LogLevel.Info;
 
                 OnLogCallback(c, s, logLevel);
             };
@@ -157,11 +157,11 @@ namespace KEngine
             }
         }
 
-        public static void LogFileCallbackHandler(string condition, string stacktrace, KLogLevel type)
+        public static void LogFileCallbackHandler(string condition, string stacktrace, LogLevel type)
         {
             try
             {
-                if (type > KLogLevel.Warning)
+                if (type > LogLevel.Warning)
                     LogToFile(condition + "\n\n");
                 else
                     LogToFile(condition + stacktrace + "\n\n");
@@ -172,7 +172,7 @@ namespace KEngine
             }
         }
 
-        private static void OnLogCallback(string condition, string stacktrace, KLogLevel type)
+        private static void OnLogCallback(string condition, string stacktrace, LogLevel type)
         {
             if (LogCallbackEvent != null)
             {
@@ -236,7 +236,7 @@ namespace KEngine
         {
 #if !KENGINE_DLL
             if (IsUnityEditor)
-                DoLog(log, args, KLogLevel.Info);
+                DoLog(log, args, LogLevel.Info);
             else
 #endif
                 Console.WriteLine(log, args);
@@ -244,22 +244,22 @@ namespace KEngine
 
         public static void Trace(string log, params object[] args)
         {
-            DoLog(log, args, KLogLevel.Trace);
+            DoLog(log, args, LogLevel.Trace);
         }
 
         public static void Debug(string log, params object[] args)
         {
-            DoLog(log, args, KLogLevel.Debug);
+            DoLog(log, args, LogLevel.Debug);
         }
 
         //[Obsolete]
         //public static void Trace(string log, params object[] args)
         //{
-        //    DoLog(string.Format(log, args), KLogLevel.Debug);
+        //    DoLog(string.Format(log, args), LogLevel.Debug);
         //}
         public static void Info(string log, params object[] args)
         {
-            DoLog(log, args, KLogLevel.Info);
+            DoLog(log, args, LogLevel.Info);
         }
 
         public static void Logs(params object[] logs)
@@ -270,7 +270,7 @@ namespace KEngine
                 sb.Append(logs[i].ToString());
                 sb.Append(", ");
             }
-            DoLog(sb.ToString(), null, KLogLevel.Info);
+            DoLog(sb.ToString(), null, LogLevel.Info);
         }
 
         public static void LogException(Exception e)
@@ -289,7 +289,7 @@ namespace KEngine
             string log = string.Format("[ERROR]{0}\n\n{1}:{2}\t{3}", err, sf.GetFileName(), sf.GetFileLineNumber(),
                 sf.GetMethod());
             Console.Write(log);
-            DoLog(log, null, KLogLevel.Error);
+            DoLog(log, null, LogLevel.Error);
 
             if (LogErrorEvent != null)
                 LogErrorEvent(err);
@@ -316,15 +316,15 @@ namespace KEngine
 
         public static void Warning(string err, params object[] args)
         {
-            DoLog(err, args, KLogLevel.Warning);
+            DoLog(err, args, LogLevel.Warning);
         }
 
         public static void LogWarning(string err, params object[] args)
         {
-            DoLog(err, args, KLogLevel.Warning);
+            DoLog(err, args, LogLevel.Warning);
         }
 
-        private static void DoLog(string szMsg, object[] args, KLogLevel emLevel)
+        private static void DoLog(string szMsg, object[] args, LogLevel emLevel)
         {
             if (LogLevel > emLevel)
                 return;
@@ -335,15 +335,15 @@ namespace KEngine
 
             switch (emLevel)
             {
-                case KLogLevel.Warning:
-                case KLogLevel.Trace:
+                case LogLevel.Warning:
+                case LogLevel.Trace:
 #if !KENGINE_DLL
                     UnityEngine.Debug.LogWarning(szMsg);
 #else
                     Console.WriteLine(szMsg);
 #endif
                     break;
-                case KLogLevel.Error:
+                case LogLevel.Error:
 #if !KENGINE_DLL
                     UnityEngine.Debug.LogError(szMsg);
 #else

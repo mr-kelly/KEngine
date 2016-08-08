@@ -65,7 +65,7 @@ namespace KEngine.Editor
         {
             var engine = target as AppEngine;
             //Log.InfoLevel
-            Log.LogLevel = (KLogLevel) EditorGUILayout.EnumPopup("Log Level", Log.LogLevel);
+            Log.LogLevel = (LogLevel) EditorGUILayout.EnumPopup("Log Level", Log.LogLevel);
             EditorGUILayout.LabelField("Modules Count: ", engine.GameModules.Count.ToString());
 
             _showModules = EditorGUILayout.Foldout(_showModules, "Modules");
