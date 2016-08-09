@@ -248,7 +248,7 @@ namespace CosmosTable
                                     var hasAllVars = true;
                                     foreach (var var in ifVars)
                                     {
-                                        if (_config.ConditionVars != null && 
+                                        if (_config.ConditionVars == null || 
                                             !_config.ConditionVars.Contains(var)) // 定义的变量，需要全部配置妥当,否则if失败
                                         {
                                             hasAllVars = false;

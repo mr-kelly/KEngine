@@ -51,7 +51,7 @@ namespace KEngine
     public class AppEngine : MonoBehaviour
     {
         public static bool IsDebugBuild { get; private set; } // cache Debug.isDebugBuild for multi thread
-        public bool ShowFps = Debug.isDebugBuild;
+        public bool ShowFps = false;
 
         /// <summary>
         /// To Display FPS in the Debug Mode (Debug.isDebugBuild is true)
@@ -132,6 +132,7 @@ namespace KEngine
         private void Awake()
         {
             IsDebugBuild = Debug.isDebugBuild;
+            ShowFps = IsDebugBuild;
 
             if (EngineInstance != null)
             {

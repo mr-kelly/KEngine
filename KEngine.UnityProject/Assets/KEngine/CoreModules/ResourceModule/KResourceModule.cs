@@ -463,7 +463,9 @@ namespace KEngine
                         buildPlatformName = "iOS";
                         break;
                     case RuntimePlatform.WindowsPlayer:
+#if !UNITY_5_4_OR_NEWER
                     case RuntimePlatform.WindowsWebPlayer:
+#endif
                         buildPlatformName = "Windows";
                         break;
                     default:
@@ -485,8 +487,11 @@ namespace KEngine
         {
             string fileProtocol = "file://";
             if (Application.platform == RuntimePlatform.WindowsEditor ||
-                Application.platform == RuntimePlatform.WindowsPlayer ||
-                Application.platform == RuntimePlatform.WindowsWebPlayer)
+                Application.platform == RuntimePlatform.WindowsPlayer
+#if !UNITY_5_4_OR_NEWER
+                || Application.platform == RuntimePlatform.WindowsWebPlayer
+#endif
+                )
                 fileProtocol = "file:///";
 
             return fileProtocol;
