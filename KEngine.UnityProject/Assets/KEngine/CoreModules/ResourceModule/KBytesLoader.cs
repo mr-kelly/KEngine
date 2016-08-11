@@ -89,7 +89,7 @@ namespace KEngine
                 _wwwLoader = KWWWLoader.Load(_fullUrl);
                 while (!_wwwLoader.IsCompleted)
                 {
-                    Progress = _wwwLoader.Progress / 2f; // 最多50%， 要算上Parser的嘛
+                    Progress = _wwwLoader.Progress;
                     yield return null;
                 }
 
