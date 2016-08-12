@@ -54,7 +54,7 @@ namespace {{ NameSpace }}
                 {
                     _settingsList = new IReloadableSettings[]
                     { {% for file in Files %}
-                        {{ file.ClassName }}Settings.GetInstance(),{% endfor %}
+                        {{ file.ClassName }}Settings._instance,{% endfor %}
                     };
                 }
                 return _settingsList;
@@ -69,9 +69,14 @@ namespace {{ NameSpace }}
 	        for (var i = 0; i < SettingsList.Length; i++)
 	        {
 	            var settings = SettingsList[i];
-                settings.ReloadAll();
-
-	            Log.Info(""Reload settings: {0}, Row Count: {1}"", settings.GetType(), settings.Count);
+                if (settings.Count > 0 // if never reload, ignore
+#if UNITY_EDITOR
+                    || !UnityEditor.EditorApplication.isPlaying // in editor and not playing, force load!
+#endif
+                    )
+                {
+                    settings.ReloadAll();
+                }
 
 	        }
 	    }
@@ -85,11 +90,16 @@ namespace {{ NameSpace }}
 	/// </summary>>
     public partial class {{file.ClassName}}Settings : IReloadableSettings
     {
+        /// <summary>
+        /// How many reload function load?
+        /// </summary>>
+        public static int ReloadCount { get; private set; }
+
 		public static readonly string[] TabFilePaths = 
         {
             {{ file.TabFilePaths }}
         };
-        static {{file.ClassName}}Settings _instance;
+        internal static {{file.ClassName}}Settings _instance = new {{file.ClassName}}Settings();
         Dictionary<{{ file.PrimaryKeyField.FormatType }}, {{file.ClassName}}Setting> _dict = new Dictionary<{{ file.PrimaryKeyField.FormatType }}, {{file.ClassName}}Setting>();
 
         /// <summary>
@@ -111,10 +121,8 @@ namespace {{ NameSpace }}
         /// <returns></returns>
 	    public static {{file.ClassName}}Settings GetInstance()
 	    {
-            if (_instance == null) 
+            if (ReloadCount == 0)
             {
-                _instance = new {{file.ClassName}}Settings();
-
                 _instance._ReloadAll(true);
     #if UNITY_EDITOR
                 if (SettingModule.IsFileSystemMode)
@@ -127,7 +135,7 @@ namespace {{ NameSpace }}
                             if (path.Replace(""\\"", ""/"").EndsWith(path))
                             {
                                 _instance.ReloadAll();
-                                Log.LogConsole_MultiThread(""Reload success! -> "" + path);
+                                Log.LogConsole_MultiThread(""File Watcher! Reload success! -> "" + path);
                             }
                         });
                     }
@@ -135,6 +143,7 @@ namespace {{ NameSpace }}
                 }
     #endif
             }
+
 	        return _instance;
 	    }
         
@@ -186,6 +195,9 @@ namespace {{ NameSpace }}
 	        {
 	            OnReload();
 	        }
+
+            ReloadCount++;
+            Log.Info(""Reload settings: {0}, Row Count: {1}, Reload Count: {2}"", GetType(), Count, ReloadCount);
         }
 
 	    /// <summary>

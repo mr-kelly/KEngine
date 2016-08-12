@@ -43,6 +43,14 @@ namespace KEngine.Editor
         : KBuild_Base
 #endif
     {
+#if UNITY_5
+        /// <summary>
+        /// 是否在保存场景的时候，自动判断场景中是否有UI对象，自动导出Prefab？
+        /// 如果嫌弃保存自动导出，卡顿明显，可以设置这里为false，手动从菜单执行
+        /// </summary>
+        public static bool AutoUIPrefab = true;
+
+#endif
         static KUGUIBuilder()
         {
             KUnityEditorEventCatcher.OnWillPlayEvent -= OnWillPlayEvent;
@@ -56,21 +64,26 @@ namespace KEngine.Editor
         private static void OnSaveScene()
         {
 #if UNITY_5
-            var scenePath = EditorSceneManager.GetActiveScene().path;
-            if (!scenePath.Contains("Assets/" + KEngineDef.ResourcesEditDir+ "/UI") && 
-                !scenePath.Contains("Assets/" + KEngineDef.ResourcesBuildDir+ "/UI"))
-                return;
+            if (AutoUIPrefab)
+            {
+                var scenePath = EditorSceneManager.GetActiveScene().path;
+                if (!scenePath.Contains("Assets/" + KEngineDef.ResourcesEditDir + "/UI") &&
+                    !scenePath.Contains("Assets/" + KEngineDef.ResourcesBuildDir + "/UI"))
+                    return;
 
-            // Unity 5模式，自动把需要打包的资源，转成Prefab放置到UI下
-            Debug.Log("Save Scene... " + EditorSceneManager.GetActiveScene().path);
-            UISceneToPrefabs();
+                // Unity 5模式，自动把需要打包的资源，转成Prefab放置到UI下
+                Debug.Log("Save Scene... " + EditorSceneManager.GetActiveScene().path);
+                UISceneToPrefabs();
+            }
 #endif
         }
 #if UNITY_5
         /// <summary>
         /// Unity 5下，将场景中的UI对象转成Prefab
         /// </summary>
-        private static void UISceneToPrefabs()
+
+        [MenuItem("KEngine/UI(UGUI)/UIScene -> Prefabs")]
+        public static void UISceneToPrefabs()
         {
             var windowAssets = GetUIWIndoeAssetsFromCurrentScene();
             var uiPrefabDir = "Assets/" + KEngineDef.ResourcesBuildDir + "/UI";
@@ -79,7 +92,7 @@ namespace KEngine.Editor
 
             foreach (var windowAsset in windowAssets)
             {
-                var uiPrefabPath = uiPrefabDir + "/" + windowAsset.name+".prefab";
+                var uiPrefabPath = uiPrefabDir + "/" + windowAsset.name + ".prefab";
                 //if (File.Exists(uiPrefabPath))
                 //{
                 //    var srcPrefab = AssetDatabase.LoadAssetAtPath(uiPrefabPath, typeof (UnityEngine.Object));

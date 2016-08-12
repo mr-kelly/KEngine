@@ -124,21 +124,29 @@ namespace KEngine
             KResourceModule.LogRequest("AssetBundle", RelativeResourceUrl);
             KResourceModule.Instance.StartCoroutine(LoadAssetBundle(url));
         }
+
+#if UNITY_5
+        /// <summary>
+        /// 依赖的AssetBundleLoader
+        /// </summary>
+        private KAssetBundleLoader[] _depLoaders;
+#endif
+
         private IEnumerator LoadAssetBundle(string relativeUrl)
         {
 #if UNITY_5
             // Unity 5下，自动进行依赖加载
             var abPath = relativeUrl.ToLower();
             var deps = _assetBundleManifest.GetAllDependencies(abPath);
-            var depLoaders = new KAssetBundleLoader[deps.Length];
+            _depLoaders = new KAssetBundleLoader[deps.Length];
             for (var d = 0; d < deps.Length; d++)
             {
                 var dep = deps[d];
-                depLoaders[d] = KAssetBundleLoader.Load(dep, null, _loaderMode);
+                _depLoaders[d] = KAssetBundleLoader.Load(dep, null, _loaderMode);
             }
-            for (var l = 0; l < depLoaders.Length; l++)
+            for (var l = 0; l < _depLoaders.Length; l++)
             {
-                var loader = depLoaders[l];
+                var loader = _depLoaders[l];
                 while (!loader.IsCompleted)
                 {
                     yield return null;
@@ -211,6 +219,13 @@ namespace KEngine
 
             if (BundleParser != null)
                 BundleParser.Dispose(false);
+#if UNITY_5
+            foreach (var depLoader in _depLoaders)
+            {
+                depLoader.Release();
+            }
+            _depLoaders = null;
+#endif
         }
 
         public override void Release()
