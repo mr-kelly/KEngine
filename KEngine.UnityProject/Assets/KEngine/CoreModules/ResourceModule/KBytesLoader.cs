@@ -105,10 +105,21 @@ namespace KEngine
                 }
 
                 Bytes = _wwwLoader.Www.bytes;
+
             }
 
             OnFinish(Bytes);
         }
+
+        protected override void DoDispose()
+        {
+            base.DoDispose();
+            if (_wwwLoader != null)
+            {
+                _wwwLoader.Release(IsBeenReleaseNow);
+            }
+        }
+
         protected override void Init(string url, params object[] args)
         {
             base.Init(url, args);

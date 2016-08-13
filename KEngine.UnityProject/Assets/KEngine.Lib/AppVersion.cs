@@ -92,8 +92,7 @@ namespace KEngine
         /// <returns></returns>
         public object Clone()
         {
-            var newVersion = new AppVersion(ToString());
-            return newVersion;
+            return this.MemberwiseClone();
         }
 
         /// <summary>
