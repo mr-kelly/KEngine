@@ -164,14 +164,28 @@ namespace {{ NameSpace }}
         }
 
         /// <summary>
+        /// Do reload the setting class : {{ file.ClassName }}, no exception when duplicate primary key, use custom string content
+        /// </summary>
+        public void ReloadAllWithString(string context)
+        {
+            _ReloadAll(false, context);
+        }
+
+        /// <summary>
         /// Do reload the setting file: {{ file.ClassName }}
         /// </summary>
-	    void _ReloadAll(bool throwWhenDuplicatePrimaryKey)
+	    void _ReloadAll(bool throwWhenDuplicatePrimaryKey, string customContent = null)
         {
             for (var j = 0; j < TabFilePaths.Length; j++)
             {
                 var tabFilePath = TabFilePaths[j];
-                using (var tableFile = SettingModule.Get(tabFilePath, false))
+                TableFile tableFile;
+                if (customContent == null)
+                    tableFile = SettingModule.Get(tabFilePath, false);
+                else
+                    tableFile = TableFile.LoadFromString(customContent);
+
+                using (tableFile)
                 {
                     foreach (var row in tableFile)
                     {
