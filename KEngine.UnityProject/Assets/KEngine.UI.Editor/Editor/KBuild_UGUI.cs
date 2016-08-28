@@ -150,11 +150,11 @@ namespace KEngine.Editor
 #endif
         }
 
-        static KUIWindowAsset[] GetUIWIndoeAssetsFromCurrentScene()
+        static UIWindowAsset[] GetUIWIndoeAssetsFromCurrentScene()
         {
 
             //var UIName = Path.GetFileNameWithoutExtension(EditorApplication.currentScene);
-            var windowAssets = GameObject.FindObjectsOfType<KUIWindowAsset>();
+            var windowAssets = GameObject.FindObjectsOfType<UIWindowAsset>();
             if (windowAssets.Length <= 0)
             {
 #if UNITY_5
@@ -162,7 +162,7 @@ namespace KEngine.Editor
 #else
                 var currentScene = EditorApplication.currentScene;
 #endif
-                Log.Error("Not found KUIWindowAsset in scene `{0}`", currentScene);
+                Log.Error("Not found UIWindowAsset in scene `{0}`", currentScene);
             }
 
             return windowAssets;
@@ -192,7 +192,7 @@ namespace KEngine.Editor
             }
             GameObject uiObj = new GameObject(uiName);
             uiObj.layer = (int)UnityLayerDef.UI;
-            uiObj.AddComponent<KUIWindowAsset>();
+            uiObj.AddComponent<UIWindowAsset>();
 
             var uiPanel = new GameObject("Image").AddComponent<Image>();
             uiPanel.transform.parent = uiObj.transform;

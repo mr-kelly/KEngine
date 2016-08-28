@@ -3,7 +3,7 @@
 // KEngine - Toolset and framework for Unity3D
 // ===================================
 // 
-// Filename: KUIWindowAssetEditor.cs
+// Filename: UIWindowAssetEditor.cs
 // Date:     2015/12/03
 // Author:  Kelly
 // Email: 23110388@qq.com
@@ -41,7 +41,7 @@ internal class KUIPanelAssetEditorInitializer
         var obj = EditorUtility.InstanceIDToObject(instanceid) as GameObject;
         if (obj != null)
         {
-            if (obj.GetComponent<KUIWindowAsset>() != null)
+            if (obj.GetComponent<UIWindowAsset>() != null)
             {
                 Rect r = new Rect(selectionrect);
                 r.x = r.width - 30;
@@ -55,12 +55,16 @@ internal class KUIPanelAssetEditorInitializer
     }
 }
 
-[CustomEditor(typeof (KUIWindowAsset))]
-public class KUIWindowAssetEditor : Editor
+[CustomEditor(typeof (UIWindowAsset))]
+public class UIWindowAssetEditor : Editor
 {
+	public static System.Action<UIWindowAsset> CustomInspectorGUIAfter;
+	public static System.Action<UIWindowAsset> CustomInspectorGUIBefore;
     public override void OnInspectorGUI()
     {
+		if (CustomInspectorGUIBefore != null) CustomInspectorGUIBefore(target as UIWindowAsset);
         EditorGUILayout.HelpBox("A UI Will be build for name: " + target.name, MessageType.Info);
         base.OnInspectorGUI();
+		if (CustomInspectorGUIAfter != null) CustomInspectorGUIAfter(target as UIWindowAsset);
     }
 }
