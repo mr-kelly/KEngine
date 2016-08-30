@@ -41,8 +41,8 @@ namespace KEngine
     /// </summary>
     public interface IAppEntry
     {
-        IEnumerator OnBeforeInitModules();
-        IEnumerator OnFinishInitModules();
+        IEnumerator OnBeforeInit();
+        IEnumerator OnGameStart();
     }
 
     /// <summary>
@@ -189,12 +189,15 @@ namespace KEngine
             Log.Info("Finish Init ResourceManager");
 
             if (AppEntry != null)
-                yield return StartCoroutine(AppEntry.OnBeforeInitModules());
+                yield return StartCoroutine(AppEntry.OnBeforeInit());
 
 
             yield return StartCoroutine(DoInitModules(GameModules));
             if (AppEntry != null)
-                yield return StartCoroutine(AppEntry.OnFinishInitModules());
+            {
+                yield return StartCoroutine(AppEntry.OnGameStart());
+                
+            }
 
             IsInited = true;
         }
