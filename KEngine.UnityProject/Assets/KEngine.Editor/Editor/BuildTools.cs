@@ -79,6 +79,32 @@ namespace KEngine.Editor
             
         }
 
+        [MenuItem("KEngine/AssetBundle/Build All to All Platforms")]
+        public static void BuildAllAssetBundlesToAllPlatforms()
+        {
+            var platforms = new List<BuildTarget>()
+            {
+                BuildTarget.iOS,
+                BuildTarget.Android,
+                BuildTarget.StandaloneWindows,
+//                BuildTarget.StandaloneOSXIntel,
+            };
+
+            // Build all support platforms asset bundle
+            var currentBuildTarget = EditorUserBuildSettings.activeBuildTarget;
+            platforms.Remove(currentBuildTarget);
+            BuildAllAssetBundles();
+
+            foreach (var platform in platforms)
+            {
+                EditorUserBuildSettings.SwitchActiveBuildTarget(platform);
+                BuildAllAssetBundles();
+            }
+
+            // revert platform 
+            EditorUserBuildSettings.SwitchActiveBuildTarget(currentBuildTarget);
+        }
+
         [MenuItem("KEngine/AssetBundle/Build All %&b")]
         public static void BuildAllAssetBundles()
         {
