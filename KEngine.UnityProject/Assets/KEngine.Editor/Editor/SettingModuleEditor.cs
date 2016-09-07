@@ -74,7 +74,11 @@ namespace KEngine.Editor
         /// <summary>
         /// 编译出的后缀名, 可修改
         /// </summary>
-        public static string SettingExtension = ".bytes";
+		public static string SettingExtension {
+			get {
+				return AppEngine.GetConfig (KEngineDefaultConfigs.AssetBundleExt);
+			}
+		}
 
         /// <summary>
         /// 生成代码吗？它的路径配置
