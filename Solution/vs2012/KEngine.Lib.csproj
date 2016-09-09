@@ -47,11 +47,17 @@
     <Compile Include="..\..\AssemblyInfo.cs">
       <Link>AssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Lib\AppVersion.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Lib\AppVersion.cs</Link>
+    </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Lib\Debuger.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Lib\Debuger.cs</Link>
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Lib\EngineConfigs.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Lib\EngineConfigs.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Lib\KCallback.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Lib\KCallback.cs</Link>
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Lib\KEngine.Table\TabFileWriter.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Lib\KEngine.Table\TabFileWriter.cs</Link>

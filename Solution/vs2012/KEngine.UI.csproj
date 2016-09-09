@@ -56,14 +56,14 @@
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.UI\KUIModule.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.UI\KUIModule.cs</Link>
     </Compile>
-    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.UI\KUIWindowAsset.cs">
-      <Link>KEngine.UnityProject\Assets\KEngine.UI\KUIWindowAsset.cs</Link>
-    </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.UI\UGUIBridge.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.UI\UGUIBridge.cs</Link>
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.UI\UIController.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.UI\UIController.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.UI\UIWindowAsset.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.UI\UIWindowAsset.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>
