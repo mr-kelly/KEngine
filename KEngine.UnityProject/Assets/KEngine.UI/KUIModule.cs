@@ -597,7 +597,7 @@ namespace KEngine.UI
 
         internal Queue<Action<UIController, object[]>> CallbacksWhenFinish;
         internal Queue<object[]> CallbacksArgsWhenFinish;
-        public KAbstractResourceLoader UIResourceLoader; // 加载器，用于手动释放资源
+        public AbstractResourceLoader UIResourceLoader; // 加载器，用于手动释放资源
 
         public CUILoadState(string uiTemplateName, string uiInstanceName, Type uiControllerType = default(Type))
         {

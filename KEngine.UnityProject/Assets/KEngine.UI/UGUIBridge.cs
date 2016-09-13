@@ -77,7 +77,7 @@ namespace KEngine.UI
 #else
             string path = string.Format("UI/{0}_UI{1}", loadState.TemplateName, KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt));
 #endif
-            var assetLoader = KStaticAssetLoader.Load(path);
+            var assetLoader = StaticAssetLoader.Load(path);
             loadState.UIResourceLoader = assetLoader; // 基本不用手工释放的
             while (!assetLoader.IsCompleted)
                 yield return null;

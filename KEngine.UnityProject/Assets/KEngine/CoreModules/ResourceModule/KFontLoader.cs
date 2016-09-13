@@ -3,7 +3,7 @@
 // KEngine - Toolset and framework for Unity3D
 // ===================================
 // 
-// Filename: KFontLoader.cs
+// Filename: FontLoader.cs
 // Date:     2015/12/03
 // Author:  Kelly
 // Email: 23110388@qq.com
@@ -29,16 +29,16 @@ using UnityEngine;
 
 namespace KEngine
 {
-    public class KFontLoader : KAbstractResourceLoader
+    public class FontLoader : AbstractResourceLoader
     {
-        private KAssetFileLoader _bridge;
+        private AssetFileLoader _bridge;
 
         public override float Progress
         {
             get { return _bridge.Progress; }
         }
 
-        public static KFontLoader Load(string path, Action<bool, Font> callback = null)
+        public static FontLoader Load(string path, Action<bool, Font> callback = null)
         {
             LoaderDelgate realcallback = null;
             if (callback != null)
@@ -46,14 +46,14 @@ namespace KEngine
                 realcallback = (isOk, obj) => callback(isOk, obj as Font);
             }
 
-            return AutoNew<KFontLoader>(path, realcallback);
+            return AutoNew<FontLoader>(path, realcallback);
         }
 
         protected override void Init(string url, params object[] args)
         {
             base.Init(url, args);
 
-            _bridge = KAssetFileLoader.Load(Url, (_isOk, _obj) => { OnFinish(_obj); });
+            _bridge = AssetFileLoader.Load(Url, (_isOk, _obj) => { OnFinish(_obj); });
         }
 
         protected override void DoDispose()

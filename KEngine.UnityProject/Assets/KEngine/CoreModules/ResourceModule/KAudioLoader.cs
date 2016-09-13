@@ -3,7 +3,7 @@
 // KEngine - Toolset and framework for Unity3D
 // ===================================
 // 
-// Filename: KAudioLoader.cs
+// Filename: AudioLoader.cs
 // Date:     2015/12/03
 // Author:  Kelly
 // Email: 23110388@qq.com
@@ -28,35 +28,35 @@ using UnityEngine;
 
 namespace KEngine
 {
-    public class KAudioLoader : KAbstractResourceLoader
+    public class AudioLoader : AbstractResourceLoader
     {
         private AudioClip ResultAudioClip
         {
             get { return ResultObject as AudioClip; }
         }
 
-        private KAssetFileLoader AssetFileBridge;
+        private AssetFileLoader AssetFileBridge;
 
         public override float Progress
         {
             get { return AssetFileBridge.Progress; }
         }
 
-        public static KAudioLoader Load(string url, System.Action<bool, AudioClip> callback = null)
+        public static AudioLoader Load(string url, System.Action<bool, AudioClip> callback = null)
         {
             LoaderDelgate newCallback = null;
             if (callback != null)
             {
                 newCallback = (isOk, obj) => callback(isOk, obj as AudioClip);
             }
-            return AutoNew<KAudioLoader>(url, newCallback);
+            return AutoNew<AudioLoader>(url, newCallback);
         }
 
         protected override void Init(string url, params object[] args)
         {
             base.Init(url, args);
 
-            AssetFileBridge = KAssetFileLoader.Load(url, (bool isOk, UnityEngine.Object obj) => { OnFinish(obj); });
+            AssetFileBridge = AssetFileLoader.Load(url, (bool isOk, UnityEngine.Object obj) => { OnFinish(obj); });
         }
 
         protected override void DoDispose()

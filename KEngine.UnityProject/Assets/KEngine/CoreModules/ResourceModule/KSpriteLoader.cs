@@ -3,7 +3,7 @@
 // KEngine - Toolset and framework for Unity3D
 // ===================================
 // 
-// Filename: KSpriteLoader.cs
+// Filename: SpriteLoader.cs
 // Date:     2015/12/03
 // Author:  Kelly
 // Email: 23110388@qq.com
@@ -28,7 +28,7 @@ using UnityEngine;
 
 namespace KEngine
 {
-    public class KSpriteLoader : KAbstractResourceLoader
+    public class SpriteLoader : AbstractResourceLoader
     {
         public Sprite Asset
         {
@@ -37,7 +37,7 @@ namespace KEngine
 
         public delegate void CSpriteLoaderDelegate(bool isOk, Sprite tex);
 
-        private KAssetFileLoader AssetFileBridge;
+        private AssetFileLoader AssetFileBridge;
 
         public override float Progress
         {
@@ -46,21 +46,21 @@ namespace KEngine
 
         public string Path { get; private set; }
 
-        public static KSpriteLoader Load(string path, CSpriteLoaderDelegate callback = null)
+        public static SpriteLoader Load(string path, CSpriteLoaderDelegate callback = null)
         {
             LoaderDelgate newCallback = null;
             if (callback != null)
             {
                 newCallback = (isOk, obj) => callback(isOk, obj as Sprite);
             }
-            return AutoNew<KSpriteLoader>(path, newCallback);
+            return AutoNew<SpriteLoader>(path, newCallback);
         }
 
         protected override void Init(string url, params object[] args)
         {
             base.Init(url, args);
             Path = url;
-            AssetFileBridge = KAssetFileLoader.Load(Path, OnAssetLoaded);
+            AssetFileBridge = AssetFileLoader.Load(Path, OnAssetLoaded);
         }
 
         private void OnAssetLoaded(bool isOk, UnityEngine.Object obj)

@@ -3,7 +3,7 @@
 // KEngine - Toolset and framework for Unity3D
 // ===================================
 //
-// Filename: KAssetFileLoader.cs
+// Filename: AssetFileLoader.cs
 // Date:     2015/12/03
 // Author:  Kelly
 // Email: 23110388@qq.com
@@ -35,7 +35,7 @@ namespace KEngine
     /// 根據不同模式，從AssetBundle中獲取Asset或從Resources中獲取,两种加载方式同时实现的桥接类
     /// 读取一个文件的对象，不做拷贝和引用
     /// </summary>
-    public class KAssetFileLoader : KAbstractResourceLoader
+    public class AssetFileLoader : AbstractResourceLoader
     {
         public delegate void AssetFileBridgeDelegate(bool isOk, UnityEngine.Object resultObj);
 
@@ -56,9 +56,9 @@ namespace KEngine
             }
         }
 
-        private KAssetBundleLoader _bundleLoader;
+        private AssetBundleLoader _bundleLoader;
 
-        public static KAssetFileLoader Load(string path, AssetFileBridgeDelegate assetFileLoadedCallback = null, LoaderMode loaderMode = LoaderMode.Async)
+        public static AssetFileLoader Load(string path, AssetFileBridgeDelegate assetFileLoadedCallback = null, LoaderMode loaderMode = LoaderMode.Async)
         {
             LoaderDelgate realcallback = null;
             if (assetFileLoadedCallback != null)
@@ -66,7 +66,7 @@ namespace KEngine
                 realcallback = (isOk, obj) => assetFileLoadedCallback(isOk, obj as UnityEngine.Object);
             }
 
-            return AutoNew<KAssetFileLoader>(path, realcallback, false, loaderMode);
+            return AutoNew<AssetFileLoader>(path, realcallback, false, loaderMode);
         }
 
         protected override void Init(string url, params object[] args)
@@ -96,7 +96,7 @@ namespace KEngine
             }
             else
             {
-                _bundleLoader = KAssetBundleLoader.Load(path, null, loaderMode);
+                _bundleLoader = AssetBundleLoader.Load(path, null, loaderMode);
 
                 while (!_bundleLoader.IsCompleted)
                 {
@@ -111,7 +111,7 @@ namespace KEngine
 
                 if (!_bundleLoader.IsSuccess)
                 {
-                    Log.Error("[KAssetFileLoader]Load BundleLoader Failed(Error) when Finished: {0}", path);
+                    Log.Error("[AssetFileLoader]Load BundleLoader Failed(Error) when Finished: {0}", path);
                     _bundleLoader.Release();
                     OnFinish(null);
                     yield break;

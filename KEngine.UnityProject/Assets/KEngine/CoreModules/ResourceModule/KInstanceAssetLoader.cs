@@ -3,7 +3,7 @@
 // KEngine - Toolset and framework for Unity3D
 // ===================================
 // 
-// Filename: KInstanceAssetLoader.cs
+// Filename: InstanceAssetLoader.cs
 // Date:     2015/12/03
 // Author:  Kelly
 // Email: 23110388@qq.com
@@ -35,12 +35,12 @@ namespace KEngine
     /// <summary>
     /// 这是拷一份出来的
     /// </summary>
-    public class KInstanceAssetLoader : KAbstractResourceLoader
+    public class InstanceAssetLoader : AbstractResourceLoader
     {
         public delegate void KAssetLoaderDelegate(bool isOk, UnityEngine.Object asset, object[] args);
 
         public GameObject InstanceAsset { get; private set; }
-        private KAssetFileLoader _assetFileBridge; // 引用ResultObject
+        private AssetFileLoader _assetFileBridge; // 引用ResultObject
 
         public override float Progress
         {
@@ -48,9 +48,9 @@ namespace KEngine
         }
 
         // TODO: 无视AssetName暂时！
-        public static KInstanceAssetLoader Load(string url, KAssetFileLoader.AssetFileBridgeDelegate callback = null)
+        public static InstanceAssetLoader Load(string url, AssetFileLoader.AssetFileBridgeDelegate callback = null)
         {
-            var loader = AutoNew<KInstanceAssetLoader>(url, (ok, resultObject) =>
+            var loader = AutoNew<InstanceAssetLoader>(url, (ok, resultObject) =>
             {
                 if (callback != null)
                     callback(ok, resultObject as UnityEngine.Object);
@@ -63,7 +63,7 @@ namespace KEngine
         {
             base.Init(url, args);
 
-            _assetFileBridge = KAssetFileLoader.Load(url, (isOk, asset) =>
+            _assetFileBridge = AssetFileLoader.Load(url, (isOk, asset) =>
             {
                 if (IsReadyDisposed) // 中途释放
                 {
@@ -96,9 +96,9 @@ namespace KEngine
         }
 
         //仅仅是预加载，回调仅告知是否加载成功
-        public static KAssetFileLoader Preload(string path, System.Action<bool> callback = null)
+        public static AssetFileLoader Preload(string path, System.Action<bool> callback = null)
         {
-            return KAssetFileLoader.Load(path, (isOk, asset) =>
+            return AssetFileLoader.Load(path, (isOk, asset) =>
             {
                 if (callback != null)
                     callback(isOk);
@@ -121,7 +121,7 @@ namespace KEngine
         //仅仅是预加载，回调仅告知是否加载成功
         public static IEnumerator CoPreload(string path, System.Action<bool> callback = null)
         {
-            var w = KAssetFileLoader.Load(path, null);
+            var w = AssetFileLoader.Load(path, null);
 
             while (!w.IsCompleted)
                 yield return null;

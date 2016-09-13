@@ -32,7 +32,7 @@ namespace KEngine
     /// <summary>
     /// Shader加载器
     /// </summary>
-    public class KShaderLoader : KAbstractResourceLoader
+    public class ShaderLoader : AbstractResourceLoader
     {
         public delegate void ShaderLoaderDelegate(bool isOk, Shader shader);
 
@@ -41,14 +41,14 @@ namespace KEngine
             get { return ResultObject as Shader; }
         }
 
-        public static KShaderLoader Load(string path, ShaderLoaderDelegate callback = null)
+        public static ShaderLoader Load(string path, ShaderLoaderDelegate callback = null)
         {
             LoaderDelgate newCallback = null;
             if (callback != null)
             {
                 newCallback = (isOk, obj) => callback(isOk, obj as Shader);
             }
-            return AutoNew<KShaderLoader>(path, newCallback);
+            return AutoNew<ShaderLoader>(path, newCallback);
         }
 
         protected override void Init(string url, params object[] args)
@@ -59,7 +59,7 @@ namespace KEngine
 
         private IEnumerator CoLoadShader()
         {
-            var loader = KAssetBundleLoader.Load(Url);
+            var loader = AssetBundleLoader.Load(Url);
             while (!loader.IsCompleted)
             {
                 Progress = loader.Progress;

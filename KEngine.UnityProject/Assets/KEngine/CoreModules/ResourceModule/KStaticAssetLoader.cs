@@ -3,7 +3,7 @@
 // KEngine - Toolset and framework for Unity3D
 // ===================================
 // 
-// Filename: KStaticAssetLoader.cs
+// Filename: StaticAssetLoader.cs
 // Date:     2015/12/03
 // Author:  Kelly
 // Email: 23110388@qq.com
@@ -34,21 +34,21 @@ namespace KEngine
     /// 跟其它TextureLoader不一样的是,它会拷一份
     /// 原加载对象(AssetFileBridge)会被删除，节省内存
     /// </summary>
-    public class KStaticAssetLoader : KAbstractResourceLoader
+    public class StaticAssetLoader : AbstractResourceLoader
     {
         public UnityEngine.Object TheAsset // Copy
         {
             get { return (UnityEngine.Object)ResultObject; }
         }
 
-        private KAssetFileLoader _assetFileLoader;
+        private AssetFileLoader _assetFileLoader;
 
         public override float Progress
         {
             get { return _assetFileLoader.Progress; }
         }
 
-        public static KStaticAssetLoader Load(string url, KAssetFileLoader.AssetFileBridgeDelegate callback = null, LoaderMode loaderMode = LoaderMode.Async)
+        public static StaticAssetLoader Load(string url, AssetFileLoader.AssetFileBridgeDelegate callback = null, LoaderMode loaderMode = LoaderMode.Async)
         {
             LoaderDelgate newCallback = null;
             if (callback != null)
@@ -56,7 +56,7 @@ namespace KEngine
                 newCallback = (isOk, obj) => callback(isOk, obj as UnityEngine.Object);
             }
 
-            return AutoNew<KStaticAssetLoader>(url, newCallback, false, loaderMode);
+            return AutoNew<StaticAssetLoader>(url, newCallback, false, loaderMode);
         }
 
         protected override void Init(string path, params object[] args)
@@ -67,7 +67,7 @@ namespace KEngine
             if (string.IsNullOrEmpty(path))
                 Log.Error("StaticAssetLoader 空资源路径!");
 
-            _assetFileLoader = KAssetFileLoader.Load(path, (_isOk, _obj) =>
+            _assetFileLoader = AssetFileLoader.Load(path, (_isOk, _obj) =>
             {
                 OnFinish(_obj);
 

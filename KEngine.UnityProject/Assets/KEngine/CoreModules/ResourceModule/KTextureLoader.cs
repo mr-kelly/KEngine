@@ -3,7 +3,7 @@
 // KEngine - Toolset and framework for Unity3D
 // ===================================
 // 
-// Filename: KTextureLoader.cs
+// Filename: TextureLoader.cs
 // Date:     2015/12/03
 // Author:  Kelly
 // Email: 23110388@qq.com
@@ -29,7 +29,7 @@ using UnityEngine;
 
 namespace KEngine
 {
-    public class KTextureLoader : KAbstractResourceLoader
+    public class TextureLoader : AbstractResourceLoader
     {
         public Texture Asset
         {
@@ -38,7 +38,7 @@ namespace KEngine
 
         public delegate void CTextureLoaderDelegate(bool isOk, Texture tex);
 
-        private KAssetFileLoader AssetFileBridge;
+        private AssetFileLoader AssetFileBridge;
 
         public override float Progress
         {
@@ -47,14 +47,14 @@ namespace KEngine
 
         public string Path { get; private set; }
 
-        public static KTextureLoader Load(string path, CTextureLoaderDelegate callback = null)
+        public static TextureLoader Load(string path, CTextureLoaderDelegate callback = null)
         {
             LoaderDelgate newCallback = null;
             if (callback != null)
             {
                 newCallback = (isOk, obj) => callback(isOk, obj as Texture);
             }
-            return AutoNew<KTextureLoader>(path, newCallback);
+            return AutoNew<TextureLoader>(path, newCallback);
         }
 
         protected override void Init(string url, params object[] args)
@@ -62,14 +62,14 @@ namespace KEngine
             base.Init(url, args);
 
             Path = url;
-            AssetFileBridge = KAssetFileLoader.Load(Path, OnAssetLoaded);
+            AssetFileBridge = AssetFileLoader.Load(Path, OnAssetLoaded);
         }
 
         private void OnAssetLoaded(bool isOk, UnityEngine.Object obj)
         {
             if (!isOk)
             {
-                Log.Error("[KTextureLoader:OnAssetLoaded]Is not OK: {0}", this.Url);
+                Log.Error("[TextureLoader:OnAssetLoaded]Is not OK: {0}", this.Url);
             }
 
             OnFinish(obj);

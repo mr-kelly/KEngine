@@ -35,7 +35,7 @@ namespace KEngine
     /// <summary>
     /// 读取字节，调用WWW, 会自动识别Product/Bundles/Platform目录和StreamingAssets路径
     /// </summary>
-    public class HotBytesLoader : KAbstractResourceLoader
+    public class HotBytesLoader : AbstractResourceLoader
     {
         public byte[] Bytes { get; private set; }
 

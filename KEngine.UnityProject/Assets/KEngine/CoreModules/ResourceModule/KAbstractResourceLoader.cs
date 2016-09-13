@@ -3,7 +3,7 @@
 // KEngine - Toolset and framework for Unity3D
 // ===================================
 // 
-// Filename: KAbstractResourceLoader.cs
+// Filename: AbstractResourceLoader.cs
 // Date:     2015/12/03
 // Author:  Kelly
 // Email: 23110388@qq.com
@@ -35,12 +35,12 @@ namespace KEngine
     /// <summary>
     /// 所有资源Loader继承这个
     /// </summary>
-    public abstract class KAbstractResourceLoader : IAsyncObject
+    public abstract class AbstractResourceLoader : IAsyncObject
     {
         public delegate void LoaderDelgate(bool isOk, object resultObject);
 
-        private static readonly Dictionary<Type, Dictionary<string, KAbstractResourceLoader>> _loadersPool =
-            new Dictionary<Type, Dictionary<string, KAbstractResourceLoader>>();
+        private static readonly Dictionary<Type, Dictionary<string, AbstractResourceLoader>> _loadersPool =
+            new Dictionary<Type, Dictionary<string, AbstractResourceLoader>>();
 
         private readonly List<LoaderDelgate> _afterFinishedCallbacks = new List<LoaderDelgate>();
 
@@ -74,14 +74,14 @@ namespace KEngine
         /// <summary>
         /// 缓存起来要删掉的，供DoGarbageCollect函数用, 避免重复的new List
         /// </summary>
-        private static readonly List<KAbstractResourceLoader> CacheLoaderToRemoveFromUnUsed =
-            new List<KAbstractResourceLoader>();
+        private static readonly List<AbstractResourceLoader> CacheLoaderToRemoveFromUnUsed =
+            new List<AbstractResourceLoader>();
 
         /// <summary>
         /// 进行垃圾回收
         /// </summary>
-        private static readonly Dictionary<KAbstractResourceLoader, float> UnUsesLoaders =
-            new Dictionary<KAbstractResourceLoader, float>();
+        private static readonly Dictionary<AbstractResourceLoader, float> UnUsesLoaders =
+            new Dictionary<AbstractResourceLoader, float>();
 
         #endregion
 
@@ -196,12 +196,12 @@ namespace KEngine
             return GetTypeDict(typeof(T)).Count;
         }
 
-        protected static Dictionary<string, KAbstractResourceLoader> GetTypeDict(Type type)
+        protected static Dictionary<string, AbstractResourceLoader> GetTypeDict(Type type)
         {
-            Dictionary<string, KAbstractResourceLoader> typesDict;
+            Dictionary<string, AbstractResourceLoader> typesDict;
             if (!_loadersPool.TryGetValue(type, out typesDict))
             {
-                typesDict = _loadersPool[type] = new Dictionary<string, KAbstractResourceLoader>();
+                typesDict = _loadersPool[type] = new Dictionary<string, AbstractResourceLoader>();
             }
             return typesDict;
         }
@@ -209,7 +209,7 @@ namespace KEngine
         public static int GetRefCount<T>(string url)
         {
             var dict = GetTypeDict(typeof(T));
-            KAbstractResourceLoader loader;
+            AbstractResourceLoader loader;
             if (dict.TryGetValue(url, out loader))
             {
                 return loader.RefCount;
@@ -226,10 +226,10 @@ namespace KEngine
         /// <param name="forceCreateNew"></param>
         /// <returns></returns>
         protected static T AutoNew<T>(string url, LoaderDelgate callback = null, bool forceCreateNew = false,
-            params object[] initArgs) where T : KAbstractResourceLoader, new()
+            params object[] initArgs) where T : AbstractResourceLoader, new()
         {
-            Dictionary<string, KAbstractResourceLoader> typesDict = GetTypeDict(typeof(T));
-            KAbstractResourceLoader loader;
+            Dictionary<string, AbstractResourceLoader> typesDict = GetTypeDict(typeof(T));
+            AbstractResourceLoader loader;
             if (string.IsNullOrEmpty(url))
             {
                 Log.Error("[{0}:AutoNew]url为空", typeof(T));
@@ -330,7 +330,7 @@ namespace KEngine
             IsReadyDisposed = false; // 复活！
         }
 
-        protected KAbstractResourceLoader()
+        protected AbstractResourceLoader()
         {
             RefCount = 0;
         }

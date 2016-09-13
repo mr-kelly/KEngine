@@ -35,7 +35,7 @@ namespace KEngine
     /// <summary>
     /// Load www, A wrapper of WWW.
     /// </summary>
-    public class KWWWLoader : KAbstractResourceLoader
+    public class KWWWLoader : AbstractResourceLoader
     {
         // 前几项用于监控器
         private static IEnumerator CachedWWWLoaderMonitorCoroutine; // 专门监控WWW的协程

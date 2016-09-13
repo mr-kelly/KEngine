@@ -3,7 +3,7 @@
 // KEngine - Toolset and framework for Unity3D
 // ===================================
 // 
-// Filename: KMaterialLoader.cs
+// Filename: MaterialLoader.cs
 // Date:     2015/12/03
 // Author:  Kelly
 // Email: 23110388@qq.com
@@ -34,22 +34,22 @@ namespace KEngine
     /// <summary>
     /// 加载材质，通过CSerializeMaterial
     /// </summary>
-    public class KMaterialLoader : KAbstractResourceLoader
+    public class MaterialLoader : AbstractResourceLoader
     {
         public delegate void CCMaterialLoaderDelegate(bool isOk, Material mat);
 
         public Material Mat { get; private set; }
 
-        private List<KTextureLoader> TextureLoaders;
+        private List<TextureLoader> TextureLoaders;
 
-        public static KMaterialLoader Load(string path, CCMaterialLoaderDelegate callback = null)
+        public static MaterialLoader Load(string path, CCMaterialLoaderDelegate callback = null)
         {
-            KAbstractResourceLoader.LoaderDelgate newCallback = null;
+            AbstractResourceLoader.LoaderDelgate newCallback = null;
             if (callback != null)
             {
                 newCallback = (isOk, obj) => callback(isOk, obj as Material);
             }
-            return AutoNew<KMaterialLoader>(path, newCallback);
+            return AutoNew<MaterialLoader>(path, newCallback);
         }
 
         protected override void Init(string url, params object[] args)
@@ -60,7 +60,7 @@ namespace KEngine
 
         private IEnumerator CoLoadSerializeMaterial()
         {
-            var matLoadBridge = KAssetFileLoader.Load(Url);
+            var matLoadBridge = AssetFileLoader.Load(Url);
             while (!matLoadBridge.IsCompleted)
             {
                 Progress = matLoadBridge.Progress;
@@ -87,7 +87,7 @@ namespace KEngine
         {
             if (resultObj == null)
             {
-                Log.Error("[KMaterialLoader:OnFinishe] Null Material: {0}", Url);
+                Log.Error("[MaterialLoader:OnFinishe] Null Material: {0}", Url);
             }
             base.OnFinish(resultObj);
         }
@@ -130,7 +130,7 @@ namespace KEngine
             // 纹理全部加载完成后到这里
             //if (!CachedMaterials.TryGetValue(matPath, out mat))
             {
-                var shaderLoader = KShaderLoader.Load(sMat.ShaderPath);
+                var shaderLoader = ShaderLoader.Load(sMat.ShaderPath);
                 while (!shaderLoader.IsCompleted)
                 {
                     yield return null;
@@ -163,9 +163,9 @@ namespace KEngine
                             Vector2 offset;
                             var texturePath = ParseMaterialStr(shaderProp.PropValue, out tiling, out offset);
                             if (TextureLoaders == null)
-                                TextureLoaders = new List<KTextureLoader>();
+                                TextureLoaders = new List<TextureLoader>();
 
-                            var texLoader = KTextureLoader.Load(texturePath);
+                            var texLoader = TextureLoader.Load(texturePath);
                             TextureLoaders.Add(texLoader);
                             while (!texLoader.IsCompleted)
                                 yield return null;

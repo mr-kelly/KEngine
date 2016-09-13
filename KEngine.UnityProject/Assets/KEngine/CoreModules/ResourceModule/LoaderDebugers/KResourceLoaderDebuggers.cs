@@ -35,12 +35,12 @@ namespace KEngine
     /// </summary>
     public class KResourceLoaderDebugger : MonoBehaviour
     {
-        public KAbstractResourceLoader TheLoader;
+        public AbstractResourceLoader TheLoader;
         public int RefCount;
         public float FinishUsedTime; // 参考，完成所需时间
         public static bool IsApplicationQuit = false;
 
-        public static KResourceLoaderDebugger Create(string type, string url, KAbstractResourceLoader loader)
+        public static KResourceLoaderDebugger Create(string type, string url, AbstractResourceLoader loader)
         {
             if (IsApplicationQuit) return null;
 

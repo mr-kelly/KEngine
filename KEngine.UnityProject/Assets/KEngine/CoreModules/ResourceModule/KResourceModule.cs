@@ -371,7 +371,7 @@ namespace KEngine
 
         private void Update()
         {
-            KAbstractResourceLoader.CheckGcCollect();
+            AbstractResourceLoader.CheckGcCollect();
         }
 
         public IEnumerator Init()
@@ -537,9 +537,9 @@ namespace KEngine
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static KAbstractResourceLoader LoadBundleAsync(string path)
+        public static AbstractResourceLoader LoadBundleAsync(string path)
         {
-            var request = KAssetFileLoader.Load(path);
+            var request = AssetFileLoader.Load(path);
             return request;
         }
 
@@ -548,9 +548,9 @@ namespace KEngine
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static KAbstractResourceLoader LoadBundle(string path, KAssetFileLoader.AssetFileBridgeDelegate callback = null)
+        public static AbstractResourceLoader LoadBundle(string path, AssetFileLoader.AssetFileBridgeDelegate callback = null)
         {
-            var request = KAssetFileLoader.Load(path, callback, LoaderMode.Sync);
+            var request = AssetFileLoader.Load(path, callback, LoaderMode.Sync);
             return request;
         }
 

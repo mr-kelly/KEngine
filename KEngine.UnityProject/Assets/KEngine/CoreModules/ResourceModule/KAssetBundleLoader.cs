@@ -42,12 +42,12 @@ namespace KEngine
     }
 
     // 調用WWWLoader
-    public class KAssetBundleLoader : KAbstractResourceLoader
+    public class AssetBundleLoader : AbstractResourceLoader
     {
         public delegate void CAssetBundleLoaderDelegate(bool isOk, AssetBundle ab);
 
         public static Action<string> NewAssetBundleLoaderEvent;
-        public static Action<KAssetBundleLoader> AssetBundlerLoaderErrorEvent;
+        public static Action<AssetBundleLoader> AssetBundlerLoaderErrorEvent;
 
         private KWWWLoader _wwwLoader;
         private KAssetBundleParser BundleParser;
@@ -69,7 +69,7 @@ namespace KEngine
         /// </summary>
         //private KResourceInAppPathType _inAppPathType;
 
-        public static KAssetBundleLoader Load(string url, CAssetBundleLoaderDelegate callback = null,
+        public static AssetBundleLoader Load(string url, CAssetBundleLoaderDelegate callback = null,
             LoaderMode loaderMode = LoaderMode.Async)
         {
             LoaderDelgate newCallback = null;
@@ -77,7 +77,7 @@ namespace KEngine
             {
                 newCallback = (isOk, obj) => callback(isOk, obj as AssetBundle);
             }
-            var newLoader = AutoNew<KAssetBundleLoader>(url, newCallback, false, loaderMode);
+            var newLoader = AutoNew<AssetBundleLoader>(url, newCallback, false, loaderMode);
 
 
             return newLoader;
@@ -129,7 +129,7 @@ namespace KEngine
         /// <summary>
         /// 依赖的AssetBundleLoader
         /// </summary>
-        private KAssetBundleLoader[] _depLoaders;
+        private AssetBundleLoader[] _depLoaders;
 #endif
 
         private IEnumerator LoadAssetBundle(string relativeUrl)
@@ -138,11 +138,11 @@ namespace KEngine
             // Unity 5下，自动进行依赖加载
             var abPath = relativeUrl.ToLower();
             var deps = _assetBundleManifest.GetAllDependencies(abPath);
-            _depLoaders = new KAssetBundleLoader[deps.Length];
+            _depLoaders = new AssetBundleLoader[deps.Length];
             for (var d = 0; d < deps.Length; d++)
             {
                 var dep = deps[d];
-                _depLoaders[d] = KAssetBundleLoader.Load(dep, null, _loaderMode);
+                _depLoaders[d] = AssetBundleLoader.Load(dep, null, _loaderMode);
             }
             for (var l = 0; l < _depLoaders.Length; l++)
             {
@@ -169,7 +169,7 @@ namespace KEngine
                 {
                     AssetBundlerLoaderErrorEvent(this);
                 }
-                Log.Error("[KAssetBundleLoader]Error Load Bytes AssetBundle: {0}", relativeUrl);
+                Log.Error("[AssetBundleLoader]Error Load Bytes AssetBundle: {0}", relativeUrl);
                 OnFinish(null);
                 yield break;
             }
