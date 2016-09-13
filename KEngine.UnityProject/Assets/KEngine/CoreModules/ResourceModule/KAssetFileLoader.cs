@@ -60,6 +60,9 @@ namespace KEngine
 
         public static AssetFileLoader Load(string path, AssetFileBridgeDelegate assetFileLoadedCallback = null, LoaderMode loaderMode = LoaderMode.Async)
         {
+            // 添加扩展名
+            path = path + AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt);
+
             LoaderDelgate realcallback = null;
             if (assetFileLoadedCallback != null)
             {
@@ -123,21 +126,29 @@ namespace KEngine
 #if UNITY_5
                 // Unity 5 下，不能用mainAsset, 要取对象名
                 var abAssetName = Path.GetFileNameWithoutExtension(Url).ToLower();
-                if (loaderMode == LoaderMode.Sync)
+                if (!assetBundle.isStreamedSceneAssetBundle)
                 {
-                    getAsset = assetBundle.LoadAsset(abAssetName);
-                    Debuger.Assert(getAsset);
+                    if (loaderMode == LoaderMode.Sync)
+                    {
+                        getAsset = assetBundle.LoadAsset(abAssetName);
+                        Debuger.Assert(getAsset);
+                    }
+                    else
+                    {
+                        var request = assetBundle.LoadAssetAsync(abAssetName);
+                        while (!request.isDone)
+                        {
+                            yield return null;
+                        }
+                        Debuger.Assert(getAsset = request.asset);
+                    }
                 }
                 else
                 {
-                    var request = assetBundle.LoadAssetAsync(abAssetName);
-                    while (!request.isDone)
-                    {
-                        yield return null;
-                    }
-                    Debuger.Assert(getAsset = request.asset);
+                    // if it's a scene in asset bundle, did nothing
+                    // but set a fault Object the result
+                    getAsset = KResourceModule.Instance;
                 }
-
 #else
                 // 经过AddWatch调试，.mainAsset这个getter第一次执行时特别久，要做序列化
                 //AssetBundleRequest request = assetBundle.LoadAsync("", typeof(Object));// mainAsset

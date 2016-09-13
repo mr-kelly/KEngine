@@ -73,9 +73,9 @@ namespace KEngine.UI
         public IEnumerator LoadUIAsset(CUILoadState loadState, UILoadRequest request)
         {
 #if UNITY_5
-            string path = string.Format("UI/{0}.prefab{1}", loadState.TemplateName, KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt));
+            string path = string.Format("UI/{0}.prefab", loadState.TemplateName);
 #else
-            string path = string.Format("UI/{0}_UI{1}", loadState.TemplateName, KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt));
+            string path = string.Format("UI/{0}_UI", loadState.TemplateName);
 #endif
             var assetLoader = StaticAssetLoader.Load(path);
             loadState.UIResourceLoader = assetLoader; // 基本不用手工释放的

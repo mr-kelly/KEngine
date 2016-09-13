@@ -536,10 +536,11 @@ namespace KEngine
         /// Load Async Asset Bundle
         /// </summary>
         /// <param name="path"></param>
+        /// <param name="callback">cps style async</param>
         /// <returns></returns>
-        public static AbstractResourceLoader LoadBundleAsync(string path)
+        public static AbstractResourceLoader LoadBundleAsync(string path, AssetFileLoader.AssetFileBridgeDelegate callback = null)
         {
-            var request = AssetFileLoader.Load(path);
+            var request = AssetFileLoader.Load(path, callback);
             return request;
         }
 
@@ -547,6 +548,7 @@ namespace KEngine
         /// load asset bundle immediatly
         /// </summary>
         /// <param name="path"></param>
+        /// <param name="callback"></param>
         /// <returns></returns>
         public static AbstractResourceLoader LoadBundle(string path, AssetFileLoader.AssetFileBridgeDelegate callback = null)
         {
