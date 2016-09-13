@@ -414,16 +414,17 @@ namespace KEngine
         protected internal bool IsBeenReleaseNow = false;
 
         /// <summary>
-        /// 执行Release，并立刻出发残余清理
+        /// 执行Release，并立刻触发残余清理
         /// </summary>
-        public virtual void Release(bool now)
+        /// <param name="gcNow">是否立刻触发垃圾回收，默认垃圾回收是隔几秒进行的</param>
+        public virtual void Release(bool gcNow)
         {
-            if (now)
+            if (gcNow)
                 IsBeenReleaseNow = true;
 
             Release();
 
-            if (now)
+            if (gcNow)
                 DoGarbageCollect();
         }
 
