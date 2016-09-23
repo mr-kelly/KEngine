@@ -82,7 +82,18 @@ namespace KEngine
             Debuger.Assert(_assetFileBridge.Asset);
 
             var sceneName = Path.GetFileNameWithoutExtension(_url);
-            UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName, UnityEngine.SceneManagement.LoadSceneMode.Additive);
+            if (_mode == LoaderMode.Sync)
+                UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName,
+                    UnityEngine.SceneManagement.LoadSceneMode.Additive);
+
+            else
+            {
+                var op = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(sceneName, UnityEngine.SceneManagement.LoadSceneMode.Additive);
+                while (!op.isDone)
+                {
+                    yield return null;
+                }
+            }
 
             if (Application.isEditor)
                 KResourceModule.Instance.StartCoroutine(EditorLoadSceneBugFix(null));
@@ -116,23 +127,18 @@ namespace KEngine
         {
             foreach (var renderer in GameObject.FindObjectsOfType<Renderer>())
             {
-                if (renderer.sharedMaterials != null)
-                {
-                    foreach (var mat in renderer.sharedMaterials)
-                    {
-                        if (mat != null && mat.shader != null)
-                        {
-                            mat.shader = Shader.Find(mat.shader.name);
-                        }
-                    }
-                }
+                AssetFileLoader.RefreshMaterialsShaders(renderer);
             }
         }
+
 
         protected override void DoDispose()
         {
             base.DoDispose();
             _assetFileBridge.Release(IsBeenReleaseNow);
+
+            var sceneName = Path.GetFileNameWithoutExtension(_url);
+            UnityEngine.SceneManagement.SceneManager.UnloadScene(sceneName);
         }
     }
 }

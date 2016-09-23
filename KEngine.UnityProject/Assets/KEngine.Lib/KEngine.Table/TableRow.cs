@@ -44,6 +44,11 @@ namespace KEngine.Table
         {
             return Get_int(value, defaultValue);
         }
+        public bool Get_bool(string value, string defaultValue)
+        {
+            return Get_Boolean(value, defaultValue);
+        }
+
         public bool Get_Boolean(string value, string defaultValue)
         {
             var str = Get_string(value, defaultValue);

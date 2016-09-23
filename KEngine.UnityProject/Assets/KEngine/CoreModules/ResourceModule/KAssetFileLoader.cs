@@ -24,10 +24,12 @@
 
 #endregion
 
+using System;
 using System.Collections;
 using System.IO;
 using KEngine;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace KEngine
 {
@@ -37,11 +39,11 @@ namespace KEngine
     /// </summary>
     public class AssetFileLoader : AbstractResourceLoader
     {
-        public delegate void AssetFileBridgeDelegate(bool isOk, UnityEngine.Object resultObj);
+        public delegate void AssetFileBridgeDelegate(bool isOk, Object resultObj);
 
-        public UnityEngine.Object Asset
+        public Object Asset
         {
-            get { return ResultObject as UnityEngine.Object; }
+            get { return ResultObject as Object; }
         }
 
         private bool IsLoadAssetBundle;
@@ -66,7 +68,7 @@ namespace KEngine
             LoaderDelgate realcallback = null;
             if (assetFileLoadedCallback != null)
             {
-                realcallback = (isOk, obj) => assetFileLoadedCallback(isOk, obj as UnityEngine.Object);
+                realcallback = (isOk, obj) => assetFileLoadedCallback(isOk, obj as Object);
             }
 
             return AutoNew<AssetFileLoader>(path, realcallback, false, loaderMode);
@@ -82,15 +84,15 @@ namespace KEngine
 
         private IEnumerator _Init(string path, LoaderMode loaderMode)
         {
-            IsLoadAssetBundle = KEngine.AppEngine.GetConfig("KEngine", "IsLoadAssetBundle").ToInt32() != 0;
+            IsLoadAssetBundle = AppEngine.GetConfig("KEngine", "IsLoadAssetBundle").ToInt32() != 0;
 
-            UnityEngine.Object getAsset = null;
+            Object getAsset = null;
             if (!IsLoadAssetBundle)
             {
-                string extension = System.IO.Path.GetExtension(path);
+                string extension = Path.GetExtension(path);
                 path = path.Substring(0, path.Length - extension.Length); // remove extensions
 
-                getAsset = Resources.Load<UnityEngine.Object>(path);
+                getAsset = Resources.Load<Object>(path);
                 if (getAsset == null)
                 {
                     Log.Error("Asset is NULL(from Resources Folder): {0}", path);
@@ -122,7 +124,7 @@ namespace KEngine
 
                 var assetBundle = _bundleLoader.Bundle;
 
-                System.DateTime beginTime = System.DateTime.Now;
+                DateTime beginTime = DateTime.Now;
 #if UNITY_5
                 // Unity 5 下，不能用mainAsset, 要取对象名
                 var abAssetName = Path.GetFileNameWithoutExtension(Url).ToLower();
@@ -178,20 +180,42 @@ namespace KEngine
             if (Application.isEditor)
             {
                 if (getAsset != null)
-                    KResoourceLoadedAssetDebugger.Create(getAsset.GetType().Name, Url, getAsset as UnityEngine.Object);
+                    KResoourceLoadedAssetDebugger.Create(getAsset.GetType().Name, Url, getAsset as Object);
+
+                // 编辑器环境下，如果遇到GameObject，对Shader进行Fix
+                if (getAsset is GameObject)
+                {
+                    var go = getAsset as GameObject;
+                    foreach (var r in go.GetComponentsInChildren<Renderer>(true))
+                    {
+                        RefreshMaterialsShaders(r);
+                    }
+                }
             }
 
             if (getAsset != null)
             {
                 // 更名~ 注明来源asset bundle 带有类型
-                getAsset.name = string.Format("{0}~{1}", getAsset, Url);
+                getAsset.name = String.Format("{0}~{1}", getAsset, Url);
             }
             OnFinish(getAsset);
         }
 
-        protected override void OnReadyDisposed()
+        /// <summary>
+        /// 编辑器模式下，对指定GameObject刷新一下Material
+        /// </summary>
+        public static void RefreshMaterialsShaders(Renderer renderer)
         {
-            base.OnReadyDisposed();
+            if (renderer.sharedMaterials != null)
+            {
+                foreach (var mat in renderer.sharedMaterials)
+                {
+                    if (mat != null && mat.shader != null)
+                    {
+                        mat.shader = Shader.Find(mat.shader.name);
+                    }
+                }
+            }
         }
 
         protected override void DoDispose()
@@ -202,14 +226,14 @@ namespace KEngine
             {
                 if (!IsLoadAssetBundle)
                 {
-                    Resources.UnloadAsset(ResultObject as UnityEngine.Object);
+                    Resources.UnloadAsset(ResultObject as Object);
                 }
                 else
                 {
                     //Object.DestroyObject(ResultObject as UnityEngine.Object);
 
                     // Destroying GameObjects immediately is not permitted during physics trigger/contact, animation event callbacks or OnValidate. You must use Destroy instead.
-                    Object.DestroyImmediate(ResultObject as UnityEngine.Object, true);
+                    Object.DestroyImmediate(ResultObject as Object, true);
                 }
 
                 //var bRemove = Caches.Remove(Url);

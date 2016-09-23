@@ -70,7 +70,7 @@ namespace KEngine.UI
         {
         }
 
-        public IEnumerator LoadUIAsset(CUILoadState loadState, UILoadRequest request)
+        public IEnumerator LoadUIAsset(UILoadState loadState, UILoadRequest request)
         {
 #if UNITY_5
             string path = string.Format("UI/{0}.prefab", loadState.TemplateName);

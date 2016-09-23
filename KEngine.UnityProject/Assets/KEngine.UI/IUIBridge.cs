@@ -44,7 +44,7 @@ namespace KEngine.UI
 
         void UIObjectFilter(UIController controller, GameObject uiObject);
 
-        IEnumerator LoadUIAsset(CUILoadState loadState, UILoadRequest request);
+        IEnumerator LoadUIAsset(UILoadState loadState, UILoadRequest request);
 
     }
 }

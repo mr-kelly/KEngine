@@ -367,6 +367,14 @@ namespace KEngine
                 Debuger.Assert(_Instance == this);
 
             //InvokeRepeating("CheckGcCollect", 0f, 3f);
+            if (Debug.isDebugBuild)
+            {
+                Log.Info("ResourceManager ApplicationPath: {0}", ApplicationPath);
+                Log.Info("ResourceManager BundlesPathWithProtocol: {0}", BundlesPathWithProtocol);
+                Log.Info("ResourceManager BundlesPathWithoutProtocol: {0}", BundlesPathWithoutFileProtocol);
+                Log.Info("ResourceManager DocumentResourcesPath: {0}", DocumentResourcesPath);
+                Log.Info("================================================================================");
+            }
         }
 
         private void Update()
@@ -376,15 +384,6 @@ namespace KEngine
 
         public IEnumerator Init()
         {
-
-            if (Debug.isDebugBuild)
-            {
-                Log.Info("ResourceManager ApplicationPath: {0}", ApplicationPath);
-                Log.Info("ResourceManager BundlesPathWithProtocol: {0}", BundlesPathWithProtocol);
-                Log.Info("ResourceManager BundlesPathWithoutProtocol: {0}", BundlesPathWithoutFileProtocol);
-                Log.Info("ResourceManager DocumentResourcesPath: {0}", DocumentResourcesPath);
-                Log.Info("================================================================================");
-            }
             yield break;
         }
 

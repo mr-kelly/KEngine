@@ -80,19 +80,14 @@ namespace KEngine.UI
         /// </summary>
         public IUIBridge UiBridge;
 
-        public Dictionary<string, CUILoadState> UIWindows = new Dictionary<string, CUILoadState>();
-        public bool UIRootLoaded = false;
+        public Dictionary<string, UILoadState> UIWindows = new Dictionary<string, UILoadState>();
 
-        public static event Action<UIController> OnInitEvent;
+        public static Action<UIController> OnInitEvent;
 
-        public static event Action<UIController> OnOpenEvent;
-        public static event Action<UIController> OnCloseEvent;
+        public static Action<UIController> OnOpenEvent;
+        public static Action<UIController> OnCloseEvent;
 
         public UIModule()
-        {
-        }
-
-        public IEnumerator Init()
         {
             var configUiBridge = AppEngine.GetConfig("KEngine.UI", "UIModuleBridge");
 
@@ -117,7 +112,10 @@ namespace KEngine.UI
             }
 
             UiBridge.InitBridge();
+        }
 
+        public IEnumerator Init()
+        {
             yield break;
         }
 
@@ -127,22 +125,22 @@ namespace KEngine.UI
         }
 
         [Obsolete("Use string ui name instead for more flexible!")]
-        public CUILoadState OpenWindow(Type type, params object[] args)
+        public UILoadState OpenWindow(Type type, params object[] args)
         {
             string uiName = type.Name.Remove(0, 3); // 去掉"CUI"
             return OpenWindow(uiName, args);
         }
 
         [Obsolete("Use string ui name instead for more flexible!")]
-        public CUILoadState OpenWindow<T>(params object[] args) where T : UIController
+        public UILoadState OpenWindow<T>(params object[] args) where T : UIController
         {
             return OpenWindow(typeof(T), args);
         }
 
         // 打开窗口（非复制）
-        public CUILoadState OpenWindow(string uiTemplateName, params object[] args)
+        public UILoadState OpenWindow(string uiTemplateName, params object[] args)
         {
-            CUILoadState uiState;
+            UILoadState uiState;
             if (!UIWindows.TryGetValue(uiTemplateName, out uiState))
             {
                 uiState = LoadWindow(uiTemplateName, true, args);
@@ -175,19 +173,19 @@ namespace KEngine.UI
         /// <summary>
         /// // Dynamic动态窗口，复制基准面板
         /// </summary>
-        public CUILoadState OpenDynamicWindow(string template, string instanceName, params object[] args)
+        public UILoadState OpenDynamicWindow(string template, string instanceName, params object[] args)
         {
-            CUILoadState uiState = _GetUIState(instanceName);
+            UILoadState uiState = _GetUIState(instanceName);
             if (uiState != null)
             {
                 OnOpen(uiState, args);
                 return uiState;
             }
 
-            CUILoadState uiInstanceState;
+            UILoadState uiInstanceState;
             if (!UIWindows.TryGetValue(instanceName, out uiInstanceState)) // 实例创建
             {
-                uiInstanceState = new CUILoadState(template, instanceName);
+                uiInstanceState = new UILoadState(template, instanceName);
                 uiInstanceState.IsStaticUI = false;
                 uiInstanceState.IsLoading = true;
                 uiInstanceState.UIWindow = null;
@@ -199,7 +197,7 @@ namespace KEngine.UI
             {
                 // _args useless
 
-                CUILoadState uiTemplateState = _GetUIState(template);
+                UILoadState uiTemplateState = _GetUIState(template);
 
                 // 组合template和name的参数 和args外部参数
                 object[] totalArgs = new object[args.Length + 2];
@@ -224,7 +222,7 @@ namespace KEngine.UI
 
             UiBridge.UIObjectFilter(_ui, uiObj);
 
-            CUILoadState instanceUIState = UIWindows[name];
+            UILoadState instanceUIState = UIWindows[name];
             instanceUIState.IsLoading = false;
 
             UIController uiBase = uiObj.GetComponent<UIController>();
@@ -251,7 +249,7 @@ namespace KEngine.UI
 
         public void CloseWindow(string name)
         {
-            CUILoadState uiState;
+            UILoadState uiState;
             if (!UIWindows.TryGetValue(name, out uiState))
             {
                 if (Debug.isDebugBuild)
@@ -293,7 +291,7 @@ namespace KEngine.UI
         {
             List<string> LoadList = new List<string>();
 
-            foreach (KeyValuePair<string, CUILoadState> uiWindow in UIWindows)
+            foreach (KeyValuePair<string, UILoadState> uiWindow in UIWindows)
             {
                 if (IsLoad(uiWindow.Key))
                 {
@@ -310,7 +308,7 @@ namespace KEngine.UI
         {
             List<string> toCloses = new List<string>();
 
-            foreach (KeyValuePair<string, CUILoadState> uiWindow in UIWindows)
+            foreach (KeyValuePair<string, UILoadState> uiWindow in UIWindows)
             {
                 if (IsOpen(uiWindow.Key))
                 {
@@ -324,9 +322,9 @@ namespace KEngine.UI
             }
         }
 
-        private CUILoadState _GetUIState(string name)
+        private UILoadState _GetUIState(string name)
         {
-            CUILoadState uiState;
+            UILoadState uiState;
             UIWindows.TryGetValue(name, out uiState);
             if (uiState != null)
                 return uiState;
@@ -336,7 +334,7 @@ namespace KEngine.UI
 
         private UIController GetUIBase(string name)
         {
-            CUILoadState uiState;
+            UILoadState uiState;
             UIWindows.TryGetValue(name, out uiState);
             if (uiState != null && uiState.UIWindow != null)
                 return uiState.UIWindow;
@@ -363,7 +361,7 @@ namespace KEngine.UI
             return false;
         }
 
-        public CUILoadState LoadWindow(string windowTemplateName, bool openWhenFinish, params object[] args)
+        public UILoadState LoadWindow(string windowTemplateName, bool openWhenFinish, params object[] args)
         {
             if (UIWindows.ContainsKey(windowTemplateName))
             {
@@ -371,7 +369,7 @@ namespace KEngine.UI
             }
             Debuger.Assert(!UIWindows.ContainsKey(windowTemplateName));
 
-            CUILoadState openState = new CUILoadState(windowTemplateName, windowTemplateName);
+            UILoadState openState = new UILoadState(windowTemplateName, windowTemplateName);
             openState.IsStaticUI = true;
             openState.OpenArgs = args;
 
@@ -385,7 +383,7 @@ namespace KEngine.UI
             return openState;
         }
 
-        private IEnumerator LoadUIAssetBundle(string name, CUILoadState openState, KCallback callback = null)
+        private IEnumerator LoadUIAssetBundle(string name, UILoadState openState, KCallback callback = null)
         {
             if (openState.UIResourceLoader != null)
             {
@@ -435,7 +433,7 @@ namespace KEngine.UI
         /// <param name="uiTemplateName"></param>
         public Coroutine ReloadWindow(string windowTemplateName, KCallback callback)
         {
-            CUILoadState uiState;
+            UILoadState uiState;
             UIWindows.TryGetValue(windowTemplateName, out uiState);
             if (uiState == null || uiState.UIWindow == null)
             {
@@ -447,7 +445,7 @@ namespace KEngine.UI
 
         public void DestroyWindow(string uiTemplateName)
         {
-            CUILoadState uiState;
+            UILoadState uiState;
             UIWindows.TryGetValue(uiTemplateName, out uiState);
             if (uiState == null || uiState.UIWindow == null)
             {
@@ -475,7 +473,7 @@ namespace KEngine.UI
         {
             Debuger.Assert(callback);
 
-            CUILoadState uiState;
+            UILoadState uiState;
             if (!UIWindows.TryGetValue(uiTemplateName, out uiState))
             {
                 uiState = LoadWindow(uiTemplateName, false); // 加载，这样就有UIState了, 但注意因为没参数，不要随意执行OnOpen
@@ -494,14 +492,14 @@ namespace KEngine.UI
         {
             Debuger.Assert(callback);
 
-            CUILoadState uiState;
+            UILoadState uiState;
             if (!UIWindows.TryGetValue(uiName, out uiState))
             {
                 Log.Error("找不到UIState: {0}", uiName);
                 return;
             }
 
-            CUILoadState openState = UIWindows[uiName];
+            UILoadState openState = UIWindows[uiName];
             openState.DoCallback(callback, args);
         }
 
@@ -520,7 +518,7 @@ namespace KEngine.UI
             CallUI(uiName, (_uibase, _args) => { callback(_uibase as T, _args); }, args);
         }
 
-        private void OnOpen(CUILoadState uiState, params object[] args)
+        private void OnOpen(UILoadState uiState, params object[] args)
         {
             if (uiState.IsLoading)
             {
@@ -553,7 +551,7 @@ namespace KEngine.UI
         }
 
 
-        private void InitWindow(CUILoadState uiState, UIController uiBase, bool open, params object[] args)
+        private void InitWindow(UILoadState uiState, UIController uiBase, bool open, params object[] args)
         {
             uiBase.OnInit();
             if (OnInitEvent != null)
@@ -583,7 +581,7 @@ namespace KEngine.UI
     /// <summary>
     /// UI Async Load State class
     /// </summary>
-    public class CUILoadState
+    public class UILoadState
     {
         public string TemplateName;
         public string InstanceName;
@@ -599,7 +597,7 @@ namespace KEngine.UI
         internal Queue<object[]> CallbacksArgsWhenFinish;
         public AbstractResourceLoader UIResourceLoader; // 加载器，用于手动释放资源
 
-        public CUILoadState(string uiTemplateName, string uiInstanceName, Type uiControllerType = default(Type))
+        public UILoadState(string uiTemplateName, string uiInstanceName, Type uiControllerType = default(Type))
         {
             if (uiControllerType == default(Type)) uiControllerType = typeof(UIController);
 
@@ -638,7 +636,7 @@ namespace KEngine.UI
             callback(UIWindow, args);
         }
 
-        internal void OnUIWindowLoadedCallbacks(CUILoadState uiState, UIController uiObject)
+        internal void OnUIWindowLoadedCallbacks(UILoadState uiState, UIController uiObject)
         {
             //if (openState.OpenWhenFinish)  // 加载完打开 模式下，打开时执行回调
             {
