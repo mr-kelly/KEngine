@@ -455,7 +455,8 @@ namespace KEngine.UI
 
             UnityEngine.Object.Destroy(uiState.UIWindow.gameObject);
 
-            uiState.UIResourceLoader.Release();
+            if (uiState.UIResourceLoader != null)
+                uiState.UIResourceLoader.Release();
             uiState.UIWindow = null;
 
             UIWindows.Remove(uiTemplateName);
