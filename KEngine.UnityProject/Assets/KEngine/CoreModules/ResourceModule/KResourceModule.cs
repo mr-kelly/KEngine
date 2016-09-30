@@ -58,7 +58,7 @@ namespace KEngine
         PersistentDataPathPriority,
     }
 
-    public class KResourceModule : MonoBehaviour, KEngine.IModuleInitable
+    public class KResourceModule : MonoBehaviour
     {
         static KResourceModule()
         {
@@ -381,17 +381,6 @@ namespace KEngine
         {
             AbstractResourceLoader.CheckGcCollect();
         }
-
-        public IEnumerator Init()
-        {
-            yield break;
-        }
-
-        public IEnumerator UnInit()
-        {
-            yield break;
-        }
-
 
         private static string _unityEditorEditorUserBuildSettingsActiveBuildTarget;
 

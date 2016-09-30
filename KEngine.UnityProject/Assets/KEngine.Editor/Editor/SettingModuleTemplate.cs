@@ -38,6 +38,11 @@ using System.Collections.Generic;
 using KEngine;
 using KEngine.Modules;
 using KEngine.Table;
+
+#if UNITY_5 || UNITY_4 || UNITY_3
+using UnityEngine;
+#endif
+
 namespace {{ NameSpace }}
 {
 	/// <summary>

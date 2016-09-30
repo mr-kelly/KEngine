@@ -70,12 +70,14 @@ namespace KEngine
                 // 存在应用内的，StreamingAssets内的，同步读取；否则去PersitentDataPath
                 if (getResPathType == KResourceModule.GetResourceFullPathType.InApp)
                 {
-                    var loadSyncPath = string.Format("{0}/{1}", KResourceModule.BundlesPathWithoutFileProtocol, url);
                     if (Application.isEditor) // Editor mode : 读取Product配置目录
+                    {
+                        var loadSyncPath = Path.Combine(KResourceModule.BundlesPathWithoutFileProtocol, url);
                         Bytes = File.ReadAllBytes(loadSyncPath);
+                    }
                     else // product mode: read streamingAssetsPath
                     {
-                        Bytes = KResourceModule.LoadSyncFromStreamingAssets(loadSyncPath);
+                        Bytes = KResourceModule.LoadSyncFromStreamingAssets(KResourceModule.BundlesPathRelative + url);
                     }
                 }
                 else

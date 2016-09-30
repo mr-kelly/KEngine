@@ -34,7 +34,16 @@ namespace KEngine
     /// </summary>
     public interface IModuleInitable
     {
+        /// <summary>
+        /// Async Initialization
+        /// </summary>
+        /// <returns></returns>
         IEnumerator Init();
+
+        /// <summary>
+        /// the progress of the initialize operation
+        /// </summary>
+        double InitProgress { get; }
     }
 
 }

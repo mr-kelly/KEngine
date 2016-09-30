@@ -47,7 +47,7 @@ namespace KEngine.UI
     /// <summary>
     /// UI Module
     /// </summary>
-    public class UIModule : KEngine.IModuleInitable
+    public class UIModule
     {
         private class _InstanceClass
         {
@@ -112,16 +112,6 @@ namespace KEngine.UI
             }
 
             UiBridge.InitBridge();
-        }
-
-        public IEnumerator Init()
-        {
-            yield break;
-        }
-
-        public IEnumerator UnInit()
-        {
-            yield break;
         }
 
         [Obsolete("Use string ui name instead for more flexible!")]
@@ -190,6 +180,7 @@ namespace KEngine.UI
                 uiInstanceState.IsLoading = true;
                 uiInstanceState.UIWindow = null;
                 uiInstanceState.OpenWhenFinish = true;
+				uiInstanceState.OpenArgs = args;
                 UIWindows[instanceName] = uiInstanceState;
             }
 
@@ -197,15 +188,16 @@ namespace KEngine.UI
             {
                 // _args useless
 
-                UILoadState uiTemplateState = _GetUIState(template);
+					UILoadState newUiInstanceState = _GetUIState(instanceName);
+					UILoadState templateState = _GetUIState(template);
 
                 // 组合template和name的参数 和args外部参数
-                object[] totalArgs = new object[args.Length + 2];
-                totalArgs[0] = template;
-                totalArgs[1] = instanceName;
-                args.CopyTo(totalArgs, 2);
+					object[] totalArgs = new object[newUiInstanceState.OpenArgs.Length + 2];
+                	totalArgs[0] = template;
+	                totalArgs[1] = instanceName;
+					newUiInstanceState.OpenArgs.CopyTo(totalArgs, 2);
 
-                OnDynamicWindowCallback(uiTemplateState.UIWindow, totalArgs);
+					OnDynamicWindowCallback(templateState.UIWindow, totalArgs);
             });
 
             return uiInstanceState;
@@ -376,9 +368,8 @@ namespace KEngine.UI
             //if (openState.IsLoading)
             openState.OpenWhenFinish = openWhenFinish;
 
+			UIWindows.Add(windowTemplateName, openState);
             KResourceModule.Instance.StartCoroutine(LoadUIAssetBundle(windowTemplateName, openState));
-
-            UIWindows.Add(windowTemplateName, openState);
 
             return openState;
         }
@@ -455,6 +446,7 @@ namespace KEngine.UI
 
             UnityEngine.Object.Destroy(uiState.UIWindow.gameObject);
 
+            // Instance UI State has no Resources loader, so fix here
             if (uiState.UIResourceLoader != null)
                 uiState.UIResourceLoader.Release();
             uiState.UIWindow = null;
@@ -534,7 +526,10 @@ namespace KEngine.UI
             {
                 if (uiBase.gameObject.activeSelf)
                 {
-                    uiBase.OnClose();
+					uiBase.OnClose();
+
+					if (OnCloseEvent != null)
+						OnCloseEvent(uiBase);
                 }
 
                 uiBase.BeforeOpen(args, () =>

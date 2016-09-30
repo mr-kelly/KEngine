@@ -117,7 +117,6 @@ namespace KEngine.Editor
             var outputPath = GetExportPath(EditorUserBuildSettings.activeBuildTarget);
             Log.Info("Asset bundle start build to: {0}", outputPath);
             BuildPipeline.BuildAssetBundles(outputPath, BuildAssetBundleOptions.DeterministicAssetBundle, EditorUserBuildSettings.activeBuildTarget);
-
         }
 
 #endif

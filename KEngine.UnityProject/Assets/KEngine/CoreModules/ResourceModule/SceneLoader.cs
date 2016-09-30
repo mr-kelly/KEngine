@@ -35,10 +35,16 @@ namespace KEngine
         private AssetFileLoader _assetFileBridge;
         private LoaderMode _mode;
         private string _url;
+        private string _sceneName;
 
         public override float Progress
         {
             get { return _assetFileBridge.Progress; }
+        }
+
+        public string SceneName
+        {
+            get { return _sceneName; }
         }
 
         public static SceneLoader Load(string url, System.Action<bool> callback = null,
@@ -58,6 +64,7 @@ namespace KEngine
 
             _mode = (LoaderMode)args[0];
             _url = url;
+            _sceneName = Path.GetFileNameWithoutExtension(_url);
             KResourceModule.Instance.StartCoroutine(Start());
         }
 
@@ -81,14 +88,13 @@ namespace KEngine
             // load scene
             Debuger.Assert(_assetFileBridge.Asset);
 
-            var sceneName = Path.GetFileNameWithoutExtension(_url);
             if (_mode == LoaderMode.Sync)
-                UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName,
+                UnityEngine.SceneManagement.SceneManager.LoadScene(_sceneName,
                     UnityEngine.SceneManagement.LoadSceneMode.Additive);
 
             else
             {
-                var op = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(sceneName, UnityEngine.SceneManagement.LoadSceneMode.Additive);
+                var op = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(_sceneName, UnityEngine.SceneManagement.LoadSceneMode.Additive);
                 while (!op.isDone)
                 {
                     yield return null;
@@ -137,8 +143,7 @@ namespace KEngine
             base.DoDispose();
             _assetFileBridge.Release(IsBeenReleaseNow);
 
-            var sceneName = Path.GetFileNameWithoutExtension(_url);
-            UnityEngine.SceneManagement.SceneManager.UnloadScene(sceneName);
+            UnityEngine.SceneManagement.SceneManager.UnloadScene(_sceneName);
         }
     }
 }

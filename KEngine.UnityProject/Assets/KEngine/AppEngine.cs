@@ -178,25 +178,19 @@ namespace KEngine
         /// </summary>
         private IEnumerator DoInit()
         {
-            var baseModules = new KEngine.IModuleInitable[]
-            {
-                // 基础2件套
-                KResourceModule.Instance,
-            };
-
-            yield return StartCoroutine(DoInitModules(baseModules));
-
-            Log.Info("Finish Init ResourceManager");
+            yield return null;
 
             if (AppEntry != null)
                 yield return StartCoroutine(AppEntry.OnBeforeInit());
 
 
+//            if (GameModules != null)
             yield return StartCoroutine(DoInitModules(GameModules));
+
             if (AppEntry != null)
             {
                 yield return StartCoroutine(AppEntry.OnGameStart());
-                
+
             }
 
             IsInited = true;
