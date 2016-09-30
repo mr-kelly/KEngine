@@ -28,10 +28,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
-using CosmosTable;
 using DotLiquid;
 using KUnityEditorTools;
+using TableML.Compiler;
 using UnityEditor;
 using UnityEngine;
 
@@ -74,11 +75,13 @@ namespace KEngine.Editor
         /// <summary>
         /// 编译出的后缀名, 可修改
         /// </summary>
-		public static string SettingExtension {
-			get {
-				return AppEngine.GetConfig (KEngineDefaultConfigs.AssetBundleExt);
-			}
-		}
+        public static string SettingExtension
+        {
+            get
+            {
+                return AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt);
+            }
+        }
 
         /// <summary>
         /// 生成代码吗？它的路径配置
@@ -121,204 +124,6 @@ namespace KEngine.Editor
                 Debug.Log("[SettingModuleEditor]Watching directory: " + SettingSourcePath);
             }
         }
-
-        /// <summary>
-        /// Generate static code from settings
-        /// </summary>
-        /// <param name="templateVars"></param>
-        public static void GenerateCode(string genCodeFilePath, string nameSpace, List<Hash> files)
-        {
-
-            var codeTemplates = new Dictionary<string, string>()
-            {
-                {SettingModuleTemplate.GenCodeTemplate, genCodeFilePath},
-            };
-
-            foreach (var kv in codeTemplates)
-            {
-                var templateStr = kv.Key;
-                var exportPath = kv.Value;
-
-                // 生成代码
-                var template = Template.Parse(templateStr);
-                var topHash = new Hash();
-                topHash["NameSpace"] = nameSpace;
-                topHash["Files"] = files;
-
-                if (!string.IsNullOrEmpty(exportPath))
-                {
-                    var genCode = template.Render(topHash);
-                    if (File.Exists(exportPath)) // 存在，比较是否相同
-                    {
-                        if (File.ReadAllText(exportPath) != genCode)
-                        {
-                            EditorUtility.ClearProgressBar();
-                            // 不同，会触发编译，强制停止Unity后再继续写入
-                            if (EditorApplication.isPlaying)
-                            {
-                                Log.Error("[CAUTION]AppSettings code modified! Force stop Unity playing");
-                                EditorApplication.isPlaying = false;
-                            }
-                            File.WriteAllText(exportPath, genCode);
-                        }
-                    }
-                    else
-                        File.WriteAllText(exportPath, genCode);
-
-                }
-            }
-            // make unity compile
-            AssetDatabase.Refresh();
-        }
-        /// <summary>
-        /// Compile one directory 's all settings, and return behaivour results
-        /// </summary>
-        /// <param name="sourcePath"></param>
-        /// <param name="compilePath"></param>
-        /// <param name="genCodeFilePath"></param>
-        /// <param name="changeExtension"></param>
-        /// <param name="force"></param>
-        /// <returns></returns>
-        public static List<TableCompileResult> CompileTabConfigs(string sourcePath, string compilePath, string genCodeFilePath, string changeExtension = ".bytes", bool force = false)
-        {
-            var results = new List<TableCompileResult>();
-            var compileBaseDir = compilePath;
-            // excel compiler
-            var compiler = new Compiler(new CompilerConfig() {ConditionVars = CompileSettingConditionVars});
-
-            var excelExt = new HashSet<string>() { ".xls", ".xlsx", ".tsv" };
-            var findDir = sourcePath;
-            try
-            {
-                var allFiles = Directory.GetFiles(findDir, "*.*", SearchOption.AllDirectories);
-                var allFilesCount = allFiles.Length;
-                var nowFileIndex = -1; // 开头+1， 起始为0
-                foreach (var excelPath in allFiles)
-                {
-                    nowFileIndex++;
-                    var ext = Path.GetExtension(excelPath);
-                    var fileName = Path.GetFileNameWithoutExtension(excelPath);
-                    if (excelExt.Contains(ext) && !fileName.StartsWith("~")) // ~开头为excel临时文件，不要读
-                    {
-                        // it's an excel file
-                        var relativePath = excelPath.Replace(findDir, "").Replace("\\", "/");
-                        if (relativePath.StartsWith("/"))
-                            relativePath = relativePath.Substring(1);
-
-
-                        var compileToPath = string.Format("{0}/{1}", compileBaseDir,
-                            Path.ChangeExtension(relativePath, changeExtension));
-                        var srcFileInfo = new FileInfo(excelPath);
-
-                        EditorUtility.DisplayProgressBar("Compiling Excel to Tab...",
-                            string.Format("{0} -> {1}", excelPath, compileToPath), nowFileIndex / (float)allFilesCount);
-
-                        // 如果已经存在，判断修改时间是否一致，用此来判断是否无需compile，节省时间
-                        bool doCompile = true;
-                        if (File.Exists(compileToPath))
-                        {
-                            var toFileInfo = new FileInfo(compileToPath);
-
-                            if (!force && srcFileInfo.LastWriteTime == toFileInfo.LastWriteTime)
-                            {
-                                //Log.DoLog("Pass!SameTime! From {0} to {1}", excelPath, compileToPath);
-                                doCompile = false;
-                            }
-                        }
-                        if (doCompile)
-                        {
-                            Log.Warning("[SettingModule]Compile from {0} to {1}", excelPath, compileToPath);
-
-                            var compileResult = compiler.Compile(excelPath, compileToPath, compileBaseDir, doCompile);
-
-                            // 添加模板值
-                            results.Add(compileResult);
-
-                            var compiledFileInfo = new FileInfo(compileToPath);
-                            compiledFileInfo.LastWriteTime = srcFileInfo.LastWriteTime;
-
-                        }
-                    }
-                }
-
-                // 根据模板生成所有代码,  如果不是强制重建，无需进行代码编译
-                if (!AutoGenerateCode)
-                {
-                    Log.Warning("Ignore Gen Settings code");
-                }
-                else if (!force)
-                {
-                    Log.Warning("Ignore Gen Settings Code, not a forcing compiling");
-                }
-                else
-                {
-
-                    // 根据编译结果，构建vars，同class名字的，进行合并
-                    var templateVars = new Dictionary<string, TableTemplateVars>();
-                    foreach (var compileResult in results)
-                    {
-                        // 判断本文件是否忽略代码生成，用正则表达式
-                        var settingCodeIgnorePattern = AppEngine.GetConfig("KEngine.Setting", "SettingCodeIgnorePattern", false);
-                        if (!string.IsNullOrEmpty(settingCodeIgnorePattern))
-                        {
-                            var ignoreRegex = new Regex(settingCodeIgnorePattern);
-                            if (ignoreRegex.IsMatch(compileResult.TabFilePath))
-                                continue; // ignore this 
-                        }
-
-                        var customExtraStr = CustomExtraString != null ? CustomExtraString(compileResult) : null;
-
-                        var templateVar = new TableTemplateVars(compileResult, customExtraStr);
-
-                        // 尝试类过滤
-                        var ignoreThisClassName = false;
-                        if (GenerateCodeFilesFilter != null)
-                        {
-                            for (var i = 0; i < GenerateCodeFilesFilter.Length; i++)
-                            {
-                                var filterClass = GenerateCodeFilesFilter[i];
-                                if (templateVar.ClassName.Contains(filterClass))
-                                {
-                                    ignoreThisClassName = true;
-                                    break;
-                                }
-
-                            }
-                        }
-                        if (!ignoreThisClassName)
-                        {
-                            if (!templateVars.ContainsKey(templateVar.ClassName))
-                                templateVars.Add(templateVar.ClassName, templateVar);
-                            else
-                            {
-                                templateVars[templateVar.ClassName].Paths.Add(compileResult.TabFilePath);
-                            }
-                        }
-
-                    }
-
-                    // 整合成字符串模版使用的List
-                    var templateHashes = new List<Hash>();
-                    foreach (var kv in templateVars)
-                    {
-                        var templateVar = kv.Value;
-                        var renderTemplateHash = Hash.FromAnonymousObject(templateVar);
-                        templateHashes.Add(renderTemplateHash);
-                    }
-
-
-                    var nameSpace = "AppSettings";
-                    GenerateCode(genCodeFilePath, nameSpace, templateHashes);
-                }
-
-            }
-            finally
-            {
-                EditorUtility.ClearProgressBar();
-            }
-            return results;
-        }
-
         static string SettingSourcePath
         {
             get
@@ -358,7 +163,21 @@ namespace KEngine.Editor
                 Log.Error("Need to KEngineConfig: SettingCompiledPath");
                 return;
             }
-            CompileTabConfigs(sourcePath, compilePath, SettingCodePath, SettingExtension, force);
+
+            var bc = new BatchCompiler();
+
+            var settingCodeIgnorePattern = AppEngine.GetConfig("KEngine.Setting", "SettingCodeIgnorePattern", false);
+            var results = bc.CompileTableMLAll(sourcePath, compilePath, SettingCodePath, DefaultTemplate.GenCodeTemplate, "AppSettings", SettingExtension, settingCodeIgnorePattern, force);
+
+            //            CompileTabConfigs(sourcePath, compilePath, SettingCodePath, SettingExtension, force);
+            var sb = new StringBuilder();
+            foreach (var r in results)
+            {
+                sb.AppendLine(string.Format("Excel {0} -> {1}", r.ExcelFile, r.TabFileRelativePath));
+            }
+            Log.Info("TableML all Compile ok!\n{0}", sb.ToString());
+            // make unity compile
+            AssetDatabase.Refresh();
         }
     }
 
@@ -416,8 +235,8 @@ namespace KEngine.Editor
         public TableTemplateVars(TableCompileResult compileResult, string extraString)
             : base()
         {
-            var tabFilePath = compileResult.TabFilePath;
-            Paths.Add(compileResult.TabFilePath);
+            var tabFilePath = compileResult.TabFileRelativePath;
+            Paths.Add(compileResult.TabFileRelativePath);
 
             ClassName = DefaultClassNameParse(tabFilePath);
             // 可自定义Class Name
