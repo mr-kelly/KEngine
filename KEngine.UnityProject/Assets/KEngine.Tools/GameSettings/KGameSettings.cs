@@ -65,6 +65,8 @@ namespace KEngine.CoreModules
             yield return new WaitForEndOfFrame();
         }
 
+        public double InitProgress { get; private set; }
+
         public IEnumerator UnInit()
         {
             yield break;

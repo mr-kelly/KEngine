@@ -41,6 +41,9 @@
     <Reference Include="INIFileParser">
       <HintPath>..\..\KEngine.UnityProject\Assets\KEngine.Lib\INIFileParser.dll</HintPath>
     </Reference>
+    <Reference Include="TableML">
+      <HintPath>..\..\KEngine.UnityProject\Assets\KEngine.Lib\TableML\TableML.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="UnityEngine">
       <HintPath>..\..\Tools\UnityEngine.dll</HintPath>
@@ -121,6 +124,9 @@
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\LoaderDebugers\KResourceLoaderDebuggers.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\LoaderDebugers\KResourceLoaderDebuggers.cs</Link>
+    </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\SceneLoader.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\ResourceModule\SceneLoader.cs</Link>
     </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine\CoreModules\SettingModule.cs">
       <Link>KEngine.UnityProject\Assets\KEngine\CoreModules\SettingModule.cs</Link>

@@ -61,6 +61,8 @@ local UNITY_UI_DLL = "./UnityEngine.UI.dll" --C:/Program Files (x86)/Unity/Edito
 local SharpZipLib_DLL = "../KEngine.UnityProject/Assets/KEngine.Tools/SharpZipLib/ICSharpCode.SharpZipLib.dll"
 local UNITY_EDITOR_DLL = "./UnityEditor.dll" --C:/Program Files (x86)/Unity/Editor/Data/Managed/UnityEditor.dll"
 local IniDll = "../KEngine.UnityProject/Assets/KEngine.Lib/INIFileParser.dll"
+local TableMLDLL = "../KEngine.UnityProject/Assets/KEngine.Lib/TableML/TableML.dll"
+local TableMLCompilerDLL = "../KEngine.UnityProject/Assets/KEngine.Editor/Editor/TableMLCompiler/TableMLCompiler.dll"
 
 ------------------KEngine Base Library --------------------
 project "KEngine.Lib"
@@ -81,6 +83,7 @@ links
 {
     "System",
     IniDll,
+    TableMLDLL,
 }
 
 ------------------KEngine Main--------------------
@@ -102,6 +105,7 @@ defines
 links
 {
     IniDll,
+    TableMLDLL,
     "KEngine.Lib",
     "System",
     UNITY_ENGINE_DLL,
@@ -182,6 +186,8 @@ defines
 links
 {
     IniDll,
+    TableMLDLL,
+    TableMLCompilerDLL,
     "KEngine.Lib",
     "KEngine",
     "System",

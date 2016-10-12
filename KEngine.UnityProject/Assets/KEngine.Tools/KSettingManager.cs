@@ -79,6 +79,8 @@ public class KSettingManager : KEngine.IModuleInitable
         yield return KResourceModule.Instance.StartCoroutine(InitSetting());
     }
 
+    public double InitProgress { get; private set; }
+
     public IEnumerator UnInit()
     {
         yield break;
@@ -86,7 +88,7 @@ public class KSettingManager : KEngine.IModuleInitable
 
     private IEnumerator InitSetting()
     {
-        var assetLoader = KStaticAssetLoader.Load("GameSetting" + KEngine.AppEngine.GetConfig("KEngine", "AssetBundleExt"), null);
+        var assetLoader = StaticAssetLoader.Load("GameSetting" + KEngine.AppEngine.GetConfig("KEngine", "AssetBundleExt"), null);
         while (!assetLoader.IsCompleted)
             yield return null;
 

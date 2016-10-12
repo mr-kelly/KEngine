@@ -42,6 +42,9 @@
     <Reference Include="INIFileParser">
       <HintPath>..\..\KEngine.UnityProject\Assets\KEngine.Lib\INIFileParser.dll</HintPath>
     </Reference>
+    <Reference Include="TableML">
+      <HintPath>..\..\KEngine.UnityProject\Assets\KEngine.Lib\TableML\TableML.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\AssemblyInfo.cs">
