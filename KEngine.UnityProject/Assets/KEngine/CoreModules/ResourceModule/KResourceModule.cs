@@ -62,7 +62,10 @@ namespace KEngine
     {
         static KResourceModule()
         {
-            InitResourcePath();
+            if (_Instance == null)
+            {
+                InitResourcePath();
+            }
         }
 
         public delegate void AsyncLoadABAssetDelegate(Object asset, object[] args);
@@ -89,14 +92,7 @@ namespace KEngine
             {
                 if (_Instance == null)
                 {
-                    GameObject resMgr = GameObject.Find("_ResourceModule_");
-                    if (resMgr == null)
-                    {
-                        resMgr = new GameObject("_ResourceModule_");
-                        GameObject.DontDestroyOnLoad(resMgr);
-                    }
-
-                    _Instance = resMgr.AddComponent<KResourceModule>();
+                    InitResourcePath();
                 }
                 return _Instance;
             }
@@ -581,6 +577,15 @@ namespace KEngine
         /// <returns></returns>
         static void InitResourcePath()
         {
+            GameObject resMgr = GameObject.Find("_ResourceModule_");
+            if (resMgr == null)
+            {
+                resMgr = new GameObject("_ResourceModule_");
+                GameObject.DontDestroyOnLoad(resMgr);
+            }
+
+            _Instance = resMgr.AddComponent<KResourceModule>();
+
             string editorProductPath = EditorProductFullPath;
 
             BundlesPathRelative = string.Format("{0}/{1}/", BundlesDirName, GetBuildPlatformName());

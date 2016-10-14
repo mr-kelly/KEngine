@@ -59,6 +59,9 @@
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Lib\EngineConfigs.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Lib\EngineConfigs.cs</Link>
     </Compile>
+    <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Lib\IModuleInitable.cs">
+      <Link>KEngine.UnityProject\Assets\KEngine.Lib\IModuleInitable.cs</Link>
+    </Compile>
     <Compile Include="..\..\KEngine.UnityProject\Assets\KEngine.Lib\KCallback.cs">
       <Link>KEngine.UnityProject\Assets\KEngine.Lib\KCallback.cs</Link>
     </Compile>
