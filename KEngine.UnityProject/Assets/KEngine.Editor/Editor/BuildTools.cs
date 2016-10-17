@@ -61,6 +61,24 @@ namespace KEngine.Editor
         public static void MakeAssetBundleNames()
         {
             var dir = "Assets/" + KEngineDef.ResourcesBuildDir + "/";
+
+            // Check marked asset bundle whether real
+            foreach (var assetGuid in AssetDatabase.FindAssets(""))
+            {
+                var assetPath = AssetDatabase.GUIDToAssetPath(assetGuid);
+                var assetImporter = AssetImporter.GetAtPath(assetPath);
+                var bundleName = assetImporter.assetBundleName;
+                if (string.IsNullOrEmpty(bundleName))
+                {
+                    continue;
+                }
+                if (!assetPath.StartsWith(dir))
+                {
+                    assetImporter.assetBundleName = null;
+                }
+            }
+
+            // set BundleResources's all bundle name
             foreach (var filepath in Directory.GetFiles(dir, "*.*", SearchOption.AllDirectories))
             {
                 if (filepath.EndsWith(".meta")) continue;
