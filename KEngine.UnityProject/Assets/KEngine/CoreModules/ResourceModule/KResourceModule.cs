@@ -62,6 +62,9 @@ namespace KEngine
     {
         static KResourceModule()
         {
+#if UNITY_EDITOR
+            if (UnityEditor.EditorApplication.isPlaying)
+#endif
             if (_Instance == null)
             {
                 InitResourcePath();

@@ -149,7 +149,7 @@ namespace KEngine.Editor
         /// </summary>
         /// <param name="force">Whether or not,check diff.  false will be faster!</param>
         /// <param name="genCode">Generate static code?</param>
-        public static void DoCompileSettings(bool force = true)
+        public static void DoCompileSettings(bool force = true, string forceTemplate = null)
         {
             var sourcePath = SettingSourcePath;//AppEngine.GetConfig("SettingSourcePath");
             if (string.IsNullOrEmpty(sourcePath))
@@ -167,7 +167,7 @@ namespace KEngine.Editor
             var bc = new BatchCompiler();
 
             var settingCodeIgnorePattern = AppEngine.GetConfig("KEngine.Setting", "SettingCodeIgnorePattern", false);
-            var results = bc.CompileTableMLAll(sourcePath, compilePath, SettingCodePath, DefaultTemplate.GenCodeTemplate, "AppSettings", SettingExtension, settingCodeIgnorePattern, force);
+            var results = bc.CompileTableMLAll(sourcePath, compilePath, SettingCodePath, forceTemplate ?? DefaultTemplate.GenCodeTemplate, "AppSettings", SettingExtension, settingCodeIgnorePattern, force);
 
             //            CompileTabConfigs(sourcePath, compilePath, SettingCodePath, SettingExtension, force);
             var sb = new StringBuilder();
