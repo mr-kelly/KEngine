@@ -145,12 +145,22 @@ namespace KEngine.Editor
         }
 
         /// <summary>
+        /// Custom the monitor trigger compile settings behaviour
+        /// </summary>
+        public static Action CustomCompileSettings;
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="force">Whether or not,check diff.  false will be faster!</param>
         /// <param name="genCode">Generate static code?</param>
-        public static void DoCompileSettings(bool force = true, string forceTemplate = null)
+        public static void DoCompileSettings(bool force = true, string forceTemplate = null, bool canCustom = true)
         {
+            if (canCustom && CustomCompileSettings != null)
+            {
+                CustomCompileSettings();
+                return;
+            }
+
             var sourcePath = SettingSourcePath;//AppEngine.GetConfig("SettingSourcePath");
             if (string.IsNullOrEmpty(sourcePath))
             {
@@ -167,7 +177,8 @@ namespace KEngine.Editor
             var bc = new BatchCompiler();
 
             var settingCodeIgnorePattern = AppEngine.GetConfig("KEngine.Setting", "SettingCodeIgnorePattern", false);
-            var results = bc.CompileTableMLAll(sourcePath, compilePath, SettingCodePath, forceTemplate ?? DefaultTemplate.GenCodeTemplate, "AppSettings", SettingExtension, settingCodeIgnorePattern, force);
+            var template = force ? (forceTemplate ?? DefaultTemplate.GenCodeTemplate) : null; // 
+            var results = bc.CompileTableMLAll(sourcePath, compilePath, SettingCodePath, template, "AppSettings", SettingExtension, settingCodeIgnorePattern, force);
 
             //            CompileTabConfigs(sourcePath, compilePath, SettingCodePath, SettingExtension, force);
             var sb = new StringBuilder();
