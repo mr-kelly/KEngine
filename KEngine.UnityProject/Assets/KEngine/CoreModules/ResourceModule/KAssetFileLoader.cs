@@ -46,6 +46,13 @@ namespace KEngine
         }
 
         private bool IsLoadAssetBundle;
+		public static bool IsEditorLoadAsset
+		{
+			get
+			{
+	            return AppEngine.GetConfig("KEngine", "IsEditorLoadAsset").ToInt32() != 0 && Application.isEditor;
+			}
+		}
 
         public override float Progress
         {
@@ -62,7 +69,8 @@ namespace KEngine
         public static AssetFileLoader Load(string path, AssetFileBridgeDelegate assetFileLoadedCallback = null, LoaderMode loaderMode = LoaderMode.Async)
         {
             // 添加扩展名
-            path = path + AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt);
+			if (!IsEditorLoadAsset)
+	            path = path + AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt);
 
             LoaderDelgate realcallback = null;
             if (assetFileLoadedCallback != null)
@@ -86,7 +94,32 @@ namespace KEngine
             IsLoadAssetBundle = AppEngine.GetConfig("KEngine", "IsLoadAssetBundle").ToInt32() != 0;
 
             Object getAsset = null;
-            if (!IsLoadAssetBundle)
+
+			if (IsEditorLoadAsset) 
+			{
+#if UNITY_EDITOR
+				if (path.EndsWith(".unity"))
+				{
+					// scene
+					getAsset = KResourceModule.Instance;
+					Log.LogWarning("Load scene from Build Settings: {0}", path);
+				}
+				else 
+				{
+					getAsset = UnityEditor.AssetDatabase.LoadAssetAtPath("Assets/" + KEngineDef.ResourcesBuildDir + "/" + path, typeof(UnityEngine.Object));
+					if (getAsset == null)
+					{
+						Log.Error("Asset is NULL(from {0} Folder): {1}", KEngineDef.ResourcesBuildDir, path);
+					}
+				}
+#else
+				Log.Error("`IsEditorLoadAsset` is Unity Editor only");
+
+#endif
+				OnFinish(getAsset);
+
+			}
+            else if (!IsLoadAssetBundle)
             {
                 string extension = Path.GetExtension(path);
                 path = path.Substring(0, path.Length - extension.Length); // remove extensions

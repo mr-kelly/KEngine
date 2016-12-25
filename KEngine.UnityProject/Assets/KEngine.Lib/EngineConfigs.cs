@@ -43,6 +43,9 @@ StreamingBundlesFolderName = Bundles
 AssetBundleExt = .bytes	
 IsLoadAssetBundle = 1	
 
+;whether use assetdata.loadassetatpath insead of load asset bundle, editor only
+IsEditorLoadAsset = 0
+
 [KEngine.Setting]
 SettingSourcePath = Product/SettingSource	
 
