@@ -58,7 +58,7 @@ namespace KEngine.Editor
         private static KEngineUtils Instance;
 
 
-        [MenuItem("KEngine/Options")]
+        [MenuItem("KEngine/KEngine Options")]
         private static void Init()
         {
             // Get existing open window or if none, make a new one:
