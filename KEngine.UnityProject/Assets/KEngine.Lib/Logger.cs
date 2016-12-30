@@ -406,7 +406,7 @@ namespace KEngine
                 logPath = "logs/";
 #if !KENGINE_DLL
             else
-                logPath = Application.persistentDataPath + "/" + "logs/";
+                logPath = Path.Combine(Application.persistentDataPath, "logs/");
 #endif
 
             var now = DateTime.Now;
