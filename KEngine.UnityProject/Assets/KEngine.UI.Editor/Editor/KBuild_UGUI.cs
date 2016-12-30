@@ -108,7 +108,7 @@ namespace KEngine.Editor
                 AssetDatabase.ImportAsset(uiPrefabPath, ImportAssetOptions.ForceSynchronousImport);
                 Debug.Log("Create UIWindowAsset to prfab: " + uiPrefabPath);
             }
-            EditorApplication.SaveAssets();
+            AssetDatabase.SaveAssets();
         }
 
 #endif

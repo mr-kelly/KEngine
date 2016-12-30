@@ -49,7 +49,13 @@ namespace KEngine
             var newHelp = newHelpGameObject.AddComponent<KResoourceLoadedAssetDebugger>();
             newHelp.Type = type;
             newHelp.TheObject = theObject;
-            newHelp.MemorySize = string.Format("{0:F5}KB", UnityEngine.Profiler.GetRuntimeMemorySize(theObject) / 1024f);
+            newHelp.MemorySize = string.Format("{0:F5}KB", 
+#if UNITY_5_5
+				UnityEngine.Profiling.Profiler.GetRuntimeMemorySize(theObject) / 1024f
+#else
+				UnityEngine.Profiler.GetRuntimeMemorySize(theObject) / 1024f
+#endif
+			);
             return newHelp;
         }
 

@@ -333,7 +333,13 @@ namespace KEngine
         {
             if (Time.frameCount % 30 == 0 || _cacheMemoryStr == null || _cacheFPSStr == null)
             {
-                _cacheMemoryStr = string.Format("Memory: {0:F3}KB", UnityEngine.Profiler.GetMonoUsedSize() / 1024f);
+                _cacheMemoryStr = string.Format("Memory: {0:F3}KB", 
+#if UNITY_5_5
+					UnityEngine.Profiling.Profiler.GetMonoUsedSize() / 1024f
+#else
+					UnityEngine.Profiler.GetMonoUsedSize() / 1024f
+#endif
+				);
                 _cacheFPSStr = Watch("FPS: {0:N0}", 1f / Time.deltaTime);
 #if USE_UGUI_FPS
                 if (CacheText == null) return;
