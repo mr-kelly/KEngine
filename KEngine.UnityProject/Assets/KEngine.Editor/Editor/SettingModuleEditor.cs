@@ -109,6 +109,14 @@ namespace KEngine.Editor
             var path = SettingSourcePath;
             if (Directory.Exists(path))
             {
+                // when build app, ensure compile ALL settings
+                KUnityEditorEventCatcher.OnBeforeBuildPlayerEvent -= CompileSettings;
+                KUnityEditorEventCatcher.OnBeforeBuildPlayerEvent += CompileSettings;
+                // when play editor, ensure compile settings
+                KUnityEditorEventCatcher.OnWillPlayEvent -= QuickCompileSettings;
+                KUnityEditorEventCatcher.OnWillPlayEvent += QuickCompileSettings;
+
+                // watch files, when changed, compile settings
                 new KDirectoryWatcher(path, (o, args) =>
                 {
                     if (_isPopUpConfirm) return;
@@ -117,13 +125,14 @@ namespace KEngine.Editor
                     KEditorUtils.CallMainThread(() =>
                     {
                         EditorUtility.DisplayDialog("Excel Setting Changed!", "Ready to Recompile All!", "OK");
-                        DoCompileSettings(false);
+                        QuickCompileSettings();
                         _isPopUpConfirm = false;
                     });
                 });
                 Debug.Log("[SettingModuleEditor]Watching directory: " + SettingSourcePath);
             }
         }
+
         static string SettingSourcePath
         {
             get
