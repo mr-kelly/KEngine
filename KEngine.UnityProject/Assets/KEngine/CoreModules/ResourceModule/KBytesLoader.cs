@@ -72,12 +72,12 @@ namespace KEngine
                 {
                     if (Application.isEditor) // Editor mode : 读取Product配置目录
                     {
-                        var loadSyncPath = Path.Combine(KResourceModule.BundlesPathWithoutFileProtocol, url);
+                        var loadSyncPath = Path.Combine(KResourceModule.ProductPathWithoutFileProtocol, url);
                         Bytes = File.ReadAllBytes(loadSyncPath);
                     }
                     else // product mode: read streamingAssetsPath
                     {
-                        Bytes = KResourceModule.LoadSyncFromStreamingAssets(KResourceModule.BundlesPathRelative + url);
+                        Bytes = KResourceModule.LoadSyncFromStreamingAssets(url);
                     }
                 }
                 else

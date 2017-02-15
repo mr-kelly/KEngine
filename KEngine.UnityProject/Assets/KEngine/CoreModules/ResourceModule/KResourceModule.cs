@@ -134,9 +134,9 @@ namespace KEngine
         /// StreamingAssetsPath/Bundles/Android/ etc.
         /// WWW的读取，是需要Protocol前缀的
         /// </summary>
-        public static string BundlesPathWithProtocol { get; private set; }
+        public static string ProductPathWithProtocol { get; private set; }
 
-        public static string BundlesPathWithoutFileProtocol { get; private set; }
+        public static string ProductPathWithoutFileProtocol { get; private set; }
 
         /// <summary>
         /// Bundles/Android/ etc... no prefix for streamingAssets
@@ -287,20 +287,20 @@ namespace KEngine
         public static bool TryGetInAppStreamingUrl(string url, bool withFileProtocol, out string newUrl)
         {
             if (withFileProtocol)
-                newUrl = BundlesPathWithProtocol + url;
+                newUrl = ProductPathWithProtocol + url;
             else
-                newUrl = BundlesPathWithoutFileProtocol + url;
+                newUrl = ProductPathWithoutFileProtocol + url;
 
             // 注意，StreamingAssetsPath在Android平台時，壓縮在apk里面，不要做文件檢查了
             if (!Application.isEditor && Application.platform == RuntimePlatform.Android)
             {
-                if (!KEngineAndroidPlugin.IsAssetExists(BundlesPathRelative + url))
+                if (!KEngineAndroidPlugin.IsAssetExists(url))
                     return false;
             }
             else
             {
                 // Editor, 非android运行，直接进行文件检查
-                if (!File.Exists(BundlesPathWithoutFileProtocol + url))
+                if (!File.Exists(ProductPathWithoutFileProtocol + url))
                 {
                     return false;
                 }
@@ -309,7 +309,7 @@ namespace KEngine
             // Windows/Edtiro平台下，进行大小敏感判断
             if (Application.isEditor)
             {
-                var result = FileExistsWithDifferentCase(BundlesPathWithoutFileProtocol + url);
+                var result = FileExistsWithDifferentCase(ProductPathWithoutFileProtocol + url);
                 if (!result)
                 {
                     Log.Error("[大小写敏感]发现一个资源 {0}，大小写出现问题，在Windows可以读取，手机不行，请改表修改！", url);
@@ -369,8 +369,8 @@ namespace KEngine
             if (Debug.isDebugBuild)
             {
                 Log.Info("ResourceManager ApplicationPath: {0}", ApplicationPath);
-                Log.Info("ResourceManager BundlesPathWithProtocol: {0}", BundlesPathWithProtocol);
-                Log.Info("ResourceManager BundlesPathWithoutProtocol: {0}", BundlesPathWithoutFileProtocol);
+                Log.Info("ResourceManager ProductPathWithProtocol: {0}", ProductPathWithProtocol);
+                Log.Info("ResourceManager ProductPathWithoutProtocol: {0}", ProductPathWithoutFileProtocol);
                 Log.Info("ResourceManager DocumentResourcesPath: {0}", DocumentResourcesPath);
                 Log.Info("================================================================================");
             }
@@ -599,9 +599,9 @@ namespace KEngine
                 case RuntimePlatform.WindowsEditor:
                 case RuntimePlatform.OSXEditor:
                     {
-                        ApplicationPath = string.Format("{0}{1}/", GetFileProtocol(), editorProductPath);
-                        BundlesPathWithProtocol = GetFileProtocol() + EditorAssetBundleFullPath + "/" + BuildPlatformName + "/";
-                        BundlesPathWithoutFileProtocol = EditorAssetBundleFullPath + "/" + BuildPlatformName + "/";
+                        ApplicationPath = string.Format("{0}{1}", GetFileProtocol(), editorProductPath);
+                        ProductPathWithProtocol = GetFileProtocol() + EditorProductFullPath + "/";
+                        ProductPathWithoutFileProtocol = EditorProductFullPath + "/";
                         // Resources folder
                     }
                     break;
@@ -610,21 +610,18 @@ namespace KEngine
                     {
                         string path = Application.streamingAssetsPath.Replace('\\', '/');//Application.dataPath.Replace('\\', '/');
                                                                                          //                        path = path.Substring(0, path.LastIndexOf('/') + 1);
-                        ApplicationPath = string.Format("{0}{1}/", GetFileProtocol(), Application.dataPath);
-                        BundlesPathWithProtocol = string.Format("{0}{1}/{2}/{3}/", GetFileProtocol(), path, BundlesDirName,
-                            GetBuildPlatformName());
-                        BundlesPathWithoutFileProtocol = string.Format("{0}/{1}/{2}/", path, BundlesDirName,
-                            GetBuildPlatformName());
+                        ApplicationPath = string.Format("{0}{1}", GetFileProtocol(), Application.dataPath);
+                        ProductPathWithProtocol = string.Format("{0}{1}/", GetFileProtocol(), path);
+                        ProductPathWithoutFileProtocol = string.Format("{0}/", path);
                         // Resources folder
                     }
                     break;
                 case RuntimePlatform.Android:
                     {
-                        ApplicationPath = string.Concat("jar:", GetFileProtocol(), Application.dataPath,
-                            string.Format("!/assets/{0}/", BundlesDirName));
-                        BundlesPathWithProtocol = string.Concat(ApplicationPath, GetBuildPlatformName(), "/");
-                        BundlesPathWithoutFileProtocol = string.Concat(Application.dataPath,
-                            "!/assets/" + BundlesDirName + "/", GetBuildPlatformName() + "/");
+                        ApplicationPath = string.Concat("jar:", GetFileProtocol(), Application.dataPath, "!/assets");
+                        ProductPathWithProtocol = string.Concat(ApplicationPath, "/");
+                        ProductPathWithoutFileProtocol = string.Concat(Application.dataPath,
+                            "!/assets/" );
                         // 注意，StramingAsset在Android平台中，是在壓縮的apk里，不做文件檢查
                         // Resources folder
                     }
@@ -632,12 +629,11 @@ namespace KEngine
                 case RuntimePlatform.IPhonePlayer:
                     {
                         ApplicationPath =
-                            System.Uri.EscapeUriString(GetFileProtocol() + Application.streamingAssetsPath + "/" +
-                                                       BundlesDirName + "/"); // MacOSX下，带空格的文件夹，空格字符需要转义成%20
-                        BundlesPathWithProtocol = string.Format("{0}{1}/", ApplicationPath, GetBuildPlatformName());
+                            System.Uri.EscapeUriString(GetFileProtocol() + Application.streamingAssetsPath); // MacOSX下，带空格的文件夹，空格字符需要转义成%20
+
+                        ProductPathWithProtocol = string.Format("{0}/", ApplicationPath);
                         // only iPhone need to Escape the fucking Url!!! other platform works without it!!! Keng Die!
-                        BundlesPathWithoutFileProtocol = Application.streamingAssetsPath + "/" + BundlesDirName + "/" +
-                                                                   GetBuildPlatformName() + "/";
+                        ProductPathWithoutFileProtocol = Application.streamingAssetsPath + "/";
                         // Resources folder
                     }
                     break;
