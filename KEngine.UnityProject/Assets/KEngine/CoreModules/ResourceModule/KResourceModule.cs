@@ -149,7 +149,7 @@ namespace KEngine
         {
             get
             {
-                return string.Format("{0}/{1}/{2}/", GetAppDataPath(), BundlesDirName, GetBuildPlatformName()); // 各平台通用
+                return string.Format("{0}/", GetAppDataPath()); // 各平台通用
             }
         }
 
