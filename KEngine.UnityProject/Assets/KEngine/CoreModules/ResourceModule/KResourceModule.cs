@@ -571,7 +571,22 @@ namespace KEngine
                 return KEngineAndroidPlugin.GetAssetBytes(path);
 
             var fullPath = Path.Combine(Application.streamingAssetsPath, path);
-            return File.ReadAllBytes(fullPath);
+            return ReadAllBytes(fullPath);
+        }
+
+        /// <summary>
+        /// 无视锁文件，直接读bytes
+        /// </summary>
+        /// <param name="resPath"></param>
+        public static byte[] ReadAllBytes(string resPath)
+        {
+            byte[] bytes;
+            using (FileStream fs = File.Open(resPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            {
+                bytes = new byte[fs.Length];
+                fs.Read(bytes, 0, (int)fs.Length);
+            }
+            return bytes;
         }
 
         /// <summary>
