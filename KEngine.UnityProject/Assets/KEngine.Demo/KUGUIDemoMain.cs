@@ -49,7 +49,7 @@ public class KUGUIDemoMain : MonoBehaviour
             new IModuleInitable[]
             {
                 //KGameSettings.Instance,
-                UIModule.Instance,
+//                UIModule.Instance,
             });
 
         while (!engine.IsInited)

@@ -31,7 +31,7 @@ public class KImageDep : KAssetDep
 {
     protected override void DoProcess(string resourcePath)
     {
-        var loader = KSpriteLoader.Load(resourcePath, (isOk, sprite) =>
+        var loader = SpriteLoader.Load(resourcePath, (isOk, sprite) =>
         {
             if (!IsDestroy)
             {

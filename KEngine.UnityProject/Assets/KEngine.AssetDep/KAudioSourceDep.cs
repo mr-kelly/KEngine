@@ -36,7 +36,7 @@ public class KAudioSourceDep : KAssetDep
 
     protected void ProcessAudioSource(string path)
     {
-        KAudioLoader.Load(path, (isOk, clip) =>
+        AudioLoader.Load(path, (isOk, clip) =>
         {
             if (!IsDestroy)
             {

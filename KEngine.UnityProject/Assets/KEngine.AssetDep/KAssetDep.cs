@@ -85,8 +85,8 @@ public abstract class KAssetDep : MonoBehaviour
         new Queue<Action<KAssetDep, UnityEngine.Object>>();
         // 所有依赖加载完毕后的回调， 暂时用在SpriteCollection、UIAtlas加载完、Sprite加载完后, 会多次被用，跟FinishEvent不同
 
-    [System.NonSerialized] protected readonly List<KAbstractResourceLoader> ResourceLoaders =
-        new List<KAbstractResourceLoader>();
+    [System.NonSerialized] protected readonly List<AbstractResourceLoader> ResourceLoaders =
+        new List<AbstractResourceLoader>();
 
     protected KAssetDep()
     {
@@ -282,7 +282,7 @@ public abstract class KAssetDep : MonoBehaviour
     {
         //var matLoader = new CStaticAssetLoader(path, OnLoadMaterialScript, path, matCallback);
         //ResourceLoaders.Add(matLoader);  
-        var mLoader = KMaterialLoader.Load(path, (isOk, getMat) =>
+        var mLoader = MaterialLoader.Load(path, (isOk, getMat) =>
         {
             if (isOk)
                 callback(getMat);
