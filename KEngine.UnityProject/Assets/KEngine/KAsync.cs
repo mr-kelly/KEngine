@@ -63,7 +63,7 @@ namespace KEngine
 
         public bool IsFinished { get; private set; }
 
-        public Coroutine WaitFinish()
+        public UnityEngine.Coroutine WaitFinish()
         {
             return KAsyncManager.Instance.StartCoroutine(EmWaitFinish());
         }

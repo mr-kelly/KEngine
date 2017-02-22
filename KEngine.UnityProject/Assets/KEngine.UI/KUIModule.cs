@@ -114,18 +114,18 @@ namespace KEngine.UI
             UiBridge.InitBridge();
         }
 
-        [Obsolete("Use string ui name instead for more flexible!")]
-        public UILoadState OpenWindow(Type type, params object[] args)
-        {
-            string uiName = type.Name.Remove(0, 3); // 去掉"CUI"
-            return OpenWindow(uiName, args);
-        }
-
-        [Obsolete("Use string ui name instead for more flexible!")]
-        public UILoadState OpenWindow<T>(params object[] args) where T : UIController
-        {
-            return OpenWindow(typeof(T), args);
-        }
+//        [Obsolete("Use string ui name instead for more flexible!")]
+//        public UILoadState OpenWindow(Type type, params object[] args)
+//        {
+//            string uiName = type.Name.Remove(0, 3); // 去掉"CUI"
+//            return OpenWindow(uiName, args);
+//        }
+//
+//        [Obsolete("Use string ui name instead for more flexible!")]
+//        public UILoadState OpenWindow<T>(params object[] args) where T : UIController
+//        {
+//            return OpenWindow(typeof(T), args);
+//        }
 
         // 打开窗口（非复制）
         public UILoadState OpenWindow(string uiTemplateName, params object[] args)
@@ -422,7 +422,7 @@ namespace KEngine.UI
         /// Hot reload a ui asset bundle
         /// </summary>
         /// <param name="uiTemplateName"></param>
-        public Coroutine ReloadWindow(string windowTemplateName, KCallback callback)
+        public UnityEngine.Coroutine ReloadWindow(string windowTemplateName, KCallback callback)
         {
             UILoadState uiState;
             UIWindows.TryGetValue(windowTemplateName, out uiState);

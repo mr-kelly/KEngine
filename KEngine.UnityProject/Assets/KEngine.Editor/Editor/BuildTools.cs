@@ -36,22 +36,31 @@ using Object = UnityEngine.Object;
 
 namespace KEngine.Editor
 {
-	[Obsolete ("Please use BuildTools instead")]
-	public class KBuildTools : BuildTools
-	{
-	}
+    [Obsolete("Please use BuildTools instead")]
+    public class KBuildTools : BuildTools
+    {
+    }
 
-	public partial class BuildTools
-	{
-		#if !UNITY_5
+    public partial class BuildTools
+    {
+#if !UNITY_5
 		private static int PushedAssetCount = 0;
 
 		public static event Action<UnityEngine.Object, string, string> BeforeBuildAssetBundleEvent;
 		public static event Action<UnityEngine.Object, string, string> AfterBuildAssetBundleEvent;
-		#endif
+#endif
 
 
-		#if UNITY_5
+#if UNITY_5
+        static string ResourcesBuildDir
+        {
+            get
+            {
+                var dir = "Assets/" + KEngineDef.ResourcesBuildDir + "/";
+                return dir;
+            }
+        }
+
         /// <summary>
         /// Unity 5新AssetBundle系统，需要为打包的AssetBundle配置名称
         /// 
@@ -60,7 +69,7 @@ namespace KEngine.Editor
         [MenuItem("KEngine/AssetBundle/Make Names from [BundleResources]")]
         public static void MakeAssetBundleNames()
         {
-            var dir = "Assets/" + KEngineDef.ResourcesBuildDir + "/";
+            var dir = ResourcesBuildDir;
 
             // Check marked asset bundle whether real
             foreach (var assetGuid in AssetDatabase.FindAssets(""))
@@ -94,7 +103,76 @@ namespace KEngine.Editor
             }
 
             Log.Info("Make all asset name successs!");
-            
+
+        }
+
+        /// <summary>
+        /// 清理冗余，即无此资源，却有AssetBundle的, Unity 5 only
+        /// </summary>
+        [MenuItem("KEngine/AssetBundle/Clean Redundancies")]
+        public static void CleanAssetBundlesRedundancies()
+        {
+            var platformName = KResourceModule.BuildPlatformName;
+            var outputPath = GetExportPath(EditorUserBuildSettings.activeBuildTarget);
+            var srcList = new List<string>(Directory.GetFiles(ResourcesBuildDir, "*.*", SearchOption.AllDirectories));
+            for (var i = srcList.Count - 1; i >= 0; i--)
+            {
+                if (srcList[i].EndsWith(".meta"))
+                    srcList.RemoveAt(i);
+                else
+                    srcList[i] = srcList[i].Replace(ResourcesBuildDir, "").ToLower();
+            }
+
+            var toListMap = new Dictionary<string, string>();
+            var toList = new List<string>(Directory.GetFiles(outputPath, "*.*", SearchOption.AllDirectories));
+            for (var i = toList.Count - 1; i >= 0; i--)
+            {
+                var filePath = toList[i];
+
+                if (toList[i].EndsWith((".meta")) || toList[i].EndsWith(".manifest"))
+                {
+                    toList.RemoveAt(i);
+                }
+                else
+                {
+                    var rName = toList[i].Replace(outputPath, "");
+                    if (rName == platformName || // 排除AB 平台总索引文件,
+                        rName == (platformName + ".manifest") ||
+                        rName == (platformName + ".meta") ||
+                        rName == (platformName + ".manifest.meta"))
+                    {
+                        toList.RemoveAt(i);
+                    }
+                    else
+                    {
+//                        AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt
+                        // 去掉扩展名，因为AssetBundle额外扩展名
+                        toList[i] = Path.ChangeExtension(rName, "");// 会留下最后句点
+                        toList[i] = toList[i].Substring(0, toList[i].Length - 1); // 去掉句点
+
+                        toListMap[toList[i]] = filePath;
+                    }
+                }
+            }
+
+            // 删文件和manifest
+            for (var i = 0; i < toList.Count; i++)
+            {
+                if (!srcList.Contains(toList[i]))
+                {
+                    var filePath = toListMap[toList[i]];
+                    var manifestPath = filePath + ".manifest";
+                    File.Delete(filePath);
+                    Debug.LogWarning("Delete... " + filePath);
+                    if (File.Exists(manifestPath))
+                    {
+                        File.Delete(manifestPath);
+                        Debug.LogWarning("Delete... " + manifestPath);
+                    }
+
+                    
+                }
+            }
         }
 
         [MenuItem("KEngine/AssetBundle/Build All to All Platforms")]
@@ -115,8 +193,8 @@ namespace KEngine.Editor
 
             foreach (var platform in platforms)
             {
-				if (EditorUserBuildSettings.SwitchActiveBuildTarget(platform))
-	                BuildAllAssetBundles();
+                if (EditorUserBuildSettings.SwitchActiveBuildTarget(platform))
+                    BuildAllAssetBundles();
             }
 
             // revert platform 
@@ -138,80 +216,84 @@ namespace KEngine.Editor
         }
 
 #endif
-		#region 打包功能
+        #region 打包功能
 
-		/// <summary>
-		/// 获取完整的打包路径，并确保目录存在
-		/// </summary>
-		/// <param name="path"></param>
-		/// <param name="buildTarget"></param>
-		/// <returns></returns>
-		public static string MakeSureExportPath (string path, BuildTarget buildTarget, KResourceQuality quality)
-		{
-			path = BuildTools.GetExportPath (buildTarget, quality) + path;
+        /// <summary>
+        /// 获取完整的打包路径，并确保目录存在
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="buildTarget"></param>
+        /// <returns></returns>
+        public static string MakeSureExportPath(string path, BuildTarget buildTarget, KResourceQuality quality)
+        {
+            path = BuildTools.GetExportPath(buildTarget, quality) + path;
 
-			path = path.Replace ("\\", "/");
+            path = path.Replace("\\", "/");
 
-			string exportDirectory = path.Substring (0, path.LastIndexOf ('/'));
+            string exportDirectory = path.Substring(0, path.LastIndexOf('/'));
 
-			if (!System.IO.Directory.Exists (exportDirectory))
-				System.IO.Directory.CreateDirectory (exportDirectory);
+            if (!System.IO.Directory.Exists(exportDirectory))
+                System.IO.Directory.CreateDirectory(exportDirectory);
 
-			return path;
-		}
+            return path;
+        }
 
-		/// <summary>
-		/// Extra Flag ->   ex:  Android/  AndroidSD/  AndroidHD/
-		/// </summary>
-		/// <param name="platfrom"></param>
-		/// <param name="quality"></param>
-		/// <returns></returns>
-		public static string GetExportPath (BuildTarget platfrom, KResourceQuality quality = KResourceQuality.Sd)
-		{
-			string basePath =
-				Path.GetFullPath (KEngine.AppEngine.GetConfig (KEngineDefaultConfigs.AssetBundleBuildRelPath));
+        /// <summary>
+        /// Extra Flag ->   ex:  Android/  AndroidSD/  AndroidHD/
+        /// </summary>
+        /// <param name="platfrom"></param>
+        /// <param name="quality"></param>
+        /// <returns></returns>
+        public static string GetExportPath(BuildTarget platfrom, KResourceQuality quality = KResourceQuality.Sd)
+        {
+            string basePath =
+                Path.GetFullPath(KEngine.AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleBuildRelPath));
 
-			if (File.Exists (basePath)) {
-				BuildTools.ShowDialog ("路径配置错误: " + basePath);
-				throw new System.Exception ("路径配置错误");
-			}
-			if (!Directory.Exists (basePath)) {
-				Directory.CreateDirectory (basePath);
-			}
+            if (File.Exists(basePath))
+            {
+                BuildTools.ShowDialog("路径配置错误: " + basePath);
+                throw new System.Exception("路径配置错误");
+            }
+            if (!Directory.Exists(basePath))
+            {
+                Directory.CreateDirectory(basePath);
+            }
 
-			string path = null;
-			var platformName = KResourceModule.BuildPlatformName;
-			if (quality != KResourceQuality.Sd) // SD no need add
-                    platformName += quality.ToString ().ToUpper ();
+            string path = null;
+            var platformName = KResourceModule.BuildPlatformName;
+            if (quality != KResourceQuality.Sd) // SD no need add
+                platformName += quality.ToString().ToUpper();
 
-			path = basePath + "/" + platformName + "/";
-			if (!Directory.Exists (path)) {
-				Directory.CreateDirectory (path);
-			}
-			return path;
-		}
+            path = basePath + "/" + platformName + "/";
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+            return path;
+        }
 
-		public static void ClearConsole ()
-		{
-			Assembly assembly = Assembly.GetAssembly (typeof(SceneView));
-			System.Type type = assembly.GetType ("UnityEditorInternal.LogEntries");
-			MethodInfo method = type.GetMethod ("Clear");
-			method.Invoke (null, null);
-		}
+        public static void ClearConsole()
+        {
+            Assembly assembly = Assembly.GetAssembly(typeof(SceneView));
+            System.Type type = assembly.GetType("UnityEditorInternal.LogEntries");
+            MethodInfo method = type.GetMethod("Clear");
+            method.Invoke(null, null);
+        }
 
-		public static bool ShowDialog (string msg, string title = "提示", string button = "确定")
-		{
-			return EditorUtility.DisplayDialog (title, msg, button);
-		}
+        public static bool ShowDialog(string msg, string title = "提示", string button = "确定")
+        {
+            return EditorUtility.DisplayDialog(title, msg, button);
+        }
 
-		public static void ShowDialogSelection (string msg, Action yesCallback)
-		{
-			if (EditorUtility.DisplayDialog ("确定吗", msg, "是!", "不！")) {
-				yesCallback ();
-			}
-		}
+        public static void ShowDialogSelection(string msg, Action yesCallback)
+        {
+            if (EditorUtility.DisplayDialog("确定吗", msg, "是!", "不！"))
+            {
+                yesCallback();
+            }
+        }
 
-		#if !UNITY_5
+#if !UNITY_5
 		public static void PushAssetBundle (Object asset, string path)
 		{
 			BuildPipeline.PushAssetDependencies ();
@@ -233,17 +315,17 @@ namespace KEngine.Editor
 			PushedAssetCount--;
 		}
 
-		#endif
+#endif
 
-		#endregion
+        #endregion
 
-		public static void BuildError (string fmt, params string[] args)
-		{
-			fmt = "[BuildError]" + fmt;
-			Debug.LogError (string.Format (fmt, args));
-		}
+        public static void BuildError(string fmt, params string[] args)
+        {
+            fmt = "[BuildError]" + fmt;
+            Debug.LogError(string.Format(fmt, args));
+        }
 
-		#if !UNITY_5
+#if !UNITY_5
 		public static uint BuildAssetBundle (Object asset, string path)
 		{
 			return BuildAssetBundle (asset, path, EditorUserBuildSettings.activeBuildTarget, KResourceModule.Quality);
@@ -320,48 +402,54 @@ namespace KEngine.Editor
 			}
 			return crc;
 		}
-		#endif
+#endif
 
-		/// <summary>
-		/// 检查如果有依赖，报出
-		/// 检查prefab中存在prefab依赖，进行打散！
-		/// </summary>
-		/// <param name="assetPath"></param>
-		public static void CheckAndLogDependencies (string assetPath)
-		{
-			if (string.IsNullOrEmpty (assetPath))
-				return;
+        /// <summary>
+        /// 检查如果有依赖，报出
+        /// 检查prefab中存在prefab依赖，进行打散！
+        /// </summary>
+        /// <param name="assetPath"></param>
+        public static void CheckAndLogDependencies(string assetPath)
+        {
+            if (string.IsNullOrEmpty(assetPath))
+                return;
 
-			// 输出依赖
-			var depSb = new StringBuilder ();
-			var asset = AssetDatabase.LoadAssetAtPath (assetPath, typeof(UnityEngine.Object));
-			var depsArray = EditorUtility.CollectDependencies (new[] { asset });
-			if (depsArray != null && depsArray.Length > 0) {
-				if (depsArray.Length == 1 && depsArray [0] == asset) {
-					// 自己依赖自己的忽略掉
-				} else {
-					foreach (var depAsset in depsArray) {
-						var depAssetPath = AssetDatabase.GetAssetPath (depAsset);
-						depSb.AppendLine (string.Format ("{0} --> {1} <{2}>", depAssetPath, depAsset.name, depAsset.GetType ()));
-					}
-					Log.Info ("[BuildAssetBundle]Asset: {0} has dependencies: \n{1}", assetPath, depSb.ToString ());
-				}
-			}
-		}
+            // 输出依赖
+            var depSb = new StringBuilder();
+            var asset = AssetDatabase.LoadAssetAtPath(assetPath, typeof(UnityEngine.Object));
+            var depsArray = EditorUtility.CollectDependencies(new[] { asset });
+            if (depsArray != null && depsArray.Length > 0)
+            {
+                if (depsArray.Length == 1 && depsArray[0] == asset)
+                {
+                    // 自己依赖自己的忽略掉
+                }
+                else
+                {
+                    foreach (var depAsset in depsArray)
+                    {
+                        var depAssetPath = AssetDatabase.GetAssetPath(depAsset);
+                        depSb.AppendLine(string.Format("{0} --> {1} <{2}>", depAssetPath, depAsset.name, depAsset.GetType()));
+                    }
+                    Log.Info("[BuildAssetBundle]Asset: {0} has dependencies: \n{1}", assetPath, depSb.ToString());
+                }
+            }
+        }
 
-		[MenuItem ("Assets/Print Aseet Dependencies", false, 100)]
-		public static void MenuCheckAndLogDependencies ()
-		{
-			var obj = Selection.activeObject;
-			if (obj == null) {
-				Debug.LogError ("No selection object");
-				return;
-			}
-			var assetPath = AssetDatabase.GetAssetPath (obj);
-			BuildTools.CheckAndLogDependencies (assetPath);
-		}
+        [MenuItem("Assets/Print Aseet Dependencies", false, 100)]
+        public static void MenuCheckAndLogDependencies()
+        {
+            var obj = Selection.activeObject;
+            if (obj == null)
+            {
+                Debug.LogError("No selection object");
+                return;
+            }
+            var assetPath = AssetDatabase.GetAssetPath(obj);
+            BuildTools.CheckAndLogDependencies(assetPath);
+        }
 
-		#if !UNITY_5
+#if !UNITY_5
 		private static void _DoBuild (out uint crc, Object asset, Object[] subAssets, string path, string relativePath,
 		                              BuildTarget buildTarget)
 		{
@@ -417,134 +505,149 @@ namespace KEngine.Editor
 			return crc;
 		}
 
-		#endif
-		public static void CopyFolder (string sPath, string dPath)
-		{
-			if (!Directory.Exists (dPath)) {
-				Directory.CreateDirectory (dPath);
-			}
+#endif
+        public static void CopyFolder(string sPath, string dPath)
+        {
+            if (!Directory.Exists(dPath))
+            {
+                Directory.CreateDirectory(dPath);
+            }
 
-			DirectoryInfo sDir = new DirectoryInfo (sPath);
-			FileInfo[] fileArray = sDir.GetFiles ();
-			foreach (FileInfo file in fileArray) {
-				if (file.Extension != ".meta")
-					file.CopyTo (dPath + "/" + file.Name, true);
-			}
+            DirectoryInfo sDir = new DirectoryInfo(sPath);
+            FileInfo[] fileArray = sDir.GetFiles();
+            foreach (FileInfo file in fileArray)
+            {
+                if (file.Extension != ".meta")
+                    file.CopyTo(dPath + "/" + file.Name, true);
+            }
 
-			DirectoryInfo[] subDirArray = sDir.GetDirectories ();
-			foreach (DirectoryInfo subDir in subDirArray) {
-				CopyFolder (subDir.FullName, dPath + "/" + subDir.Name);
-			}
-		}
+            DirectoryInfo[] subDirArray = sDir.GetDirectories();
+            foreach (DirectoryInfo subDir in subDirArray)
+            {
+                CopyFolder(subDir.FullName, dPath + "/" + subDir.Name);
+            }
+        }
 
-		/// <summary>
-		/// 是否有指定宏呢
-		/// </summary>
-		/// <param name="symbol"></param>
-		/// <returns></returns>
-		public static bool HasDefineSymbol (string symbol)
-		{
-			string symbolStrs =
-				PlayerSettings.GetScriptingDefineSymbolsForGroup (EditorUserBuildSettings.selectedBuildTargetGroup);
-			List<string> symbols =
-				new List<string> (symbolStrs.Split (new char[] { ';' }, System.StringSplitOptions.RemoveEmptyEntries));
-			return symbols.Contains (symbol);
-		}
+        /// <summary>
+        /// 是否有指定宏呢
+        /// </summary>
+        /// <param name="symbol"></param>
+        /// <returns></returns>
+        public static bool HasDefineSymbol(string symbol)
+        {
+            string symbolStrs =
+                PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
+            List<string> symbols =
+                new List<string>(symbolStrs.Split(new char[] { ';' }, System.StringSplitOptions.RemoveEmptyEntries));
+            return symbols.Contains(symbol);
+        }
 
-		/// <summary>
-		/// 移除指定宏
-		/// </summary>
-		/// <param name="symbol"></param>
-		public static void RemoveDefineSymbols (string symbol)
-		{
-			foreach (BuildTargetGroup target in System.Enum.GetValues(typeof(BuildTargetGroup))) {
-				string symbolStr = PlayerSettings.GetScriptingDefineSymbolsForGroup (target);
-				List<string> symbols =
-					new List<string> (symbolStr.Split (new char[] { ';' }, System.StringSplitOptions.RemoveEmptyEntries));
-				if (symbols.Contains (symbol))
-					symbols.Remove (symbol);
-				PlayerSettings.SetScriptingDefineSymbolsForGroup (target, string.Join (";", symbols.ToArray ()));
-			}
-		}
+        /// <summary>
+        /// 移除指定宏
+        /// </summary>
+        /// <param name="symbol"></param>
+        public static void RemoveDefineSymbols(string symbol)
+        {
+            foreach (BuildTargetGroup target in System.Enum.GetValues(typeof(BuildTargetGroup)))
+            {
+                string symbolStr = PlayerSettings.GetScriptingDefineSymbolsForGroup(target);
+                List<string> symbols =
+                    new List<string>(symbolStr.Split(new char[] { ';' }, System.StringSplitOptions.RemoveEmptyEntries));
+                if (symbols.Contains(symbol))
+                    symbols.Remove(symbol);
+                PlayerSettings.SetScriptingDefineSymbolsForGroup(target, string.Join(";", symbols.ToArray()));
+            }
+        }
 
-		/// <summary>
-		/// 添加指定宏（不重复）
-		/// </summary>
-		/// <param name="symbol"></param>
-		public static void AddDefineSymbols (string symbol)
-		{
-			foreach (BuildTargetGroup target in System.Enum.GetValues(typeof(BuildTargetGroup))) {
-				string symbolStr = PlayerSettings.GetScriptingDefineSymbolsForGroup (target);
-				List<string> symbols =
-					new List<string> (symbolStr.Split (new char[] { ';' }, System.StringSplitOptions.RemoveEmptyEntries));
-				if (!symbols.Contains (symbol)) {
-					symbols.Add (symbol);
-					PlayerSettings.SetScriptingDefineSymbolsForGroup (target, string.Join (";", symbols.ToArray ()));
-				}
-			}
-		}
+        /// <summary>
+        /// 添加指定宏（不重复）
+        /// </summary>
+        /// <param name="symbol"></param>
+        public static void AddDefineSymbols(string symbol)
+        {
+            foreach (BuildTargetGroup target in System.Enum.GetValues(typeof(BuildTargetGroup)))
+            {
+                string symbolStr = PlayerSettings.GetScriptingDefineSymbolsForGroup(target);
+                List<string> symbols =
+                    new List<string>(symbolStr.Split(new char[] { ';' }, System.StringSplitOptions.RemoveEmptyEntries));
+                if (!symbols.Contains(symbol))
+                {
+                    symbols.Add(symbol);
+                    PlayerSettings.SetScriptingDefineSymbolsForGroup(target, string.Join(";", symbols.ToArray()));
+                }
+            }
+        }
 
-		public static bool IsWin32 {
-			get {
-				var os = Environment.OSVersion;
-				return os.ToString ().Contains ("Windows");
-			}
-		}
+        public static bool IsWin32
+        {
+            get
+            {
+                var os = Environment.OSVersion;
+                return os.ToString().Contains("Windows");
+            }
+        }
 
-		// 执行Python文件！获取返回值
-		public static string ExecutePyFile (string pyFileFullPath, string arguments)
-		{
-			string pythonExe = null;
-			if (IsWin32) {
-				var guids = AssetDatabase.FindAssets ("py");
-				foreach (var guid in guids) {
-					var assetPath = AssetDatabase.GUIDToAssetPath (guid);
+        // 执行Python文件！获取返回值
+        public static string ExecutePyFile(string pyFileFullPath, string arguments)
+        {
+            string pythonExe = null;
+            if (IsWin32)
+            {
+                var guids = AssetDatabase.FindAssets("py");
+                foreach (var guid in guids)
+                {
+                    var assetPath = AssetDatabase.GUIDToAssetPath(guid);
 
-					if (Path.GetFileName (assetPath) == "py.exe") {
-						pythonExe = assetPath; // Python地址
-						break;
-					}
-				}
-			} else {
-				pythonExe = "python"; // linux or mac
-			}
+                    if (Path.GetFileName(assetPath) == "py.exe")
+                    {
+                        pythonExe = assetPath; // Python地址
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                pythonExe = "python"; // linux or mac
+            }
 
 
-			if (string.IsNullOrEmpty (pythonExe)) {
-				Log.Error ("无法找到py.exe, 或python指令");
-				return "Error: Not found python";
-			}
+            if (string.IsNullOrEmpty(pythonExe))
+            {
+                Log.Error("无法找到py.exe, 或python指令");
+                return "Error: Not found python";
+            }
 
-			string allOutput = null;
-			using (var process = new System.Diagnostics.Process ()) {
-				process.StartInfo.FileName = pythonExe;
-				process.StartInfo.Arguments = pyFileFullPath + " " + arguments;
-				//process.StartInfo.UseShellExecute = false;
-				////process.StartInfo.CreateNoWindow = true;
-				//process.StartInfo.RedirectStandardOutput = true;
-				process.StartInfo.UseShellExecute = false;
-				process.StartInfo.CreateNoWindow = true;
-				process.StartInfo.RedirectStandardOutput = true;
+            string allOutput = null;
+            using (var process = new System.Diagnostics.Process())
+            {
+                process.StartInfo.FileName = pythonExe;
+                process.StartInfo.Arguments = pyFileFullPath + " " + arguments;
+                //process.StartInfo.UseShellExecute = false;
+                ////process.StartInfo.CreateNoWindow = true;
+                //process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.CreateNoWindow = true;
+                process.StartInfo.RedirectStandardOutput = true;
 
-				var tips = string.Format ("ExecutePython: {0} {1}", process.StartInfo.FileName, process.StartInfo.Arguments);
-				Log.Info (tips);
-				EditorUtility.DisplayProgressBar ("Python...", tips, .5f);
+                var tips = string.Format("ExecutePython: {0} {1}", process.StartInfo.FileName, process.StartInfo.Arguments);
+                Log.Info(tips);
+                EditorUtility.DisplayProgressBar("Python...", tips, .5f);
 
-				process.Start ();
+                process.Start();
 
-				allOutput = process.StandardOutput.ReadToEnd ();
+                allOutput = process.StandardOutput.ReadToEnd();
 
-				process.WaitForExit ();
+                process.WaitForExit();
 
-				Log.Info ("PyExecuteResult: {0}", allOutput);
+                Log.Info("PyExecuteResult: {0}", allOutput);
 
-				EditorUtility.ClearProgressBar ();
+                EditorUtility.ClearProgressBar();
 
-				return allOutput;
-			}
-		}
+                return allOutput;
+            }
+        }
 
-		/* TODO: CFolderSyncTool
+        /* TODO: CFolderSyncTool
             public static void DeleteLink(string linkPath)
             {
                 var os = Environment.OSVersion;
@@ -586,16 +689,16 @@ namespace KEngine.Editor
             }
             */
 
-		//[Obsolete("Please use KAssetVersionControl")]
-		//public static bool CheckNeedBuildWithMeta(params string[] assetPath)
-		//{
-		//    return KAssetVersionControl.TryCheckNeedBuildWithMeta(assetPath);
-		//}
-		//[Obsolete("Please use KAssetVersionControl")]
-		//public static void MarkBuildVersion(string assetPath)
-		//{
-		//    KAssetVersionControl.TryMarkBuildVersion(assetPath);
-		//}
-	}
+        //[Obsolete("Please use KAssetVersionControl")]
+        //public static bool CheckNeedBuildWithMeta(params string[] assetPath)
+        //{
+        //    return KAssetVersionControl.TryCheckNeedBuildWithMeta(assetPath);
+        //}
+        //[Obsolete("Please use KAssetVersionControl")]
+        //public static void MarkBuildVersion(string assetPath)
+        //{
+        //    KAssetVersionControl.TryMarkBuildVersion(assetPath);
+        //}
+    }
 
 }
