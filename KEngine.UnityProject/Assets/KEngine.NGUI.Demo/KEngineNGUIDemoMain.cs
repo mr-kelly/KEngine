@@ -46,7 +46,7 @@ public class KEngineNGUIDemoMain : MonoBehaviour
             null,
             new IModuleInitable[]
             {
-                UIModule.Instance,
+//                UIModule.Instance,
                 //KGameSettings.Instance,
 
             });

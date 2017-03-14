@@ -38,7 +38,7 @@ namespace KEngine
 
         protected void ProcessFont(string resPath)
         {
-            var loader = KFontLoader.Load(resPath, (isOk, _font) =>
+            var loader = FontLoader.Load(resPath, (isOk, _font) =>
             {
                 if (!IsDestroy)
                 {

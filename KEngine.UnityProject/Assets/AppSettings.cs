@@ -30,7 +30,8 @@ using System.Collections;
 using System.Collections.Generic;
 using KEngine;
 using KEngine.Modules;
-using KEngine.Table;
+using TableML;
+
 namespace AppSettings
 {
 	/// <summary>
@@ -223,7 +224,7 @@ namespace AppSettings
 	/// Auto Generate for Tab File: "AppConfig+Category.bytes", "AppConfig+Category2.bytes", "AppConfig+TSV.bytes", "AppConfig.bytes"
     /// Singleton class for less memory use
 	/// </summary>
-	public partial class AppConfigSetting : TableRowParser
+	public partial class AppConfigSetting : TableRowFieldParser
 	{
 		
         /// <summary>
@@ -237,12 +238,12 @@ namespace AppSettings
         public string Value { get; private set;}
         
 
-        internal AppConfigSetting(TableRow row)
+		internal AppConfigSetting(TableFileRow row)
         {
             Reload(row);
         }
 
-        internal void Reload(TableRow row)
+		internal void Reload(TableFileRow row)
         { 
             Id = row.Get_string(row.Values[0], ""); 
             Value = row.Get_string(row.Values[1], ""); 
@@ -253,7 +254,7 @@ namespace AppSettings
         /// </summary>
         /// <param name="row"></param>
         /// <returns></returns>
-        public static string ParsePrimaryKey(TableRow row)
+		public static string ParsePrimaryKey(TableFileRow row)
         {
             var primaryKey = row.Get_string(row.Values[0], "");
             return primaryKey;
@@ -407,7 +408,7 @@ namespace AppSettings
 	/// Auto Generate for Tab File: "Example.bytes"
     /// Singleton class for less memory use
 	/// </summary>
-	public partial class ExampleSetting : TableRowParser
+	public partial class ExampleSetting : TableRowFieldParser
 	{
 		
         /// <summary>
@@ -441,12 +442,12 @@ namespace AppSettings
         public Dictionary<string,int> StrIntMap { get; private set;}
         
 
-        internal ExampleSetting(TableRow row)
+		internal ExampleSetting(TableFileRow row)
         {
             Reload(row);
         }
 
-        internal void Reload(TableRow row)
+        internal void Reload(TableFileRow row)
         { 
             Id = row.Get_string(row.Values[0], ""); 
             Name = row.Get_string(row.Values[1], ""); 
@@ -461,7 +462,7 @@ namespace AppSettings
         /// </summary>
         /// <param name="row"></param>
         /// <returns></returns>
-        public static string ParsePrimaryKey(TableRow row)
+        public static string ParsePrimaryKey(TableFileRow row)
         {
             var primaryKey = row.Get_string(row.Values[0], "");
             return primaryKey;
@@ -615,7 +616,7 @@ namespace AppSettings
 	/// Auto Generate for Tab File: "Subdir/Example2.bytes"
     /// Singleton class for less memory use
 	/// </summary>
-	public partial class SubdirExample2Setting : TableRowParser
+	public partial class SubdirExample2Setting : TableRowFieldParser
 	{
 		
         /// <summary>
@@ -629,12 +630,12 @@ namespace AppSettings
         public string Name { get; private set;}
         
 
-        internal SubdirExample2Setting(TableRow row)
+        internal SubdirExample2Setting(TableFileRow row)
         {
             Reload(row);
         }
 
-        internal void Reload(TableRow row)
+        internal void Reload(TableFileRow row)
         { 
             Id = row.Get_int(row.Values[0], ""); 
             Name = row.Get_string(row.Values[1], ""); 
@@ -645,7 +646,7 @@ namespace AppSettings
         /// </summary>
         /// <param name="row"></param>
         /// <returns></returns>
-        public static int ParsePrimaryKey(TableRow row)
+        public static int ParsePrimaryKey(TableFileRow row)
         {
             var primaryKey = row.Get_int(row.Values[0], "");
             return primaryKey;
@@ -799,7 +800,7 @@ namespace AppSettings
 	/// Auto Generate for Tab File: "Subdir/__.bytes"
     /// Singleton class for less memory use
 	/// </summary>
-	public partial class SubdirSetting : TableRowParser
+	public partial class SubdirSetting : TableRowFieldParser
 	{
 		
         /// <summary>
@@ -813,12 +814,12 @@ namespace AppSettings
         public string Name { get; private set;}
         
 
-        internal SubdirSetting(TableRow row)
+        internal SubdirSetting(TableFileRow row)
         {
             Reload(row);
         }
 
-        internal void Reload(TableRow row)
+        internal void Reload(TableFileRow row)
         { 
             Id = row.Get_string(row.Values[0], ""); 
             Name = row.Get_string(row.Values[1], ""); 
@@ -829,7 +830,7 @@ namespace AppSettings
         /// </summary>
         /// <param name="row"></param>
         /// <returns></returns>
-        public static string ParsePrimaryKey(TableRow row)
+        public static string ParsePrimaryKey(TableFileRow row)
         {
             var primaryKey = row.Get_string(row.Values[0], "");
             return primaryKey;
@@ -983,7 +984,7 @@ namespace AppSettings
 	/// Auto Generate for Tab File: "Subdir/SubSubDir/Example3.bytes"
     /// Singleton class for less memory use
 	/// </summary>
-	public partial class SubdirSubSubDirExample3Setting : TableRowParser
+	public partial class SubdirSubSubDirExample3Setting : TableRowFieldParser
 	{
 		
         /// <summary>
@@ -997,12 +998,12 @@ namespace AppSettings
         public string Name { get; private set;}
         
 
-        internal SubdirSubSubDirExample3Setting(TableRow row)
+        internal SubdirSubSubDirExample3Setting(TableFileRow row)
         {
             Reload(row);
         }
 
-        internal void Reload(TableRow row)
+        internal void Reload(TableFileRow row)
         { 
             Id = row.Get_string(row.Values[0], ""); 
             Name = row.Get_string(row.Values[1], ""); 
@@ -1013,7 +1014,7 @@ namespace AppSettings
         /// </summary>
         /// <param name="row"></param>
         /// <returns></returns>
-        public static string ParsePrimaryKey(TableRow row)
+        public static string ParsePrimaryKey(TableFileRow row)
         {
             var primaryKey = row.Get_string(row.Values[0], "");
             return primaryKey;
