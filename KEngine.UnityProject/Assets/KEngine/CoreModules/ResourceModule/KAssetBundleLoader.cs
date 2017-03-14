@@ -26,9 +26,11 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using KEngine;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace KEngine
 {
@@ -58,6 +60,7 @@ namespace KEngine
         }
 
         private string RelativeResourceUrl;
+        private List<UnityEngine.Object> _loadedAssets;
 
         /// <summary>
         /// AssetBundle加载方式
@@ -72,6 +75,10 @@ namespace KEngine
         public static AssetBundleLoader Load(string url, CAssetBundleLoaderDelegate callback = null,
             LoaderMode loaderMode = LoaderMode.Async)
         {
+
+#if UNITY_5
+            url = url.ToLower();
+#endif
             LoaderDelgate newCallback = null;
             if (callback != null)
             {
@@ -96,7 +103,7 @@ namespace KEngine
                 return;
 
             _hasPreloadAssetBundleManifest = true;
-//            var mainAssetBundlePath = string.Format("{0}/{1}/{1}", KResourceModule.BundlesDirName,KResourceModule.BuildPlatformName);
+            //            var mainAssetBundlePath = string.Format("{0}/{1}/{1}", KResourceModule.BundlesDirName,KResourceModule.BuildPlatformName);
             HotBytesLoader bytesLoader = HotBytesLoader.Load(KResourceModule.BundlesPathRelative + KResourceModule.BuildPlatformName, LoaderMode.Sync);//string.Format("{0}/{1}", KResourceModule.BundlesDirName, KResourceModule.BuildPlatformName), LoaderMode.Sync);
 
             _mainAssetBundle = AssetBundle.LoadFromMemory(bytesLoader.Bytes);//KResourceModule.LoadSyncFromStreamingAssets(mainAssetBundlePath));
@@ -226,6 +233,15 @@ namespace KEngine
             }
             _depLoaders = null;
 #endif
+
+            if (_loadedAssets != null)
+            {
+                foreach (var loadedAsset in _loadedAssets)
+                {
+                    Object.DestroyImmediate(loadedAsset, true);
+                }
+                _loadedAssets.Clear();
+            }
         }
 
         public override void Release()
@@ -245,6 +261,12 @@ namespace KEngine
         /// 舊的tips~忽略
         /// 原以为，每次都通过getter取一次assetBundle会有序列化解压问题，会慢一点，后用AddWatch调试过，发现如果把.assetBundle放到Dictionary里缓存，查询会更慢
         /// 因为，估计.assetBundle是一个纯Getter，没有做序列化问题。  （不保证.mainAsset）
+        public void PushLoadedAsset(Object getAsset)
+        {
+            if (_loadedAssets == null)
+                _loadedAssets = new List<Object>();
+            _loadedAssets.Add(getAsset);
+        }
     }
 
 }

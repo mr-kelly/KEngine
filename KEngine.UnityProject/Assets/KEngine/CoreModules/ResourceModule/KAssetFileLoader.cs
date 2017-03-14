@@ -166,6 +166,7 @@ namespace KEngine
                     {
                         getAsset = assetBundle.LoadAsset(abAssetName);
                         Debuger.Assert(getAsset);
+                        _bundleLoader.PushLoadedAsset(getAsset);
                     }
                     else
                     {
@@ -175,6 +176,7 @@ namespace KEngine
                             yield return null;
                         }
                         Debuger.Assert(getAsset = request.asset);
+                        _bundleLoader.PushLoadedAsset(getAsset);
                     }
                 }
                 else
@@ -265,7 +267,7 @@ namespace KEngine
                     //Object.DestroyObject(ResultObject as UnityEngine.Object);
 
                     // Destroying GameObjects immediately is not permitted during physics trigger/contact, animation event callbacks or OnValidate. You must use Destroy instead.
-                    Object.DestroyImmediate(ResultObject as Object, true);
+//                    Object.DestroyImmediate(ResultObject as Object, true);
                 }
 
                 //var bRemove = Caches.Remove(Url);
