@@ -201,6 +201,17 @@ namespace KEngine.Editor
             EditorUserBuildSettings.SwitchActiveBuildTarget(currentBuildTarget);
         }
 
+        [MenuItem("KEngine/AssetBundle/ReBuild All")]
+        public static void ReBuildAllAssetBundles()
+        {
+            var outputPath = GetExportPath(EditorUserBuildSettings.activeBuildTarget);
+            Directory.Delete(outputPath, true);
+
+            Debug.Log("Delete folder: " + outputPath);
+
+            BuildAllAssetBundles();
+        }
+
         [MenuItem("KEngine/AssetBundle/Build All %&b")]
         public static void BuildAllAssetBundles()
         {
