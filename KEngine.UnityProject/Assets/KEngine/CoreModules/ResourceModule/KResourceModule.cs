@@ -62,13 +62,7 @@ namespace KEngine
     {
         static KResourceModule()
         {
-#if UNITY_EDITOR
-            if (UnityEditor.EditorApplication.isPlaying)
-#endif
-            if (_Instance == null)
-            {
-                InitResourcePath();
-            }
+            InitResourcePath();
         }
 
         public delegate void AsyncLoadABAssetDelegate(Object asset, object[] args);
@@ -95,7 +89,14 @@ namespace KEngine
             {
                 if (_Instance == null)
                 {
-                    InitResourcePath();
+                    GameObject resMgr = GameObject.Find("_ResourceModule_");
+                    if (resMgr == null)
+                    {
+                        resMgr = new GameObject("_ResourceModule_");
+                        GameObject.DontDestroyOnLoad(resMgr);
+                    }
+
+                    _Instance = resMgr.AddComponent<KResourceModule>();
                 }
                 return _Instance;
             }
@@ -494,7 +495,7 @@ namespace KEngine
 #if !UNITY_5_4_OR_NEWER
                 || Application.platform == RuntimePlatform.WindowsWebPlayer
 #endif
-                )
+)
                 fileProtocol = "file:///";
 
             return fileProtocol;
@@ -595,14 +596,6 @@ namespace KEngine
         /// <returns></returns>
         static void InitResourcePath()
         {
-            GameObject resMgr = GameObject.Find("_ResourceModule_");
-            if (resMgr == null)
-            {
-                resMgr = new GameObject("_ResourceModule_");
-                GameObject.DontDestroyOnLoad(resMgr);
-            }
-
-            _Instance = resMgr.AddComponent<KResourceModule>();
 
             string editorProductPath = EditorProductFullPath;
 
@@ -624,7 +617,7 @@ namespace KEngine
                 case RuntimePlatform.OSXPlayer:
                     {
                         string path = Application.streamingAssetsPath.Replace('\\', '/');//Application.dataPath.Replace('\\', '/');
-                                                                                         //                        path = path.Substring(0, path.LastIndexOf('/') + 1);
+                        //                        path = path.Substring(0, path.LastIndexOf('/') + 1);
                         ApplicationPath = string.Format("{0}{1}", GetFileProtocol(), Application.dataPath);
                         ProductPathWithProtocol = string.Format("{0}{1}/", GetFileProtocol(), path);
                         ProductPathWithoutFileProtocol = string.Format("{0}/", path);
@@ -636,7 +629,7 @@ namespace KEngine
                         ApplicationPath = string.Concat("jar:", GetFileProtocol(), Application.dataPath, "!/assets");
                         ProductPathWithProtocol = string.Concat(ApplicationPath, "/");
                         ProductPathWithoutFileProtocol = string.Concat(Application.dataPath,
-                            "!/assets/" );
+                            "!/assets/");
                         // 注意，StramingAsset在Android平台中，是在壓縮的apk里，不做文件檢查
                         // Resources folder
                     }
