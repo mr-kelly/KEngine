@@ -378,7 +378,8 @@ namespace KEngine.UI
         {
             if (openState.UIResourceLoader != null)
             {
-                openState.UIResourceLoader.Release(true);// now!
+                openState.UIResourceLoader.Release();// now!
+                KResourceModule.Collect();
                 Log.Info("Release UI ResourceLoader: {0}", openState.UIResourceLoader.Url);
                 openState.UIResourceLoader = null;
             }

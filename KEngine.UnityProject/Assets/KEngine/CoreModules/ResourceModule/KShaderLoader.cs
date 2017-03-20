@@ -74,7 +74,7 @@ namespace KEngine
             if (Application.isEditor)
                 KResoourceLoadedAssetDebugger.Create("Shader", Url, shader);
 
-            loader.Release(IsBeenReleaseNow);
+            loader.Release();
 
             OnFinish(shader);
         }

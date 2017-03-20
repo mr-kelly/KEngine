@@ -118,7 +118,7 @@ namespace KEngine
             base.DoDispose();
             if (_wwwLoader != null)
             {
-                _wwwLoader.Release(IsBeenReleaseNow);
+                _wwwLoader.Release();
             }
         }
 

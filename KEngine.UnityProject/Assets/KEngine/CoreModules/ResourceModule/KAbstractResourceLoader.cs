@@ -80,7 +80,7 @@ namespace KEngine
         /// <summary>
         /// 进行垃圾回收
         /// </summary>
-        private static readonly Dictionary<AbstractResourceLoader, float> UnUsesLoaders =
+        internal static readonly Dictionary<AbstractResourceLoader, float> UnUsesLoaders =
             new Dictionary<AbstractResourceLoader, float>();
 
         #endregion
@@ -289,7 +289,7 @@ namespace KEngine
         /// <summary>
         /// 进行垃圾回收
         /// </summary>
-        private static void DoGarbageCollect()
+        internal static void DoGarbageCollect()
         {
             foreach (var kv in UnUsesLoaders)
             {
@@ -406,26 +406,6 @@ namespace KEngine
             {
                 justDo();
             }
-        }
-
-        /// <summary>
-        /// 当被执行了ReleaseNow，这里控制成true； DoDipose的其它类，根据这个来判断自己是否也需要releaseNow
-        /// </summary>
-        protected internal bool IsBeenReleaseNow = false;
-
-        /// <summary>
-        /// 执行Release，并立刻触发残余清理
-        /// </summary>
-        /// <param name="gcNow">是否立刻触发垃圾回收，默认垃圾回收是隔几秒进行的</param>
-        public virtual void Release(bool gcNow)
-        {
-            if (gcNow)
-                IsBeenReleaseNow = true;
-
-            Release();
-
-            if (gcNow)
-                DoGarbageCollect();
         }
 
         /// <summary>

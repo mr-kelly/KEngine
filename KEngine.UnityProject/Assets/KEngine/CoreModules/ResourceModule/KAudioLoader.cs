@@ -63,7 +63,7 @@ namespace KEngine
         {
             base.DoDispose();
 
-            AssetFileBridge.Release(IsBeenReleaseNow);
+            AssetFileBridge.Release();
         }
     }
 

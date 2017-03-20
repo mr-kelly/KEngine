@@ -141,7 +141,7 @@ namespace KEngine
         protected override void DoDispose()
         {
             base.DoDispose();
-            _assetFileBridge.Release(IsBeenReleaseNow);
+            _assetFileBridge.Release();
 
             UnityEngine.SceneManagement.SceneManager.UnloadScene(_sceneName);
         }

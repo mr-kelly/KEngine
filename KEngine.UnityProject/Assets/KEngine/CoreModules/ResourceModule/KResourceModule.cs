@@ -669,10 +669,17 @@ namespace KEngine
             Log.Info("[Load] {0}, {1}, {2}s", resType, resPath, (System.DateTime.Now - begin).TotalSeconds);
         }
 
+        /// <summary>
+        /// Collect all KEngine's resource unused loaders
+        /// </summary>
         public static void Collect()
         {
+            while(AbstractResourceLoader.UnUsesLoaders.Count > 0)
+                AbstractResourceLoader.DoGarbageCollect();
+
             Resources.UnloadUnusedAssets();
             System.GC.Collect();
+
         }
     }
 

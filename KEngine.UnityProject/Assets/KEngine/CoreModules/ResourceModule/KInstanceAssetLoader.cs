@@ -109,7 +109,7 @@ namespace KEngine
         {
             base.DoDispose();
 
-            _assetFileBridge.Release(IsBeenReleaseNow);
+            _assetFileBridge.Release();
             if (InstanceAsset != null)
             {
                 Object.Destroy(InstanceAsset);
