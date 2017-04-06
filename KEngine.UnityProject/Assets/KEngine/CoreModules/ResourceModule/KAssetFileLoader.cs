@@ -95,7 +95,7 @@ namespace KEngine
 
             Object getAsset = null;
 
-			if (IsEditorLoadAsset) 
+			if (IsEditorLoadAsset && Application.isEditor) 
 			{
 #if UNITY_EDITOR
 				if (path.EndsWith(".unity"))

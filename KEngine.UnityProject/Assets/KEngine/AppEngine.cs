@@ -30,9 +30,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using KEngine.Table;
 using UnityEngine;
 using UnityEngine.UI;
+using TableML;
 
 namespace KEngine
 {
@@ -334,7 +334,7 @@ namespace KEngine
             if (Time.frameCount % 30 == 0 || _cacheMemoryStr == null || _cacheFPSStr == null)
             {
                 _cacheMemoryStr = string.Format("Memory: {0:F3}KB", 
-#if UNITY_5_5
+#if UNITY_5_5_OR_NEWER
 					UnityEngine.Profiling.Profiler.GetMonoUsedSize() / 1024f
 #else
 					UnityEngine.Profiler.GetMonoUsedSize() / 1024f
@@ -371,7 +371,7 @@ namespace KEngine
     {
         private static KEngineInfo _instance;
 
-        public static KEngineInfo Wrap(TableRow row)
+        public static KEngineInfo Wrap(TableFileRow row)
         {
             if (_instance == null)
                 _instance = new KEngineInfo();
@@ -380,10 +380,11 @@ namespace KEngine
             return _instance;
         }
 
-        private TableRow _row;
+        private TableFileRow _row;
 
         private KEngineInfo()
         {
+            
         }
 
         public string Key

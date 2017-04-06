@@ -69,27 +69,50 @@ namespace KEngine.Editor
         [MenuItem("KEngine/AssetBundle/Make Names from [BundleResources]")]
         public static void MakeAssetBundleNames()
         {
+            DoMakeAssetBundleNames(false);
+        }
+
+        [MenuItem("KEngine/AssetBundle/Make Names from [BundleResources] (All)")]
+        public static void MakeAssetBundleNamesAll()
+        {
+            DoMakeAssetBundleNames(true);
+        }
+
+        /// <summary>
+        /// 是否清理所有之前的
+        /// </summary>
+        /// <param name="remake">Clear all asset bundle name</param>
+        public static void DoMakeAssetBundleNames(bool remake)
+        {
             var dir = ResourcesBuildDir;
 
             // Check marked asset bundle whether real
-            foreach (var assetGuid in AssetDatabase.FindAssets(""))
+            if (remake)
             {
-                var assetPath = AssetDatabase.GUIDToAssetPath(assetGuid);
-                var assetImporter = AssetImporter.GetAtPath(assetPath);
-                var bundleName = assetImporter.assetBundleName;
-                if (string.IsNullOrEmpty(bundleName))
+                foreach (var assetGuid in AssetDatabase.FindAssets(""))
                 {
-                    continue;
-                }
-                if (!assetPath.StartsWith(dir))
-                {
-                    assetImporter.assetBundleName = null;
-                }
-            }
+                    EditorUtility.DisplayProgressBar("AssetBundle", string.Format("Finding assets... {0}", assetGuid), .2f);
 
+                    var assetPath = AssetDatabase.GUIDToAssetPath(assetGuid);
+                    var assetImporter = AssetImporter.GetAtPath(assetPath);
+                    var bundleName = assetImporter.assetBundleName;
+                    if (string.IsNullOrEmpty(bundleName))
+                    {
+                        continue;
+                    }
+                    if (!assetPath.StartsWith(dir))
+                    {
+                        assetImporter.assetBundleName = null;
+                    }
+                }
+
+                
+            }
             // set BundleResources's all bundle name
             foreach (var filepath in Directory.GetFiles(dir, "*.*", SearchOption.AllDirectories))
             {
+                EditorUtility.DisplayProgressBar("AssetBundle", string.Format("Making asset bundle name: {0}", filepath), .5f);
+
                 if (filepath.EndsWith(".meta")) continue;
 
                 var importer = AssetImporter.GetAtPath(filepath);
@@ -103,6 +126,7 @@ namespace KEngine.Editor
             }
 
             Log.Info("Make all asset name successs!");
+            EditorUtility.ClearProgressBar();
 
         }
 
