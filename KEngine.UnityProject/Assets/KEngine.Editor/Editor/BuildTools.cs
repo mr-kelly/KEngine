@@ -233,18 +233,54 @@ namespace KEngine.Editor
 
             Debug.Log("Delete folder: " + outputPath);
 
-            BuildAllAssetBundles();
+            BuildAllAssetBundles(true);
+        }
+
+
+        /// <summary>
+        /// Delete BundleResources's Resource's AssetBundle
+        /// </summary>
+        [MenuItem("Assets/Delete Resources's AssetBundle")]
+        private static void DeleteAssetBundle()
+        {
+            var sel = Selection.activeObject;
+            var path = AssetDatabase.GetAssetPath(sel);
+            var startWith = "Assets/" + KEngineDef.ResourcesBuildDir + "/";
+
+            if (!path.StartsWith(startWith))
+            {
+                Debug.LogError("Not Asset Bundle Resources: " + path);
+                return;
+            }
+
+            var abPath = Path.Combine(KResourceModule.ProductPathWithoutFileProtocol, 
+                KResourceModule.BundlesPathRelative + path.Substring(startWith.Length, path.Length - startWith.Length) +  AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt));
+
+            if (File.Exists(abPath))
+            {
+                Debug.Log("Delete AB: " + abPath);
+                File.Delete(abPath);
+            }
+            else
+            {
+                Debug.LogError("Not Exist AB: " + abPath);
+            }
+
         }
 
         [MenuItem("KEngine/AssetBundle/Build All %&b")]
         public static void BuildAllAssetBundles()
+        {
+            BuildAllAssetBundles(false);
+        }
+        public static void BuildAllAssetBundles(bool isRebuild)
         {
             if (EditorApplication.isPlaying)
             {
                 Log.Error("Cannot build in playing mode! Please stop!");
                 return;
             }
-            MakeAssetBundleNames();
+            DoMakeAssetBundleNames(isRebuild);
             var outputPath = GetExportPath(EditorUserBuildSettings.activeBuildTarget);
             Log.Info("Asset bundle start build to: {0}", outputPath);
             BuildPipeline.BuildAssetBundles(outputPath, BuildAssetBundleOptions.DeterministicAssetBundle, EditorUserBuildSettings.activeBuildTarget);

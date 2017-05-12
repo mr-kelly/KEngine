@@ -408,6 +408,13 @@ namespace KEngine
             }
         }
 
+        public virtual void Release(bool now)
+        {
+            Release();
+            if (now)
+                KResourceModule.Collect();
+        }
+
         /// <summary>
         /// 释放资源，减少引用计数
         /// </summary>

@@ -55,14 +55,17 @@ namespace KEngine.Editor
         {
             KUnityEditorEventCatcher.OnWillPlayEvent -= OnWillPlayEvent;
             KUnityEditorEventCatcher.OnWillPlayEvent += OnWillPlayEvent;
-            KUnityEditorEventCatcher.OnSaveSceneEvent -= OnSaveScene;
-            KUnityEditorEventCatcher.OnSaveSceneEvent += OnSaveScene;
+            //KUnityEditorEventCatcher.OnSaveSceneEvent -= OnSaveScene;
+            //KUnityEditorEventCatcher.OnSaveSceneEvent += OnSaveScene;
             KUnityEditorEventCatcher.OnBeforeBuildPlayerEvent -= OnBeforeBuildPlayerEvent;
             KUnityEditorEventCatcher.OnBeforeBuildPlayerEvent += OnBeforeBuildPlayerEvent;
         }
 
         private static void OnSaveScene()
         {
+			foreach (var ani in GameObject.FindObjectsOfType<DG.Tweening.DOTweenAnimation>()) {
+				ani.enabled = false;
+			}
 #if UNITY_5
             if (AutoUIPrefab)
             {
@@ -108,7 +111,7 @@ namespace KEngine.Editor
                 AssetDatabase.ImportAsset(uiPrefabPath, ImportAssetOptions.ForceSynchronousImport);
                 Debug.Log("Create UIWindowAsset to prfab: " + uiPrefabPath);
             }
-            AssetDatabase.SaveAssets();
+            EditorApplication.SaveAssets();
         }
 
 #endif
@@ -126,6 +129,13 @@ namespace KEngine.Editor
 
         private static void OnWillPlayEvent()
         {
+			#if UNITY_EDITOR
+			if (Application.dataPath.EndsWith("/Art/Assets")) {
+				foreach (var p in GameObject.FindObjectsOfType<DG.Tweening.DOTweenAnimation> ()) {
+					p.enabled = true;
+				}
+			}
+			#endif
         }
 
         [MenuItem("KEngine/UI(UGUI)/Export Current UI %&e")]
