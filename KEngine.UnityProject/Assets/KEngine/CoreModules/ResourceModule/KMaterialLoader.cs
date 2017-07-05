@@ -100,7 +100,7 @@ namespace KEngine
             {
                 foreach (var texLoader in TextureLoaders)
                 {
-                    texLoader.Release(IsBeenReleaseNow);
+                    texLoader.Release();
                 }
                 TextureLoaders.Clear();
             }

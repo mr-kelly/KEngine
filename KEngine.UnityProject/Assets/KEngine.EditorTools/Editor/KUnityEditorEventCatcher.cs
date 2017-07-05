@@ -276,7 +276,8 @@ namespace KUnityEditorTools
                 {
                     //scenePath = Path.GetDirectoryName(path);
                     //sceneName = Path.GetFileNameWithoutExtension(path);
-                    KUnityEditorEventCatcher._onSaveSceneEvent();
+                    if(KUnityEditorEventCatcher._onSaveSceneEvent != null)
+                       KUnityEditorEventCatcher._onSaveSceneEvent();
                 }
             }
 

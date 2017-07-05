@@ -59,7 +59,7 @@ namespace KEngine
         protected override void DoDispose()
         {
             base.DoDispose();
-            _bridge.Release(IsBeenReleaseNow);
+            _bridge.Release();
         }
     }
 }

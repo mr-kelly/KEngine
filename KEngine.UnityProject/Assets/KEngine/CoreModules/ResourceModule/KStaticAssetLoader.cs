@@ -88,7 +88,7 @@ namespace KEngine
         protected override void DoDispose()
         {
             base.DoDispose();
-            _assetFileLoader.Release(IsBeenReleaseNow);
+            _assetFileLoader.Release();
             GameObject.Destroy(TheAsset);
         }
     }

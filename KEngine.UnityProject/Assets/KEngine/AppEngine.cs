@@ -30,9 +30,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using KEngine.Table;
 using UnityEngine;
 using UnityEngine.UI;
+using TableML;
 
 namespace KEngine
 {
@@ -56,7 +56,7 @@ namespace KEngine
         /// <summary>
         /// To Display FPS in the Debug Mode (Debug.isDebugBuild is true)
         /// </summary>
-        static FpsWatcher RenderWatcher { get; set; } // 帧数监听器
+        public static FpsWatcher RenderWatcher { get; set; } // 帧数监听器
 
         /// <summary>
         /// In Init func has a check if the user has the write privillige
@@ -64,29 +64,6 @@ namespace KEngine
         public static bool IsRootUser; // 是否越狱iOS
 
         public static AppEngine EngineInstance { get; private set; }
-
-        //private static AppVersion _appVersion = null;
-
-        /// <summary>
-        /// Get App Version from KEngineConfig.txt
-        /// </summary>
-        //public static AppVersion AppVersion
-        //{
-        //    get
-        //    {
-        //        if (_appVersion == null)
-        //        {
-        //            var appVersionStr = GetConfig(KEngineDefaultConfigs.AppVersion);
-        //            if (string.IsNullOrEmpty(appVersionStr))
-        //            {
-        //                Log.Error("Cannot find AppVersion in KEngineConfig.txt, use 1.0.0.0 as default");
-        //                appVersionStr = "1.0.0.0.alpha.default";
-        //            }
-        //            _appVersion = new AppVersion(appVersionStr);
-        //        }
-        //        return _appVersion;
-        //    }
-        //}
 
         /// <summary>
         /// Read Tab file (CEngineConfig.txt), cache to here
@@ -100,6 +77,12 @@ namespace KEngine
         /// 是否初始化完成
         /// </summary>
         public bool IsInited { get; private set; }
+
+        public bool IsBeforeInit { get; private set; }
+
+        public bool IsOnInit { get; private set; }
+
+        public bool IsStartGame { get; private set; }
 
         /// <summary>
         /// AppEngine must be new by static function New(xxx)!
@@ -179,14 +162,17 @@ namespace KEngine
         private IEnumerator DoInit()
         {
             yield return null;
-
+            IsBeforeInit = true;
             if (AppEntry != null)
+            {
                 yield return StartCoroutine(AppEntry.OnBeforeInit());
+            }
 
 
-//            if (GameModules != null)
+            IsOnInit = true;
             yield return StartCoroutine(DoInitModules(GameModules));
 
+            IsStartGame = true;
             if (AppEntry != null)
             {
                 yield return StartCoroutine(AppEntry.OnGameStart());
@@ -223,11 +209,9 @@ namespace KEngine
         protected virtual void OnGUI()
 #endif
         {
-            if (ShowFps)
+            if (RenderWatcher != null)
             {
-                if (RenderWatcher == null)
-                    RenderWatcher = new FpsWatcher(0.95f);
-                RenderWatcher.OnUIUpdate();
+                RenderWatcher.OnUIUpdate(ShowFps);
             }
         }
 
@@ -297,10 +281,10 @@ namespace KEngine
         // StreamingAssets inner folder name, when build, will link the Bundle build Path to here
     }
 
-    class FpsWatcher
+    public class FpsWatcher
     {
-        private float Value;
-        private float Sensitivity;
+        private float _value;
+        private float _sensitivity;
 
         private string _cacheMemoryStr;
         private string _cacheFPSStr;
@@ -309,10 +293,15 @@ namespace KEngine
         private Text CacheText;
 #endif
 
+        public float Value
+        {
+            get { return _value; }
+        }
+
         public FpsWatcher(float sensitivity)
         {
-            Value = 0f;
-            Sensitivity = sensitivity;
+            _value = 0f;
+            _sensitivity = sensitivity;
 #if USE_UGUI_FPS
             var canvasGameObj = new GameObject("__FPSCanvas__").AddComponent<Canvas>();
             canvasGameObj.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -329,37 +318,40 @@ namespace KEngine
 #endif
         }
 
-        public void OnUIUpdate()
+        public void OnUIUpdate(bool bShowFps)
         {
             if (Time.frameCount % 30 == 0 || _cacheMemoryStr == null || _cacheFPSStr == null)
             {
-                _cacheMemoryStr = string.Format("Memory: {0:F3}KB", 
-#if UNITY_5_5
+                _cacheMemoryStr = string.Format("Memory: {0:F3}KB",
+#if UNITY_5_5_OR_NEWER
 					UnityEngine.Profiling.Profiler.GetMonoUsedSize() / 1024f
 #else
-					UnityEngine.Profiler.GetMonoUsedSize() / 1024f
+ UnityEngine.Profiler.GetMonoUsedSize() / 1024f
 #endif
-				);
+);
                 _cacheFPSStr = Watch("FPS: {0:N0}", 1f / Time.deltaTime);
 #if USE_UGUI_FPS
-                if (CacheText == null) return;
+                if (!bShowFps || CacheText == null) return;
                 CacheText.text = _cacheMemoryStr + "\n" + _cacheFPSStr;
 #endif
             }
 
 #if !USE_UGUI_FPS
             // Must run in OnGUI
-            GUILayout.BeginVertical(GUILayout.Width(300));
-            GUILayout.Label(_cacheMemoryStr);
-            GUILayout.Label(_cacheFPSStr);
-            GUILayout.EndVertical();
+            if (bShowFps)
+            {
+                GUILayout.BeginVertical(GUILayout.Width(300));
+                GUILayout.Label(_cacheMemoryStr);
+                GUILayout.Label(_cacheFPSStr);
+                GUILayout.EndVertical();
+            }         
 #endif
         }
 
         public string Watch(string format, float value)
         {
-            Value = Value * Sensitivity + value * (1f - Sensitivity);
-            return string.Format(format, Value);
+            _value = _value * _sensitivity + value * (1f - _sensitivity);
+            return string.Format(format, _value);
         }
     }
 
@@ -371,7 +363,7 @@ namespace KEngine
     {
         private static KEngineInfo _instance;
 
-        public static KEngineInfo Wrap(TableRow row)
+        public static KEngineInfo Wrap(TableFileRow row)
         {
             if (_instance == null)
                 _instance = new KEngineInfo();
@@ -380,10 +372,11 @@ namespace KEngine
             return _instance;
         }
 
-        private TableRow _row;
+        private TableFileRow _row;
 
         private KEngineInfo()
         {
+            
         }
 
         public string Key

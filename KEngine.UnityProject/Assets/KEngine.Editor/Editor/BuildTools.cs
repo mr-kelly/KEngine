@@ -69,27 +69,50 @@ namespace KEngine.Editor
         [MenuItem("KEngine/AssetBundle/Make Names from [BundleResources]")]
         public static void MakeAssetBundleNames()
         {
+            DoMakeAssetBundleNames(false);
+        }
+
+        [MenuItem("KEngine/AssetBundle/Make Names from [BundleResources] (All)")]
+        public static void MakeAssetBundleNamesAll()
+        {
+            DoMakeAssetBundleNames(true);
+        }
+
+        /// <summary>
+        /// 是否清理所有之前的
+        /// </summary>
+        /// <param name="remake">Clear all asset bundle name</param>
+        public static void DoMakeAssetBundleNames(bool remake)
+        {
             var dir = ResourcesBuildDir;
 
             // Check marked asset bundle whether real
-            foreach (var assetGuid in AssetDatabase.FindAssets(""))
+            if (remake)
             {
-                var assetPath = AssetDatabase.GUIDToAssetPath(assetGuid);
-                var assetImporter = AssetImporter.GetAtPath(assetPath);
-                var bundleName = assetImporter.assetBundleName;
-                if (string.IsNullOrEmpty(bundleName))
+                foreach (var assetGuid in AssetDatabase.FindAssets(""))
                 {
-                    continue;
-                }
-                if (!assetPath.StartsWith(dir))
-                {
-                    assetImporter.assetBundleName = null;
-                }
-            }
+                    EditorUtility.DisplayProgressBar("AssetBundle", string.Format("Finding assets... {0}", assetGuid), .2f);
 
+                    var assetPath = AssetDatabase.GUIDToAssetPath(assetGuid);
+                    var assetImporter = AssetImporter.GetAtPath(assetPath);
+                    var bundleName = assetImporter.assetBundleName;
+                    if (string.IsNullOrEmpty(bundleName))
+                    {
+                        continue;
+                    }
+                    if (!assetPath.StartsWith(dir))
+                    {
+                        assetImporter.assetBundleName = null;
+                    }
+                }
+
+                
+            }
             // set BundleResources's all bundle name
             foreach (var filepath in Directory.GetFiles(dir, "*.*", SearchOption.AllDirectories))
             {
+                EditorUtility.DisplayProgressBar("AssetBundle", string.Format("Making asset bundle name: {0}", filepath), .5f);
+
                 if (filepath.EndsWith(".meta")) continue;
 
                 var importer = AssetImporter.GetAtPath(filepath);
@@ -103,6 +126,7 @@ namespace KEngine.Editor
             }
 
             Log.Info("Make all asset name successs!");
+            EditorUtility.ClearProgressBar();
 
         }
 
@@ -209,18 +233,54 @@ namespace KEngine.Editor
 
             Debug.Log("Delete folder: " + outputPath);
 
-            BuildAllAssetBundles();
+            BuildAllAssetBundles(true);
+        }
+
+
+        /// <summary>
+        /// Delete BundleResources's Resource's AssetBundle
+        /// </summary>
+        [MenuItem("Assets/Delete Resources's AssetBundle")]
+        private static void DeleteAssetBundle()
+        {
+            var sel = Selection.activeObject;
+            var path = AssetDatabase.GetAssetPath(sel);
+            var startWith = "Assets/" + KEngineDef.ResourcesBuildDir + "/";
+
+            if (!path.StartsWith(startWith))
+            {
+                Debug.LogError("Not Asset Bundle Resources: " + path);
+                return;
+            }
+
+            var abPath = Path.Combine(KResourceModule.ProductPathWithoutFileProtocol, 
+                KResourceModule.BundlesPathRelative + path.Substring(startWith.Length, path.Length - startWith.Length) +  AppEngine.GetConfig(KEngineDefaultConfigs.AssetBundleExt));
+
+            if (File.Exists(abPath))
+            {
+                Debug.Log("Delete AB: " + abPath);
+                File.Delete(abPath);
+            }
+            else
+            {
+                Debug.LogError("Not Exist AB: " + abPath);
+            }
+
         }
 
         [MenuItem("KEngine/AssetBundle/Build All %&b")]
         public static void BuildAllAssetBundles()
+        {
+            BuildAllAssetBundles(false);
+        }
+        public static void BuildAllAssetBundles(bool isRebuild)
         {
             if (EditorApplication.isPlaying)
             {
                 Log.Error("Cannot build in playing mode! Please stop!");
                 return;
             }
-            MakeAssetBundleNames();
+            DoMakeAssetBundleNames(isRebuild);
             var outputPath = GetExportPath(EditorUserBuildSettings.activeBuildTarget);
             Log.Info("Asset bundle start build to: {0}", outputPath);
             BuildPipeline.BuildAssetBundles(outputPath, BuildAssetBundleOptions.DeterministicAssetBundle, EditorUserBuildSettings.activeBuildTarget);

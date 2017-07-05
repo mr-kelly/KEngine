@@ -86,7 +86,7 @@ namespace KEngine
         protected override void DoDispose()
         {
             base.DoDispose();
-            AssetFileBridge.Release(IsBeenReleaseNow); // all, Texture is singleton!
+            AssetFileBridge.Release(); // all, Texture is singleton!
         }
     }
 
