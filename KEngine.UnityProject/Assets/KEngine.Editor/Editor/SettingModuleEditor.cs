@@ -124,7 +124,7 @@ namespace KEngine.Editor
                     _isPopUpConfirm = true;
                     KEditorUtils.CallMainThread(() =>
                     {
-                        EditorUtility.DisplayDialog("Excel Setting Changed!", "Ready to Recompile All!", "OK");
+//                        EditorUtility.DisplayDialog("Excel Setting Changed!", "Ready to Recompile All!", "OK");
                         QuickCompileSettings();
                         _isPopUpConfirm = false;
                     });
@@ -147,7 +147,7 @@ namespace KEngine.Editor
         {
             DoCompileSettings(true);
         }
-        [MenuItem("KEngine/Settings/Quick Compile Settings")]
+        [MenuItem("KEngine/Settings/Quick Compile Settings %&s")]
         public static void QuickCompileSettings()
         {
             DoCompileSettings(false);
@@ -157,6 +157,15 @@ namespace KEngine.Editor
         /// Custom the monitor trigger compile settings behaviour
         /// </summary>
         public static Action CustomCompileSettings;
+
+        public static string SettingCompiledPath
+        {
+            get
+            {
+                var compilePath = AppEngine.GetConfig("KEngine.Setting", "SettingCompiledPath");
+                return compilePath;
+            }
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -176,7 +185,8 @@ namespace KEngine.Editor
                 Log.Error("Need to KEngineConfig: SettingSourcePath");
                 return;
             }
-            var compilePath = AppEngine.GetConfig("KEngine.Setting", "SettingCompiledPath");
+
+            var compilePath = SettingCompiledPath;
             if (string.IsNullOrEmpty(compilePath))
             {
                 Log.Error("Need to KEngineConfig: SettingCompiledPath");
@@ -195,7 +205,7 @@ namespace KEngine.Editor
             {
                 sb.AppendLine(string.Format("Excel {0} -> {1}", r.ExcelFile, r.TabFileRelativePath));
             }
-            Log.Info("TableML all Compile ok!\n{0}", sb.ToString());
+            Debug.LogWarning(string.Format("TableML all Compile ok!\n{0}", sb.ToString()));
             // make unity compile
             AssetDatabase.Refresh();
         }

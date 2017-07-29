@@ -25,6 +25,7 @@
 #endregion
 
 using System;
+using IniParser.Parser;
 using KUnityEditorTools;
 using UnityEditor;
 using UnityEngine;
@@ -33,7 +34,7 @@ namespace KEngine.Editor
 {
     public class KEngineUtils : EditorWindow
     {
-        public static readonly Version KEngineVersion = new Version("5.3.5");
+        public static readonly Version KEngineVersion = new Version("5.5.2");
 
         static KEngineUtils()
         {
@@ -74,6 +75,10 @@ namespace KEngine.Editor
 
         private KEngineUtils()
         {
+        }
+
+        private void OnEnable()
+        {
             _headerStyle.fontSize = 22;
             _headerStyle.normal.textColor = Color.white;
         }
@@ -96,9 +101,17 @@ namespace KEngine.Editor
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
-        public static void SetConfValue(string key, string value)
+        public static void SetConfValue(string section, string key, string value)
         {
             //AppEngine.SetConfig(key, value);
+            var filePath = "Assets/Resources/AppConfigs.txt";
+            var parser = new IniDataParser();
+            var iniData = parser.Parse(System.IO.File.ReadAllText(filePath));
+            iniData.Sections[section][key] = value;
+
+            System.IO.File.WriteAllText(filePath, iniData.ToString());
+            Log.Warning("Set: [{0}:{1}] to {2}", section, key, value);
+            AssetDatabase.Refresh();
         }
 
         private void OnGUI()
@@ -135,14 +148,16 @@ namespace KEngine.Editor
                 {
                     string value = key.Value;
                     EditorGUILayout.BeginHorizontal();
-                    EditorGUILayout.LabelField(key.KeyName);
-                    EditorGUILayout.LabelField(value);
+//                    EditorGUILayout.LabelField(key.KeyName);
+//                    EditorGUILayout.LabelField(value);
+                    string newValue = EditorGUILayout.TextField(key.KeyName, value);
+                    if (value != newValue)
+                    {
+//                        tabDirty = true;
+                        SetConfValue(sectionData.SectionName, key.KeyName, newValue);
+                        AppEngine.PreloadConfigs(true);
+                    }
                     EditorGUILayout.EndHorizontal();
-                    //string newValue = EditorGUILayout.TextField(key.KeyName, value);
-                    //if (value != newValue)
-                    //{
-                    //    tabDirty = true;
-                    //}
                 }
             }
 

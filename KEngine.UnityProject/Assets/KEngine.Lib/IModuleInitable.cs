@@ -44,6 +44,7 @@ namespace KEngine
         /// the progress of the initialize operation
         /// </summary>
         double InitProgress { get; }
+
     }
 
 }

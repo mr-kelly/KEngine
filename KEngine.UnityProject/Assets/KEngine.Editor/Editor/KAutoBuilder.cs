@@ -165,10 +165,14 @@ namespace KEngine.Editor
         //	PerformBuild(GetProjectName() + "X86.exe", BuildTarget.StandaloneWindows, BuildOptions.AllowDebugging | BuildOptions.ConnectWithProfiler);
         //}
 
-        [MenuItem("KEngine/AutoBuilder/iOS")]
         public static void PerformiOSBuild()
         {
-            PerformiOSBuild("App");
+            PerformiOSBuild("App", false);
+        }
+        [MenuItem("KEngine/AutoBuilder/iOS")]
+        public static void PerformiOSBuildDevelopment()
+        {
+            PerformiOSBuild("App", true);
         }
 
         public static string PerformiOSBuild(string ipaName, bool isDevelopment = true)
@@ -183,10 +187,19 @@ namespace KEngine.Editor
 #endif
         }
 
-        [MenuItem("KEngine/AutoBuilder/Android")]
         public static void PerformAndroidBuild()
         {
-            PerformAndroidBuild("StrikeHero");
+            PerformAndroidBuild("App", false);
+        }
+
+        [MenuItem("KEngine/AutoBuilder/Android")]
+        public static void PerformAndroidBuildDevelopment()
+        {
+
+            EditorPrefs.SetString("AndroidSdkRoot", "C:\\android-sdk-windows");
+            Debug.LogWarning("SDK Path: " + EditorPrefs.GetString("AndroidSdkRoot"));
+
+            PerformAndroidBuild("App", true);
         }
 
         public static string PerformAndroidBuild(string apkName, bool isDevelopment = true)
