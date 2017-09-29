@@ -63,9 +63,10 @@ namespace KEngine.Editor
 
         private static void OnSaveScene()
         {
-			foreach (var ani in GameObject.FindObjectsOfType<DG.Tweening.DOTweenAnimation>()) {
-				ani.enabled = false;
-			}
+			//dotween		
+			//foreach (var ani in GameObject.FindObjectsOfType<DG.Tweening.DOTweenAnimation>()) {
+			//	ani.enabled = false;
+			//}
 #if UNITY_5
             if (AutoUIPrefab)
             {
