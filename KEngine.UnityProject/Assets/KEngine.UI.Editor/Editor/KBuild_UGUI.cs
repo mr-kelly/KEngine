@@ -1,4 +1,4 @@
-﻿#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
+#region Copyright (c) 2015 KEngine / Kelly <http://github.com/mr-kelly>, All rights reserved.
 
 // KEngine - Toolset and framework for Unity3D
 // ===================================
@@ -132,9 +132,9 @@ namespace KEngine.Editor
         {
 			#if UNITY_EDITOR
 			if (Application.dataPath.EndsWith("/Art/Assets")) {
-				foreach (var p in GameObject.FindObjectsOfType<DG.Tweening.DOTweenAnimation> ()) {
-					p.enabled = true;
-				}
+//				foreach (var p in GameObject.FindObjectsOfType<DG.Tweening.DOTweenAnimation> ()) {
+//					p.enabled = true;
+//				}
 			}
 			#endif
         }
