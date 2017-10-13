@@ -24,6 +24,7 @@
 
 #endregion
 
+using System;
 using System.IO;
 using KEngine.UI;
 using KUnityEditorTools;
@@ -161,6 +162,19 @@ namespace KEngine.Editor
 #endif
         }
 
+        [MenuItem("KEngine/UI(UGUI)/Export All UI")]
+        public static void ExportAllUI()
+        {
+            var uiPath = Application.dataPath + "/" + KEngineDef.ResourcesEditDir + "/UI";
+            var uiScenes = Directory.GetFiles(uiPath, "*.unity", SearchOption.AllDirectories);
+            foreach (string uiScene in uiScenes)
+            {
+                Log.Info("begin export {0}", uiScene);
+                KUGUIBuilder.UISceneToPrefabs();
+                EditorSceneManager.OpenScene(uiScene);
+            }
+        }
+
         static UIWindowAsset[] GetUIWIndoeAssetsFromCurrentScene()
         {
 
@@ -181,7 +195,7 @@ namespace KEngine.Editor
 
         public static string GetBuildRelPath(string uiName)
         {
-            return string.Format("UI/{0}_UI{1}", uiName, KEngine.AppEngine.GetConfig("KEngine", "AssetBundleExt"));
+            return String.Format("UI/{0}_UI{1}", uiName, AppEngine.GetConfig("KEngine", "AssetBundleExt"));
         }
 
         [MenuItem("KEngine/UI(UGUI)/Create UI(UGUI)")]
@@ -197,7 +211,7 @@ namespace KEngine.Editor
                 GameObject.DestroyImmediate(mainCamera);
 
             var uiName = Path.GetFileNameWithoutExtension(currentScene);
-            if (string.IsNullOrEmpty(uiName) || GameObject.Find(uiName) != null) // default use scene name, if exist create random name
+            if (String.IsNullOrEmpty(uiName) || GameObject.Find(uiName) != null) // default use scene name, if exist create random name
             {
                 uiName = "NewUI_" + Path.GetRandomFileName();
             }
