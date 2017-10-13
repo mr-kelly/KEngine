@@ -43,7 +43,7 @@ namespace KEngine.Editor
 
     public partial class BuildTools
     {
-#if !UNITY_5
+#if UNITY_4
 		private static int PushedAssetCount = 0;
 
 		public static event Action<UnityEngine.Object, string, string> BeforeBuildAssetBundleEvent;
@@ -51,7 +51,7 @@ namespace KEngine.Editor
 #endif
 
 
-#if UNITY_5
+#if UNITY_5 || UNITY_2017_1_OR_NEWER
         static string ResourcesBuildDir
         {
             get
@@ -379,7 +379,7 @@ namespace KEngine.Editor
             }
         }
 
-#if !UNITY_5
+#if UNITY_4
 		public static void PushAssetBundle (Object asset, string path)
 		{
 			BuildPipeline.PushAssetDependencies ();
@@ -411,7 +411,7 @@ namespace KEngine.Editor
             Debug.LogError(string.Format(fmt, args));
         }
 
-#if !UNITY_5
+#if UNITY_4
 		public static uint BuildAssetBundle (Object asset, string path)
 		{
 			return BuildAssetBundle (asset, path, EditorUserBuildSettings.activeBuildTarget, KResourceModule.Quality);
@@ -535,7 +535,7 @@ namespace KEngine.Editor
             BuildTools.CheckAndLogDependencies(assetPath);
         }
 
-#if !UNITY_5
+#if UNITY_4
 		private static void _DoBuild (out uint crc, Object asset, Object[] subAssets, string path, string relativePath,
 		                              BuildTarget buildTarget)
 		{

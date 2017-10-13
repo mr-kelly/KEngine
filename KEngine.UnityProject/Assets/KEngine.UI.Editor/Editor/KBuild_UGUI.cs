@@ -29,7 +29,7 @@ using System.IO;
 using KEngine.UI;
 using KUnityEditorTools;
 using UnityEditor;
-#if UNITY_5
+#if UNITY_5 || UNITY_2017_1_OR_NEWER
 using UnityEditor.SceneManagement;
 #endif
 using UnityEngine;
@@ -40,11 +40,11 @@ namespace KEngine.Editor
 {
     [InitializeOnLoad]
     public class KUGUIBuilder
-#if !UNITY_5
+#if UNITY_4
         : KBuild_Base
 #endif
     {
-#if UNITY_5
+#if UNITY_5 || UNITY_2017_1_OR_NEWER
         /// <summary>
         /// 是否在保存场景的时候，自动判断场景中是否有UI对象，自动导出Prefab？
         /// 如果嫌弃保存自动导出，卡顿明显，可以设置这里为false，手动从菜单执行
@@ -68,7 +68,7 @@ namespace KEngine.Editor
 			//foreach (var ani in GameObject.FindObjectsOfType<DG.Tweening.DOTweenAnimation>()) {
 			//	ani.enabled = false;
 			//}
-#if UNITY_5
+#if UNITY_5 || UNITY_2017_1_OR_NEWER
             if (AutoUIPrefab)
             {
                 var scenePath = EditorSceneManager.GetActiveScene().path;
@@ -82,7 +82,7 @@ namespace KEngine.Editor
             }
 #endif
         }
-#if UNITY_5
+#if UNITY_5 || UNITY_2017_1_OR_NEWER
         /// <summary>
         /// Unity 5下，将场景中的UI对象转成Prefab
         /// </summary>
@@ -148,7 +148,7 @@ namespace KEngine.Editor
                 Log.Error("Cannot export in playing mode! Please stop!");
                 return;
             }
-#if !UNITY_5
+#if UNITY_4
 
             var windowAssets = GetUIWIndoeAssetsFromCurrentScene();
 
@@ -182,7 +182,7 @@ namespace KEngine.Editor
             var windowAssets = GameObject.FindObjectsOfType<UIWindowAsset>();
             if (windowAssets.Length <= 0)
             {
-#if UNITY_5
+#if UNITY_5 || UNITY_2017_1_OR_NEWER
                 var currentScene = EditorSceneManager.GetActiveScene().path;
 #else
                 var currentScene = EditorApplication.currentScene;
@@ -201,7 +201,7 @@ namespace KEngine.Editor
         [MenuItem("KEngine/UI(UGUI)/Create UI(UGUI)")]
         public static void CreateNewUI()
         {
-#if UNITY_5
+#if UNITY_5 || UNITY_2017_1_OR_NEWER
             var currentScene = EditorSceneManager.GetActiveScene().path;
 #else
             var currentScene = EditorApplication.currentScene;
@@ -233,7 +233,7 @@ namespace KEngine.Editor
                 var evtSystemObj = new GameObject("EventSystem");
                 evtSystemObj.AddComponent<EventSystem>();
                 evtSystemObj.AddComponent<StandaloneInputModule>();
-#if !UNITY_5
+#if UNITY_4
                 evtSystemObj.AddComponent<TouchInputModule>();
 #endif
 
@@ -261,7 +261,7 @@ namespace KEngine.Editor
             Selection.activeGameObject = uiObj;
         }
 
-#if !UNITY_5
+#if UNITY_4
         public override void Export(string path)
         {
             EditorApplication.OpenScene(path);
