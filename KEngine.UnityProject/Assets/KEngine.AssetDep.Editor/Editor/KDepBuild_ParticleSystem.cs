@@ -24,7 +24,7 @@
 
 #endregion
 
-#if !UNITY_5
+#if UNITY_4
 using KEngine;
 using UnityEngine;
 

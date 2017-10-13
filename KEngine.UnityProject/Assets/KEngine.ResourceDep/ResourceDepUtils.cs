@@ -23,7 +23,7 @@
 
 #endregion
 
-#if !UNITY_5
+#if UNITY_4
 using System;
 using UnityEngine;
 using System.Collections;

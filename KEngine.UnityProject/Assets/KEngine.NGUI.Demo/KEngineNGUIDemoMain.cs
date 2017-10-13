@@ -28,7 +28,7 @@
 using System.Collections;
 using KEngine;
 using KEngine.CoreModules;
-#if !UNITY_5
+#if UNITY_4
 using KEngine.ResourceDep;
 #endif
 using KEngine.UI;
@@ -70,7 +70,7 @@ public class KEngineNGUIDemoMain : MonoBehaviour
 
     void TestLoadLevelAdditiveAsync()
     {
-#if !UNITY_5
+#if UNITY_4
         Log.Info("Load Scene");
         ResourceDepUtils.LoadLevelAdditiveAsync("BundleResources/NGUI/TestNGUI.unity");
 #else

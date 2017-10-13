@@ -82,7 +82,7 @@ namespace KEngine.Editor
             SetupHistory();
 
             //KDependencyBuild.Clear();
-#if !UNITY_5
+#if UNITY_4
             BuildTools.AfterBuildAssetBundleEvent += OnAfterBuildAssetBundleEvent;
 #endif
         }
@@ -101,7 +101,7 @@ namespace KEngine.Editor
             //KDependencyBuild.SaveBuildAction();
 
             Current = null;
-#if !UNITY_5
+#if UNITY_4
             BuildTools.AfterBuildAssetBundleEvent -= OnAfterBuildAssetBundleEvent;
 #endif
             //KDependencyBuild.Clear();
