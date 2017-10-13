@@ -52,7 +52,7 @@ namespace KEngine.UI
 
         public UIController CreateUIController(GameObject uiObj, string uiTemplateName)
         {
-#if UNITY_5
+#if UNITY_5 || UNITY_2017_1_OR_NEWER
             UIController uiBase = uiObj.AddComponent(System.Type.GetType("KUI" + uiTemplateName + ", Assembly-CSharp")) as UIController;
 #else
             UIController uiBase = uiObj.AddComponent("KUI" + uiTemplateName) as UIController;
@@ -72,7 +72,7 @@ namespace KEngine.UI
 
         public IEnumerator LoadUIAsset(UILoadState loadState, UILoadRequest request)
         {
-#if UNITY_5
+#if UNITY_5 || UNITY_2017_1_OR_NEWER
             string path = string.Format("UI/{0}.prefab", loadState.TemplateName);
 #else
             string path = string.Format("UI/{0}_UI", loadState.TemplateName);

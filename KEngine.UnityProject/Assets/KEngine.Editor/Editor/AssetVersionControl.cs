@@ -294,7 +294,7 @@ namespace KEngine.Editor
         /// <returns></returns>
         private bool DoCheckBuild(string filePath, bool log = true)
         {
-#if UNITY_5
+#if UNITY_5 || UNITY_2017_1_OR_NEWER
             var currentScene = UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene().path;
 #else
             var currentScene = EditorApplication.currentScene;

@@ -68,7 +68,7 @@ namespace KEngine
             if (!_hasRegisterLogCallback)
             {
 #if !KENGINE_DLL
-#if UNITY_5
+#if UNITY_5 || UNITY_2017_1_OR_NEWER
                 Application.logMessageReceivedThreaded += GetUnityLogCallback(OnLogCallback);
 #else
                 Application.RegisterLogCallbackThreaded(GetUnityLogCallback(OnLogCallback));
@@ -99,7 +99,7 @@ namespace KEngine
             if (!_hasRegisterLogCallback)
             {
 #if !KENGINE_DLL
-#if UNITY_5
+#if UNITY_5 || UNITY_2017_1_OR_NEWER
                 Application.logMessageReceivedThreaded += GetUnityLogCallback(callback);
 #else
                 Application.RegisterLogCallbackThreaded(GetUnityLogCallback(OnLogCallback));

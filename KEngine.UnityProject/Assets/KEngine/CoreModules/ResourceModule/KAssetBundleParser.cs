@@ -84,7 +84,7 @@ namespace KEngine
             switch (Mode)
             {
                 case CAssetBundleParserMode.Async:
-#if UNITY_5
+#if UNITY_5 || UNITY_2017_1_OR_NEWER
                     CreateRequest = AssetBundle.LoadFromMemoryAsync(abBytes);
 #else
 					CreateRequest = AssetBundle.CreateFromMemory(abBytes);
@@ -93,7 +93,7 @@ namespace KEngine
                     KResourceModule.Instance.StartCoroutine(WaitCreateAssetBundle(CreateRequest));
                     break;
                 case CAssetBundleParserMode.Sync:
-#if UNITY_5
+#if UNITY_5 || UNITY_2017_1_OR_NEWER
                     OnFinish(AssetBundle.LoadFromMemory(abBytes));
 #else
 					OnFinish(AssetBundle.CreateFromMemoryImmediate(abBytes));

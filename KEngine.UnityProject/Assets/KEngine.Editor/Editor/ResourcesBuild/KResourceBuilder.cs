@@ -28,7 +28,7 @@ using System;
 using System.IO;
 using KEngine;
 using UnityEditor;
-#if UNITY_5
+#if UNITY_5 || UNITY_2017_1_OR_NEWER
 using UnityEditor.SceneManagement;
 #endif
 using UnityEngine;
@@ -142,7 +142,7 @@ namespace KEngine.Editor
                 Log.Error("[Fail] Auto Build... {0}, Exception: {1}, Used Time: {2}, CurrentScene: {3}, Stack: {4}",
                     export.GetType().Name,
                     e.Message + "," + (e.InnerException != null ? e.InnerException.Message : ""), DateTime.Now - time,
-#if UNITY_5
+#if UNITY_5 || UNITY_2017_1_OR_NEWER
                     EditorSceneManager.GetActiveScene().path,
 #else
                     EditorApplication.currentScene,

@@ -24,7 +24,7 @@
 
 #endregion
 
-#if UNITY_5 || UNITY_4 || UNITY_3
+#if UNITY_5 || UNITY_2017_1_OR_NEWER || UNITY_4 || UNITY_3
 #define UNITY
 #endif
 

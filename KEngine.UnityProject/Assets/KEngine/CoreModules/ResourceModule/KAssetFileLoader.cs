@@ -163,7 +163,7 @@ namespace KEngine
                 var assetBundle = _bundleLoader.Bundle;
 
                 DateTime beginTime = DateTime.Now;
-#if UNITY_5
+#if UNITY_5 || UNITY_2017_1_OR_NEWER
                 // Unity 5 下，不能用mainAsset, 要取对象名
                 var abAssetName = Path.GetFileNameWithoutExtension(Url).ToLower();
                 if (!assetBundle.isStreamedSceneAssetBundle)

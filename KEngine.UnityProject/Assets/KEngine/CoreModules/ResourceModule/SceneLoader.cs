@@ -26,7 +26,7 @@ using System.Collections;
 using System.IO;
 using UnityEngine;
 
-#if UNITY_5
+#if UNITY_5 || UNITY_2017_1_OR_NEWER
 
 namespace KEngine
 {
