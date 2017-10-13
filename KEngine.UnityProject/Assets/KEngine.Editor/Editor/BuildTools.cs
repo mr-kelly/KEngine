@@ -61,6 +61,20 @@ namespace KEngine.Editor
             }
         }
 
+        //以下规则不需要被ab处理//
+        public static bool IfOneNameNeed2AssetBundle(string pathName)
+        {
+            var checkName = pathName.ToLower();
+            if (checkName.EndsWith(".meta")
+                || checkName.Contains(("LightingData").ToLower())
+                || checkName.Contains(("DS_Store").ToLower())
+                || checkName.EndsWith(".cs")
+                || checkName.EndsWith(".dll")
+                //  || checkName.Contains("navmesh")
+            )
+                return false;
+            return true;
+        }
         /// <summary>
         /// Unity 5新AssetBundle系统，需要为打包的AssetBundle配置名称
         /// 
@@ -113,7 +127,8 @@ namespace KEngine.Editor
             {
                 EditorUtility.DisplayProgressBar("AssetBundle", string.Format("Making asset bundle name: {0}", filepath), .5f);
 
-                if (filepath.EndsWith(".meta")) continue;
+                if (IfOneNameNeed2AssetBundle(filepath) == false)
+                    continue;
 
                 var importer = AssetImporter.GetAtPath(filepath);
                 if (importer == null)
