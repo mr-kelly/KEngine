@@ -1,0 +1,55 @@
+ManifestFileVersion: 0
+CRC: 1190440478
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: cfdf5b5383ca4b7c8dfa46a2e30d923d
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 529a1c0a2ecb9c002039a83866df6c0e
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 20
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 54
+  Script: {instanceID: 0}
+- Class: 104
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: 4d0c51bb0b6e93049af5e88f93826e3b, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: e9d0b5f3bbe925a408bd595c79d0bf63, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 8d2512a629fda544f981dee0e73348c2, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: d5c5ca47aa5c01740810b7c66662099f, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: c8077b76001d36d489868d20d28bddb9, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: ae942c9068183dc40a9d01f648273726, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 2a92b5d748695fd44aac9feef17ba415, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 2c5ecb5660b11414fb042fb826e03b73, type: 3}
+- Class: 128
+  Script: {instanceID: 0}
+- Class: 157
+  Script: {instanceID: 0}
+Assets:
+- Assets/BundleEditing/UI/TestNGUI.unity
+Dependencies:
+- E:/Code/KEngine/KEngine.UnityProject/Product/Bundles/Windows/ui/textures/button_red.png.bytes
+- E:/Code/KEngine/KEngine.UnityProject/Product/Bundles/Windows/ngui/atlas/commonuiatlas.prefab.bytes
+- E:/Code/KEngine/KEngine.UnityProject/Product/Bundles/Windows/consola.ttf.bytes
