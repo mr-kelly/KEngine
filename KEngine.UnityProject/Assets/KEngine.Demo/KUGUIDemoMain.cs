@@ -79,10 +79,8 @@ public class KUGUIDemoMain : MonoBehaviour
             Log.Info("Reload ExampleInfos! Now info: {0} -> {1}", "C_9888", reloadedInfo.Name);
         };
 
-
-
-
         Log.Info("Start reading streamingAssets Test...");
+        //打开或获取UI实例，并设置UI中的值
         UIModule.Instance.CallUI(uiName, (ui, args) =>
         {
             var tip = string.Format("Reading from streamingAssets, content: {0}", Encoding.UTF8.GetString(KResourceModule.LoadSyncFromStreamingAssets("TestFile.txt")));
