@@ -30,7 +30,7 @@ using System.Diagnostics;
 
 namespace KEngine
 {
-    public class Profiler
+    public class KProfiler
     {
         public static bool bEnable = false;
 
