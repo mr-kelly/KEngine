@@ -56,8 +56,8 @@ namespace KEngine.Editor
         {
             KUnityEditorEventCatcher.OnWillPlayEvent -= OnWillPlayEvent;
             KUnityEditorEventCatcher.OnWillPlayEvent += OnWillPlayEvent;
-            //KUnityEditorEventCatcher.OnSaveSceneEvent -= OnSaveScene;
-            //KUnityEditorEventCatcher.OnSaveSceneEvent += OnSaveScene;
+            KUnityEditorEventCatcher.OnSaveSceneEvent -= OnSaveScene;
+            KUnityEditorEventCatcher.OnSaveSceneEvent += OnSaveScene;
             KUnityEditorEventCatcher.OnBeforeBuildPlayerEvent -= OnBeforeBuildPlayerEvent;
             KUnityEditorEventCatcher.OnBeforeBuildPlayerEvent += OnBeforeBuildPlayerEvent;
         }
@@ -198,7 +198,7 @@ namespace KEngine.Editor
             return String.Format("UI/{0}_UI{1}", uiName, AppEngine.GetConfig("KEngine", "AssetBundleExt"));
         }
 
-        [MenuItem("KEngine/UI(UGUI)/Create UI(UGUI)")]
+        [MenuItem("KEngine/UI(UGUI)/Create UI(UGUI) %&U")]
         public static void CreateNewUI()
         {
 #if UNITY_5 || UNITY_2017_1_OR_NEWER
@@ -220,13 +220,24 @@ namespace KEngine.Editor
             uiObj.AddComponent<UIWindowAsset>();
 
             var uiPanel = new GameObject("Image").AddComponent<Image>();
-            uiPanel.transform.parent = uiObj.transform;
+            uiPanel.transform.SetParent(uiObj.transform);
             KTool.ResetLocalTransform(uiPanel.transform);
 
             var canvas = uiObj.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            uiObj.AddComponent<CanvasScaler>();
+            CanvasScaler canvasScaler = uiObj.AddComponent<CanvasScaler>();
             uiObj.AddComponent<GraphicRaycaster>();
+            //NOTE canvas的分辨率读取AppEngine的设置
+            var uiSize = new Vector2(1280, 720);
+            var uiResolution = AppEngine.GetConfig("KEngine.UI", "UIResolution");
+            if (!string.IsNullOrEmpty(uiResolution))
+            {
+                var sizeArr = uiResolution.Split(',');
+                if (sizeArr.Length >= 2) { uiSize = new Vector2(sizeArr[0].ToInt32(), sizeArr[1].ToInt32()); }
+            }
+            canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            canvasScaler.referenceResolution = uiSize;
+            canvasScaler.screenMatchMode = CanvasScaler.ScreenMatchMode.Expand;
 
             if (GameObject.Find("EventSystem") == null)
             {
