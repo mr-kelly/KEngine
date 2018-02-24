@@ -138,25 +138,87 @@ public static class KEngineExtensions
     {
         return new Vector2(vec.x, vec.y);
     }
-
     public static byte ToByte(this string val)
     {
-        return string.IsNullOrEmpty(val) ? (byte)0 : Convert.ToByte(val);
-    }
-
-    public static int ToInt32(this string val)
-    {
-        return string.IsNullOrEmpty(val) ? 0 : Convert.ToInt32(val);
+        byte ret = 0;
+        try
+        {
+            if (!String.IsNullOrEmpty(val))
+            {
+                ret = Convert.ToByte(val);
+            }
+        }
+        catch (Exception)
+        {
+        }
+        return ret;
     }
 
     public static long ToInt64(this string val)
     {
-        return string.IsNullOrEmpty(val) ? 0 : Convert.ToInt64(val);
+        long ret = 0;
+        try
+        {
+            if (!String.IsNullOrEmpty(val))
+            {
+                ret = Convert.ToInt64(val);
+            }
+        }
+        catch (Exception)
+        {
+        }
+        return ret;
     }
+
 
     public static float ToFloat(this string val)
     {
-        return string.IsNullOrEmpty(val) ? 0f : Convert.ToSingle(val);
+        float ret = 0;
+        try
+        {
+            if (!String.IsNullOrEmpty(val))
+            {
+                ret = Convert.ToSingle(val);
+            }
+        }
+        catch (Exception)
+        {
+        }
+        return ret;
+    }
+
+    static public Int32 ToInt32(this string str)
+    {
+        Int32 ret = 0;
+
+        try
+        {
+            if (!String.IsNullOrEmpty(str))
+            {
+                ret = Convert.ToInt32(str);
+            }
+        }
+        catch (Exception)
+        {
+        }
+        return ret;
+    }
+
+    public static Int32 ToInt32(this object obj)
+    {
+        Int32 ret = 0;
+        try
+        {
+            if (obj != null)
+            {
+                ret = Convert.ToInt32(obj);
+            }
+        }
+        catch (Exception)
+        {
+        }
+
+        return ret;
     }
 
     /// <summary>
@@ -167,7 +229,21 @@ public static class KEngineExtensions
     /// <param name="offset"></param>
     /// <param name="isLog"></param>
     /// <returns></returns>
-    public static T Get<T>(this object[] openArgs, int offset, bool isLog = true)
+    public static T GetArgForm<T>(object[] openArgs, int offset, bool isLog = true)
+    {
+        if (openArgs == null) return default(T);
+        return openArgs.GetArg<T>(offset, isLog);
+    }
+
+    /// <summary>
+    /// Get from object Array
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="openArgs"></param>
+    /// <param name="offset"></param>
+    /// <param name="isLog"></param>
+    /// <returns></returns>
+    public static T GetArg<T>(this object[] openArgs, int offset, bool isLog = true)
     {
         T ret;
         if ((openArgs.Length - 1) >= offset)

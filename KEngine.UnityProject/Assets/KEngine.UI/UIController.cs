@@ -179,7 +179,7 @@ namespace KEngine.UI
         /// <returns></returns>
         protected T GetFromArgs<T>(object[] openArgs, int offset, bool isLog = true)
         {
-            return openArgs.Get<T>(offset, isLog);
+            return openArgs.GetArg<T>(offset, isLog);
         }
 
         [Obsolete("Use CallUI(stringName) insted!")]
