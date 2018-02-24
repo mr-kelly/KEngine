@@ -232,12 +232,22 @@ namespace KEngine.Editor
 
             foreach (var platform in platforms)
             {
+#if UNITY_2017_1_OR_NEWER
+                if (EditorUserBuildSettings.SwitchActiveBuildTarget(BuildPipeline.GetBuildTargetGroup(platform), platform))
+                    BuildAllAssetBundles();
+#else
                 if (EditorUserBuildSettings.SwitchActiveBuildTarget(platform))
                     BuildAllAssetBundles();
+#endif
             }
 
             // revert platform 
+#if UNITY_2017_1_OR_NEWER
+            EditorUserBuildSettings.SwitchActiveBuildTarget(BuildPipeline.GetBuildTargetGroup(currentBuildTarget), currentBuildTarget);
+#else
             EditorUserBuildSettings.SwitchActiveBuildTarget(currentBuildTarget);
+#endif
+
         }
 
         [MenuItem("KEngine/AssetBundle/ReBuild All")]
@@ -302,14 +312,14 @@ namespace KEngine.Editor
         }
 
 #endif
-        #region 打包功能
+                #region 打包功能
 
-        /// <summary>
-        /// 获取完整的打包路径，并确保目录存在
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="buildTarget"></param>
-        /// <returns></returns>
+                /// <summary>
+                /// 获取完整的打包路径，并确保目录存在
+                /// </summary>
+                /// <param name="path"></param>
+                /// <param name="buildTarget"></param>
+                /// <returns></returns>
         public static string MakeSureExportPath(string path, BuildTarget buildTarget, KResourceQuality quality)
         {
             path = BuildTools.GetExportPath(buildTarget, quality) + path;

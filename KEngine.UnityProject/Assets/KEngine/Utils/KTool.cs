@@ -38,7 +38,6 @@ using UnityEngine;
 
 namespace KEngine
 {
-
     /// <summary>
     /// Some tool function for time, bytes, MD5, or something...
     /// </summary>
@@ -485,6 +484,7 @@ namespace KEngine
         {
             return ((ulong)high) << 32 | low;
         }
+
         public static uint HiInt(ulong l)
         {
             return (uint)(l >> 32);
@@ -815,7 +815,8 @@ namespace KEngine
             return obj;
         }
 
-        public static void SetChild(GameObject child, GameObject parent, bool selfRotation = false, bool selfScale = false)
+        public static void SetChild(GameObject child, GameObject parent, bool selfRotation = false,
+            bool selfScale = false)
         {
             SetChild(child.transform, parent.transform, selfRotation, selfScale);
         }
@@ -826,7 +827,8 @@ namespace KEngine
             ResetTransform(child, selfRotation, selfScale);
         }
 
-        public static void ResetTransform(UnityEngine.Transform transform, bool selfRotation = false, bool selfScale = false)
+        public static void ResetTransform(UnityEngine.Transform transform, bool selfRotation = false,
+            bool selfScale = false)
         {
             transform.localPosition = UnityEngine.Vector3.zero;
             if (!selfRotation)
@@ -918,9 +920,18 @@ namespace KEngine
             foreach (ParticleSystem p in gameObj.GetComponentsInChildren<ParticleSystem>(true))
             {
                 notFind = false;
+#if UNITY_2017_1_OR_NEWER
                 p.startSize *= scale;
                 p.startSpeed *= scale;
                 p.startRotation *= scale;
+#else
+
+                p.startSize *= scale;
+                p.startSpeed *= scale;
+                p.startRotation *= scale;
+#endif
+
+
                 p.transform.localScale *= scale;
             }
             if (notFind)
@@ -1142,7 +1153,8 @@ namespace KEngine
         }
 
         /// 返回localPoint
-        public static Vector3[] GetParallelPoints(Vector3 startPos, Vector3 startDirection, int nNum, float meterInterval)
+        public static Vector3[] GetParallelPoints(Vector3 startPos, Vector3 startDirection, int nNum,
+            float meterInterval)
         {
             bool bPlural = nNum % 2 == 0 ? true : false; // 是否复数模式
             int nMidNum = bPlural ? nNum / 2 : nNum / 2 + 1; // 中间数, 循环过了中间数后，另一个方向起排布
@@ -1206,7 +1218,7 @@ namespace KEngine
             intersectPoint = new Vector2(
                 (B2 * C1 - B1 * C2) / delta,
                 (A1 * C2 - A2 * C1) / delta
-                );
+            );
             return true;
         }
 
@@ -1339,5 +1351,4 @@ namespace KEngine
             }
         }
     }
-
 }

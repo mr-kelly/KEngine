@@ -50,8 +50,8 @@ namespace KEngine
             newHelp.Type = type;
             newHelp.TheObject = theObject;
             newHelp.MemorySize = string.Format("{0:F5}KB", 
-#if UNITY_5_5_OR_NEWER
-				UnityEngine.Profiling.Profiler.GetRuntimeMemorySize(theObject) / 1024f
+#if UNITY_5_5_OR_NEWER 
+				UnityEngine.Profiling.Profiler.GetRuntimeMemorySizeLong(theObject) / 1024f
 #else
 				UnityEngine.Profiler.GetRuntimeMemorySize(theObject) / 1024f
 #endif

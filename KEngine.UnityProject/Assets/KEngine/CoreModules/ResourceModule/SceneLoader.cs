@@ -142,8 +142,12 @@ namespace KEngine
         {
             base.DoDispose();
             _assetFileBridge.Release();
+#if UNITY_2017_1_OR_NEWER
+            UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync(_sceneName);
+#else
+             UnityEngine.SceneManagement.SceneManager.UnloadScene(_sceneName);
+#endif
 
-            UnityEngine.SceneManagement.SceneManager.UnloadScene(_sceneName);
         }
     }
 }

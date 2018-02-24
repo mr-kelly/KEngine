@@ -53,7 +53,14 @@ namespace KEngine
 
         public int Size
         {
-            get { return Www.size; }
+            get
+            {
+#if UNITY_2017_1_OR_NEWER
+                return Www.bytesDownloaded;
+#else
+                return Www.size;
+#endif
+            }
         }
 
         public float LoadSpeed

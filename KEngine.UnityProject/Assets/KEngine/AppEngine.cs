@@ -324,7 +324,7 @@ namespace KEngine
             {
                 _cacheMemoryStr = string.Format("Memory: {0:F3}KB",
 #if UNITY_5_5_OR_NEWER
-					UnityEngine.Profiling.Profiler.GetMonoUsedSize() / 1024f
+					UnityEngine.Profiling.Profiler.GetMonoUsedSizeLong() / 1024f
 #else
  UnityEngine.Profiler.GetMonoUsedSize() / 1024f
 #endif

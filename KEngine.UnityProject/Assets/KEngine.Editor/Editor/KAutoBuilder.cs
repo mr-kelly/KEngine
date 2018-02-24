@@ -120,7 +120,12 @@ namespace KEngine.Editor
         /// <returns></returns>
         private static string PerformBuild(string outputpath, BuildTarget tag, BuildOptions opt)
         {
+#if UNITY_2017_1_OR_NEWER
+            EditorUserBuildSettings.SwitchActiveBuildTarget(BuildPipeline.GetBuildTargetGroup(tag), tag);
+#else
             EditorUserBuildSettings.SwitchActiveBuildTarget(tag);
+#endif
+
 
             ParseArgs(ref opt, ref outputpath);
 
