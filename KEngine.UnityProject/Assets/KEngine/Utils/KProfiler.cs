@@ -27,10 +27,11 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using UnityEngine;
 
 namespace KEngine
 {
-    public class Profiler
+    public class KProfiler
     {
         public static bool bEnable = false;
 

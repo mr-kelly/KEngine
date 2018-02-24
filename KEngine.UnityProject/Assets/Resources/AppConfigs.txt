@@ -1,0 +1,24 @@
+
+[KEngine]
+AssetBundleExt = .bytes
+AssetBundleBuildRelPath	= ../Product/Bundles	
+StreamingBundlesFolderName = Bundles	
+IsEditorLoadAsset = 0
+
+; Override default "UGUIBridge"
+[KEngine.UI]
+UIModuleBridge = KEngine.UI.UGUIBridge
+UIResolution = 1280,720
+
+[KSFramework.I18N]
+
+;first as default
+I18NLanguages = zh_CN,en_US
+
+; current language
+I18N = zh_CN
+
+
+[KSFramework.Lua]
+; a path relative to product path
+LuaPath = Lua
