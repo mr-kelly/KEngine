@@ -111,6 +111,11 @@ namespace KEngine
         /// <returns></returns>
         private IEnumerator CoLoad(string url)
         {
+#if UNITY_2017_1_1
+            //NOTE Unity2017.1.1 Free版本报 UriFormatException: Invalid URI: Invalid port number
+            url = url.Replace("\\", "/");
+#endif
+            Log.Info(url);
             KResourceModule.LogRequest("WWW", url);
             System.DateTime beginTime = System.DateTime.Now;
 
