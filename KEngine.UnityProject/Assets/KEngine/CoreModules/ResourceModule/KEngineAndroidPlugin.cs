@@ -94,6 +94,22 @@ namespace KEngine
 #endif
         }
 
+        
+        static bool isInited = false;
+        static IntPtr clsPtr;
+        static IntPtr methondPtr_getAssetBytes;
+        static jvalue[] arg;
+        static void DoInit()
+        {
+            if (isInited)
+            {
+                return;
+            }
+            isInited = true;
+            clsPtr  = AndroidJNI.FindClass("com/github/KEngine/AndroidHelper");
+            methondPtr_getAssetBytes = AndroidJNIHelper.GetMethodID(clsPtr, "getAssetBytes", "(Ljava/lang/String;)[B", true);
+            arg = new[] { new jvalue()  };
+        }
         /// <summary>
         /// Call from java get asset file bytes
         /// </summary>
@@ -102,7 +118,16 @@ namespace KEngine
         public static byte[] GetAssetBytes(string path)
         {
 #if !KENGINE_DLL && UNITY_ANDROID
-            return AndroidHelper.CallStatic<byte[]>("getAssetBytes", path);
+            if (!isInited)
+            {
+                DoInit();
+            }
+            arg[0].l = AndroidJNI.NewStringUTF(path);
+            var byteArray = AndroidJNI.CallStaticObjectMethod(clsPtr, methondPtr_getAssetBytes, arg);
+            var bytes = AndroidJNI.FromByteArray(byteArray);
+            AndroidJNI.DeleteLocalRef(byteArray);
+            AndroidJNI.DeleteLocalRef(arg[0].l);
+            return bytes;
 #else
             ErrorNotSupport();
             return null;
