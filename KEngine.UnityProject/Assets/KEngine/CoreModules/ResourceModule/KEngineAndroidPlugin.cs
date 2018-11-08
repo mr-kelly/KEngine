@@ -87,7 +87,20 @@ namespace KEngine
         public static string GetAssetString(string path)
         {
 #if !KENGINE_DLL && UNITY_ANDROID
+#if UNITY_2017
+            var clsPtr = AndroidJNI.FindClass("com/github/KEngine/AndroidHelper");
+            var methondPtr_getAssetBytes = AndroidJNIHelper.GetMethodID(clsPtr, "getAssetBytes", "(Ljava/lang/String;)[B", true);
+            var arg1 = new object[] { path };
+            var args = AndroidJNIHelper.CreateJNIArgArray(arg1);
+            var byteArray = AndroidJNI.CallStaticObjectMethod(clsPtr, methondPtr_getAssetBytes, args);
+            var bytes = AndroidJNI.FromByteArray(byteArray);
+            AndroidJNIHelper.DeleteJNIArgArray(arg1, args);
+            AndroidJNI.DeleteLocalRef(byteArray);
+            AndroidJNI.DeleteLocalRef(clsPtr);
+            return bytes;
+#else
             return AndroidHelper.CallStatic<string>("getAssetString", path);
+#endif
 #else
             ErrorNotSupport();
             return null;
